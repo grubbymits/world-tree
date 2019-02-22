@@ -8,7 +8,7 @@ class Event;
 class Observer {
 public:
   virtual ~Observer();
-  virtual void Notify(Event *E) { }
+  virtual void Notify(Event *E);
 };
 
 } // end namespace Eden
