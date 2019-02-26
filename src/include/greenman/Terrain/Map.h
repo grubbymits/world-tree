@@ -1,7 +1,7 @@
 #ifndef __MAP_H_
 #define __MAP_H_
 
-namespace Eden {
+namespace greenman {
 
 class MNode {
   float Height = 1.0;
@@ -42,6 +42,6 @@ public:
   }
 };
 
-} // end namespace Eden
+} // end namespace greenman
 
 #endif

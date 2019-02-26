@@ -1,7 +1,7 @@
 #ifndef __ENTITY_H_
 #define __ENTITY_H_
 
-namespace Eden {
+namespace greenman {
 
 class MNode;
 

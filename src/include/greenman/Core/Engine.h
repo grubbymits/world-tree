@@ -5,7 +5,7 @@
 #ifndef __ENGINE_H_
 #define __ENGINE_H_
 
-namespace Eden {
+namespace greenman {
 
 class Event;
 class Observer;
@@ -19,6 +19,6 @@ public:
   void addObserver(Observer *O);
 };
 
-} // end namespace Eden
+} // end namespace greenman
 
 #endif

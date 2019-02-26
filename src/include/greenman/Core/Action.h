@@ -1,7 +1,7 @@
 #ifndef __ACTION_H_
 #define __ACTION_H_
 
-namespace Eden {
+namespace greenman {
 
 class Action {
   Actor &Performer;
@@ -13,6 +13,6 @@ public:
   virtual void operator()() = 0;
 };
 
-} // end namespace Eden
+} // end namespace greenman
 
 #endif

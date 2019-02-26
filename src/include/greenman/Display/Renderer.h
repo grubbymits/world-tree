@@ -1,7 +1,7 @@
 #ifndef __RENDERER_H_
 #define __RENDERER_H_
 
-namespace Eden {
+namespace greenman {
 
 class Renderer {
 public:
@@ -13,6 +13,6 @@ public:
   virtual void Reset() = 0;
 };
 
-} // end namespace Eden
+} // end namespace greenman
 
 #endif

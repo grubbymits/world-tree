@@ -1,39 +1,40 @@
 #ifndef __PATHFINDER_H_
 #define __PATHFINDER_H_
 
-namespace Eden {
+#include <map>
+#include <vector>
+
+namespace greenman {
 
 class MNode;
 class Map;
 
 using NeighbourMap = std::map<MNode*, std::vector<MNode*>>;
-using Path = std::vector<MNode*>;
-using PathsToFrom = std::map<MNode*, std::map<MNode*, Path>>;
 
 class Graph {
   NeighbourMap Neighbours;
-  PathsToFrom AllPaths;
   Map &CurMap;
+  std::map<MNode*, MNode*> GoTo;
 
 public:
   Graph(Map &M) : CurMap(M) { }
-  float getCost(MNode *Current, MNode *Next) const;
+  float getCost(MNode *From, MNode *To) const;
 
-  const std::vector<MNode*>& getNeighbours(MNode *Node) const {
+  std::vector<MNode*>& getNeighbours(MNode *Node) const {
 #ifdef DEBUG
     assert(Neighbours.count(Node);
 #endif
     return Neighbours[Node];
   }
 
-  void CalcNewPath(MNode *From, MNode *To) const;
+  bool FindPath(MNode *Start, MNode *Dest, std::vector<MNode*> &Path) const;
 
-  void CalcAllPathsTo(MNode *To) const;
+  void FindAllPathsTo(MNode *Dest);
 
   MNode *getNext(MNode *Current, MNode *Dest) const;
 
 };
 
-} // end namespace Eden
+} // end namespace greenman
 
 #endif

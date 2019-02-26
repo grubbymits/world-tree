@@ -1,7 +1,7 @@
 #ifndef __OBSERVER_H_
 #define __OBSERVER_H_
 
-namespace Eden {
+namespace greenman {
 
 class Event;
 
@@ -11,6 +11,6 @@ public:
   virtual void Notify(Event *E);
 };
 
-} // end namespace Eden
+} // end namespace greenman
 
 #endif

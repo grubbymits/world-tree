@@ -1,7 +1,7 @@
 #ifndef __EVENT_H_
 #define __EVENT_H_
 
-namespace Eden {
+namespace greenman {
 
 class Event {
 public:
@@ -28,6 +28,6 @@ private:
   EventT EvTy;
 };
 
-} // end namespace Eden
+} // end namespace greenman
 
 #endif
