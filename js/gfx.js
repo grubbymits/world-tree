@@ -1,4 +1,4 @@
-class SpriteSheet {
+export class SpriteSheet {
     constructor(name) {
         this._image = new Image();
         this._ready = false;
@@ -14,7 +14,7 @@ class SpriteSheet {
         return this._image;
     }
 }
-class Sprite {
+export class Sprite {
     constructor(_sheet, _offsetX, _offsetY, _width, _height) {
         this._sheet = _sheet;
         this._offsetX = _offsetX;
@@ -26,7 +26,7 @@ class Sprite {
         ctx.drawImage(this._sheet.image, this._offsetX, this._offsetY, this._width, this._height, coord.x, coord.y, this._width, this._height);
     }
 }
-class Renderer {
+export class Renderer {
     constructor(_ctx, _width, _height, _sprites) {
         this._ctx = _ctx;
         this._width = _width;

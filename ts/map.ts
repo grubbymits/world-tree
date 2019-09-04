@@ -55,13 +55,16 @@ export abstract class GameMap {
 }
 
 export class SquareGrid extends GameMap {
-  static convertToIsometric(coord: Point): Point {
-    return new Point(coord.x - coord.y, (coord.x + coord.y) / 2);
+  static convertToIsometric(x: number, y: number, width: number,
+                            height: number): Point {
+    let drawX = Math.floor(x * width / 2) + Math.floor(y * width / 2);
+    let drawY = Math.floor(y * height / 2) - Math.floor(x * height / 2);
+    return new Point(drawX, drawY);
   }
 
   static convertToCartisan(coord: Point) : Point {
-    let x = (2 * coord.y + coord.x) / 2;
-    let y = (2 * coord.y - coord.x) / 2;
+    let x = Math.floor((2 * coord.y + coord.x) / 2);
+    let y = Math.floor((2 * coord.y - coord.x) / 2);
     return new Point(x, y);
   }
 
@@ -78,6 +81,7 @@ export class SquareGrid extends GameMap {
     let id: number = 0;
     this._locations = new Array<Array<Location>>();
     for (let x = 0; x < this._width; x++) {
+      this._locations[x] = new Array<Location>();
       for (let y = 0; y < this._height; y++) {
         this._locations[x].push(new Location(false, x, y, id));
         ++id;
@@ -101,14 +105,14 @@ export class SquareGrid extends GameMap {
   
   getDrawCoord(cellX: number, cellY: number, width: number, height: number,
                sys: CoordSystem): Point {
-    let Scaled = new Point(cellX * width, cellY * height);
+
     switch (sys) {
     default:
       throw("Unhandled coordinate system");
     case CoordSystem.Cartisan:
-      return Scaled;
+      return new Point(cellX * width, cellY * height);
     case CoordSystem.Isometric:
-      return SquareGrid.convertToIsometric(Scaled);
+      return SquareGrid.convertToIsometric(cellX, cellY, width, height);
     }
   }
 }

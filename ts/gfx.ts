@@ -1,12 +1,10 @@
 import { Point } from "map"
 
-class SpriteSheet {
+export class SpriteSheet {
   private _image: HTMLImageElement;
-  private _ready: boolean;
 
   constructor(name: string) {
     this._image = new Image();
-    this._ready = false;
 
     if (name) {
       this._image.src = "res/img/" + name + ".png";
@@ -21,7 +19,7 @@ class SpriteSheet {
   }
 }
 
-class Sprite {
+export class Sprite {
   constructor(private readonly _sheet: SpriteSheet,
               private readonly _offsetX: number,
               private readonly _offsetY: number,
@@ -37,7 +35,7 @@ class Sprite {
   }
 }
 
-class Renderer {
+export class Renderer {
   constructor(private _ctx: CanvasRenderingContext2D,
               private readonly _width: number,
               private readonly _height: number,

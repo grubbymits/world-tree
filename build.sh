@@ -1,2 +1,2 @@
 #!/bin/sh
-tsc --strict -t ES6 ts/* --outDir js/
+tsc --strict -t ES2015 ts/* --outDir js/
