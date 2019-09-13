@@ -181,7 +181,6 @@ export class SquareGrid extends GameMap {
   
   getDrawCoord(cellX: number, cellY: number, width: number, height: number,
                sys: CoordSystem): Point {
-
     switch (sys) {
     default:
       throw("Unhandled coordinate system");
