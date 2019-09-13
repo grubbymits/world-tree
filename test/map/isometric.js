@@ -26,7 +26,7 @@ sheet.image.onload = function() {
     for (let x = cellsX - 1; x >= 0; x--) {
       let location = gameMap.getLocation(x, y);
       location.spriteId = 0;
-      let coord = gameMap.getDrawCoord(x, y, tileWidth, tileHeight,
+      let coord = gameMap.getDrawCoord(x, y, 0, tileWidth, tileHeight,
                                        CoordSystem.Isometric);
       let newCoord = new Point(coord.x + offset.x, coord.y + offset.y);
       console.log("draw at:", newCoord);

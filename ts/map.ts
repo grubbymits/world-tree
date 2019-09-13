@@ -11,6 +11,7 @@ export class Location {
   constructor(private readonly _blocking: boolean,
               private readonly _x: number,
               private readonly _y: number,
+              private readonly _z: number,
               private readonly _id: number) {
     this._spriteId = 0;
   }
@@ -21,6 +22,10 @@ export class Location {
 
   get y(): number {
     return this._y;
+  }
+
+  get z(): number {
+    return this._z;
   }
 
   get id(): number {
@@ -46,13 +51,17 @@ export enum CoordSystem {
 }
 
 export abstract class GameMap {
-  constructor(protected _width: number, protected _height: number) { }
+  constructor(protected _width: number, protected _height: number) {
+    this._ids = 0;
+  }
   abstract getLocation(x: number, y: number): Location;
   abstract getNeighbours(centre: Location): Array<Location>;
   abstract getNeighbourCost(from: Location, to: Location): number;
-  abstract getDrawCoord(cellX: number, cellY: number,
+  abstract getDrawCoord(cellX: number, cellY: number, cellZ: number,
                         width: number, height: number,
                         sys: CoordSystem): Point;
+
+  protected _ids: number;
 
   findPath(begin: Location, end: Location) : Array<Location> {
     let path = new Array<Location>();
@@ -141,19 +150,44 @@ export class SquareGrid extends GameMap {
       new Point(-1, 1),  new Point(0, 1),  new Point(1, 1), ];
 
   private _locations: Array<Array<Location>>;
+  private _depthMap: any;
 
   constructor(width: number, height: number) {
     super(width, height);
 
-    let id: number = 0;
+    // The key is the location id on one of the floor tiles. The value is
+    // another map, indexed by the height 'z' and returns a location.
+    this._depthMap = new Map();
+
     this._locations = new Array<Array<Location>>();
     for (let x = 0; x < this._width; x++) {
       this._locations[x] = new Array<Location>();
       for (let y = 0; y < this._height; y++) {
-        this._locations[x].push(new Location(false, x, y, id));
-        ++id;
+        this._locations[x].push(new Location(false, x, y, 0, this._ids));
+        this._ids++;
       }
     }
+  }
+
+  getOrAddRaisedLocation(x: number, y: number, z: number) {
+    let location: Location = this.getLocation(x, y);
+
+    if (this._depthMap.has(location.id)) {
+      let locationMap = this._depthMap[location.id];
+      if (locationMap.has(z)) {
+        return locationMap[z];
+      } else {
+        locationMap[z] = new Location(false, x, y, z, this._ids);
+        this._ids++;
+        return locationMap[z];
+      }
+    }
+
+    // Create new entry.
+    this._depthMap[location.id] = new Map();
+    this._depthMap[location.id][z] = new Location(false, x, y, z, this._ids);
+    this._ids++;
+    return this._depthMap[location.id][z];
   }
   
   getLocation(x: number, y: number): Location {
@@ -179,13 +213,13 @@ export class SquareGrid extends GameMap {
     return neighbours;
   }
   
-  getDrawCoord(cellX: number, cellY: number, width: number, height: number,
-               sys: CoordSystem): Point {
+  getDrawCoord(cellX: number, cellY: number, cellZ: number,
+               width: number, height: number, sys: CoordSystem): Point {
     switch (sys) {
     default:
       throw("Unhandled coordinate system");
     case CoordSystem.Cartisan:
-      return new Point(cellX * width, cellY * height);
+      return new Point(cellX * width, (cellY * height) - (cellZ * height));
     case CoordSystem.Isometric:
       return SquareGrid.convertToIsometric(cellX, cellY, width, height);
     }

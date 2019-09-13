@@ -28,6 +28,7 @@ sheet.image.onload = function() {
 
   let camera = new Point(2 * tileWidth, 2 * tileHeight);
 
+  // Draw the base ground
   for (let y = 0; y < cellsY; y++) {
     for (let x = 0; x < cellsX; x++) {
       let location = gameMap.getLocation(x, y);
@@ -38,6 +39,25 @@ sheet.image.onload = function() {
       console.log("draw at:", newCoord);
       gfx.render(newCoord, location.spriteId);
     }
+  }
+
+  // Draw raised tiles.
+  let raised = [];
+  raised.push(gameMap.getOrAddRaisedLocation(1, 2, 0));
+  raised.push(gameMap.getOrAddRaisedLocation(2, 2, 0));
+  raised.push(gameMap.getOrAddRaisedLocation(3, 2, 0));
+  raised[0].spriteId = 6; // left lower edge
+  raised[1].spriteId = 7; // middle lower edge
+  raised[2].spriteId = 8; // right lower edge
+
+  for (let i in raised) {
+    let tile = raised[i];
+    let coord = gameMap.getDrawCoord(tile.x, tile.y, tile.z,
+                                     tileWidth, tileHeight,
+                                     CoordSystem.Cartisan);
+    let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
+    console.log("draw at:", newCoord);
+    gfx.render(newCoord, tile.spriteId);
   }
   console.log("done");
 }
