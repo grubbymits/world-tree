@@ -3,7 +3,7 @@ export class Point {
               private readonly _y: number) { }
   get x() { return this._x; }
   get y() { return this._y; }
-}
+} // end class Point
 
 export class Location {
   private _spriteId: number;
@@ -43,7 +43,7 @@ export class Location {
   set spriteId(id: number) {
     this._spriteId = id;
   }
-}
+} // end class Location
 
 export enum CoordSystem {
   Cartisan,
@@ -144,7 +144,7 @@ export abstract class GameMap {
     path.reverse();
     return path.splice(1);
   }
-}
+} // end class GameMap
 
 export class SquareGrid extends GameMap {
   static convertToIsometric(x: number, y: number, width: number,
@@ -182,8 +182,8 @@ export class SquareGrid extends GameMap {
 
   addRaisedLocation(x: number, y: number, z: number): Location {
     let location: Location = new Location(false, x, y, z, this._ids);
-    this._ids++;
     this._raisedLocations.push(location);
+    this._ids++;
 
     // We're drawing a 2D map, so depth is being simulated by the position on
     // the Y axis and the order in which those elements are drawn. Insert
@@ -243,7 +243,7 @@ export class SquareGrid extends GameMap {
       return SquareGrid.convertToIsometric(x, y, width, height);
     }
   }
-}
+} // end class SquareGrid
 
 class LocationCost {
   constructor(private readonly _location: Location,
@@ -251,5 +251,93 @@ class LocationCost {
   get location(): Location { return this._location; }
   get id(): number { return this._location.id }
   get cost(): number { return this._cost; }
+} // end class LocationCost
+
+export class SpriteSheet {
+  private _image: HTMLImageElement;
+
+  constructor(name: string) {
+    this._image = new Image();
+
+    if (name) {
+      this._image.src = name + ".png";
+    } else {
+      throw new Error("No filename passed");
+    }
+    console.log("load", name);
+  }
+
+  get image(): HTMLImageElement {
+    return this._image;
+  }
+} // end class SpriteSheet
+
+export class Sprite {
+  constructor(private readonly _sheet: SpriteSheet,
+              private readonly _offsetX: number,
+              private readonly _offsetY: number,
+              private readonly _width: number,
+              private readonly _height: number) { }
+
+  render(coord: Point, ctx: CanvasRenderingContext2D): void {
+    ctx.drawImage(this._sheet.image,
+                  this._offsetX, this._offsetY,
+                  this._width, this._height,
+                  coord.x, coord.y,
+                  this._width, this._height);
+  }
+} // end class Sprite
+
+export class Renderer {
+  constructor(private _ctx: CanvasRenderingContext2D,
+              private readonly _width: number,
+              private readonly _height: number,
+              private _sprites: Array<Sprite>) { }
+
+  clear(): void {
+    this._ctx.fillStyle = '#000000';
+    this._ctx.fillRect(0, 0, this._width, this._height);
+  }
+
+  render(coord: Point, id: number): void {
+    this._sprites[id].render(coord, this._ctx);
+  }
+} // end class Renderer
+
+export function renderRaised(gameMap: GameMap, camera: Point, sys: CoordSystem,
+                             gfx: Renderer) {
+  let locations: Array<Location> = gameMap.raisedLocations;
+  if (sys == CoordSystem.Cartisan) {
+    for (let i in locations) {
+      let location = locations[i];
+      let coord = gameMap.getDrawCoord(location.x, location.y, 0, sys);
+      let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
+      gfx.render(newCoord, location.spriteId);
+    }
+  }
 }
 
+export function renderFloor(gameMap: GameMap, camera: Point, sys: CoordSystem,
+                            gfx: Renderer) {
+  if (sys == CoordSystem.Cartisan) {
+    for (let y = 0; y < gameMap.height; y++) {
+      for (let x = 0; x < gameMap.width; x++) {
+        let location = gameMap.getLocation(x, y);
+        let coord = gameMap.getDrawCoord(x, y, 0, sys);
+        let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
+        gfx.render(newCoord, location.spriteId);
+      }
+    }
+  } else if (sys == CoordSystem.Isometric) {
+    for (let y = 0; y < gameMap.height; y++) {
+      for (let x = gameMap.width - 1; x >= 0; x--) {
+        let location = gameMap.getLocation(x, y);
+        let coord = gameMap.getDrawCoord(x, y, 0, sys);
+        let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
+        gfx.render(newCoord, location.spriteId);
+      }
+    }
+  } else {
+    throw("invalid coordinate system");
+  }
+}

@@ -1,17 +1,25 @@
-import { Point, CoordSystem, Location, SquareGrid } from '../../js/map.js';
-import { SpriteSheet, Sprite, Renderer } from '../../js/gfx.js';
+import { Point,
+         CoordSystem,
+         Location,
+         SquareGrid,
+         SpriteSheet,
+         Sprite,
+         Renderer,
+         renderRaised,
+         renderFloor
+} from '../../js/greenman.js';
 
 console.log("begin");
 
-let sheet = new SpriteSheet("cartisan-grass-floor");
+let sheet = new SpriteSheet("../res/img/cartisan-grass-floor");
 
 sheet.image.onload = function() {
   let cellsX = 6;
   let cellsY = 6;
-  let gameMap = new SquareGrid(cellsX, cellsY);
-  let sprites = [];
   let tileWidth = 64;
   let tileHeight = 64;
+  let gameMap = new SquareGrid(cellsX, cellsY, tileWidth, tileHeight);
+  let sprites = [];
 
   // The sprite sheet is 3x3...
   for (let y = 0; y < 3; y++) {
@@ -32,12 +40,8 @@ sheet.image.onload = function() {
     for (let x = 0; x < cellsX; x++) {
       let location = gameMap.getLocation(x, y);
       location.spriteId = 4; // middle tile
-      let coord = gameMap.getDrawCoord(x, y, 0, tileWidth, tileHeight,
-                                       CoordSystem.Cartisan);
-      let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-      console.log("draw at:", newCoord);
-      gfx.render(newCoord, location.spriteId);
     }
   }
+  renderFloor(gameMap, camera, CoordSystem.Cartisan, gfx);
   console.log("done");
 }

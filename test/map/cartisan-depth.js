@@ -1,17 +1,25 @@
-import { Point, CoordSystem, Location, SquareGrid } from '../../js/map.js';
-import { SpriteSheet, Sprite, Renderer } from '../../js/gfx.js';
+import { Point,
+         CoordSystem,
+         Location,
+         SquareGrid,
+         SpriteSheet,
+         Sprite,
+         Renderer,
+         renderRaised,
+         renderFloor
+} from '../../js/greenman.js';
 
 console.log("begin");
 
-let sheet = new SpriteSheet("cartisan-grass-floor");
+let sheet = new SpriteSheet("../res/img/cartisan-grass-floor");
 
 sheet.image.onload = function() {
   let cellsX = 6;
   let cellsY = 6;
-  let gameMap = new SquareGrid(cellsX, cellsY);
-  let sprites = [];
   let tileWidth = 64;
   let tileHeight = 64;
+  let gameMap = new SquareGrid(cellsX, cellsY, tileWidth, tileHeight);
+  let sprites = [];
 
   // The sprite sheet is 3x3...
   for (let y = 0; y < 3; y++) {
@@ -28,36 +36,23 @@ sheet.image.onload = function() {
 
   let camera = new Point(2 * tileWidth, 2 * tileHeight);
 
-  // Draw the base ground
+  // Setup sprites for each location.
   for (let y = 0; y < cellsY; y++) {
     for (let x = 0; x < cellsX; x++) {
       let location = gameMap.getLocation(x, y);
       location.spriteId = 4; // middle tile
-      let coord = gameMap.getDrawCoord(x, y, 0, tileWidth, tileHeight,
-                                       CoordSystem.Cartisan);
-      let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-      console.log("draw at:", newCoord);
-      gfx.render(newCoord, location.spriteId);
     }
   }
 
-  // Draw raised tiles.
   let raised = [];
-  raised.push(gameMap.getOrAddRaisedLocation(1, 2, 0));
-  raised.push(gameMap.getOrAddRaisedLocation(2, 2, 0));
-  raised.push(gameMap.getOrAddRaisedLocation(3, 2, 0));
+  raised.push(gameMap.addRaisedLocation(1, 2, 0));
+  raised.push(gameMap.addRaisedLocation(2, 2, 0));
+  raised.push(gameMap.addRaisedLocation(3, 2, 0));
   raised[0].spriteId = 6; // left lower edge
   raised[1].spriteId = 7; // middle lower edge
   raised[2].spriteId = 8; // right lower edge
 
-  for (let i in raised) {
-    let tile = raised[i];
-    let coord = gameMap.getDrawCoord(tile.x, tile.y, tile.z,
-                                     tileWidth, tileHeight,
-                                     CoordSystem.Cartisan);
-    let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-    console.log("draw at:", newCoord);
-    gfx.render(newCoord, tile.spriteId);
-  }
+  renderFloor(gameMap, camera, CoordSystem.Cartisan, gfx);
+  renderRaised(gameMap, camera, CoordSystem.Cartisan, gfx);
   console.log("done");
 }
