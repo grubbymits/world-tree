@@ -1,7 +1,6 @@
 export class SpriteSheet {
     constructor(name) {
         this._image = new Image();
-        this._ready = false;
         if (name) {
             this._image.src = "res/img/" + name + ".png";
         }

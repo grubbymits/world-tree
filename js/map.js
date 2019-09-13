@@ -43,6 +43,64 @@ export class GameMap {
         this._width = _width;
         this._height = _height;
     }
+    findPath(begin, end) {
+        let path = new Array();
+        if (end.blocked)
+            return path;
+        // Adapted from:
+        // http://www.redblobgames.com/pathfinding/a-star/introduction.html
+        let frontier = new Array();
+        let cameFrom = new Map();
+        let costSoFar = new Map();
+        cameFrom.set(begin, null);
+        costSoFar.set(begin, 0);
+        // frontier is a sorted list of locations with their lowest cost
+        frontier.push(new LocationCost(begin, 0));
+        let current = frontier[0];
+        // breadth-first search
+        while (frontier.length > 0) {
+            current = frontier.shift();
+            // Found!
+            if (current.id == end.id) {
+                break;
+            }
+            let neighbours = this.getNeighbours(current.location);
+            for (let next of neighbours) {
+                let newCost = costSoFar.get(current.id) +
+                    this.getNeighbourCost(current.location, next);
+                if (!costSoFar.has(next) || newCost < costSoFar.get(next)) {
+                    frontier.push(new LocationCost(next, newCost));
+                    costSoFar.set(next, newCost);
+                    frontier.sort((a, b) => {
+                        if (a.cost > b.cost) {
+                            return 1;
+                        }
+                        else if (a.cost < b.cost) {
+                            return -1;
+                        }
+                        else {
+                            return 0;
+                        }
+                    });
+                    cameFrom.set(next, current);
+                }
+            }
+        }
+        // Search has ended...
+        if (current.id != end.id) {
+            console.log("Could not find a path...");
+            return path;
+        }
+        // finalise the path.
+        let step = end;
+        path.push(step);
+        while (step.id != begin.id) {
+            step = cameFrom.get(step);
+            path.push(step);
+        }
+        path.reverse();
+        return path.splice(1);
+    }
 }
 export class SquareGrid extends GameMap {
     constructor(width, height) {
@@ -73,6 +131,14 @@ export class SquareGrid extends GameMap {
     getLocation(x, y) {
         return this._locations[x][y];
     }
+    getNeighbourCost(centre, to) {
+        // If a horizontal, or vertical, move cost 1 then a diagonal move would be
+        // 1.444... So scale by 2 and round.
+        if ((centre.x == to.x) || (centre.y == to.y)) {
+            return 2;
+        }
+        return 3;
+    }
     getNeighbours(centre) {
         let neighbours = new Array();
         for (let offset of this._neighbourOffsets) {
@@ -91,4 +157,13 @@ export class SquareGrid extends GameMap {
                 return SquareGrid.convertToIsometric(cellX, cellY, width, height);
         }
     }
+}
+class LocationCost {
+    constructor(_location, _cost) {
+        this._location = _location;
+        this._cost = _cost;
+    }
+    get location() { return this._location; }
+    get id() { return this._location.id; }
+    get cost() { return this._cost; }
 }
