@@ -1,3 +1,31 @@
+import { Point } from "./map.js";
+export class Drawable {
+    constructor(_x, _y, _z, _drawPoint) {
+        this._x = _x;
+        this._y = _y;
+        this._z = _z;
+        this._drawPoint = _drawPoint;
+        this._spriteId = 0;
+    }
+    get x() {
+        return this._x;
+    }
+    get y() {
+        return this._y;
+    }
+    get z() {
+        return this._z;
+    }
+    get drawPoint() {
+        return this._drawPoint;
+    }
+    get spriteId() {
+        return this._spriteId;
+    }
+    set spriteId(id) {
+        this._spriteId = id;
+    }
+}
 export class SpriteSheet {
     constructor(name) {
         this._image = new Image();
@@ -21,7 +49,7 @@ export class Sprite {
         this._width = _width;
         this._height = _height;
     }
-    render(coord, ctx) {
+    draw(coord, ctx) {
         ctx.drawImage(this._sheet.image, this._offsetX, this._offsetY, this._width, this._height, coord.x, coord.y, this._width, this._height);
     }
 }
@@ -36,7 +64,14 @@ export class Renderer {
         this._ctx.fillStyle = '#000000';
         this._ctx.fillRect(0, 0, this._width, this._height);
     }
-    render(coord, id) {
-        this._sprites[id].render(coord, this._ctx);
+    draw(coord, id) {
+        this._sprites[id].draw(coord, this._ctx);
+    }
+    drawAll(drawables, camera) {
+        for (let i in drawables) {
+            let drawable = drawables[i];
+            let coord = new Point(drawable.drawPoint.x + camera.x, drawable.drawPoint.y + camera.y);
+            this.draw(coord, drawable.spriteId);
+        }
     }
 }

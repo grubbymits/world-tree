@@ -1,3 +1,9 @@
+import { Drawable } from "./gfx.js";
+export var CoordSystem;
+(function (CoordSystem) {
+    CoordSystem[CoordSystem["Cartisan"] = 0] = "Cartisan";
+    CoordSystem[CoordSystem["Isometric"] = 1] = "Isometric";
+})(CoordSystem || (CoordSystem = {}));
 export class Point {
     constructor(_x, _y) {
         this._x = _x;
@@ -6,35 +12,18 @@ export class Point {
     get x() { return this._x; }
     get y() { return this._y; }
 }
-export class Location {
-    constructor(_blocking, _x, _y, _z, _id) {
+export class Location extends Drawable {
+    constructor(_blocking, x, y, z, coord, _id) {
+        super(x, y, z, coord);
         this._blocking = _blocking;
-        this._x = _x;
-        this._y = _y;
-        this._z = _z;
         this._id = _id;
         this._spriteId = 0;
-    }
-    get x() {
-        return this._x;
-    }
-    get y() {
-        return this._y;
-    }
-    get z() {
-        return this._z;
     }
     get id() {
         return this._id;
     }
     get blocked() {
         return this._blocking;
-    }
-    get spriteId() {
-        return this._spriteId;
-    }
-    set spriteId(id) {
-        this._spriteId = id;
     }
 }
 class LocationCost {
@@ -61,7 +50,8 @@ export class SquareGrid {
         for (let x = 0; x < this._width; x++) {
             this._locations[x] = new Array();
             for (let y = 0; y < this._height; y++) {
-                this._locations[x].push(new Location(false, x, y, 0, this._ids));
+                let coord = this.getDrawCoord(x, y, 0);
+                this._locations[x].push(new Location(false, x, y, 0, coord, this._ids));
                 this._ids++;
             }
         }
@@ -74,6 +64,13 @@ export class SquareGrid {
     }
     get raisedLocations() {
         return this._raisedLocations;
+    }
+    addRaisedLocation(x, y, z) {
+        let coord = this.getDrawCoord(x, y, z);
+        let location = new Location(false, x, y, z, coord, this._ids);
+        this._ids++;
+        this._raisedLocations.push(location);
+        return location;
     }
     getLocation(x, y) {
         return this._locations[x][y];
@@ -143,14 +140,6 @@ export class SquareGrid {
         path.reverse();
         return path.splice(1);
     }
-    renderRaised(camera, gfx) {
-        for (let i in this._raisedLocations) {
-            let location = this._raisedLocations[i];
-            let coord = this.getDrawCoord(location.x, location.y, 0);
-            let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-            gfx.render(newCoord, location.spriteId);
-        }
-    }
 }
 export class IsometricGrid extends SquareGrid {
     static convertToIsometric(x, y, width, height) {
@@ -158,31 +147,22 @@ export class IsometricGrid extends SquareGrid {
         let drawY = Math.floor(y * height / 2) - Math.floor(x * height / 2);
         return new Point(drawX, drawY);
     }
-    static convertToCartisan(coord) {
-        let x = Math.floor((2 * coord.y + coord.x) / 2);
-        let y = Math.floor((2 * coord.y - coord.x) / 2);
-        return new Point(x, y);
-    }
     getDrawCoord(x, y, z) {
         let width = this._tileWidth;
         let height = this._tileHeight;
         return IsometricGrid.convertToIsometric(x, y, width, height);
     }
-    renderFloor(camera, gfx) {
+    drawFloor(camera, gfx) {
         for (let y = 0; y < this._height; y++) {
             for (let x = this._width - 1; x >= 0; x--) {
                 let location = this.getLocation(x, y);
-                let coord = this.getDrawCoord(x, y, 0);
-                let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-                gfx.render(newCoord, location.spriteId);
+                let newCoord = new Point(location.drawPoint.x + camera.x, location.drawPoint.y + camera.y);
+                gfx.draw(newCoord, location.spriteId);
             }
         }
     }
-    addRaisedLocation(x, y, z) {
-        let location = new Location(false, x, y, z, this._ids);
-        this._ids++;
-        this._raisedLocations.push(location);
-        this._raisedLocations.sort((a, b) => {
+    sortDrawables(drawables) {
+        drawables.sort((a, b) => {
             if (a.z < b.z) {
                 return 1;
             }
@@ -197,7 +177,6 @@ export class IsometricGrid extends SquareGrid {
             }
             return 0;
         });
-        return location;
     }
 }
 export class CartisanGrid extends SquareGrid {
@@ -206,21 +185,18 @@ export class CartisanGrid extends SquareGrid {
         let height = this._tileHeight;
         return new Point(x * width, (y * height) - (z * height));
     }
-    renderFloor(camera, gfx) {
+    drawFloor(camera, gfx) {
         for (let y = 0; y < this._height; y++) {
             for (let x = 0; x < this._width; x++) {
                 let location = this.getLocation(x, y);
                 let coord = this.getDrawCoord(x, y, 0);
                 let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-                gfx.render(newCoord, location.spriteId);
+                gfx.draw(newCoord, location.spriteId);
             }
         }
     }
-    addRaisedLocation(x, y, z) {
-        let location = new Location(false, x, y, z, this._ids);
-        this._ids++;
-        this._raisedLocations.push(location);
-        this._raisedLocations.sort((a, b) => {
+    sortDrawables(drawables) {
+        drawables.sort((a, b) => {
             if (a.z < b.z) {
                 return 1;
             }
@@ -235,6 +211,5 @@ export class CartisanGrid extends SquareGrid {
             }
             return 0;
         });
-        return location;
     }
 }

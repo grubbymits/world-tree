@@ -1,4 +1,9 @@
-import { Renderer } from "./gfx.js"
+import { Drawable, Renderer } from "./gfx.js"
+
+export enum CoordSystem {
+  Cartisan,
+  Isometric,
+}
 
 export class Point {
   constructor(private readonly _x: number,
@@ -7,28 +12,16 @@ export class Point {
   get y() { return this._y; }
 }
 
-export class Location {
-  private _spriteId: number;
+export class Location extends Drawable {
 
   constructor(private readonly _blocking: boolean,
-              private readonly _x: number,
-              private readonly _y: number,
-              private readonly _z: number,
+              x: number, y: number, z: number,
+              coord: Point,
               private readonly _id: number) {
+    super(x, y, z, coord);
     this._spriteId = 0;
   }
 
-  get x(): number {
-    return this._x;
-  }
-
-  get y(): number {
-    return this._y;
-  }
-
-  get z(): number {
-    return this._z;
-  }
 
   get id(): number {
     return this._id;
@@ -36,14 +29,6 @@ export class Location {
 
   get blocked(): boolean {
     return this._blocking;
-  }
-  
-  get spriteId(): number {
-    return this._spriteId;
-  }
-  
-  set spriteId(id: number) {
-    this._spriteId = id;
   }
 }
 
@@ -65,9 +50,9 @@ export abstract class SquareGrid {
   protected _raisedLocations: Array<Location>;
   protected _locations: Array<Array<Location>>;
 
-  abstract addRaisedLocation(x: number, y: number, z: number): Location;
   abstract getDrawCoord(cellX: number, cellY: number, cellZ: number): Point;
-  abstract renderFloor(camera: Point, gfx: Renderer): void;
+  abstract drawFloor(camera: Point, gfx: Renderer): void;
+  abstract sortDrawables(drawables: Array<Drawable>): void;
 
   constructor(protected _width: number, protected _height: number,
               protected _tileWidth: number, protected _tileHeight: number) {
@@ -77,7 +62,8 @@ export abstract class SquareGrid {
     for (let x = 0; x < this._width; x++) {
       this._locations[x] = new Array<Location>();
       for (let y = 0; y < this._height; y++) {
-        this._locations[x].push(new Location(false, x, y, 0, this._ids));
+        let coord = this.getDrawCoord(x, y, 0);
+        this._locations[x].push(new Location(false, x, y, 0, coord, this._ids));
         this._ids++;
       }
     }
@@ -93,6 +79,14 @@ export abstract class SquareGrid {
 
   get raisedLocations(): Array<Location> {
     return this._raisedLocations;
+  }
+
+  addRaisedLocation(x: number, y: number, z: number): Location {
+    let coord = this.getDrawCoord(x, y, z);
+    let location: Location = new Location(false, x, y, z, coord, this._ids);
+    this._ids++;
+    this._raisedLocations.push(location);
+    return location;
   }
 
   getLocation(x: number, y: number): Location {
@@ -184,14 +178,6 @@ export abstract class SquareGrid {
     return path.splice(1);
   }
 
-  renderRaised(camera: Point, gfx: Renderer): void {
-    for (let i in this._raisedLocations) {
-      let location = this._raisedLocations[i];
-      let coord = this.getDrawCoord(location.x, location.y, 0);
-      let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-      gfx.render(newCoord, location.spriteId);
-    }
-  }
 }
 
 export class IsometricGrid extends SquareGrid {
@@ -202,38 +188,28 @@ export class IsometricGrid extends SquareGrid {
     return new Point(drawX, drawY);
   }
 
-  static convertToCartisan(coord: Point) : Point {
-    let x = Math.floor((2 * coord.y + coord.x) / 2);
-    let y = Math.floor((2 * coord.y - coord.x) / 2);
-    return new Point(x, y);
-  }
-
   getDrawCoord(x: number, y: number, z: number): Point {
     let width = this._tileWidth;
     let height = this._tileHeight;
     return IsometricGrid.convertToIsometric(x, y, width, height);
   }
 
-  renderFloor(camera: Point, gfx: Renderer) {
+  drawFloor(camera: Point, gfx: Renderer) {
     for (let y = 0; y < this._height; y++) {
       for (let x = this._width - 1; x >= 0; x--) {
         let location = this.getLocation(x, y);
-        let coord = this.getDrawCoord(x, y, 0);
-        let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-        gfx.render(newCoord, location.spriteId);
+        let newCoord = new Point(location.drawPoint.x + camera.x,
+                                 location.drawPoint.y + camera.y);
+        gfx.draw(newCoord, location.spriteId);
       }
     }
   }
 
-  addRaisedLocation(x: number, y: number, z: number): Location {
-    let location: Location = new Location(false, x, y, z, this._ids);
-    this._ids++;
-    this._raisedLocations.push(location);
-
+  sortDrawables(drawables: Array<Drawable>): void {
     // We're drawing a 2D map, so depth is being simulated by the position on
-    // the Y axis and the order in which those elements are drawn. Insert
+    // the X axis and the order in which those elements are drawn. Insert
     // the new location and sort the array by draw order.
-    this._raisedLocations.sort((a, b) => {
+    drawables.sort((a, b) => {
       if (a.z < b.z) {
         return 1;
       } else if (b.z < a.z) {
@@ -246,7 +222,6 @@ export class IsometricGrid extends SquareGrid {
       }
       return 0;
     });
-    return location;
   }
 }
 
@@ -258,26 +233,22 @@ export class CartisanGrid extends SquareGrid {
     return new Point(x * width, (y * height) - (z * height));
   }
 
-  renderFloor(camera: Point, gfx: Renderer) {
+  drawFloor(camera: Point, gfx: Renderer) {
     for (let y = 0; y < this._height; y++) {
       for (let x = 0; x < this._width; x++) {
         let location = this.getLocation(x, y);
         let coord = this.getDrawCoord(x, y, 0);
         let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-        gfx.render(newCoord, location.spriteId);
+        gfx.draw(newCoord, location.spriteId);
       }
     }
   }
 
-  addRaisedLocation(x: number, y: number, z: number): Location {
-    let location: Location = new Location(false, x, y, z, this._ids);
-    this._ids++;
-    this._raisedLocations.push(location);
-
+  sortDrawables(drawables: Array<Drawable>): void {
     // We're drawing a 2D map, so depth is being simulated by the position on
     // the Y axis and the order in which those elements are drawn. Insert
     // the new location and sort the array by draw order.
-    this._raisedLocations.sort((a, b) => {
+    drawables.sort((a, b) => {
       if (a.z < b.z) {
         return 1;
       } else if (b.z < a.z) {
@@ -290,7 +261,6 @@ export class CartisanGrid extends SquareGrid {
       }
       return 0;
     });
-    return location;
   }
 }
 

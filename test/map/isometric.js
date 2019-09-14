@@ -9,24 +9,21 @@ sheet.image.onload = function() {
   let cellsY = 7;
   let tileWidth = 128;
   let tileHeight = 64;
-  let gameMap = new GM.SquareGrid(cellsX, cellsY, tileWidth, tileHeight);
   let sprites = [];
+
   sprites.push(new GM.Sprite(sheet, 0, 0, 128, 128));
-
   let canvas = document.getElementById("testCanvas");
-  let context = canvas.getContext("2d", { alpha: false });
-  let gfx = new GM.Renderer(context, canvas.width, canvas.height, sprites);
-  gfx.clear();
-
+  let game = new GM.Game(cellsX, cellsY, tileWidth, tileHeight,
+                         GM.CoordSystem.Isometric, canvas, sprites);
 
   for (let y = 0; y < cellsY; y++) {
     for (let x = cellsX - 1; x >= 0; x--) {
-      let location = gameMap.getLocation(x, y);
+      let location = game.getLocation(x, y);
       location.spriteId = 0;
     }
   }
   // Offset the grid so its displayed roughly in the middle of the canvas.
   let camera = new GM.Point(0, Math.floor(canvas.height / 2));
-  GM.renderFloor(gameMap, camera, GM.CoordSystem.Isometric, gfx);
+  game.update(camera);
   console.log("done");
 }
