@@ -51,14 +51,25 @@ class LocationCost {
     get id() { return this._location.id; }
     get cost() { return this._cost; }
 }
-export class GameMap {
+export class SquareGrid {
     constructor(_width, _height, _tileWidth, _tileHeight) {
         this._width = _width;
         this._height = _height;
         this._tileWidth = _tileWidth;
         this._tileHeight = _tileHeight;
+        this._neighbourOffsets = [new Point(-1, -1), new Point(0, -1), new Point(1, -1),
+            new Point(-1, 0), new Point(1, 0),
+            new Point(-1, 1), new Point(0, 1), new Point(1, 1),];
         this._ids = 0;
         this._raisedLocations = new Array();
+        this._locations = new Array();
+        for (let x = 0; x < this._width; x++) {
+            this._locations[x] = new Array();
+            for (let y = 0; y < this._height; y++) {
+                this._locations[x].push(new Location(false, x, y, 0, this._ids));
+                this._ids++;
+            }
+        }
     }
     get width() {
         return this._width;
@@ -68,6 +79,23 @@ export class GameMap {
     }
     get raisedLocations() {
         return this._raisedLocations;
+    }
+    getLocation(x, y) {
+        return this._locations[x][y];
+    }
+    getNeighbourCost(centre, to) {
+        if ((centre.x == to.x) || (centre.y == to.y)) {
+            return 2;
+        }
+        return 3;
+    }
+    getNeighbours(centre) {
+        let neighbours = new Array();
+        for (let offset of this._neighbourOffsets) {
+            let neighbour = this.getLocation(centre.x + offset.x, centre.y + offset.y);
+            neighbours.push(neighbour);
+        }
+        return neighbours;
     }
     findPath(begin, end) {
         let path = new Array();
@@ -120,22 +148,16 @@ export class GameMap {
         path.reverse();
         return path.splice(1);
     }
-}
-export class SquareGrid extends GameMap {
-    constructor(width, height, tileWidth, tileHeight) {
-        super(width, height, tileWidth, tileHeight);
-        this._neighbourOffsets = [new Point(-1, -1), new Point(0, -1), new Point(1, -1),
-            new Point(-1, 0), new Point(1, 0),
-            new Point(-1, 1), new Point(0, 1), new Point(1, 1),];
-        this._locations = new Array();
-        for (let x = 0; x < this._width; x++) {
-            this._locations[x] = new Array();
-            for (let y = 0; y < this._height; y++) {
-                this._locations[x].push(new Location(false, x, y, 0, this._ids));
-                this._ids++;
-            }
+    renderRaised(camera, gfx) {
+        for (let i in this._raisedLocations) {
+            let location = this._raisedLocations[i];
+            let coord = this.getDrawCoord(location.x, location.y, 0);
+            let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
+            gfx.render(newCoord, location.spriteId);
         }
     }
+}
+export class IsometricGrid extends SquareGrid {
     static convertToIsometric(x, y, width, height) {
         let drawX = Math.floor(x * width / 2) + Math.floor(y * width / 2);
         let drawY = Math.floor(y * height / 2) - Math.floor(x * height / 2);
@@ -145,6 +167,59 @@ export class SquareGrid extends GameMap {
         let x = Math.floor((2 * coord.y + coord.x) / 2);
         let y = Math.floor((2 * coord.y - coord.x) / 2);
         return new Point(x, y);
+    }
+    getDrawCoord(x, y, z) {
+        let width = this._tileWidth;
+        let height = this._tileHeight;
+        return IsometricGrid.convertToIsometric(x, y, width, height);
+    }
+    renderFloor(camera, gfx) {
+        for (let y = 0; y < this._height; y++) {
+            for (let x = this._width - 1; x >= 0; x--) {
+                let location = this.getLocation(x, y);
+                let coord = this.getDrawCoord(x, y, 0);
+                let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
+                gfx.render(newCoord, location.spriteId);
+            }
+        }
+    }
+    addRaisedLocation(x, y, z) {
+        let location = new Location(false, x, y, z, this._ids);
+        this._ids++;
+        this._raisedLocations.push(location);
+        this._raisedLocations.sort((a, b) => {
+            if (a.z < b.z) {
+                return 1;
+            }
+            else if (b.z < a.z) {
+                return -1;
+            }
+            if (a.x < b.x) {
+                return 1;
+            }
+            else if (b.x < a.x) {
+                return -1;
+            }
+            return 0;
+        });
+        return location;
+    }
+}
+export class CartisanGrid extends SquareGrid {
+    getDrawCoord(x, y, z) {
+        let width = this._tileWidth;
+        let height = this._tileHeight;
+        return new Point(x * width, (y * height) - (z * height));
+    }
+    renderFloor(camera, gfx) {
+        for (let y = 0; y < this._height; y++) {
+            for (let x = 0; x < this._width; x++) {
+                let location = this.getLocation(x, y);
+                let coord = this.getDrawCoord(x, y, 0);
+                let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
+                gfx.render(newCoord, location.spriteId);
+            }
+        }
     }
     addRaisedLocation(x, y, z) {
         let location = new Location(false, x, y, z, this._ids);
@@ -166,37 +241,5 @@ export class SquareGrid extends GameMap {
             return 0;
         });
         return location;
-    }
-    getLocation(x, y) {
-        return this._locations[x][y];
-    }
-    get raisedLocations() {
-        return this._raisedLocations;
-    }
-    getNeighbourCost(centre, to) {
-        if ((centre.x == to.x) || (centre.y == to.y)) {
-            return 2;
-        }
-        return 3;
-    }
-    getNeighbours(centre) {
-        let neighbours = new Array();
-        for (let offset of this._neighbourOffsets) {
-            let neighbour = this.getLocation(centre.x + offset.x, centre.y + offset.y);
-            neighbours.push(neighbour);
-        }
-        return neighbours;
-    }
-    getDrawCoord(x, y, z, sys) {
-        let width = this._tileWidth;
-        let height = this._tileHeight;
-        switch (sys) {
-            default:
-                throw ("Unhandled coordinate system");
-            case CoordSystem.Cartisan:
-                return new Point(x * width, (y * height) - (z * height));
-            case CoordSystem.Isometric:
-                return SquareGrid.convertToIsometric(x, y, width, height);
-        }
     }
 }

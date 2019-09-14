@@ -1,4 +1,3 @@
-import { Point, CoordSystem } from "./map.js";
 export class SpriteSheet {
     constructor(name) {
         this._image = new Image();
@@ -39,41 +38,5 @@ export class Renderer {
     }
     render(coord, id) {
         this._sprites[id].render(coord, this._ctx);
-    }
-}
-export function renderRaised(gameMap, camera, sys, gfx) {
-    let locations = gameMap.raisedLocations;
-    if (sys == CoordSystem.Cartisan) {
-        for (let i in locations) {
-            let location = locations[i];
-            let coord = gameMap.getDrawCoord(location.x, location.y, 0, sys);
-            let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-            gfx.render(newCoord, location.spriteId);
-        }
-    }
-}
-export function renderFloor(gameMap, camera, sys, gfx) {
-    if (sys == CoordSystem.Cartisan) {
-        for (let y = 0; y < gameMap.height; y++) {
-            for (let x = 0; x < gameMap.width; x++) {
-                let location = gameMap.getLocation(x, y);
-                let coord = gameMap.getDrawCoord(x, y, 0, sys);
-                let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-                gfx.render(newCoord, location.spriteId);
-            }
-        }
-    }
-    else if (sys == CoordSystem.Isometric) {
-        for (let y = 0; y < gameMap.height; y++) {
-            for (let x = gameMap.width - 1; x >= 0; x--) {
-                let location = gameMap.getLocation(x, y);
-                let coord = gameMap.getDrawCoord(x, y, 0, sys);
-                let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-                gfx.render(newCoord, location.spriteId);
-            }
-        }
-    }
-    else {
-        throw ("invalid coordinate system");
     }
 }
