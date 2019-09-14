@@ -1,4 +1,4 @@
-import { Point, CoordSystem, Location, GameMap } from "map"
+import { Point, CoordSystem, Location, GameMap } from "./map.js"
 
 export class SpriteSheet {
   private _image: HTMLImageElement;

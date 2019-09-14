@@ -50,6 +50,14 @@ export enum CoordSystem {
   Isometric,
 }
 
+class LocationCost {
+  constructor(private readonly _location: Location,
+              private readonly _cost: number) { }
+  get location(): Location { return this._location; }
+  get id(): number { return this._location.id }
+  get cost(): number { return this._cost; }
+}
+
 export abstract class GameMap {
   constructor(protected _width: number, protected _height: number,
               protected _tileWidth: number, protected _tileHeight: number) {
@@ -243,13 +251,5 @@ export class SquareGrid extends GameMap {
       return SquareGrid.convertToIsometric(x, y, width, height);
     }
   }
-}
-
-class LocationCost {
-  constructor(private readonly _location: Location,
-              private readonly _cost: number) { }
-  get location(): Location { return this._location; }
-  get id(): number { return this._location.id }
-  get cost(): number { return this._cost; }
 }
 

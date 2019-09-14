@@ -1,2 +1,2 @@
 #!/bin/sh
-tsc --strict -t ES2015 ts/* --outDir js/
+./node_modules/typescript/bin/tsc --project .

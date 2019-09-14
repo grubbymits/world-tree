@@ -42,6 +42,15 @@ export var CoordSystem;
     CoordSystem[CoordSystem["Cartisan"] = 0] = "Cartisan";
     CoordSystem[CoordSystem["Isometric"] = 1] = "Isometric";
 })(CoordSystem || (CoordSystem = {}));
+class LocationCost {
+    constructor(_location, _cost) {
+        this._location = _location;
+        this._cost = _cost;
+    }
+    get location() { return this._location; }
+    get id() { return this._location.id; }
+    get cost() { return this._cost; }
+}
 export class GameMap {
     constructor(_width, _height, _tileWidth, _tileHeight) {
         this._width = _width;
@@ -64,20 +73,15 @@ export class GameMap {
         let path = new Array();
         if (end.blocked)
             return path;
-        // Adapted from:
-        // http://www.redblobgames.com/pathfinding/a-star/introduction.html
         let frontier = new Array();
         let cameFrom = new Map();
         let costSoFar = new Map();
         cameFrom.set(begin, null);
         costSoFar.set(begin, 0);
-        // frontier is a sorted list of locations with their lowest cost
         frontier.push(new LocationCost(begin, 0));
         let current = frontier[0];
-        // breadth-first search
         while (frontier.length > 0) {
             current = frontier.shift();
-            // Found!
             if (current.id == end.id) {
                 break;
             }
@@ -103,12 +107,10 @@ export class GameMap {
                 }
             }
         }
-        // Search has ended...
         if (current.id != end.id) {
             console.log("Could not find a path...");
             return path;
         }
-        // finalise the path.
         let step = end;
         path.push(step);
         while (step.id != begin.id) {
@@ -146,11 +148,8 @@ export class SquareGrid extends GameMap {
     }
     addRaisedLocation(x, y, z) {
         let location = new Location(false, x, y, z, this._ids);
-        this._raisedLocations.push(location);
         this._ids++;
-        // We're drawing a 2D map, so depth is being simulated by the position on
-        // the Y axis and the order in which those elements are drawn. Insert
-        // the new location and sort the array by draw order.
+        this._raisedLocations.push(location);
         this._raisedLocations.sort((a, b) => {
             if (a.z < b.z) {
                 return 1;
@@ -175,8 +174,6 @@ export class SquareGrid extends GameMap {
         return this._raisedLocations;
     }
     getNeighbourCost(centre, to) {
-        // If a horizontal, or vertical, move cost 1 then a diagonal move would be
-        // 1.444... So scale by 2 and round.
         if ((centre.x == to.x) || (centre.y == to.y)) {
             return 2;
         }
@@ -201,92 +198,5 @@ export class SquareGrid extends GameMap {
             case CoordSystem.Isometric:
                 return SquareGrid.convertToIsometric(x, y, width, height);
         }
-    }
-}
-class LocationCost {
-    constructor(_location, _cost) {
-        this._location = _location;
-        this._cost = _cost;
-    }
-    get location() { return this._location; }
-    get id() { return this._location.id; }
-    get cost() { return this._cost; }
-}
-export class SpriteSheet {
-    constructor(name) {
-        this._image = new Image();
-        if (name) {
-            this._image.src = name + ".png";
-        }
-        else {
-            throw new Error("No filename passed");
-        }
-        console.log("load", name);
-    }
-    get image() {
-        return this._image;
-    }
-}
-export class Sprite {
-    constructor(_sheet, _offsetX, _offsetY, _width, _height) {
-        this._sheet = _sheet;
-        this._offsetX = _offsetX;
-        this._offsetY = _offsetY;
-        this._width = _width;
-        this._height = _height;
-    }
-    render(coord, ctx) {
-        ctx.drawImage(this._sheet.image, this._offsetX, this._offsetY, this._width, this._height, coord.x, coord.y, this._width, this._height);
-    }
-}
-export class Renderer {
-    constructor(_ctx, _width, _height, _sprites) {
-        this._ctx = _ctx;
-        this._width = _width;
-        this._height = _height;
-        this._sprites = _sprites;
-    }
-    clear() {
-        this._ctx.fillStyle = '#000000';
-        this._ctx.fillRect(0, 0, this._width, this._height);
-    }
-    render(coord, id) {
-        this._sprites[id].render(coord, this._ctx);
-    }
-}
-export function renderRaised(gameMap, camera, sys, gfx) {
-    let locations = gameMap.raisedLocations;
-    if (sys == CoordSystem.Cartisan) {
-        for (let i in locations) {
-            let location = locations[i];
-            let coord = gameMap.getDrawCoord(location.x, location.y, 0, sys);
-            let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-            gfx.render(newCoord, location.spriteId);
-        }
-    }
-}
-export function renderFloor(gameMap, camera, sys, gfx) {
-    if (sys == CoordSystem.Cartisan) {
-        for (let y = 0; y < gameMap.height; y++) {
-            for (let x = 0; x < gameMap.width; x++) {
-                let location = gameMap.getLocation(x, y);
-                let coord = gameMap.getDrawCoord(x, y, 0, sys);
-                let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-                gfx.render(newCoord, location.spriteId);
-            }
-        }
-    }
-    else if (sys == CoordSystem.Isometric) {
-        for (let y = 0; y < gameMap.height; y++) {
-            for (let x = gameMap.width - 1; x >= 0; x--) {
-                let location = gameMap.getLocation(x, y);
-                let coord = gameMap.getDrawCoord(x, y, 0, sys);
-                let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-                gfx.render(newCoord, location.spriteId);
-            }
-        }
-    }
-    else {
-        throw ("invalid coordinate system");
     }
 }

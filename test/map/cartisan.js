@@ -7,7 +7,7 @@ import { Point,
          Renderer,
          renderRaised,
          renderFloor
-} from '../../js/greenman.js';
+} from '../../dist/greenman.js';
 
 console.log("begin");
 
