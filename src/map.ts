@@ -47,11 +47,6 @@ export class Location {
   }
 }
 
-export enum CoordSystem {
-  Cartisan,
-  Isometric,
-}
-
 class LocationCost {
   constructor(private readonly _location: Location,
               private readonly _cost: number) { }

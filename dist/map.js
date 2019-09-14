@@ -37,11 +37,6 @@ export class Location {
         this._spriteId = id;
     }
 }
-export var CoordSystem;
-(function (CoordSystem) {
-    CoordSystem[CoordSystem["Cartisan"] = 0] = "Cartisan";
-    CoordSystem[CoordSystem["Isometric"] = 1] = "Isometric";
-})(CoordSystem || (CoordSystem = {}));
 class LocationCost {
     constructor(_location, _cost) {
         this._location = _location;
