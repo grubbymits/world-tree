@@ -1,12 +1,11 @@
-import { Point, Location } from "./map.js"
+import { Point, Location, SquareGrid } from "./map.js"
 
 export abstract class Drawable {
   protected _spriteId: number;
 
   constructor(protected _x: number,
               protected _y: number,
-              protected _z: number,
-              protected _drawPoint: Point) {
+              protected _z: number) {
     this._spriteId = 0;
   }
 
@@ -20,10 +19,6 @@ export abstract class Drawable {
 
   get z(): number {
     return this._z;
-  }
-
-  get drawPoint(): Point {
-    return this._drawPoint;
   }
 
   get spriteId(): number {
@@ -70,11 +65,13 @@ export class Sprite {
   }
 }
 
-export class Renderer {
+export abstract class Renderer {
   constructor(private _ctx: CanvasRenderingContext2D,
-              private readonly _width: number,
-              private readonly _height: number,
-              private _sprites: Array<Sprite>) { }
+              protected readonly _width: number,
+              protected readonly _height: number,
+              protected readonly _tileWidth: number,
+              protected readonly _tileHeight: number,
+              protected _sprites: Array<Sprite>) { }
 
   clear(): void {
     this._ctx.fillStyle = '#000000';
@@ -85,13 +82,119 @@ export class Renderer {
     this._sprites[id].draw(coord, this._ctx);
   }
 
+  abstract getDrawCoord(drawable: Drawable): Point;
+  abstract drawFloor(camera: Point, gameMap: SquareGrid): void;
+  abstract sortDrawables(drawables: Array<Drawable>): void;
+
   drawAll(drawables: Array<Drawable>, camera: Point): void {
+    this.sortDrawables(drawables);
     for (let i in drawables) {
       let drawable = drawables[i];
-      let coord = new Point(drawable.drawPoint.x + camera.x,
-                            drawable.drawPoint.y + camera.y);
+      let coord = this.getDrawCoord(drawable);
+      coord = new Point(coord.x + camera.x, coord.y + camera.y);
       this.draw(coord, drawable.spriteId);
     }
+  }
+}
+
+export class CartisanRenderer extends Renderer {
+  constructor(ctx: CanvasRenderingContext2D,
+              width: number,
+              height: number,
+              tileWidth: number,
+              tileHeight: number,
+              sprites: Array<Sprite>) {
+    super(ctx, width, height, tileWidth, tileHeight, sprites);
+  }
+
+  getDrawCoord(drawable: Drawable): Point {
+    let width = this._tileWidth;
+    let height = this._tileHeight;
+    return new Point(drawable.x * width,
+                     (drawable.y * height) - (drawable.z * height));
+  }
+
+  drawFloor(camera: Point, gameMap: SquareGrid) {
+    for (let y = 0; y < gameMap.height; y++) {
+      for (let x = 0; x < gameMap.width; x++) {
+        let location = gameMap.getLocation(x, y);
+        let coord = this.getDrawCoord(location);
+        let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
+        this.draw(newCoord, location.spriteId);
+      }
+    }
+  }
+
+  sortDrawables(drawables: Array<Drawable>): void {
+    // We're drawing a 2D map, so depth is being simulated by the position on
+    // the Y axis and the order in which those elements are drawn. Insert
+    // the new location and sort the array by draw order.
+    drawables.sort((a, b) => {
+      if (a.z < b.z) {
+        return 1;
+      } else if (b.z < a.z) {
+        return -1;
+      }
+      if (a.y < b.y) {
+        return 1;
+      } else if (b.y < a.y) {
+        return -1;
+      }
+      return 0;
+    });
+  }
+}
+
+function convertToIsometric(x: number, y: number, width: number,
+                            height: number): Point {
+  let drawX = Math.floor(x * width / 2) + Math.floor(y * width / 2);
+  let drawY = Math.floor(y * height / 2) - Math.floor(x * height / 2);
+  return new Point(drawX, drawY);
+}
+
+export class IsometricRenderer extends Renderer {
+  constructor(ctx: CanvasRenderingContext2D,
+              width: number,
+              height: number,
+              tileWidth: number,
+              tileHeight: number,
+              sprites: Array<Sprite>) {
+    super(ctx, width, height, tileWidth, tileHeight, sprites);
+  }
+
+  getDrawCoord(drawable: Drawable): Point {
+    return convertToIsometric(drawable.x, drawable.y,
+                              this._tileWidth, this._tileHeight);
+  }
+
+  drawFloor(camera: Point, gameMap: SquareGrid): void {
+    for (let y = 0; y < gameMap.height; y++) {
+      for (let x = gameMap.width - 1; x >= 0; x--) {
+        let location = gameMap.getLocation(x, y);
+        let coord = this.getDrawCoord(location);
+        coord = new Point(coord.x + camera.x, coord.y + camera.y);
+        this.draw(coord, location.spriteId);
+      }
+    }
+  }
+
+  sortDrawables(drawables: Array<Drawable>): void {
+    // We're drawing a 2D map, so depth is being simulated by the position on
+    // the X axis and the order in which those elements are drawn. Insert
+    // the new location and sort the array by draw order.
+    drawables.sort((a, b) => {
+      if (a.z < b.z) {
+        return 1;
+      } else if (b.z < a.z) {
+        return -1;
+      }
+      if (a.x < b.x) {
+        return 1;
+      } else if (b.x < a.x) {
+        return -1;
+      }
+      return 0;
+    });
   }
 }
 

@@ -16,9 +16,8 @@ export class Location extends Drawable {
 
   constructor(private readonly _blocking: boolean,
               x: number, y: number, z: number,
-              coord: Point,
               private readonly _id: number) {
-    super(x, y, z, coord);
+    super(x, y, z);
     this._spriteId = 0;
   }
 
@@ -40,30 +39,25 @@ class LocationCost {
   get cost(): number { return this._cost; }
 }
 
-export abstract class SquareGrid {
+export class SquareGrid {
   private readonly _neighbourOffsets: Array<Point> =
     [ new Point(-1, -1), new Point(0, -1), new Point(1, -1),
       new Point(-1, 0),                    new Point(1, 0),
       new Point(-1, 1),  new Point(0, 1),  new Point(1, 1), ];
 
-  protected _ids: number;
-  protected _raisedLocations: Array<Location>;
-  protected _locations: Array<Array<Location>>;
+  private  _ids: number;
+  private _raisedLocations: Array<Location>;
+  private _locations: Array<Array<Location>>;
 
-  abstract getDrawCoord(cellX: number, cellY: number, cellZ: number): Point;
-  abstract drawFloor(camera: Point, gfx: Renderer): void;
-  abstract sortDrawables(drawables: Array<Drawable>): void;
-
-  constructor(protected _width: number, protected _height: number,
-              protected _tileWidth: number, protected _tileHeight: number) {
+  constructor(private readonly _width: number,
+              private readonly _height: number) {
     this._ids = 0;
     this._raisedLocations = new Array<Location>();
     this._locations = new Array<Array<Location>>();
     for (let x = 0; x < this._width; x++) {
       this._locations[x] = new Array<Location>();
       for (let y = 0; y < this._height; y++) {
-        let coord = this.getDrawCoord(x, y, 0);
-        this._locations[x].push(new Location(false, x, y, 0, coord, this._ids));
+        this._locations[x].push(new Location(false, x, y, 0, this._ids));
         this._ids++;
       }
     }
@@ -82,8 +76,7 @@ export abstract class SquareGrid {
   }
 
   addRaisedLocation(x: number, y: number, z: number): Location {
-    let coord = this.getDrawCoord(x, y, z);
-    let location: Location = new Location(false, x, y, z, coord, this._ids);
+    let location = new Location(false, x, y, z, this._ids);
     this._ids++;
     this._raisedLocations.push(location);
     return location;
@@ -177,90 +170,4 @@ export abstract class SquareGrid {
     path.reverse();
     return path.splice(1);
   }
-
 }
-
-export class IsometricGrid extends SquareGrid {
-  static convertToIsometric(x: number, y: number, width: number,
-                            height: number): Point {
-    let drawX = Math.floor(x * width / 2) + Math.floor(y * width / 2);
-    let drawY = Math.floor(y * height / 2) - Math.floor(x * height / 2);
-    return new Point(drawX, drawY);
-  }
-
-  getDrawCoord(x: number, y: number, z: number): Point {
-    let width = this._tileWidth;
-    let height = this._tileHeight;
-    return IsometricGrid.convertToIsometric(x, y, width, height);
-  }
-
-  drawFloor(camera: Point, gfx: Renderer) {
-    for (let y = 0; y < this._height; y++) {
-      for (let x = this._width - 1; x >= 0; x--) {
-        let location = this.getLocation(x, y);
-        let newCoord = new Point(location.drawPoint.x + camera.x,
-                                 location.drawPoint.y + camera.y);
-        gfx.draw(newCoord, location.spriteId);
-      }
-    }
-  }
-
-  sortDrawables(drawables: Array<Drawable>): void {
-    // We're drawing a 2D map, so depth is being simulated by the position on
-    // the X axis and the order in which those elements are drawn. Insert
-    // the new location and sort the array by draw order.
-    drawables.sort((a, b) => {
-      if (a.z < b.z) {
-        return 1;
-      } else if (b.z < a.z) {
-        return -1;
-      }
-      if (a.x < b.x) {
-        return 1;
-      } else if (b.x < a.x) {
-        return -1;
-      }
-      return 0;
-    });
-  }
-}
-
-export class CartisanGrid extends SquareGrid {
-
-  getDrawCoord(x: number, y: number, z: number): Point {
-    let width = this._tileWidth;
-    let height = this._tileHeight;
-    return new Point(x * width, (y * height) - (z * height));
-  }
-
-  drawFloor(camera: Point, gfx: Renderer) {
-    for (let y = 0; y < this._height; y++) {
-      for (let x = 0; x < this._width; x++) {
-        let location = this.getLocation(x, y);
-        let coord = this.getDrawCoord(x, y, 0);
-        let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-        gfx.draw(newCoord, location.spriteId);
-      }
-    }
-  }
-
-  sortDrawables(drawables: Array<Drawable>): void {
-    // We're drawing a 2D map, so depth is being simulated by the position on
-    // the Y axis and the order in which those elements are drawn. Insert
-    // the new location and sort the array by draw order.
-    drawables.sort((a, b) => {
-      if (a.z < b.z) {
-        return 1;
-      } else if (b.z < a.z) {
-        return -1;
-      }
-      if (a.y < b.y) {
-        return 1;
-      } else if (b.y < a.y) {
-        return -1;
-      }
-      return 0;
-    });
-  }
-}
-

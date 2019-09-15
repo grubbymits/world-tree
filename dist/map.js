@@ -13,8 +13,8 @@ export class Point {
     get y() { return this._y; }
 }
 export class Location extends Drawable {
-    constructor(_blocking, x, y, z, coord, _id) {
-        super(x, y, z, coord);
+    constructor(_blocking, x, y, z, _id) {
+        super(x, y, z);
         this._blocking = _blocking;
         this._id = _id;
         this._spriteId = 0;
@@ -36,11 +36,9 @@ class LocationCost {
     get cost() { return this._cost; }
 }
 export class SquareGrid {
-    constructor(_width, _height, _tileWidth, _tileHeight) {
+    constructor(_width, _height) {
         this._width = _width;
         this._height = _height;
-        this._tileWidth = _tileWidth;
-        this._tileHeight = _tileHeight;
         this._neighbourOffsets = [new Point(-1, -1), new Point(0, -1), new Point(1, -1),
             new Point(-1, 0), new Point(1, 0),
             new Point(-1, 1), new Point(0, 1), new Point(1, 1),];
@@ -50,8 +48,7 @@ export class SquareGrid {
         for (let x = 0; x < this._width; x++) {
             this._locations[x] = new Array();
             for (let y = 0; y < this._height; y++) {
-                let coord = this.getDrawCoord(x, y, 0);
-                this._locations[x].push(new Location(false, x, y, 0, coord, this._ids));
+                this._locations[x].push(new Location(false, x, y, 0, this._ids));
                 this._ids++;
             }
         }
@@ -66,8 +63,7 @@ export class SquareGrid {
         return this._raisedLocations;
     }
     addRaisedLocation(x, y, z) {
-        let coord = this.getDrawCoord(x, y, z);
-        let location = new Location(false, x, y, z, coord, this._ids);
+        let location = new Location(false, x, y, z, this._ids);
         this._ids++;
         this._raisedLocations.push(location);
         return location;
@@ -139,77 +135,5 @@ export class SquareGrid {
         }
         path.reverse();
         return path.splice(1);
-    }
-}
-export class IsometricGrid extends SquareGrid {
-    static convertToIsometric(x, y, width, height) {
-        let drawX = Math.floor(x * width / 2) + Math.floor(y * width / 2);
-        let drawY = Math.floor(y * height / 2) - Math.floor(x * height / 2);
-        return new Point(drawX, drawY);
-    }
-    getDrawCoord(x, y, z) {
-        let width = this._tileWidth;
-        let height = this._tileHeight;
-        return IsometricGrid.convertToIsometric(x, y, width, height);
-    }
-    drawFloor(camera, gfx) {
-        for (let y = 0; y < this._height; y++) {
-            for (let x = this._width - 1; x >= 0; x--) {
-                let location = this.getLocation(x, y);
-                let newCoord = new Point(location.drawPoint.x + camera.x, location.drawPoint.y + camera.y);
-                gfx.draw(newCoord, location.spriteId);
-            }
-        }
-    }
-    sortDrawables(drawables) {
-        drawables.sort((a, b) => {
-            if (a.z < b.z) {
-                return 1;
-            }
-            else if (b.z < a.z) {
-                return -1;
-            }
-            if (a.x < b.x) {
-                return 1;
-            }
-            else if (b.x < a.x) {
-                return -1;
-            }
-            return 0;
-        });
-    }
-}
-export class CartisanGrid extends SquareGrid {
-    getDrawCoord(x, y, z) {
-        let width = this._tileWidth;
-        let height = this._tileHeight;
-        return new Point(x * width, (y * height) - (z * height));
-    }
-    drawFloor(camera, gfx) {
-        for (let y = 0; y < this._height; y++) {
-            for (let x = 0; x < this._width; x++) {
-                let location = this.getLocation(x, y);
-                let coord = this.getDrawCoord(x, y, 0);
-                let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-                gfx.draw(newCoord, location.spriteId);
-            }
-        }
-    }
-    sortDrawables(drawables) {
-        drawables.sort((a, b) => {
-            if (a.z < b.z) {
-                return 1;
-            }
-            else if (b.z < a.z) {
-                return -1;
-            }
-            if (a.y < b.y) {
-                return 1;
-            }
-            else if (b.y < a.y) {
-                return -1;
-            }
-            return 0;
-        });
     }
 }
