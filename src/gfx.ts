@@ -163,8 +163,13 @@ export class IsometricRenderer extends Renderer {
   }
 
   getDrawCoord(drawable: Drawable): Point {
-    return convertToIsometric(drawable.x, drawable.y,
-                              this._tileWidth, this._tileHeight);
+    let width = this._tileWidth;
+    let height = this._tileHeight;
+    let coord = convertToIsometric(drawable.x + drawable.z,
+                                   drawable.y - drawable.z,
+                                   width, height);
+
+    return coord;
   }
 
   drawFloor(camera: Point, gameMap: SquareGrid): void {
@@ -183,9 +188,14 @@ export class IsometricRenderer extends Renderer {
     // the X axis and the order in which those elements are drawn. Insert
     // the new location and sort the array by draw order.
     drawables.sort((a, b) => {
-      if (a.z < b.z) {
+      if (a.z > b.z) {
         return 1;
-      } else if (b.z < a.z) {
+      } else if (b.z > a.z) {
+        return -1;
+      }
+      if (a.y > b.y) {
+        return 1;
+      } else if (b.y > a.y) {
         return -1;
       }
       if (a.x < b.x) {

@@ -24,16 +24,17 @@ sheet.image.onload = function() {
   }
 
   let raised = [];
-  raised.push(game.addLocation(3, 1, 0));
-  raised.push(game.addLocation(2, 1, 0));
+  raised.push(game.addLocation(0, 4, 1));
+  raised.push(game.addLocation(2, 4, 1));
+
   raised.push(game.addLocation(2, 2, 0));
-  raised.push(game.addLocation(2, 3, 0));
-  raised.push(game.addLocation(3, 3, 0));
-  raised[0].spriteId = 0;
-  raised[1].spriteId = 0;
-  raised[2].spriteId = 0;
-  raised[3].spriteId = 0;
-  raised[4].spriteId = 0;
+  raised.push(game.addLocation(2, 2, 1));
+  raised.push(game.addLocation(2, 2, 2));
+
+  raised.push(game.addLocation(1, 1, 0));
+  raised.push(game.addLocation(2, 1, 0));
+  raised.push(game.addLocation(3, 2, 0));
+  raised.push(game.addLocation(4, 2, 0));
 
   // Offset the grid so its displayed roughly in the middle of the canvas.
   let camera = new GM.Point(tileWidth, Math.floor(canvas.height / 2));

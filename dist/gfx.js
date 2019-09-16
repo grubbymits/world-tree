@@ -122,7 +122,10 @@ export class IsometricRenderer extends Renderer {
         super(ctx, width, height, tileWidth, tileHeight, sprites);
     }
     getDrawCoord(drawable) {
-        return convertToIsometric(drawable.x, drawable.y, this._tileWidth, this._tileHeight);
+        let width = this._tileWidth;
+        let height = this._tileHeight;
+        let coord = convertToIsometric(drawable.x + drawable.z, drawable.y - drawable.z, width, height);
+        return coord;
     }
     drawFloor(camera, gameMap) {
         for (let y = 0; y < gameMap.height; y++) {
@@ -136,10 +139,16 @@ export class IsometricRenderer extends Renderer {
     }
     sortDrawables(drawables) {
         drawables.sort((a, b) => {
-            if (a.z < b.z) {
+            if (a.z > b.z) {
                 return 1;
             }
-            else if (b.z < a.z) {
+            else if (b.z > a.z) {
+                return -1;
+            }
+            if (a.y > b.y) {
+                return 1;
+            }
+            else if (b.y > a.y) {
                 return -1;
             }
             if (a.x < b.x) {
