@@ -1,35 +1,5 @@
 import { Point, Location, SquareGrid } from "./map.js"
 
-export abstract class Drawable {
-  protected _spriteId: number;
-
-  constructor(protected _x: number,
-              protected _y: number,
-              protected _z: number) {
-    this._spriteId = 0;
-  }
-
-  get x(): number {
-    return this._x;
-  }
-
-  get y(): number {
-    return this._y;
-  }
-
-  get z(): number {
-    return this._z;
-  }
-
-  get spriteId(): number {
-    return this._spriteId;
-  }
-
-  set spriteId(id: number) {
-    this._spriteId = id;
-  }
-}
-
 export class SpriteSheet {
   private _image: HTMLImageElement;
 
@@ -65,6 +35,18 @@ export class Sprite {
   }
 }
 
+export abstract class GraphicsComponent {
+  update(obj: GameObject, gfx: Renderer): void;
+}
+
+export class StaticGraphicsComponent {
+  private  _spriteId: number;
+}
+
+export class AnimatedGraphicsComponent {
+  private _spriteIds: Array<number>;
+}
+
 export abstract class Renderer {
   constructor(private _ctx: CanvasRenderingContext2D,
               protected readonly _width: number,
@@ -82,17 +64,17 @@ export abstract class Renderer {
     this._sprites[id].draw(coord, this._ctx);
   }
 
-  abstract getDrawCoord(drawable: Drawable): Point;
+  abstract getDrawCoord(object: GameObject): Point;
   abstract drawFloor(camera: Point, gameMap: SquareGrid): void;
-  abstract sortDrawables(drawables: Array<Drawable>): void;
+  abstract sortGameObjects(objects: Array<GameObject>): void;
 
-  drawAll(drawables: Array<Drawable>, camera: Point): void {
-    this.sortDrawables(drawables);
-    for (let i in drawables) {
-      let drawable = drawables[i];
-      let coord = this.getDrawCoord(drawable);
+  drawAll(objects: Array<GameObject>, camera: Point): void {
+    this.sortGameObjects(objects);
+    for (let i in objects) {
+      let object = objects[i];
+      let coord = this.getDrawCoord(object);
       coord = new Point(coord.x + camera.x, coord.y + camera.y);
-      this.draw(coord, drawable.spriteId);
+      this.draw(coord, object.spriteId);
     }
   }
 }
@@ -107,11 +89,11 @@ export class CartisanRenderer extends Renderer {
     super(ctx, width, height, tileWidth, tileHeight, sprites);
   }
 
-  getDrawCoord(drawable: Drawable): Point {
+  getDrawCoord(object: GameObject): Point {
     let width = this._tileWidth;
     let height = this._tileHeight;
-    return new Point(drawable.x * width,
-                     (drawable.y * height) - (drawable.z * height));
+    return new Point(object.x * width,
+                     (object.y * height) - (object.z * height));
   }
 
   drawFloor(camera: Point, gameMap: SquareGrid) {
@@ -125,11 +107,11 @@ export class CartisanRenderer extends Renderer {
     }
   }
 
-  sortDrawables(drawables: Array<Drawable>): void {
+  sortGameObjects(objects: Array<GameObject>): void {
     // We're drawing a 2D map, so depth is being simulated by the position on
     // the Y axis and the order in which those elements are drawn. Insert
     // the new location and sort the array by draw order.
-    drawables.sort((a, b) => {
+    objects.sort((a, b) => {
       if (a.z < b.z) {
         return 1;
       } else if (b.z < a.z) {
@@ -162,11 +144,11 @@ export class IsometricRenderer extends Renderer {
     super(ctx, width, height, tileWidth, tileHeight, sprites);
   }
 
-  getDrawCoord(drawable: Drawable): Point {
+  getDrawCoord(object: GameObject): Point {
     let width = this._tileWidth;
     let height = this._tileHeight;
-    let coord = convertToIsometric(drawable.x + drawable.z,
-                                   drawable.y - drawable.z,
+    let coord = convertToIsometric(object.x + object.z,
+                                   object.y - object.z,
                                    width, height);
 
     return coord;
@@ -183,24 +165,26 @@ export class IsometricRenderer extends Renderer {
     }
   }
 
-  sortDrawables(drawables: Array<Drawable>): void {
+  sortGameObjects(objects: Array<GameObject>): void {
     // We're drawing a 2D map, so depth is being simulated by the position on
     // the X axis and the order in which those elements are drawn. Insert
     // the new location and sort the array by draw order.
-    drawables.sort((a, b) => {
-      if (a.z > b.z) {
+    objects.sort((a, b) => {
+      let locA = a.location;
+      let locB = a.location;
+      if (locA.z > locB.z) {
         return 1;
-      } else if (b.z > a.z) {
+      } else if (locB.z > locA.z) {
         return -1;
       }
-      if (a.y > b.y) {
+      if (locA.y > locB.y) {
         return 1;
-      } else if (b.y > a.y) {
+      } else if (locB.y > locA.y) {
         return -1;
       }
-      if (a.x < b.x) {
+      if (locA.x < locB.x) {
         return 1;
-      } else if (b.x < a.x) {
+      } else if (locB.x < locA.x) {
         return -1;
       }
       return 0;

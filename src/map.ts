@@ -12,25 +12,6 @@ export class Point {
   get y() { return this._y; }
 }
 
-export class Location extends Drawable {
-
-  constructor(private readonly _blocking: boolean,
-              x: number, y: number, z: number,
-              private readonly _id: number) {
-    super(x, y, z);
-    this._spriteId = 0;
-  }
-
-
-  get id(): number {
-    return this._id;
-  }
-
-  get blocked(): boolean {
-    return this._blocking;
-  }
-}
-
 class LocationCost {
   constructor(private readonly _location: Location,
               private readonly _cost: number) { }
@@ -46,18 +27,19 @@ export class SquareGrid {
       new Point(-1, 1),  new Point(0, 1),  new Point(1, 1), ];
 
   private  _ids: number;
-  private _raisedLocations: Array<Location>;
-  private _locations: Array<Array<Location>>;
+  private _raisedLocations: Array<GameObject>;
+  private _locations: Array<Array<GameObject>>;
 
   constructor(private readonly _width: number,
               private readonly _height: number) {
     this._ids = 0;
-    this._raisedLocations = new Array<Location>();
-    this._locations = new Array<Array<Location>>();
+    this._raisedLocations = new Array<GameObject>();
+    this._floor = new Array<Array<GameObject>>();
     for (let x = 0; x < this._width; x++) {
-      this._locations[x] = new Array<Location>();
+      this._floor[x] = new Array<GameObject>();
       for (let y = 0; y < this._height; y++) {
-        this._locations[x].push(new Location(false, x, y, 0, this._ids));
+        let location = new Location(x, y, 0);
+        this._floor[x].push(new GameObject(location, false, this._ids));
         this._ids++;
       }
     }
