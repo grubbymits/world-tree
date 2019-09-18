@@ -1,27 +1,9 @@
 import { Point } from "./map.js";
-export class Drawable {
-    constructor(_x, _y, _z) {
-        this._x = _x;
-        this._y = _y;
-        this._z = _z;
-        this._spriteId = 0;
-    }
-    get x() {
-        return this._x;
-    }
-    get y() {
-        return this._y;
-    }
-    get z() {
-        return this._z;
-    }
-    get spriteId() {
-        return this._spriteId;
-    }
-    set spriteId(id) {
-        this._spriteId = id;
-    }
-}
+export var CoordSystem;
+(function (CoordSystem) {
+    CoordSystem[CoordSystem["Cartisan"] = 0] = "Cartisan";
+    CoordSystem[CoordSystem["Isometric"] = 1] = "Isometric";
+})(CoordSystem || (CoordSystem = {}));
 export class SpriteSheet {
     constructor(name) {
         this._image = new Image();
@@ -49,6 +31,19 @@ export class Sprite {
         ctx.drawImage(this._sheet.image, this._offsetX, this._offsetY, this._width, this._height, coord.x, coord.y, this._width, this._height);
     }
 }
+export class GraphicsComponent {
+    constructor(_currentSpriteId) {
+        this._currentSpriteId = _currentSpriteId;
+    }
+}
+export class StaticGraphicsComponent extends GraphicsComponent {
+    constructor(id) {
+        super(id);
+    }
+    update() {
+        return this._currentSpriteId;
+    }
+}
 export class Renderer {
     constructor(_ctx, _width, _height, _tileWidth, _tileHeight, _sprites) {
         this._ctx = _ctx;
@@ -65,13 +60,14 @@ export class Renderer {
     draw(coord, id) {
         this._sprites[id].draw(coord, this._ctx);
     }
-    drawAll(drawables, camera) {
-        this.sortDrawables(drawables);
-        for (let i in drawables) {
-            let drawable = drawables[i];
-            let coord = this.getDrawCoord(drawable);
+    drawAll(objects, camera) {
+        this.sortGameObjects(objects);
+        for (let i in objects) {
+            let gameObj = objects[i];
+            let coord = this.getDrawCoord(gameObj);
             coord = new Point(coord.x + camera.x, coord.y + camera.y);
-            this.draw(coord, drawable.spriteId);
+            let spriteId = gameObj.graphicsComponent.update();
+            this.draw(coord, spriteId);
         }
     }
 }
@@ -79,23 +75,24 @@ export class CartisanRenderer extends Renderer {
     constructor(ctx, width, height, tileWidth, tileHeight, sprites) {
         super(ctx, width, height, tileWidth, tileHeight, sprites);
     }
-    getDrawCoord(drawable) {
+    getDrawCoord(object) {
         let width = this._tileWidth;
         let height = this._tileHeight;
-        return new Point(drawable.x * width, (drawable.y * height) - (drawable.z * height));
+        return new Point(object.x * width, (object.y * height) - (object.z * height));
     }
     drawFloor(camera, gameMap) {
         for (let y = 0; y < gameMap.height; y++) {
             for (let x = 0; x < gameMap.width; x++) {
-                let location = gameMap.getLocation(x, y);
-                let coord = this.getDrawCoord(location);
+                let gameObj = gameMap.getFloor(x, y);
+                let coord = this.getDrawCoord(gameObj);
                 let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-                this.draw(newCoord, location.spriteId);
+                let spriteId = gameObj.graphicsComponent.update();
+                this.draw(newCoord, spriteId);
             }
         }
     }
-    sortDrawables(drawables) {
-        drawables.sort((a, b) => {
+    sortGameObjects(objects) {
+        objects.sort((a, b) => {
             if (a.z < b.z) {
                 return 1;
             }
@@ -121,40 +118,43 @@ export class IsometricRenderer extends Renderer {
     constructor(ctx, width, height, tileWidth, tileHeight, sprites) {
         super(ctx, width, height, tileWidth, tileHeight, sprites);
     }
-    getDrawCoord(drawable) {
+    getDrawCoord(object) {
         let width = this._tileWidth;
         let height = this._tileHeight;
-        let coord = convertToIsometric(drawable.x + drawable.z, drawable.y - drawable.z, width, height);
+        let coord = convertToIsometric(object.x + object.z, object.y - object.z, width, height);
         return coord;
     }
     drawFloor(camera, gameMap) {
         for (let y = 0; y < gameMap.height; y++) {
             for (let x = gameMap.width - 1; x >= 0; x--) {
-                let location = gameMap.getLocation(x, y);
-                let coord = this.getDrawCoord(location);
+                let gameObj = gameMap.getFloor(x, y);
+                let coord = this.getDrawCoord(gameObj);
                 coord = new Point(coord.x + camera.x, coord.y + camera.y);
-                this.draw(coord, location.spriteId);
+                let spriteId = gameObj.graphicsComponent.update();
+                this.draw(coord, spriteId);
             }
         }
     }
-    sortDrawables(drawables) {
-        drawables.sort((a, b) => {
-            if (a.z > b.z) {
+    sortGameObjects(objects) {
+        objects.sort((a, b) => {
+            let locA = a.location;
+            let locB = a.location;
+            if (locA.z > locB.z) {
                 return 1;
             }
-            else if (b.z > a.z) {
+            else if (locB.z > locA.z) {
                 return -1;
             }
-            if (a.y > b.y) {
+            if (locA.y > locB.y) {
                 return 1;
             }
-            else if (b.y > a.y) {
+            else if (locB.y > locA.y) {
                 return -1;
             }
-            if (a.x < b.x) {
+            if (locA.x < locB.x) {
                 return 1;
             }
-            else if (b.x < a.x) {
+            else if (locB.x < locA.x) {
                 return -1;
             }
             return 0;

@@ -1,4 +1,10 @@
-import { Point, Location, SquareGrid } from "./map.js"
+import { Point, SquareGrid } from "./map.js"
+import { Location, GameObject } from "./entity.js"
+
+export enum CoordSystem {
+  Cartisan,
+  Isometric,
+}
 
 export class SpriteSheet {
   private _image: HTMLImageElement;
@@ -36,15 +42,19 @@ export class Sprite {
 }
 
 export abstract class GraphicsComponent {
-  update(obj: GameObject, gfx: Renderer): void;
+  constructor(protected _currentSpriteId: number) { }
+              
+  abstract update(): number;
 }
 
-export class StaticGraphicsComponent {
-  private  _spriteId: number;
-}
+export class StaticGraphicsComponent extends GraphicsComponent {
+  constructor(id: number) {
+    super(id);
+  }
 
-export class AnimatedGraphicsComponent {
-  private _spriteIds: Array<number>;
+  update(): number {
+    return this._currentSpriteId;
+  }
 }
 
 export abstract class Renderer {
@@ -71,10 +81,11 @@ export abstract class Renderer {
   drawAll(objects: Array<GameObject>, camera: Point): void {
     this.sortGameObjects(objects);
     for (let i in objects) {
-      let object = objects[i];
-      let coord = this.getDrawCoord(object);
+      let gameObj = objects[i];
+      let coord = this.getDrawCoord(gameObj);
       coord = new Point(coord.x + camera.x, coord.y + camera.y);
-      this.draw(coord, object.spriteId);
+      let spriteId = gameObj.graphicsComponent.update();
+      this.draw(coord, spriteId);
     }
   }
 }
@@ -99,10 +110,11 @@ export class CartisanRenderer extends Renderer {
   drawFloor(camera: Point, gameMap: SquareGrid) {
     for (let y = 0; y < gameMap.height; y++) {
       for (let x = 0; x < gameMap.width; x++) {
-        let location = gameMap.getLocation(x, y);
-        let coord = this.getDrawCoord(location);
+        let gameObj = gameMap.getFloor(x, y);
+        let coord = this.getDrawCoord(gameObj);
         let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
-        this.draw(newCoord, location.spriteId);
+        let spriteId = gameObj.graphicsComponent.update();
+        this.draw(newCoord, spriteId);
       }
     }
   }
@@ -157,10 +169,11 @@ export class IsometricRenderer extends Renderer {
   drawFloor(camera: Point, gameMap: SquareGrid): void {
     for (let y = 0; y < gameMap.height; y++) {
       for (let x = gameMap.width - 1; x >= 0; x--) {
-        let location = gameMap.getLocation(x, y);
-        let coord = this.getDrawCoord(location);
+        let gameObj = gameMap.getFloor(x, y);
+        let coord = this.getDrawCoord(gameObj);
         coord = new Point(coord.x + camera.x, coord.y + camera.y);
-        this.draw(coord, location.spriteId);
+        let spriteId = gameObj.graphicsComponent.update();
+        this.draw(coord, spriteId);
       }
     }
   }

@@ -1,11 +1,13 @@
-import { CoordSystem, Point, Location, SquareGrid } from "./map.js"
-import { Drawable, Sprite,
+import { Location, GameObject } from "./entity.js"
+import { Point, SquareGrid } from "./map.js"
+import { CoordSystem, Sprite,
+         GraphicsComponent, StaticGraphicsComponent,
          Renderer, CartisanRenderer, IsometricRenderer } from "./gfx.js"
 
 export class Game {
   private _gameMap: SquareGrid;
   private _gfx: Renderer;
-  private _drawables: Array<Drawable>;
+  private _gameObjects : Array<GameObject>;
 
   constructor(_cellsX: number,
               _cellsY: number,
@@ -15,8 +17,11 @@ export class Game {
               _canvas: HTMLCanvasElement,
               _sprites: Array<Sprite>) {
 
-    this._drawables = new Array<Drawable>();
-    this._gameMap = new SquareGrid(_cellsX, _cellsY);
+    this._gameObjects = new Array<GameObject>();
+    let _tileDepth = _tileHeight; // FIXME
+    let floorGraphics = new StaticGraphicsComponent(0);
+    this._gameMap = new SquareGrid(_cellsX, _cellsY, _tileWidth,
+                                   _tileDepth, _tileHeight, floorGraphics);
 
     let context = _canvas.getContext("2d", { alpha: false })!;
     this._gfx = sys == CoordSystem.Cartisan ?
@@ -35,14 +40,15 @@ export class Game {
     return this._gameMap.getLocation(x, y);
   }
 
-  addLocation(x: number, y: number, z: number): Location {
-    let location = this._gameMap.addRaisedLocation(x, y, z);
-    this._drawables.push(location);
-    return location;
+  addTerrain(x: number, y: number, z: number,
+             component: GraphicsComponent): GameObject {
+    let terrain = this._gameMap.addRaisedTerrain(x, y, z, component);
+    this._gameObjects.push(terrain);
+    return terrain;
   }
 
   update(camera: Point): void {
     this._gfx.drawFloor(camera, this._gameMap);
-    this._gfx.drawAll(this._drawables, camera);
+    this._gfx.drawAll(this._gameObjects, camera);
   }
 }

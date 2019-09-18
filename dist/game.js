@@ -1,9 +1,11 @@
-import { CoordSystem, SquareGrid } from "./map.js";
-import { CartisanRenderer, IsometricRenderer } from "./gfx.js";
+import { SquareGrid } from "./map.js";
+import { CoordSystem, StaticGraphicsComponent, CartisanRenderer, IsometricRenderer } from "./gfx.js";
 export class Game {
     constructor(_cellsX, _cellsY, _tileWidth, _tileHeight, sys, _canvas, _sprites) {
-        this._drawables = new Array();
-        this._gameMap = new SquareGrid(_cellsX, _cellsY);
+        this._gameObjects = new Array();
+        let _tileDepth = _tileHeight;
+        let floorGraphics = new StaticGraphicsComponent(0);
+        this._gameMap = new SquareGrid(_cellsX, _cellsY, _tileWidth, _tileDepth, _tileHeight, floorGraphics);
         let context = _canvas.getContext("2d", { alpha: false });
         this._gfx = sys == CoordSystem.Cartisan ?
             new CartisanRenderer(context, _canvas.width, _canvas.height, _tileWidth, _tileHeight, _sprites) :
@@ -16,13 +18,13 @@ export class Game {
     getLocation(x, y) {
         return this._gameMap.getLocation(x, y);
     }
-    addLocation(x, y, z) {
-        let location = this._gameMap.addRaisedLocation(x, y, z);
-        this._drawables.push(location);
-        return location;
+    addTerrain(x, y, z, component) {
+        let terrain = this._gameMap.addRaisedTerrain(x, y, z, component);
+        this._gameObjects.push(terrain);
+        return terrain;
     }
     update(camera) {
         this._gfx.drawFloor(camera, this._gameMap);
-        this._gfx.drawAll(this._drawables, camera);
+        this._gfx.drawAll(this._gameObjects, camera);
     }
 }

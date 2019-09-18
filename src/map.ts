@@ -1,9 +1,5 @@
-import { Drawable, Renderer } from "./gfx.js"
-
-export enum CoordSystem {
-  Cartisan,
-  Isometric,
-}
+import { Location, GameObject } from "./entity.js"
+import { GraphicsComponent } from "./gfx.js"
 
 export class Point {
   constructor(private readonly _x: number,
@@ -16,7 +12,6 @@ class LocationCost {
   constructor(private readonly _location: Location,
               private readonly _cost: number) { }
   get location(): Location { return this._location; }
-  get id(): number { return this._location.id }
   get cost(): number { return this._cost; }
 }
 
@@ -26,21 +21,25 @@ export class SquareGrid {
       new Point(-1, 0),                    new Point(1, 0),
       new Point(-1, 1),  new Point(0, 1),  new Point(1, 1), ];
 
-  private  _ids: number;
-  private _raisedLocations: Array<GameObject>;
-  private _locations: Array<Array<GameObject>>;
+  private _raisedTerrain: Array<GameObject>;
+  private _floor: Array<Array<GameObject>>;
 
   constructor(private readonly _width: number,
-              private readonly _height: number) {
-    this._ids = 0;
-    this._raisedLocations = new Array<GameObject>();
+              private readonly _height: number,
+              private readonly _tileWidth: number,      // x
+              private readonly _tileDepth: number,      // y
+              private readonly _tileHeight: number,
+              component: GraphicsComponent) {   // z
+    this._raisedTerrain = new Array<GameObject>();
     this._floor = new Array<Array<GameObject>>();
     for (let x = 0; x < this._width; x++) {
       this._floor[x] = new Array<GameObject>();
       for (let y = 0; y < this._height; y++) {
-        let location = new Location(x, y, 0);
-        this._floor[x].push(new GameObject(location, false, this._ids));
-        this._ids++;
+        let location = new Location(x * _tileWidth,
+                                    y * _tileDepth,
+                                    0);
+        this._floor[x].push(new GameObject(location, _tileWidth, _tileDepth,
+                                           _tileHeight, false, component));
       }
     }
   }
@@ -53,19 +52,25 @@ export class SquareGrid {
     return this._height;
   }
 
-  get raisedLocations(): Array<Location> {
-    return this._raisedLocations;
+  get raisedTerrain(): Array<GameObject> {
+    return this._raisedTerrain;
   }
 
-  addRaisedLocation(x: number, y: number, z: number): Location {
-    let location = new Location(false, x, y, z, this._ids);
-    this._ids++;
-    this._raisedLocations.push(location);
-    return location;
+  addRaisedTerrain(x: number, y: number, z: number,
+                   component: GraphicsComponent): GameObject {
+    let location = new Location(x, y, z);
+    let terrain = new GameObject(location, this._tileWidth, this._tileDepth,
+                                 this._tileHeight, false, component);
+    this._raisedTerrain.push(terrain);
+    return terrain;
+  }
+
+  getFloor(x: number, y: number): GameObject {
+    return this._floor[x][y];
   }
 
   getLocation(x: number, y: number): Location {
-    return this._locations[x][y];
+    return this._floor[x][y].location;
   }
 
   getNeighbourCost(centre: Location, to: Location): number {
@@ -81,15 +86,24 @@ export class SquareGrid {
     let neighbours = new Array<Location>();
     
     for (let offset of this._neighbourOffsets) {
-      let neighbour = this.getLocation(centre.x + offset.x, centre.y + offset.y);
+      let neighbour = this.getLocation(centre.x + offset.x,
+                                       centre.y + offset.y);
       neighbours.push(neighbour);
     }
     return neighbours;
   }
 
+  isBlocked(loc: Location): boolean {
+    return this._floor[loc.x][loc.y].blocking;
+  }
+
+  objectId(loc: Location): number {
+    return this._floor[loc.x][loc.y].id;
+  }
+
   findPath(begin: Location, end: Location) : Array<Location> {
     let path = new Array<Location>();
-    if (end.blocked)
+    if (this.isBlocked(end))
       return path;
   
     // Adapted from:
@@ -109,13 +123,13 @@ export class SquareGrid {
       current = frontier.shift()!;
 
       // Found!
-      if (current.id == end.id) {
+      if (this.objectId(current.location) == this.objectId(end)) {
         break;
       }
 
       let neighbours: Array<Location> = this.getNeighbours(current.location);
       for (let next of neighbours) {
-        let newCost: number = costSoFar.get(current.id) +
+        let newCost: number = costSoFar.get(this.objectId(current.location)) +
         this.getNeighbourCost(current.location, next);
 
         if (!costSoFar.has(next) || newCost < costSoFar.get(next)) {
@@ -137,7 +151,7 @@ export class SquareGrid {
     }
 
     // Search has ended...
-    if (current.id != end.id) {
+    if (this.objectId(current.location) != this.objectId(end)) {
       console.log("Could not find a path...");
       return path;
     }
@@ -145,7 +159,7 @@ export class SquareGrid {
     // finalise the path.
     let step: Location = end;
     path.push(step);
-    while (step.id != begin.id) {
+    while (this.objectId(step) != this.objectId(begin)) {
       step = cameFrom.get(step);
       path.push(step);
     }
