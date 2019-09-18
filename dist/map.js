@@ -30,7 +30,7 @@ export class SquareGrid {
         for (let x = 0; x < this._width; x++) {
             this._floor[x] = new Array();
             for (let y = 0; y < this._height; y++) {
-                let location = new Location(x * _tileWidth, y * _tileDepth, 0);
+                let location = new Location(x, y, 0);
                 this._floor[x].push(new GameObject(location, _tileWidth, _tileDepth, _tileHeight, false, component));
             }
         }

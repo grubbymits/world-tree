@@ -26,17 +26,17 @@ export class SquareGrid {
 
   constructor(private readonly _width: number,
               private readonly _height: number,
-              private readonly _tileWidth: number,      // x
-              private readonly _tileDepth: number,      // y
-              private readonly _tileHeight: number,
-              component: GraphicsComponent) {   // z
+              private readonly _tileWidth: number,  // x
+              private readonly _tileDepth: number,  // y
+              private readonly _tileHeight: number, // z
+              component: GraphicsComponent) {
     this._raisedTerrain = new Array<GameObject>();
     this._floor = new Array<Array<GameObject>>();
     for (let x = 0; x < this._width; x++) {
       this._floor[x] = new Array<GameObject>();
       for (let y = 0; y < this._height; y++) {
-        let location = new Location(x * _tileWidth,
-                                    y * _tileDepth,
+        let location = new Location(x,
+                                    y,
                                     0);
         this._floor[x].push(new GameObject(location, _tileWidth, _tileDepth,
                                            _tileHeight, false, component));

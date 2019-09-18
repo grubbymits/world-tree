@@ -16,25 +16,17 @@ sheet.image.onload = function() {
   let game = new GM.Game(cellsX, cellsY, tileWidth, tileHeight,
                          GM.CoordSystem.Isometric, canvas, sprites);
 
-  for (let y = 0; y < cellsY; y++) {
-    for (let x = 0; x < cellsX; x++) {
-      let location = game.getLocation(x, y);
-      location.spriteId = 0;
-    }
-  }
-
   let raised = [];
-  raised.push(game.addLocation(0, 4, 1));
-  raised.push(game.addLocation(2, 4, 1));
+  let graphic = new GM.StaticGraphicsComponent(0);
+  raised.push(game.addTerrain(0, 4, 1, graphic));
+  raised.push(game.addTerrain(1, 4, 1, graphic));
+  raised.push(game.addTerrain(2, 4, 1, graphic));
+  raised.push(game.addTerrain(2, 3, 1, graphic));
+  raised.push(game.addTerrain(0, 5, 1, graphic));
 
-  raised.push(game.addLocation(2, 2, 0));
-  raised.push(game.addLocation(2, 2, 1));
-  raised.push(game.addLocation(2, 2, 2));
-
-  raised.push(game.addLocation(1, 1, 0));
-  raised.push(game.addLocation(2, 1, 0));
-  raised.push(game.addLocation(3, 2, 0));
-  raised.push(game.addLocation(4, 2, 0));
+  raised.push(game.addTerrain(2, 2, 1, graphic));
+  raised.push(game.addTerrain(2, 2, 2, graphic));
+  raised.push(game.addTerrain(2, 2, 3, graphic));
 
   // Offset the grid so its displayed roughly in the middle of the canvas.
   let camera = new GM.Point(tileWidth, Math.floor(canvas.height / 2));

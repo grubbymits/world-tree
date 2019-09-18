@@ -156,11 +156,11 @@ export class IsometricRenderer extends Renderer {
     super(ctx, width, height, tileWidth, tileHeight, sprites);
   }
 
-  getDrawCoord(object: GameObject): Point {
+  getDrawCoord(gameObj: GameObject): Point {
     let width = this._tileWidth;
     let height = this._tileHeight;
-    let coord = convertToIsometric(object.x + object.z,
-                                   object.y - object.z,
+    let coord = convertToIsometric(gameObj.x + gameObj.z,
+                                   gameObj.y - gameObj.z,
                                    width, height);
 
     return coord;
@@ -183,21 +183,19 @@ export class IsometricRenderer extends Renderer {
     // the X axis and the order in which those elements are drawn. Insert
     // the new location and sort the array by draw order.
     objects.sort((a, b) => {
-      let locA = a.location;
-      let locB = a.location;
-      if (locA.z > locB.z) {
+      if (a.z > b.z) {
         return 1;
-      } else if (locB.z > locA.z) {
+      } else if (b.z > a.z) {
         return -1;
       }
-      if (locA.y > locB.y) {
+      if (a.y > b.y) {
         return 1;
-      } else if (locB.y > locA.y) {
+      } else if (b.y > a.y) {
         return -1;
       }
-      if (locA.x < locB.x) {
+      if (a.x < b.x) {
         return 1;
-      } else if (locB.x < locA.x) {
+      } else if (b.x < a.x) {
         return -1;
       }
       return 0;
