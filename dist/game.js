@@ -1,15 +1,15 @@
 import { SquareGrid } from "./map.js";
 import { CoordSystem, StaticGraphicsComponent, CartisanRenderer, IsometricRenderer } from "./gfx.js";
 export class Game {
-    constructor(_cellsX, _cellsY, _tileWidth, _tileHeight, sys, _canvas, _sprites) {
+    constructor(_cellsX, _cellsY, _tileWidth, _tileHeight, sys, _canvas, _sprites, floorSpriteId) {
         this._gameObjects = new Array();
         let _tileDepth = _tileHeight;
-        let floorGraphics = new StaticGraphicsComponent(0);
+        let floorGraphics = new StaticGraphicsComponent(floorSpriteId);
         this._gameMap = new SquareGrid(_cellsX, _cellsY, _tileWidth, _tileDepth, _tileHeight, floorGraphics);
         let context = _canvas.getContext("2d", { alpha: false });
         this._gfx = sys == CoordSystem.Cartisan ?
-            new CartisanRenderer(context, _canvas.width, _canvas.height, _tileWidth, _tileHeight, _sprites) :
-            new IsometricRenderer(context, _canvas.width, _canvas.height, _tileWidth, _tileHeight, _sprites);
+            new CartisanRenderer(context, _canvas.width, _canvas.height, _sprites) :
+            new IsometricRenderer(context, _canvas.width, _canvas.height, _sprites);
         this._gfx.clear();
     }
     get map() {

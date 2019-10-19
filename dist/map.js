@@ -1,4 +1,4 @@
-import { Location, GameObject } from "./entity.js";
+import { Terrain } from "./entity.js";
 export class Point {
     constructor(_x, _y) {
         this._x = _x;
@@ -16,22 +16,20 @@ class LocationCost {
     get cost() { return this._cost; }
 }
 export class SquareGrid {
-    constructor(_width, _height, _tileWidth, _tileDepth, _tileHeight, component) {
+    constructor(_width, _height, tileWidth, tileDepth, tileHeight, component) {
         this._width = _width;
         this._height = _height;
-        this._tileWidth = _tileWidth;
-        this._tileDepth = _tileDepth;
-        this._tileHeight = _tileHeight;
         this._neighbourOffsets = [new Point(-1, -1), new Point(0, -1), new Point(1, -1),
             new Point(-1, 0), new Point(1, 0),
             new Point(-1, 1), new Point(0, 1), new Point(1, 1),];
         this._raisedTerrain = new Array();
         this._floor = new Array();
+        Terrain.init(tileWidth, tileDepth, tileHeight);
+        console.log("creating map", _width, _height);
         for (let x = 0; x < this._width; x++) {
             this._floor[x] = new Array();
             for (let y = 0; y < this._height; y++) {
-                let location = new Location(x, y, 0);
-                this._floor[x].push(new GameObject(location, _tileWidth, _tileDepth, _tileHeight, false, component));
+                this._floor[x].push(new Terrain(x, y, 0, component));
             }
         }
     }
@@ -45,8 +43,7 @@ export class SquareGrid {
         return this._raisedTerrain;
     }
     addRaisedTerrain(x, y, z, component) {
-        let location = new Location(x, y, z);
-        let terrain = new GameObject(location, this._tileWidth, this._tileDepth, this._tileHeight, false, component);
+        let terrain = new Terrain(x, y, z, component);
         this._raisedTerrain.push(terrain);
         return terrain;
     }
@@ -58,9 +55,9 @@ export class SquareGrid {
     }
     getNeighbourCost(centre, to) {
         if ((centre.x == to.x) || (centre.y == to.y)) {
-            return 2;
+            return centre.z == to.z ? 2 : 4;
         }
-        return 3;
+        return centre.z == to.z ? 3 : 6;
     }
     getNeighbours(centre) {
         let neighbours = new Array();

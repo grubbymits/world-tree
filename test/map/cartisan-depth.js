@@ -21,23 +21,13 @@ sheet.image.onload = function() {
 
   let canvas = document.getElementById("testCanvas");
   let game = new GM.Game(cellsX, cellsY, tileWidth, tileHeight,
-                         GM.CoordSystem.Cartisan, canvas, sprites);
-
-  // Setup sprites for each location.
-  for (let y = 0; y < cellsY; y++) {
-    for (let x = 0; x < cellsX; x++) {
-      let location = game.getLocation(x, y);
-      location.spriteId = 4; // middle tile
-    }
-  }
+                         GM.CoordSystem.Cartisan, canvas, sprites,
+                         4); // 4 = middle tile
 
   let raised = [];
-  raised.push(game.addLocation(1, 2, 0));
-  raised.push(game.addLocation(2, 2, 0));
-  raised.push(game.addLocation(3, 2, 0));
-  raised[0].spriteId = 6; // left lower edge
-  raised[1].spriteId = 7; // middle lower edge
-  raised[2].spriteId = 8; // right lower edge
+  raised.push(game.addTerrain(1, 2, 0, new GM.StaticGraphicsComponent(6)));
+  raised.push(game.addTerrain(2, 2, 0, new GM.StaticGraphicsComponent(7)));
+  raised.push(game.addTerrain(3, 2, 0, new GM.StaticGraphicsComponent(8)));
 
   let camera = new GM.Point(2 * tileWidth, 2 * tileHeight);
   game.update(camera);

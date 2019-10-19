@@ -1,4 +1,4 @@
-import { Location, GameObject } from "./entity.js"
+import { Location, Terrain } from "./entity.js"
 import { GraphicsComponent } from "./gfx.js"
 
 export class Point {
@@ -21,25 +21,24 @@ export class SquareGrid {
       new Point(-1, 0),                    new Point(1, 0),
       new Point(-1, 1),  new Point(0, 1),  new Point(1, 1), ];
 
-  private _raisedTerrain: Array<GameObject>;
-  private _floor: Array<Array<GameObject>>;
+  private _raisedTerrain: Array<Terrain>;
+  private _floor: Array<Array<Terrain>>;
 
   constructor(private readonly _width: number,
               private readonly _height: number,
-              private readonly _tileWidth: number,  // x
-              private readonly _tileDepth: number,  // y
-              private readonly _tileHeight: number, // z
+              tileWidth: number,  // x
+              tileDepth: number,  // y
+              tileHeight: number, // z
               component: GraphicsComponent) {
-    this._raisedTerrain = new Array<GameObject>();
-    this._floor = new Array<Array<GameObject>>();
+    this._raisedTerrain = new Array<Terrain>();
+    this._floor = new Array<Array<Terrain>>();
+    Terrain.init(tileWidth, tileDepth, tileHeight);
+    console.log("creating map", _width, _height);
+
     for (let x = 0; x < this._width; x++) {
-      this._floor[x] = new Array<GameObject>();
+      this._floor[x] = new Array<Terrain>();
       for (let y = 0; y < this._height; y++) {
-        let location = new Location(x,
-                                    y,
-                                    0);
-        this._floor[x].push(new GameObject(location, _tileWidth, _tileDepth,
-                                           _tileHeight, false, component));
+        this._floor[x].push(new Terrain(x, y, 0, component));
       }
     }
   }
@@ -52,20 +51,18 @@ export class SquareGrid {
     return this._height;
   }
 
-  get raisedTerrain(): Array<GameObject> {
+  get raisedTerrain(): Array<Terrain> {
     return this._raisedTerrain;
   }
 
   addRaisedTerrain(x: number, y: number, z: number,
-                   component: GraphicsComponent): GameObject {
-    let location = new Location(x, y, z);
-    let terrain = new GameObject(location, this._tileWidth, this._tileDepth,
-                                 this._tileHeight, false, component);
+                   component: GraphicsComponent): Terrain {
+    let terrain = new Terrain(x, y, z, component);
     this._raisedTerrain.push(terrain);
     return terrain;
   }
 
-  getFloor(x: number, y: number): GameObject {
+  getFloor(x: number, y: number): Terrain {
     return this._floor[x][y];
   }
 
@@ -75,11 +72,11 @@ export class SquareGrid {
 
   getNeighbourCost(centre: Location, to: Location): number {
     // If a horizontal, or vertical, move cost 1 then a diagonal move would be
-    // 1.444... So scale by 2 and round.
+    // 1.444... So scale by 2 and round. Double the cost of changing height.
     if ((centre.x == to.x) || (centre.y == to.y)) {
-      return 2;
+      return centre.z == to.z ? 2 : 4;
     }
-    return 3;
+    return centre.z == to.z ? 3 : 6;
   }
   
   getNeighbours(centre: Location): Array<Location> {

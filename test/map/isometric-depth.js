@@ -14,7 +14,7 @@ sheet.image.onload = function() {
   let canvas = document.getElementById("testCanvas");
 
   let game = new GM.Game(cellsX, cellsY, tileWidth, tileHeight,
-                         GM.CoordSystem.Isometric, canvas, sprites);
+                         GM.CoordSystem.Isometric, canvas, sprites, 0);
 
   let raised = [];
   let graphic = new GM.StaticGraphicsComponent(0);

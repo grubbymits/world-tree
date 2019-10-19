@@ -1,5 +1,5 @@
 import { Point, SquareGrid } from "./map.js"
-import { Location, GameObject } from "./entity.js"
+import { Location, GameObject, Terrain } from "./entity.js"
 
 export enum CoordSystem {
   Cartisan,
@@ -61,8 +61,6 @@ export abstract class Renderer {
   constructor(private _ctx: CanvasRenderingContext2D,
               protected readonly _width: number,
               protected readonly _height: number,
-              protected readonly _tileWidth: number,
-              protected readonly _tileHeight: number,
               protected _sprites: Array<Sprite>) { }
 
   clear(): void {
@@ -74,18 +72,24 @@ export abstract class Renderer {
     this._sprites[id].draw(coord, this._ctx);
   }
 
+  drawObject(gameObj: GameObject, camera: Point) {
+    let coord = this.getDrawCoord(gameObj);
+    console.log("draw:", gameObj);
+    console.log("at:", coord);
+    coord = new Point(coord.x + camera.x, coord.y + camera.y);
+    let spriteId = gameObj.graphicsComponent.update();
+    this.draw(coord, spriteId);
+  }
+
   abstract getDrawCoord(object: GameObject): Point;
   abstract drawFloor(camera: Point, gameMap: SquareGrid): void;
   abstract sortGameObjects(objects: Array<GameObject>): void;
 
   drawAll(objects: Array<GameObject>, camera: Point): void {
     this.sortGameObjects(objects);
+    console.log("drawing objects:", objects.length);
     for (let i in objects) {
-      let gameObj = objects[i];
-      let coord = this.getDrawCoord(gameObj);
-      coord = new Point(coord.x + camera.x, coord.y + camera.y);
-      let spriteId = gameObj.graphicsComponent.update();
-      this.draw(coord, spriteId);
+      this.drawObject(objects[i], camera);
     }
   }
 }
@@ -94,17 +98,16 @@ export class CartisanRenderer extends Renderer {
   constructor(ctx: CanvasRenderingContext2D,
               width: number,
               height: number,
-              tileWidth: number,
-              tileHeight: number,
               sprites: Array<Sprite>) {
-    super(ctx, width, height, tileWidth, tileHeight, sprites);
+    super(ctx, width, height, sprites);
   }
 
   getDrawCoord(object: GameObject): Point {
-    let width = this._tileWidth;
-    let height = this._tileHeight;
-    return new Point(object.x * width,
-                     (object.y * height) - (object.z * height));
+    //let width = this._tileWidth;
+    //let height = this._tileHeight;
+    //return new Point(object.x * width,
+      //               (object.y * height) - (object.z * height));
+    return new Point(object.x, object.y - object.z);
   }
 
   drawFloor(camera: Point, gameMap: SquareGrid) {
@@ -139,8 +142,9 @@ export class CartisanRenderer extends Renderer {
   }
 }
 
-function convertToIsometric(x: number, y: number, width: number,
-                            height: number): Point {
+function convertToIsometric(x: number, y: number): Point {
+  let width = Terrain.tileWidth;
+  let height = Terrain.tileHeight;
   let drawX = Math.floor(x * width / 2) + Math.floor(y * width / 2);
   let drawY = Math.floor(y * height / 2) - Math.floor(x * height / 2);
   return new Point(drawX, drawY);
@@ -150,30 +154,23 @@ export class IsometricRenderer extends Renderer {
   constructor(ctx: CanvasRenderingContext2D,
               width: number,
               height: number,
-              tileWidth: number,
-              tileHeight: number,
               sprites: Array<Sprite>) {
-    super(ctx, width, height, tileWidth, tileHeight, sprites);
+    super(ctx, width, height, sprites);
   }
 
   getDrawCoord(gameObj: GameObject): Point {
-    let width = this._tileWidth;
-    let height = this._tileHeight;
-    let coord = convertToIsometric(gameObj.x + gameObj.z,
-                                   gameObj.y - gameObj.z,
-                                   width, height);
-
+    let x = Math.floor(gameObj.x / Terrain.tileWidth);
+    let y = Math.floor(gameObj.y / Terrain.tileDepth);
+    let z = Math.floor(gameObj.z / Terrain.tileHeight);
+    let coord = convertToIsometric(x + z, y - z);
     return coord;
   }
 
   drawFloor(camera: Point, gameMap: SquareGrid): void {
     for (let y = 0; y < gameMap.height; y++) {
       for (let x = gameMap.width - 1; x >= 0; x--) {
-        let gameObj = gameMap.getFloor(x, y);
-        let coord = this.getDrawCoord(gameObj);
-        coord = new Point(coord.x + camera.x, coord.y + camera.y);
-        let spriteId = gameObj.graphicsComponent.update();
-        this.draw(coord, spriteId);
+        let terrain = gameMap.getFloor(x, y);
+        this.drawObject(terrain, camera);
       }
     }
   }

@@ -15,20 +15,19 @@ export class Game {
               _tileHeight: number,
               sys: CoordSystem,
               _canvas: HTMLCanvasElement,
-              _sprites: Array<Sprite>) {
+              _sprites: Array<Sprite>,
+              floorSpriteId: number) {
 
     this._gameObjects = new Array<GameObject>();
     let _tileDepth = _tileHeight; // FIXME
-    let floorGraphics = new StaticGraphicsComponent(0);
-    this._gameMap = new SquareGrid(_cellsX, _cellsY, _tileWidth,
-                                   _tileDepth, _tileHeight, floorGraphics);
+    let floorGraphics = new StaticGraphicsComponent(floorSpriteId);
+    this._gameMap = new SquareGrid(_cellsX, _cellsY, _tileWidth, _tileDepth,
+                                   _tileHeight, floorGraphics);
 
     let context = _canvas.getContext("2d", { alpha: false })!;
     this._gfx = sys == CoordSystem.Cartisan ?
-      new CartisanRenderer(context, _canvas.width, _canvas.height,
-                           _tileWidth, _tileHeight, _sprites) :
-      new IsometricRenderer(context, _canvas.width, _canvas.height,
-                            _tileWidth, _tileHeight, _sprites);
+      new CartisanRenderer(context, _canvas.width, _canvas.height, _sprites) :
+      new IsometricRenderer(context, _canvas.width, _canvas.height, _sprites);
     this._gfx.clear();
   }
 
