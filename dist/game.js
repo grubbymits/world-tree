@@ -15,11 +15,11 @@ export class Game {
     get map() {
         return this._gameMap;
     }
-    getLocation(x, y) {
-        return this._gameMap.getLocation(x, y);
+    getTerrain(x, y) {
+        return this._gameMap.getTerrain(x, y, 0);
     }
-    addTerrain(x, y, z, component) {
-        let terrain = this._gameMap.addRaisedTerrain(x, y, z, component);
+    addTerrain(x, y, z, terrainType, component) {
+        let terrain = this._gameMap.addRaisedTerrain(x, y, z, terrainType, component);
         this._gameObjects.push(terrain);
         return terrain;
     }

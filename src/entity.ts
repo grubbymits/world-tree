@@ -74,41 +74,6 @@ export class GameObject {
   }
 }
 
-export class Terrain extends GameObject {
-  private static _tileWidth: number;
-  private static _tileDepth: number;
-  private static _tileHeight: number;
-
-  static init(width: number, depth: number, height: number) {
-    this._tileWidth = width;
-    this._tileDepth = depth;
-    this._tileHeight = height;
-  }
-
-  static get tileWidth(): number {
-    return this._tileWidth;
-  }
-
-  static get tileHeight(): number {
-    return this._tileHeight;
-  }
-
-  static get tileDepth(): number {
-    return this._tileDepth;
-  }
-   
-  constructor(private readonly _gridX: number,
-              private readonly _gridY: number,
-              private readonly _gridZ: number,
-              graphics: GraphicsComponent) {
-    super(new Location(_gridX * Terrain.tileWidth,
-                       _gridY * Terrain.tileDepth,
-                       _gridZ * Terrain.tileHeight),
-          Terrain._tileWidth, Terrain._tileDepth, Terrain._tileHeight,
-          true, graphics);
-  }
-}
-
 export class GameActor extends GameObject {
   constructor(location: Location,
               width : number,     // x-axis

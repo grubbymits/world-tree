@@ -1,5 +1,5 @@
 import { Point } from "./map.js";
-import { Terrain } from "./entity.js";
+import { Terrain } from "./terrain.js";
 export var CoordSystem;
 (function (CoordSystem) {
     CoordSystem[CoordSystem["Cartisan"] = 0] = "Cartisan";
@@ -123,10 +123,8 @@ export class IsometricRenderer extends Renderer {
         super(ctx, width, height, sprites);
     }
     getDrawCoord(gameObj) {
-        let x = Math.floor(gameObj.x / Terrain.tileWidth);
-        let y = Math.floor(gameObj.y / Terrain.tileDepth);
-        let z = Math.floor(gameObj.z / Terrain.tileHeight);
-        let coord = convertToIsometric(x + z, y - z);
+        let loc = Terrain.scaleLocation(gameObj.location);
+        let coord = convertToIsometric(loc.x + loc.z, loc.y - loc.z);
         return coord;
     }
     drawFloor(camera, gameMap) {

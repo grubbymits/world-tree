@@ -1,5 +1,6 @@
 import { Point, SquareGrid } from "./map.js"
-import { Location, GameObject, Terrain } from "./entity.js"
+import { Location, GameObject } from "./entity.js"
+import { Terrain } from "./terrain.js"
 
 export enum CoordSystem {
   Cartisan,
@@ -103,10 +104,6 @@ export class CartisanRenderer extends Renderer {
   }
 
   getDrawCoord(object: GameObject): Point {
-    //let width = this._tileWidth;
-    //let height = this._tileHeight;
-    //return new Point(object.x * width,
-      //               (object.y * height) - (object.z * height));
     return new Point(object.x, object.y - object.z);
   }
 
@@ -159,10 +156,8 @@ export class IsometricRenderer extends Renderer {
   }
 
   getDrawCoord(gameObj: GameObject): Point {
-    let x = Math.floor(gameObj.x / Terrain.tileWidth);
-    let y = Math.floor(gameObj.y / Terrain.tileDepth);
-    let z = Math.floor(gameObj.z / Terrain.tileHeight);
-    let coord = convertToIsometric(x + z, y - z);
+    let loc = Terrain.scaleLocation(gameObj.location);
+    let coord = convertToIsometric(loc.x + loc.z, loc.y - loc.z);
     return coord;
   }
 

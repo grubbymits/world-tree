@@ -1,4 +1,5 @@
 import { Location, GameObject } from "./entity.js"
+import { TerrainType } from "./terrain.js"
 import { Point, SquareGrid } from "./map.js"
 import { CoordSystem, Sprite,
          GraphicsComponent, StaticGraphicsComponent,
@@ -35,13 +36,13 @@ export class Game {
     return this._gameMap;
   }
 
-  getLocation(x: number, y: number): Location {
-    return this._gameMap.getLocation(x, y);
+  getTerrain(x: number, y: number): Location {
+    return this._gameMap.getTerrain(x, y, 0);
   }
 
-  addTerrain(x: number, y: number, z: number,
+  addTerrain(x: number, y: number, z: number, terrainType: TerrainType,
              component: GraphicsComponent): GameObject {
-    let terrain = this._gameMap.addRaisedTerrain(x, y, z, component);
+    let terrain = this._gameMap.addRaisedTerrain(x, y, z, terrainType, component);
     this._gameObjects.push(terrain);
     return terrain;
   }
