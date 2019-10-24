@@ -18,15 +18,15 @@ sheet.image.onload = function() {
 
   let raised = [];
   let graphic = new GM.StaticGraphicsComponent(0);
-  raised.push(game.addTerrain(0, 4, 1, graphic));
-  raised.push(game.addTerrain(1, 4, 1, graphic));
-  raised.push(game.addTerrain(2, 4, 1, graphic));
-  raised.push(game.addTerrain(2, 3, 1, graphic));
-  raised.push(game.addTerrain(0, 5, 1, graphic));
+  raised.push(game.addFlatTerrain(0, 4, 1, graphic));
+  raised.push(game.addFlatTerrain(1, 4, 1, graphic));
+  raised.push(game.addFlatTerrain(2, 4, 1, graphic));
+  raised.push(game.addFlatTerrain(2, 3, 1, graphic));
+  raised.push(game.addFlatTerrain(0, 5, 1, graphic));
 
-  raised.push(game.addTerrain(2, 2, 1, graphic));
-  raised.push(game.addTerrain(2, 2, 2, graphic));
-  raised.push(game.addTerrain(2, 2, 3, graphic));
+  raised.push(game.addFlatTerrain(2, 2, 1, graphic));
+  raised.push(game.addFlatTerrain(2, 2, 2, graphic));
+  raised.push(game.addFlatTerrain(2, 2, 3, graphic));
 
   // Offset the grid so its displayed roughly in the middle of the canvas.
   let camera = new GM.Point(tileWidth, Math.floor(canvas.height / 2));

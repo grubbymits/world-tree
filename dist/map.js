@@ -23,7 +23,7 @@ export class SquareGrid {
             this._floor[x] = new Array();
             for (let y = 0; y < this._height; y++) {
                 let terrain = new Terrain(x, y, 0, TerrainType.Flat, component);
-                this._allTerrain[terrain.id] = terrain;
+                this._allTerrain.set(terrain.id, terrain);
                 this._floor[x].push(terrain);
             }
         }
@@ -53,7 +53,7 @@ export class SquareGrid {
                 this._raisedTerrain[x][y].push(terrain);
             }
         }
-        this._allTerrain[terrain.id] = terrain;
+        this._allTerrain.set(terrain.id, terrain);
         return terrain;
     }
     getFloor(x, y) {
@@ -91,7 +91,7 @@ export class SquareGrid {
     }
     getNeighbours(centre) {
         let neighbours = new Array();
-        for (let z in [-1, 0, 1]) {
+        for (let z of [-1, 0, 1]) {
             for (let offset of this._neighbourOffsets) {
                 let neighbour = this.getTerrain(centre.x + offset.x, centre.y + offset.y, centre.z + z);
                 if (!neighbour) {

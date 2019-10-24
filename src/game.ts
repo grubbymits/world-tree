@@ -1,5 +1,5 @@
 import { Location, GameObject } from "./entity.js"
-import { TerrainType } from "./terrain.js"
+import { Terrain, TerrainType } from "./terrain.js"
 import { Point, SquareGrid } from "./map.js"
 import { CoordSystem, Sprite,
          GraphicsComponent, StaticGraphicsComponent,
@@ -36,13 +36,13 @@ export class Game {
     return this._gameMap;
   }
 
-  getTerrain(x: number, y: number): Location {
+  getTerrain(x: number, y: number): Terrain | null {
     return this._gameMap.getTerrain(x, y, 0);
   }
 
-  addTerrain(x: number, y: number, z: number, terrainType: TerrainType,
-             component: GraphicsComponent): GameObject {
-    let terrain = this._gameMap.addRaisedTerrain(x, y, z, terrainType, component);
+  addFlatTerrain(x: number, y: number, z: number, component: GraphicsComponent): Terrain {
+    let terrain = this._gameMap.addRaisedTerrain(x, y, z, TerrainType.Flat, component);
+    console.log("created raised", terrain);
     this._gameObjects.push(terrain);
     return terrain;
   }

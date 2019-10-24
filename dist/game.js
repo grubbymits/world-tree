@@ -1,3 +1,4 @@
+import { TerrainType } from "./terrain.js";
 import { SquareGrid } from "./map.js";
 import { CoordSystem, StaticGraphicsComponent, CartisanRenderer, IsometricRenderer } from "./gfx.js";
 export class Game {
@@ -18,8 +19,9 @@ export class Game {
     getTerrain(x, y) {
         return this._gameMap.getTerrain(x, y, 0);
     }
-    addTerrain(x, y, z, terrainType, component) {
-        let terrain = this._gameMap.addRaisedTerrain(x, y, z, terrainType, component);
+    addFlatTerrain(x, y, z, component) {
+        let terrain = this._gameMap.addRaisedTerrain(x, y, z, TerrainType.Flat, component);
+        console.log("created raised", terrain);
         this._gameObjects.push(terrain);
         return terrain;
     }

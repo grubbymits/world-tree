@@ -39,7 +39,7 @@ export class SquareGrid {
       this._floor[x] = new Array<Terrain>();
       for (let y = 0; y < this._height; y++) {
         let terrain = new Terrain(x, y, 0, TerrainType.Flat, component);
-        this._allTerrain[terrain.id] = terrain;
+        this._allTerrain.set(terrain.id, terrain);
         this._floor[x].push(terrain);
       }
     }
@@ -72,7 +72,7 @@ export class SquareGrid {
         this._raisedTerrain[x][y].push(terrain);
       }
     }
-    this._allTerrain[terrain.id] = terrain;
+    this._allTerrain.set(terrain.id, terrain);
     return terrain;
   }
 
@@ -80,7 +80,7 @@ export class SquareGrid {
     return this._floor[x][y];
   }
 
-  getTerrain(x: number, y: number, z: number): Terrain {
+  getTerrain(x: number, y: number, z: number): Terrain | null {
     if (x < 0 || x >= this.width) {
       return null;
     }
@@ -103,7 +103,7 @@ export class SquareGrid {
   }
 
   getTerrainFromId(id: number): Terrain {
-    return this._allTerrain.get(id);
+    return this._allTerrain.get(id)!;
   }
 
   getNeighbourCost(centre: Terrain, to: Terrain): number {
@@ -118,7 +118,7 @@ export class SquareGrid {
   getNeighbours(centre: Terrain): Array<Terrain> {
     let neighbours = new Array<Terrain>();
    
-    for (let z in [ -1, 0, 1 ]) { 
+    for (let z of [ -1, 0, 1 ]) { 
       for (let offset of this._neighbourOffsets) {
         let neighbour = this.getTerrain(centre.x + offset.x,
                                         centre.y + offset.y,
