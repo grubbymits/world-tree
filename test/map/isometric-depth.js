@@ -5,8 +5,8 @@ console.log("begin");
 let sheet = new GM.SpriteSheet("../res/img/block");
 
 sheet.image.onload = function() {
-  let cellsX = 6;
-  let cellsY = 6;
+  let cellsX = 12;
+  let cellsY = 12;
   let tileWidth = 128;
   let tileHeight = 64;
   let sprites = [];
@@ -15,6 +15,7 @@ sheet.image.onload = function() {
 
   let game = new GM.Game(cellsX, cellsY, tileWidth, tileHeight,
                          GM.CoordSystem.Isometric, canvas, sprites, 0);
+  game.addMouseCamera();
 
   let raised = [];
   let graphic = new GM.StaticGraphicsComponent(0);
@@ -29,7 +30,12 @@ sheet.image.onload = function() {
   raised.push(game.addFlatTerrain(2, 2, 3, graphic));
 
   // Offset the grid so its displayed roughly in the middle of the canvas.
-  let camera = new GM.Point(tileWidth, Math.floor(canvas.height / 2));
-  game.update(camera);
+  var update = function update() {
+    if (document.hasFocus()) {
+      game.update();
+    }
+    window.requestAnimationFrame(update);
+  }
+  window.requestAnimationFrame(update);
   console.log("done");
 }

@@ -61,15 +61,15 @@ export class Renderer {
     }
     drawObject(gameObj, camera) {
         let coord = this.getDrawCoord(gameObj);
-        console.log("draw:", gameObj);
-        console.log("at:", coord);
-        coord = new Point(coord.x + camera.x, coord.y + camera.y);
+        if (!camera.isOnScreen(coord)) {
+            return;
+        }
+        coord = camera.getDrawCoord(coord);
         let spriteId = gameObj.graphicsComponent.update();
         this.draw(coord, spriteId);
     }
     drawAll(objects, camera) {
         this.sortGameObjects(objects);
-        console.log("drawing objects:", objects.length);
         for (let i in objects) {
             this.drawObject(objects[i], camera);
         }
@@ -87,9 +87,9 @@ export class CartisanRenderer extends Renderer {
             for (let x = 0; x < gameMap.width; x++) {
                 let gameObj = gameMap.getFloor(x, y);
                 let coord = this.getDrawCoord(gameObj);
-                let newCoord = new Point(coord.x + camera.x, coord.y + camera.y);
+                coord = camera.getDrawCoord(coord);
                 let spriteId = gameObj.graphicsComponent.update();
-                this.draw(newCoord, spriteId);
+                this.draw(coord, spriteId);
             }
         }
     }
