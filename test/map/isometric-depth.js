@@ -15,7 +15,6 @@ sheet.image.onload = function() {
 
   let game = new GM.Game(cellsX, cellsY, tileWidth, tileHeight,
                          GM.CoordSystem.Isometric, canvas, sprites, 0);
-  game.addMouseCamera();
 
   let raised = [];
   let graphic = new GM.StaticGraphicsComponent(0);

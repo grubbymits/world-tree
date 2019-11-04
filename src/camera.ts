@@ -1,15 +1,13 @@
 import { Point } from "./map.js"
 
-const edge: number = 16;
-
 export class Camera {
 
   private _lowerX : number;
   private _lowerY : number;
   private _upperX : number;
   private _upperY : number;
-  private _horizontalScroller: number;
-  private _verticalScroller: number;
+  private _centre: Point;
+  static sensistivity: number = 10;
 
   constructor(private _x: number,
               private _y: number,
@@ -19,64 +17,38 @@ export class Camera {
     this._lowerY = _y;
     this._upperX = _x + _width;
     this._upperY = _y + _height;
-    this._horizontalScroller = 0;
-    this._verticalScroller = 0;
+    this._centre = new Point(Math.floor(_width / 2), Math.floor(_height / 2));
   }
 
-  updateBoundsX(): void {
-    this._lowerX = this._x - this._width;
-    this._upperX = this._x + this._width;
+  set centre(coord: Point) {
+    this._centre = coord;
   }
-
-  scrollLeft(): void {
-    this._x = this._x - 5;
-    this.updateBoundsX();
-  }
-
-  scrollRight(): void {
-    this._x = this._x + 5;
-    this.updateBoundsX();
+  get centre(): Point {
+    return this._centre;
   }
 
   set x(x: number) {
-    if (this._horizontalScroller == 0) {
-      if (x <= edge) {
-        this._horizontalScroller = setInterval(() => { this.scrollLeft(); }, 16);
-      } else if (x >= this._width - edge) {
-        this._horizontalScroller = setInterval(() => { this.scrollRight(); }, 16);
-      }
+    if (x < this._centre.x) {
+      this._x += Math.floor((this.centre.x - x) / Camera.sensistivity);
+    } else if (x > this._centre.x) {
+      this._x -= Math.floor((x - this.centre.x) / Camera.sensistivity);
     } else {
-      clearInterval(this._horizontalScroller);
-      this._horizontalScroller = 0;
+      return;
     }
-  }
-
-  updateBoundsY(): void {
-    this._lowerY = this._y - this._height;
-    this._upperY = this._y + this._height;
-  }
-
-  scrollUp(): void {
-    this._y = this._y - 5;
-    this.updateBoundsY();
-  }
-
-  scrollDown(): void {
-    this._y = this._y + 5;
-    this.updateBoundsY();
+    this._lowerX = Math.floor(this._x - this._width);
+    this._upperX = Math.floor(this._x + this._width);
   }
 
   set y(y: number) {
-    if (this._verticalScroller == 0) {
-      if (y <= edge) {
-        this._verticalScroller = setInterval(() => { this.scrollUp(); }, 16);
-      } else if (y >= this._height - edge) {
-        this._verticalScroller = setInterval(() => { this.scrollDown(); }, 16);
-      }
+    if (y < this._centre.y) {
+      this._y += Math.floor((this.centre.y - y) / Camera.sensistivity);
+    } else if (y > this._centre.y) {
+      this._y -= Math.floor((y - this.centre.y) / Camera.sensistivity);
     } else {
-      clearInterval(this._verticalScroller);
-      this._verticalScroller = 0;
+      return;
     }
+    this._lowerY = Math.floor(this._y - this._height);
+    this._upperY = Math.floor(this._y + this._height);
   }
 
   isOnScreen(coord : Point) : boolean {

@@ -1,5 +1,4 @@
 import { Point } from "./map.js";
-const edge = 16;
 export class Camera {
     constructor(_x, _y, _width, _height) {
         this._x = _x;
@@ -10,60 +9,39 @@ export class Camera {
         this._lowerY = _y;
         this._upperX = _x + _width;
         this._upperY = _y + _height;
-        this._horizontalScroller = 0;
-        this._verticalScroller = 0;
+        this._centre = new Point(Math.floor(_width / 2), Math.floor(_height / 2));
     }
-    updateBoundsX() {
-        this._lowerX = this._x - this._width;
-        this._upperX = this._x + this._width;
+    set centre(coord) {
+        this._centre = coord;
     }
-    scrollLeft() {
-        this._x = this._x - 5;
-        this.updateBoundsX();
-    }
-    scrollRight() {
-        this._x = this._x + 5;
-        this.updateBoundsX();
+    get centre() {
+        return this._centre;
     }
     set x(x) {
-        if (this._horizontalScroller == 0) {
-            if (x <= edge) {
-                this._horizontalScroller = setInterval(() => { this.scrollLeft(); }, 16);
-            }
-            else if (x >= this._width - edge) {
-                this._horizontalScroller = setInterval(() => { this.scrollRight(); }, 16);
-            }
+        if (x < this._centre.x) {
+            this._x += Math.floor((this.centre.x - x) / Camera.sensistivity);
+        }
+        else if (x > this._centre.x) {
+            this._x -= Math.floor((x - this.centre.x) / Camera.sensistivity);
         }
         else {
-            clearInterval(this._horizontalScroller);
-            this._horizontalScroller = 0;
+            return;
         }
-    }
-    updateBoundsY() {
-        this._lowerY = this._y - this._height;
-        this._upperY = this._y + this._height;
-    }
-    scrollUp() {
-        this._y = this._y - 5;
-        this.updateBoundsY();
-    }
-    scrollDown() {
-        this._y = this._y + 5;
-        this.updateBoundsY();
+        this._lowerX = Math.floor(this._x - this._width);
+        this._upperX = Math.floor(this._x + this._width);
     }
     set y(y) {
-        if (this._verticalScroller == 0) {
-            if (y <= edge) {
-                this._verticalScroller = setInterval(() => { this.scrollUp(); }, 16);
-            }
-            else if (y >= this._height - edge) {
-                this._verticalScroller = setInterval(() => { this.scrollDown(); }, 16);
-            }
+        if (y < this._centre.y) {
+            this._y += Math.floor((this.centre.y - y) / Camera.sensistivity);
+        }
+        else if (y > this._centre.y) {
+            this._y -= Math.floor((y - this.centre.y) / Camera.sensistivity);
         }
         else {
-            clearInterval(this._verticalScroller);
-            this._verticalScroller = 0;
+            return;
         }
+        this._lowerY = Math.floor(this._y - this._height);
+        this._upperY = Math.floor(this._y + this._height);
     }
     isOnScreen(coord) {
         if (coord.x < this._lowerX || coord.y < this._lowerY ||
@@ -76,3 +54,4 @@ export class Camera {
         return new Point(coord.x - this._x, coord.y - this._y);
     }
 }
+Camera.sensistivity = 10;

@@ -4,13 +4,13 @@ import { Point, SquareGrid } from "./map.js"
 import { CoordSystem, Sprite,
          GraphicsComponent, StaticGraphicsComponent,
          Renderer, CartisanRenderer, IsometricRenderer } from "./gfx.js"
-import { Camera } from "./camera.js"
+import { MouseController } from "./controller.js"
 
 export class Game {
   private _gameMap: SquareGrid;
   private _gfx: Renderer;
   private _gameObjects : Array<GameObject>;
-  private _camera: Camera;
+  private _controller: MouseController;
 
   constructor(_cellsX: number,
               _cellsY: number,
@@ -21,6 +21,7 @@ export class Game {
               _sprites: Array<Sprite>,
               floorSpriteId: number) {
 
+    this._controller = new MouseController(_canvas);
     this._gameObjects = new Array<GameObject>();
     let _tileDepth = _tileHeight; // FIXME
     let floorGraphics = new StaticGraphicsComponent(floorSpriteId);
@@ -28,7 +29,6 @@ export class Game {
                                    _tileHeight, floorGraphics);
 
     let context = _canvas.getContext("2d", { alpha: false })!;
-    this._camera = new Camera(0, 0, _canvas.width, _canvas.height);
     this._gfx = sys == CoordSystem.Cartisan ?
       new CartisanRenderer(context, _canvas.width, _canvas.height, _sprites) :
       new IsometricRenderer(context, _canvas.width, _canvas.height, _sprites);
@@ -50,19 +50,11 @@ export class Game {
     return terrain;
   }
 
-  addMouseCamera() {
-    var camera = this._camera;
-    this._canvas.addEventListener('mousemove', e => {
-      camera.x = e.clientX;
-      camera.y = e.clientY;
-    });
-  }
-
   update(): void {
     let context = this._canvas.getContext("2d", { alpha: false })!;
     context.fillStyle = '#000000'; 
     context.fillRect(0, 0, this._canvas.width, this._canvas.height);
-    this._gfx.drawFloor(this._camera, this._gameMap);
-    this._gfx.drawAll(this._gameObjects, this._camera);
+    this._gfx.drawFloor(this._controller.camera, this._gameMap);
+    this._gfx.drawAll(this._gameObjects, this._controller.camera);
   }
 }
