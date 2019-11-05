@@ -1,8 +1,8 @@
-import * as GM from '../../dist/greenman.js';
+import * as WT from '../../dist/world-tree.js';
 
 console.log("begin");
 
-let sheet = new GM.SpriteSheet("../res/img/cartisan-grass-floor");
+let sheet = new WT.SpriteSheet("../res/img/cartisan-grass-floor");
 
 sheet.image.onload = function() {
   let cellsX = 6;
@@ -14,14 +14,14 @@ sheet.image.onload = function() {
   // The sprite sheet is 3x3...
   for (let y = 0; y < 3; y++) {
     for (let x = 0; x < 3; x++) {
-      sprites.push(new GM.Sprite(sheet, x * tileWidth, y * tileHeight,
+      sprites.push(new WT.Sprite(sheet, x * tileWidth, y * tileHeight,
                                  tileWidth, tileHeight));
     }
   }
 
   let canvas = document.getElementById("testCanvas");
-  let game = new GM.Game(cellsX, cellsY, tileWidth, tileHeight,
-                         GM.CoordSystem.Cartisan, canvas, sprites);
+  let game = new WT.Game(cellsX, cellsY, tileWidth, tileHeight,
+                         WT.CoordSystem.Cartisan, canvas, sprites);
 
   for (let y = 0; y < cellsY; y++) {
     for (let x = 0; x < cellsX; x++) {
@@ -30,7 +30,7 @@ sheet.image.onload = function() {
     }
   }
 
-  let camera = new GM.Point(2 * tileWidth, 2 * tileHeight);
+  let camera = new WT.Point(2 * tileWidth, 2 * tileHeight);
   game.update(camera);
   console.log("done");
 }

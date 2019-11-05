@@ -1,8 +1,8 @@
-import * as GM from '../../dist/greenman.js';
+import * as WT from '../../dist/world-tree.js';
 
 console.log("begin");
 
-let sheet = new GM.SpriteSheet("../res/img/block");
+let sheet = new WT.SpriteSheet("../res/img/block");
 
 sheet.image.onload = function() {
   let cellsX = 12;
@@ -10,14 +10,14 @@ sheet.image.onload = function() {
   let tileWidth = 128;
   let tileHeight = 64;
   let sprites = [];
-  sprites.push(new GM.Sprite(sheet, 0, 0, 128, 128));
+  sprites.push(new WT.Sprite(sheet, 0, 0, 128, 128));
   let canvas = document.getElementById("testCanvas");
 
-  let game = new GM.Game(cellsX, cellsY, tileWidth, tileHeight,
-                         GM.CoordSystem.Isometric, canvas, sprites, 0);
+  let game = new WT.Game(cellsX, cellsY, tileWidth, tileHeight,
+                         WT.CoordSystem.Isometric, canvas, sprites, 0);
 
   let raised = [];
-  let graphic = new GM.StaticGraphicsComponent(0);
+  let graphic = new WT.StaticGraphicsComponent(0);
   raised.push(game.addFlatTerrain(0, 4, 1, graphic));
   raised.push(game.addFlatTerrain(1, 4, 1, graphic));
   raised.push(game.addFlatTerrain(2, 4, 1, graphic));
