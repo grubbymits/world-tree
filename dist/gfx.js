@@ -46,15 +46,16 @@ export class StaticGraphicsComponent extends GraphicsComponent {
     }
 }
 export class Renderer {
-    constructor(_ctx, _width, _height, _sprites) {
-        this._ctx = _ctx;
-        this._width = _width;
-        this._height = _height;
+    constructor(_canvas, _sprites) {
+        this._canvas = _canvas;
         this._sprites = _sprites;
-    }
-    clear() {
-        this._ctx.fillStyle = '#000000';
-        this._ctx.fillRect(0, 0, this._width, this._height);
+        this._visible = this._canvas.getContext("2d", { alpha: false });
+        this._width = _canvas.width;
+        this._height = _canvas.height;
+        this._offscreenCanvas = document.createElement('canvas');
+        this._offscreenCanvas.width = this._width;
+        this._offscreenCanvas.height = this._height;
+        this._ctx = this._offscreenCanvas.getContext("2d", { alpha: false });
     }
     draw(coord, id) {
         this._sprites[id].draw(coord, this._ctx);
@@ -74,15 +75,23 @@ export class Renderer {
             this.drawObject(objects[i], camera);
         }
     }
+    update(objects, gameMap, camera) {
+        this._ctx.clearRect(0, 0, this._width, this._height);
+        this.drawFloor(gameMap, camera);
+        this.drawAll(objects, camera);
+    }
+    render() {
+        this._visible.drawImage(this._offscreenCanvas, 0, 0);
+    }
 }
 export class CartisanRenderer extends Renderer {
-    constructor(ctx, width, height, sprites) {
-        super(ctx, width, height, sprites);
+    constructor(canvas, sprites) {
+        super(canvas, sprites);
     }
     getDrawCoord(object) {
         return new Point(object.x, object.y - object.z);
     }
-    drawFloor(camera, gameMap) {
+    drawFloor(gameMap, camera) {
         for (let y = 0; y < gameMap.height; y++) {
             for (let x = 0; x < gameMap.width; x++) {
                 let gameObj = gameMap.getFloor(x, y);
@@ -119,15 +128,15 @@ function convertToIsometric(x, y) {
     return new Point(drawX, drawY);
 }
 export class IsometricRenderer extends Renderer {
-    constructor(ctx, width, height, sprites) {
-        super(ctx, width, height, sprites);
+    constructor(canvas, sprites) {
+        super(canvas, sprites);
     }
     getDrawCoord(gameObj) {
         let loc = Terrain.scaleLocation(gameObj.location);
         let coord = convertToIsometric(loc.x + loc.z, loc.y - loc.z);
         return coord;
     }
-    drawFloor(camera, gameMap) {
+    drawFloor(gameMap, camera) {
         for (let y = 0; y < gameMap.height; y++) {
             for (let x = gameMap.width - 1; x >= 0; x--) {
                 let terrain = gameMap.getFloor(x, y);

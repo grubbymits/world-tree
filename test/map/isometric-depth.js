@@ -37,4 +37,5 @@ sheet.image.onload = function() {
   }
   window.requestAnimationFrame(update);
   console.log("done");
+  game.run();
 }

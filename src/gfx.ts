@@ -60,14 +60,21 @@ export class StaticGraphicsComponent extends GraphicsComponent {
 }
 
 export abstract class Renderer {
-  constructor(private _ctx: CanvasRenderingContext2D,
-              protected readonly _width: number,
-              protected readonly _height: number,
-              protected _sprites: Array<Sprite>) { }
+  protected readonly _width: number;
+  protected readonly _height: number;
+  protected _offscreenCanvas: HTMLCanvasElement;
+  protected _ctx: CanvasRenderingContext2D;
+  protected _visible: CanvasRenderingContext2D;
 
-  clear(): void {
-    this._ctx.fillStyle = '#000000';
-    this._ctx.fillRect(0, 0, this._width, this._height);
+  constructor(protected _canvas: HTMLCanvasElement,
+              protected _sprites: Array<Sprite>) {
+    this._visible = this._canvas.getContext("2d", { alpha: false })!;
+    this._width = _canvas.width;
+    this._height = _canvas.height;
+    this._offscreenCanvas = document.createElement('canvas');
+    this._offscreenCanvas.width = this._width;
+    this._offscreenCanvas.height = this._height;
+    this._ctx = this._offscreenCanvas.getContext("2d", { alpha: false })!;
   }
 
   draw(coord: Point, id: number): void {
@@ -85,7 +92,7 @@ export abstract class Renderer {
   }
 
   abstract getDrawCoord(object: GameObject): Point;
-  abstract drawFloor(camera: Camera, gameMap: SquareGrid): void;
+  abstract drawFloor(gameMape: SquareGrid, camera: Camera): void;
   abstract sortGameObjects(objects: Array<GameObject>): void;
 
   drawAll(objects: Array<GameObject>, camera: Camera): void {
@@ -94,21 +101,29 @@ export abstract class Renderer {
       this.drawObject(objects[i], camera);
     }
   }
+
+  update(objects: Array<GameObject>, gameMap: SquareGrid, camera: Camera) {
+    this._ctx.clearRect(0, 0, this._width, this._height);
+    this.drawFloor(gameMap, camera);
+    this.drawAll(objects, camera);
+  }
+
+  render(): void {
+    this._visible.drawImage(this._offscreenCanvas, 0, 0);
+  }
 }
 
 export class CartisanRenderer extends Renderer {
-  constructor(ctx: CanvasRenderingContext2D,
-              width: number,
-              height: number,
+  constructor(canvas: HTMLCanvasElement,
               sprites: Array<Sprite>) {
-    super(ctx, width, height, sprites);
+    super(canvas, sprites);
   }
 
   getDrawCoord(object: GameObject): Point {
     return new Point(object.x, object.y - object.z);
   }
 
-  drawFloor(camera: Camera, gameMap: SquareGrid) {
+  drawFloor(gameMap: SquareGrid, camera: Camera) {
     for (let y = 0; y < gameMap.height; y++) {
       for (let x = 0; x < gameMap.width; x++) {
         let gameObj = gameMap.getFloor(x, y);
@@ -149,11 +164,9 @@ function convertToIsometric(x: number, y: number): Point {
 }
 
 export class IsometricRenderer extends Renderer {
-  constructor(ctx: CanvasRenderingContext2D,
-              width: number,
-              height: number,
+  constructor(canvas: HTMLCanvasElement,
               sprites: Array<Sprite>) {
-    super(ctx, width, height, sprites);
+    super(canvas, sprites);
   }
 
   getDrawCoord(gameObj: GameObject): Point {
@@ -162,7 +175,7 @@ export class IsometricRenderer extends Renderer {
     return coord;
   }
 
-  drawFloor(camera: Camera, gameMap: SquareGrid): void {
+  drawFloor(gameMap: SquareGrid, camera: Camera): void {
     for (let y = 0; y < gameMap.height; y++) {
       for (let x = gameMap.width - 1; x >= 0; x--) {
         let terrain = gameMap.getFloor(x, y);
