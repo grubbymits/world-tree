@@ -1,5 +1,5 @@
 import { Location, GameObject } from "./entity.js"
-import { TerrainType, Terrain } from "./terrain.js"
+import { TerrainType, TerrainShape, Terrain } from "./terrain.js"
 import { SquareGrid } from "./map.js"
 
 class MovementCost {
@@ -18,19 +18,19 @@ export class PathFinder {
     let toLoc = Terrain.scaleLocation(toTerrain.location);
     let fromLoc = Terrain.scaleLocation(fromTerrain.location);
 
-    if ((toTerrain.type == fromTerrain.type) &&
-        (toTerrain.type == TerrainType.Flat)) {
+    if ((toTerrain.shape == fromTerrain.shape) &&
+        (toTerrain.shape == TerrainShape.Flat)) {
       return fromLoc.z == toLoc.z;
     } else if (fromLoc.z == toLoc.z || Math.abs(fromLoc.z - toLoc.z) > 1) {
       return false;
     }
 
-    switch (toTerrain.type) {
-    case TerrainType.RampUpNorth:
-    case TerrainType.RampUpSouth:
+    switch (toTerrain.shape) {
+    case TerrainShape.RampUpNorth:
+    case TerrainShape.RampUpSouth:
       return fromLoc.x == toLoc.x && Math.abs(fromLoc.y - toLoc.y) == 1;
-    case TerrainType.RampUpEast:
-    case TerrainType.RampUpWest:
+    case TerrainShape.RampUpEast:
+    case TerrainShape.RampUpWest:
       return fromLoc.y == toLoc.y && Math.abs(fromLoc.x - toLoc.x) == 1;
     }
     return false;

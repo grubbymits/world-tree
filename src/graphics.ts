@@ -43,13 +43,13 @@ export class Sprite {
   }
 }
 
-export abstract class GraphicsComponent {
+export abstract class GraphicComponent {
   constructor(protected _currentSpriteId: number) { }
               
   abstract update(): number;
 }
 
-export class StaticGraphicsComponent extends GraphicsComponent {
+export class StaticGraphicComponent extends GraphicComponent {
   constructor(id: number) {
     super(id);
   }
@@ -65,7 +65,7 @@ export abstract class Renderer {
   protected _offscreenCanvas: HTMLCanvasElement;
   protected _ctx: CanvasRenderingContext2D;
   protected _visible: CanvasRenderingContext2D;
-
+  
   constructor(protected _canvas: HTMLCanvasElement,
               protected _sprites: Array<Sprite>) {
     this._visible = this._canvas.getContext("2d", { alpha: false })!;

@@ -1,4 +1,4 @@
-import { GraphicsComponent } from "./gfx.js"
+import { GraphicComponent } from "./graphics.js"
 
 export class Location {
   constructor(private _x: number,
@@ -28,11 +28,11 @@ export class GameObject {
               protected readonly _depth: number,    // y-axis
               protected readonly _height: number,   // z-axis
               protected readonly _blocking: boolean,
-              protected _graphicsComponent: GraphicsComponent) {
+              protected _graphicsComponent: GraphicComponent) {
     this._id = GameObject._ids;
     GameObject._ids++;
   }
-
+  
   get x(): number {
     return this._location.x;
   }
@@ -69,7 +69,7 @@ export class GameObject {
     return this._id;
   }
 
-  get graphicsComponent(): GraphicsComponent {
+  get graphicsComponent(): GraphicComponent {
     return this._graphicsComponent;
   }
 }
@@ -79,7 +79,7 @@ export class GameActor extends GameObject {
               width : number,     // x-axis
               depth: number,      // y-axis
               height: number,     // z-axis
-              graphics: GraphicsComponent) {
+              graphics: GraphicComponent) {
     super(location, width, depth, height, true, graphics);
   }
 }

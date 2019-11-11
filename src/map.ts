@@ -1,6 +1,6 @@
 import { Location } from "./entity.js"
-import { Terrain, TerrainType } from "./terrain.js"
-import { GraphicsComponent } from "./gfx.js"
+import { Terrain, TerrainShape, TerrainType } from "./terrain.js"
+import { GraphicComponent } from "./graphics.js"
 
 export class Point {
   constructor(private readonly _x: number,
@@ -23,25 +23,15 @@ export class SquareGrid {
   private _allTerrain: Map<number, Terrain>;
 
   constructor(private readonly _width: number,
-              private readonly _height: number,
-              tileWidth: number,  // x
-              tileDepth: number,  // y
-              tileHeight: number, // z
-              component: GraphicsComponent) {
+              private readonly _height: number) {
     this._raisedTerrain = new Map();
     this._floor = new Array<Array<Terrain>>();
     this._allTerrain = new Map<number, Terrain>();
 
-    Terrain.init(tileWidth, tileDepth, tileHeight);
     console.log("creating map", _width, _height);
 
     for (let x = 0; x < this._width; x++) {
       this._floor[x] = new Array<Terrain>();
-      for (let y = 0; y < this._height; y++) {
-        let terrain = new Terrain(x, y, 0, TerrainType.Flat, component);
-        this._allTerrain.set(terrain.id, terrain);
-        this._floor[x].push(terrain);
-      }
     }
   }
 
@@ -57,9 +47,9 @@ export class SquareGrid {
     return this._raisedTerrain;
   }
 
-  addRaisedTerrain(x: number, y: number, z: number, terrainType: TerrainType,
-                   component: GraphicsComponent): Terrain {
-    let terrain = new Terrain(x, y, z, terrainType, component);
+  addRaisedTerrain(x: number, y: number, z: number, type: TerrainType,
+                   shape: TerrainShape) {
+    let terrain = new Terrain(x, y, z, type, shape);
     if (!this._raisedTerrain.has(x)) {
       this._raisedTerrain[x] = new Map<number, Array<Terrain>>();
       this._raisedTerrain[x][y] = new Array<Terrain>();
@@ -73,7 +63,6 @@ export class SquareGrid {
       }
     }
     this._allTerrain.set(terrain.id, terrain);
-    return terrain;
   }
 
   getFloor(x: number, y: number): Terrain {
@@ -118,7 +107,7 @@ export class SquareGrid {
   getNeighbours(centre: Terrain): Array<Terrain> {
     let neighbours = new Array<Terrain>();
    
-    for (let z of [ -1, 0, 1 ]) { 
+    for (let z of [ -1, 0, 1 ]) {
       for (let offset of this._neighbourOffsets) {
         let neighbour = this.getTerrain(centre.x + offset.x,
                                         centre.y + offset.y,

@@ -32,12 +32,12 @@ export class Sprite {
         ctx.drawImage(this._sheet.image, this._offsetX, this._offsetY, this._width, this._height, coord.x, coord.y, this._width, this._height);
     }
 }
-export class GraphicsComponent {
+export class GraphicComponent {
     constructor(_currentSpriteId) {
         this._currentSpriteId = _currentSpriteId;
     }
 }
-export class StaticGraphicsComponent extends GraphicsComponent {
+export class StaticGraphicComponent extends GraphicComponent {
     constructor(id) {
         super(id);
     }
