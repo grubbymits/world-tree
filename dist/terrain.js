@@ -10,19 +10,21 @@ export var TerrainShape;
 })(TerrainShape || (TerrainShape = {}));
 export var TerrainType;
 (function (TerrainType) {
-    TerrainType[TerrainType["WATER"] = 0] = "WATER";
-    TerrainType[TerrainType["SAND"] = 1] = "SAND";
-    TerrainType[TerrainType["MUD"] = 2] = "MUD";
-    TerrainType[TerrainType["GRASS"] = 3] = "GRASS";
-    TerrainType[TerrainType["ROCK"] = 4] = "ROCK";
+    TerrainType[TerrainType["Water"] = 0] = "Water";
+    TerrainType[TerrainType["Sand"] = 1] = "Sand";
+    TerrainType[TerrainType["Mud"] = 2] = "Mud";
+    TerrainType[TerrainType["Grass"] = 3] = "Grass";
+    TerrainType[TerrainType["Rock"] = 4] = "Rock";
 })(TerrainType || (TerrainType = {}));
 export var Biome;
 (function (Biome) {
-    Biome[Biome["BEACH"] = 0] = "BEACH";
-    Biome[Biome["SWAMP"] = 1] = "SWAMP";
-    Biome[Biome["GRASSLAND"] = 2] = "GRASSLAND";
-    Biome[Biome["WOODLAND"] = 3] = "WOODLAND";
-    Biome[Biome["DESERT"] = 4] = "DESERT";
+    Biome[Biome["Water"] = 0] = "Water";
+    Biome[Biome["Beach"] = 1] = "Beach";
+    Biome[Biome["Swamp"] = 2] = "Swamp";
+    Biome[Biome["Grassland"] = 3] = "Grassland";
+    Biome[Biome["Woodland"] = 4] = "Woodland";
+    Biome[Biome["Tundra"] = 5] = "Tundra";
+    Biome[Biome["Desert"] = 6] = "Desert";
 })(Biome || (Biome = {}));
 export class Terrain extends GameObject {
     constructor(_gridX, _gridY, _gridZ, _type, _shape) {
@@ -65,15 +67,103 @@ export class Terrain extends GameObject {
         return this._type;
     }
 }
+class TerrainAttributes {
+    constructor(_height, _terrace) {
+        this._height = _height;
+        this._terrace = _terrace;
+        this._moisture = 0.0;
+        this._biome = Biome.Water;
+    }
+    get terrace() { return this._terrace; }
+    get height() { return this._height; }
+    get moisture() { return this._moisture; }
+    get biome() { return this._biome; }
+}
 export class TerrainBuilder {
-    constructor(_width, _depth, _terraces, _waterLevel, tileWidth, tileHeight, tileDepth) {
+    constructor(_width, _depth, _terraces, _waterMultiplier, _waterLevel, tileWidth, tileHeight, tileDepth) {
         this._width = _width;
         this._depth = _depth;
         this._terraces = _terraces;
+        this._waterMultiplier = _waterMultiplier;
         this._waterLevel = _waterLevel;
         Terrain.init(tileWidth, tileDepth, tileHeight);
         this._worldTerrain = new SquareGrid(_width, _depth);
+        this._surface = new Array();
+        for (let y = 0; y < this._depth; y++) {
+            this._surface.push(new Array());
+        }
+    }
+    calcTerrace(height) {
+        if (height <= this._waterLevel) {
+            return 0;
+        }
+        return Math.floor(height / ((1.0 - this._waterLevel) / this._terraces));
+    }
+    calcRelativeHeight(centreX, centreY) {
+        let centre = this._surface[centreX][centreY];
+        let relativeHeight = 0;
+        for (let yDiff = -1; yDiff < 2; yDiff++) {
+            let y = centreY + yDiff;
+            if (y < 0 || y > this._depth) {
+                continue;
+            }
+            for (let xDiff = -1; xDiff < 2; xDiff++) {
+                let x = centreX + xDiff;
+                if (x < 0 || x > this._width) {
+                    continue;
+                }
+                let neighbour = this._surface[x][y];
+                if (neighbour.terrace < centre.terrace) {
+                    if (centre.terrace - neighbour.terrace > relativeHeight) {
+                        relativeHeight = centre.terrace - neighbour.terrace;
+                    }
+                }
+            }
+        }
+        return relativeHeight;
+    }
+    calcType(x, y) {
+        let surface = this._surface[x][y];
+        switch (surface.biome) {
+            default:
+                break;
+            case Biome.Beach:
+            case Biome.Desert:
+                return TerrainType.Sand;
+            case Biome.Swamp:
+            case Biome.Woodland:
+                return TerrainType.Mud;
+            case Biome.Grassland:
+                return TerrainType.Grass;
+            case Biome.Tundra:
+                return TerrainType.Rock;
+        }
+        console.assert(surface.biome == Biome.Water);
+        return TerrainType.Water;
+    }
+    calcShape(x, y) {
+        let type = TerrainShape.Flat;
+        return type;
     }
     build(heightMap) {
+        for (let y = 0; y < this._depth; y++) {
+            for (let x = 0; x < this._width; x++) {
+                let height = heightMap[x][y];
+                this._surface[y].push(new TerrainAttributes(height, this.calcTerrace(height)));
+            }
+        }
+        for (let y = 0; y < this._depth; y++) {
+            for (let x = 0; x < this._width; x++) {
+                let type = this.calcType(x, y);
+                let shape = this.calcShape(x, y);
+                let z = this._surface[x][y].terrace;
+                this._worldTerrain.addRaisedTerrain(x, y, z, type, shape);
+                let height = this.calcRelativeHeight(x, y);
+                while (height > 0) {
+                    z--;
+                    this._worldTerrain.addRaisedTerrain(x, y, z, type, TerrainShape.Flat);
+                }
+            }
+        }
     }
 }
