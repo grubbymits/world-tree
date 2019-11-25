@@ -1,24 +1,7 @@
+import { Location } from "./physics.js"
 import { GraphicComponent } from "./graphics.js"
 
-export class Location {
-  constructor(private _x: number,
-              private _y: number,
-              private _z: number) { }
-
-  get x(): number {
-    return this._x;
-  }
-
-  get y(): number {
-    return this._y;
-  }
-
-  get z(): number {
-    return this._z;
-  }
-}
-
-export class GameObject {
+export class Entity {
   private static _ids: number = 0;
 
   private readonly _id: number;
@@ -29,8 +12,8 @@ export class GameObject {
               protected readonly _height: number,   // z-axis
               protected readonly _blocking: boolean,
               protected _graphicsComponent: GraphicComponent) {
-    this._id = GameObject._ids;
-    GameObject._ids++;
+    this._id = Entity._ids;
+    Entity._ids++;
   }
   
   get x(): number {
@@ -74,7 +57,7 @@ export class GameObject {
   }
 }
 
-export class GameActor extends GameObject {
+export class Actor extends Entity {
   constructor(location: Location,
               width : number,     // x-axis
               depth: number,      // y-axis

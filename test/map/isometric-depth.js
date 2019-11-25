@@ -2,40 +2,62 @@ import * as WT from '../../dist/world-tree.js';
 
 console.log("begin");
 
-let sheet = new WT.SpriteSheet("../res/img/block");
 
-sheet.image.onload = function() {
-  let cellsX = 12;
-  let cellsY = 12;
+function createGraphic(path) {
+  let sheet = new WT.SpriteSheet(path);
+  let sprite = new WT.Sprite(sheet, 0, 0, 128, 128);
+  return new Array(new WT.StaticGraphicComponent(sprite.id));
+}
+
+function createGraphics(paths) {
+  let graphics = new Array();
+  for (let i in paths) {
+    let path = paths[i];
+    let sheet = new WT.SpriteSheet(path);
+    let sprite = new WT.Sprite(sheet, 0, 0, 128, 128);
+    graphics.push(new WT.StaticGraphicComponent(sprite.id));
+  }
+  return graphics;
+}
+
+window.onload = function begin() {
   let tileWidth = 128;
   let tileHeight = 64;
-  let sprites = [];
-  sprites.push(new WT.Sprite(sheet, 0, 0, 128, 128));
+  let tileDepth = 64;
+  let cellsX = 12;
+  let cellsY = 12;
+  let terraces = 2;
+  let waterMultiplier = 1.0;
+  let waterLevel = 0.1;
+
+  WT.Terrain.init(tileWidth, tileDepth, tileHeight);
+  let sprites = new Array("../../../res/img/light-grass-sand-flat",
+                          "../../../res/img/light-grass-sand-ramp-north",
+                          "../../../res/img/light-grass-sand-ramp-east");
+  WT.Terrain.addTerrainGraphics(WT.TerrainType.Grass, createGraphics(sprites));
+  WT.Terrain.addTerrainGraphics(WT.TerrainType.Water, createGraphic("../../../res/img/light-water-flat"));
+  WT.Terrain.addTerrainGraphics(WT.TerrainType.Sand, createGraphic("../../../res/img/sand-flat"));
+
+  let water = new Array(0.0, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0);
+  let edge = new Array(0.0, 0.11, 0.12, 0.13, 0.14, 0.15, 0.14, 0.13, 0.12, 0.11, 0.10, 0.0);
+  let ground = new Array(0.0, 0.11, 0.12, 0.23, 0.24, 0.25, 0.24, 0.23, 0.12, 0.11, 0.10, 0.0);
+  let heightMap = new Array(water, edge, ground, ground, ground, ground,
+                          ground, ground, ground, ground, edge, water);
+  let builder = new WT.TerrainBuilder(cellsX, cellsY, terraces,
+                                    waterMultiplier, waterLevel,
+                                    tileWidth, tileHeight, tileDepth);
+  builder.build(heightMap);
   let canvas = document.getElementById("testCanvas");
+  let context = new WT.Context(builder.terrain, WT.CoordSystem.Isometric, canvas);
 
-  let game = new WT.Game(cellsX, cellsY, tileWidth, tileHeight,
-                         WT.CoordSystem.Isometric, canvas, sprites, 0);
-
-  let raised = [];
-  let graphic = new WT.StaticGraphicsComponent(0);
-  raised.push(game.addFlatTerrain(0, 4, 1, graphic));
-  raised.push(game.addFlatTerrain(1, 4, 1, graphic));
-  raised.push(game.addFlatTerrain(2, 4, 1, graphic));
-  raised.push(game.addFlatTerrain(2, 3, 1, graphic));
-  raised.push(game.addFlatTerrain(0, 5, 1, graphic));
-
-  raised.push(game.addFlatTerrain(2, 2, 1, graphic));
-  raised.push(game.addFlatTerrain(2, 2, 2, graphic));
-  raised.push(game.addFlatTerrain(2, 2, 3, graphic));
-
-  // Offset the grid so its displayed roughly in the middle of the canvas.
   var update = function update() {
     if (document.hasFocus()) {
-      game.update();
+      context.update();
+      context.render();
     }
     window.requestAnimationFrame(update);
   }
   window.requestAnimationFrame(update);
   console.log("done");
-  game.run();
+  context.run();
 }

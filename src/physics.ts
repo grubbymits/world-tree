@@ -1,6 +1,24 @@
-import { Location, GameObject } from "./entity.js"
+import { Entity } from "./entity.js"
 import { TerrainType, TerrainShape, Terrain } from "./terrain.js"
 import { SquareGrid } from "./map.js"
+
+export class Location {
+  constructor(private _x: number,
+              private _y: number,
+              private _z: number) { }
+
+  get x(): number {
+    return this._x;
+  }
+
+  get y(): number {
+    return this._y;
+  }
+
+  get z(): number {
+    return this._z;
+  }
+}
 
 class MovementCost {
   constructor(private readonly _terrain: Terrain,
@@ -12,7 +30,7 @@ class MovementCost {
 
 export class PathFinder {
   constructor(private _map: SquareGrid,
-              private _objects: Array<GameObject>) { }
+              private _objects: Array<Entity>) { }
 
   static isBlocked(toTerrain: Terrain, fromTerrain: Terrain): boolean {
     let toLoc = Terrain.scaleLocation(toTerrain.location);

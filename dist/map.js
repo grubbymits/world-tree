@@ -1,12 +1,5 @@
 import { Terrain } from "./terrain.js";
-export class Point {
-    constructor(_x, _y) {
-        this._x = _x;
-        this._y = _y;
-    }
-    get x() { return this._x; }
-    get y() { return this._y; }
-}
+import { Point } from "./graphics.js";
 export class SquareGrid {
     constructor(_width, _height) {
         this._width = _width;
@@ -15,21 +8,14 @@ export class SquareGrid {
             new Point(-1, 0), new Point(1, 0),
             new Point(-1, 1), new Point(0, 1), new Point(1, 1),];
         this._raisedTerrain = new Map();
-        this._floor = new Array();
         this._allTerrain = new Map();
         console.log("creating map", _width, _height);
-        for (let x = 0; x < this._width; x++) {
-            this._floor[x] = new Array();
-        }
     }
     get width() {
         return this._width;
     }
     get height() {
         return this._height;
-    }
-    get raisedTerrain() {
-        return this._raisedTerrain;
     }
     addRaisedTerrain(x, y, z, type, shape) {
         let terrain = new Terrain(x, y, z, type, shape);
@@ -49,8 +35,8 @@ export class SquareGrid {
         }
         this._allTerrain.set(terrain.id, terrain);
     }
-    getFloor(x, y) {
-        return this._floor[x][y];
+    get allTerrain() {
+        return this._allTerrain;
     }
     getTerrain(x, y, z) {
         if (x < 0 || x >= this.width) {
@@ -58,9 +44,6 @@ export class SquareGrid {
         }
         if (y < 0 || y >= this.height) {
             return null;
-        }
-        if (z == 0) {
-            return this.getFloor(x, y);
         }
         if (z < 0) {
             return null;

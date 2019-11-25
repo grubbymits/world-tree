@@ -1,5 +1,6 @@
-import { Point, SquareGrid } from "./map.js"
-import { Location, GameObject } from "./entity.js"
+import { SquareGrid } from "./map.js"
+import { Entity } from "./entity.js"
+import { Location } from "./physics.js"
 import { Terrain } from "./terrain.js"
 import { Camera } from "./camera.js"
 
@@ -8,7 +9,20 @@ export enum CoordSystem {
   Isometric,
 }
 
+export class Point {
+  constructor(private readonly _x: number,
+              private readonly _y: number) { }
+  get x() { return this._x; }
+  get y() { return this._y; }
+}
+
 export class SpriteSheet {
+  private static _sheets = new Array<SpriteSheet>();
+
+  private static add(sheet: SpriteSheet) {
+    this._sheets.push(sheet);
+  }
+
   private _image: HTMLImageElement;
 
   constructor(name: string) {
@@ -20,6 +34,7 @@ export class SpriteSheet {
       throw new Error("No filename passed");
     }
     console.log("load", name);
+    SpriteSheet.add(this);
   }
 
   get image(): HTMLImageElement {
@@ -28,11 +43,26 @@ export class SpriteSheet {
 }
 
 export class Sprite {
+  private static _sprites = new Array<Sprite>();
+
+  private static add(sprite: Sprite) {
+    this._sprites.push(sprite);
+  }
+
+  static get sprites(): Array<Sprite> {
+    return this._sprites;
+  }
+
+  private readonly _id: number;
+
   constructor(private readonly _sheet: SpriteSheet,
               private readonly _offsetX: number,
               private readonly _offsetY: number,
               private readonly _width: number,
-              private readonly _height: number) { }
+              private readonly _height: number) {
+    this._id = Sprite.sprites.length;
+    Sprite.add(this);
+  }
 
   draw(coord: Point, ctx: CanvasRenderingContext2D): void {
     ctx.drawImage(this._sheet.image,
@@ -40,6 +70,10 @@ export class Sprite {
                   this._width, this._height,
                   coord.x, coord.y,
                   this._width, this._height);
+  }
+
+  get id(): number {
+    return this._id;
   }
 }
 
@@ -66,8 +100,7 @@ export abstract class Renderer {
   protected _ctx: CanvasRenderingContext2D;
   protected _visible: CanvasRenderingContext2D;
   
-  constructor(protected _canvas: HTMLCanvasElement,
-              protected _sprites: Array<Sprite>) {
+  constructor(protected _canvas: HTMLCanvasElement) {
     this._visible = this._canvas.getContext("2d", { alpha: false })!;
     this._width = _canvas.width;
     this._height = _canvas.height;
@@ -77,35 +110,25 @@ export abstract class Renderer {
     this._ctx = this._offscreenCanvas.getContext("2d", { alpha: false })!;
   }
 
-  draw(coord: Point, id: number): void {
-    this._sprites[id].draw(coord, this._ctx);
-  }
-
-  drawObject(gameObj: GameObject, camera: Camera) {
-    let coord = this.getDrawCoord(gameObj);
+  drawObject(entity: Entity, camera: Camera) {
+    let coord = this.getDrawCoord(entity);
     if (!camera.isOnScreen(coord)) {
       return;
     }
     coord = camera.getDrawCoord(coord);
-    let spriteId = gameObj.graphicsComponent.update();
-    this.draw(coord, spriteId);
+    let spriteId = entity.graphicsComponent.update();
+    Sprite.sprites[spriteId].draw(coord, this._ctx);
   }
 
-  abstract getDrawCoord(object: GameObject): Point;
-  abstract drawFloor(gameMape: SquareGrid, camera: Camera): void;
-  abstract sortGameObjects(objects: Array<GameObject>): void;
+  abstract getDrawCoord(object: Entity): Point;
+  abstract sortEntitys(objects: Array<Entity>): void;
 
-  drawAll(objects: Array<GameObject>, camera: Camera): void {
-    this.sortGameObjects(objects);
-    for (let i in objects) {
-      this.drawObject(objects[i], camera);
-    }
-  }
-
-  update(objects: Array<GameObject>, gameMap: SquareGrid, camera: Camera) {
+  update(entities: Array<Entity>, gameMap: SquareGrid, camera: Camera) {
     this._ctx.clearRect(0, 0, this._width, this._height);
-    this.drawFloor(gameMap, camera);
-    this.drawAll(objects, camera);
+    this.sortEntitys(entities);
+    for (let i in entities) {
+      this.drawObject(entities[i], camera);
+    }
   }
 
   render(): void {
@@ -114,32 +137,19 @@ export abstract class Renderer {
 }
 
 export class CartisanRenderer extends Renderer {
-  constructor(canvas: HTMLCanvasElement,
-              sprites: Array<Sprite>) {
-    super(canvas, sprites);
+  constructor(canvas: HTMLCanvasElement) {
+    super(canvas);
   }
 
-  getDrawCoord(object: GameObject): Point {
-    return new Point(object.x, object.y - object.z);
+  getDrawCoord(entity: Entity): Point {
+    return new Point(entity.x, entity.y - entity.z);
   }
 
-  drawFloor(gameMap: SquareGrid, camera: Camera) {
-    for (let y = 0; y < gameMap.height; y++) {
-      for (let x = 0; x < gameMap.width; x++) {
-        let gameObj = gameMap.getFloor(x, y);
-        let coord = this.getDrawCoord(gameObj);
-        coord = camera.getDrawCoord(coord);
-        let spriteId = gameObj.graphicsComponent.update();
-        this.draw(coord, spriteId);
-      }
-    }
-  }
-
-  sortGameObjects(objects: Array<GameObject>): void {
+  sortEntitys(entities: Array<Entity>): void {
     // We're drawing a 2D map, so depth is being simulated by the position on
     // the Y axis and the order in which those elements are drawn. Insert
     // the new location and sort the array by draw order.
-    objects.sort((a, b) => {
+    entities.sort((a, b) => {
       if (a.z < b.z) {
         return 1;
       } else if (b.z < a.z) {
@@ -164,31 +174,21 @@ function convertToIsometric(x: number, y: number): Point {
 }
 
 export class IsometricRenderer extends Renderer {
-  constructor(canvas: HTMLCanvasElement,
-              sprites: Array<Sprite>) {
-    super(canvas, sprites);
+  constructor(canvas: HTMLCanvasElement) {
+    super(canvas);
   }
 
-  getDrawCoord(gameObj: GameObject): Point {
+  getDrawCoord(gameObj: Entity): Point {
     let loc = Terrain.scaleLocation(gameObj.location);
     let coord = convertToIsometric(loc.x + loc.z, loc.y - loc.z);
     return coord;
   }
 
-  drawFloor(gameMap: SquareGrid, camera: Camera): void {
-    for (let y = 0; y < gameMap.height; y++) {
-      for (let x = gameMap.width - 1; x >= 0; x--) {
-        let terrain = gameMap.getFloor(x, y);
-        this.drawObject(terrain, camera);
-      }
-    }
-  }
-
-  sortGameObjects(objects: Array<GameObject>): void {
+  sortEntitys(entities: Array<Entity>): void {
     // We're drawing a 2D map, so depth is being simulated by the position on
     // the X axis and the order in which those elements are drawn. Insert
     // the new location and sort the array by draw order.
-    objects.sort((a, b) => {
+    entities.sort((a, b) => {
       if (a.z > b.z) {
         return 1;
       } else if (b.z > a.z) {

@@ -1,5 +1,5 @@
 import { Camera } from "./camera.js"
-import { Point } from "./map.js"
+import { Point } from "./graphics.js"
 
 export class MouseController {
   private _camera: Camera;

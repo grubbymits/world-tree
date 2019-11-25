@@ -1,4 +1,4 @@
-import { Point } from "./map.js";
+import { Point } from "./graphics.js";
 export class Camera {
     constructor(_x, _y, _width, _height) {
         this._x = _x;

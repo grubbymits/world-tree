@@ -1,4 +1,5 @@
-import { Location, GameObject } from "./entity.js";
+import { Location } from "./physics.js";
+import { Entity } from "./entity.js";
 import { SquareGrid } from "./map.js";
 export var TerrainShape;
 (function (TerrainShape) {
@@ -26,7 +27,39 @@ export var Biome;
     Biome[Biome["Tundra"] = 5] = "Tundra";
     Biome[Biome["Desert"] = 6] = "Desert";
 })(Biome || (Biome = {}));
-export class Terrain extends GameObject {
+function getShapeName(terrain) {
+    switch (terrain) {
+        default:
+            console.error("unhandled terrain shape:", terrain);
+        case TerrainShape.Flat:
+            return "flat";
+        case TerrainShape.RampUpNorth:
+            return "ramp up north";
+        case TerrainShape.RampUpEast:
+            return "ramp up east";
+        case TerrainShape.RampUpSouth:
+            return "ramp up south";
+        case TerrainShape.RampUpWest:
+            return "ramp up west";
+    }
+}
+function getTypeName(terrain) {
+    switch (terrain) {
+        default:
+            console.error("unhandled terrain type:", terrain);
+        case TerrainType.Water:
+            return "water";
+        case TerrainType.Sand:
+            return "sand";
+        case TerrainType.Mud:
+            return "mud";
+        case TerrainType.Grass:
+            return "grass";
+        case TerrainType.Rock:
+            return "rock";
+    }
+}
+export class Terrain extends Entity {
     constructor(_gridX, _gridY, _gridZ, _type, _shape) {
         super(new Location(_gridX * Terrain.tileWidth, _gridY * Terrain.tileDepth, _gridZ * Terrain.tileHeight), Terrain.tileWidth, Terrain.tileDepth, Terrain.tileHeight, true, Terrain.graphics(_type, _shape));
         this._gridX = _gridX;
@@ -39,14 +72,15 @@ export class Terrain extends GameObject {
         this._tileWidth = width;
         this._tileDepth = depth;
         this._tileHeight = height;
-        this._terrainGraphics = new Map();
     }
-    static addTerrainSprites(type, graphics) {
-        this._terrainGraphics.set(type, graphics);
+    static addTerrainGraphics(terrainType, graphics) {
+        console.log("adding graphics for", getTypeName(terrainType), graphics);
+        this._terrainGraphics.set(terrainType, graphics);
     }
-    static graphics(type, shape) {
-        console.assert(this._terrainGraphics.has(type));
-        return this._terrainGraphics.get(type)[shape];
+    static graphics(terrainType, shape) {
+        console.assert(this._terrainGraphics.has(terrainType), "undefined terrain graphic for TerrainType:", getTypeName(terrainType));
+        console.assert(shape < this._terrainGraphics.get(terrainType).length, "undefined terrain graphic for TerrainShape:", getShapeName(shape));
+        return this._terrainGraphics.get(terrainType)[shape];
     }
     static get tileWidth() {
         return this._tileWidth;
@@ -67,6 +101,7 @@ export class Terrain extends GameObject {
         return this._type;
     }
 }
+Terrain._terrainGraphics = new Map();
 class TerrainAttributes {
     constructor(_height, _terrace) {
         this._height = _height;
@@ -78,6 +113,7 @@ class TerrainAttributes {
     get height() { return this._height; }
     get moisture() { return this._moisture; }
     get biome() { return this._biome; }
+    set biome(b) { this._biome = b; }
 }
 export class TerrainBuilder {
     constructor(_width, _depth, _terraces, _waterMultiplier, _waterLevel, tileWidth, tileHeight, tileDepth) {
@@ -89,9 +125,9 @@ export class TerrainBuilder {
         Terrain.init(tileWidth, tileDepth, tileHeight);
         this._worldTerrain = new SquareGrid(_width, _depth);
         this._surface = new Array();
-        for (let y = 0; y < this._depth; y++) {
-            this._surface.push(new Array());
-        }
+    }
+    get terrain() {
+        return this._worldTerrain;
     }
     calcTerrace(height) {
         if (height <= this._waterLevel) {
@@ -100,19 +136,19 @@ export class TerrainBuilder {
         return Math.floor(height / ((1.0 - this._waterLevel) / this._terraces));
     }
     calcRelativeHeight(centreX, centreY) {
-        let centre = this._surface[centreX][centreY];
+        let centre = this._surface[centreY][centreX];
         let relativeHeight = 0;
         for (let yDiff = -1; yDiff < 2; yDiff++) {
             let y = centreY + yDiff;
-            if (y < 0 || y > this._depth) {
+            if (y < 0 || y >= this._depth) {
                 continue;
             }
             for (let xDiff = -1; xDiff < 2; xDiff++) {
                 let x = centreX + xDiff;
-                if (x < 0 || x > this._width) {
+                if (x < 0 || x >= this._width) {
                     continue;
                 }
-                let neighbour = this._surface[x][y];
+                let neighbour = this._surface[y][x];
                 if (neighbour.terrace < centre.terrace) {
                     if (centre.terrace - neighbour.terrace > relativeHeight) {
                         relativeHeight = centre.terrace - neighbour.terrace;
@@ -123,7 +159,7 @@ export class TerrainBuilder {
         return relativeHeight;
     }
     calcType(x, y) {
-        let surface = this._surface[x][y];
+        let surface = this._surface[y][x];
         switch (surface.biome) {
             default:
                 break;
@@ -142,26 +178,50 @@ export class TerrainBuilder {
         return TerrainType.Water;
     }
     calcShape(x, y) {
-        let type = TerrainShape.Flat;
-        return type;
+        let shapeType = TerrainShape.Flat;
+        return shapeType;
     }
     build(heightMap) {
         for (let y = 0; y < this._depth; y++) {
+            this._surface.push(new Array());
             for (let x = 0; x < this._width; x++) {
-                let height = heightMap[x][y];
+                let height = heightMap[y][x];
                 this._surface[y].push(new TerrainAttributes(height, this.calcTerrace(height)));
+            }
+        }
+        let landRange = 1.0 - this._waterLevel;
+        let terraceSpacing = landRange / this._terraces;
+        let beachLimit = this._waterLevel + (landRange / 10);
+        for (let y = 0; y < this._depth; y++) {
+            for (let x = 0; x < this._width; x++) {
+                let biome = Biome.Water;
+                let surface = this._surface[y][x];
+                if (surface.height <= this._waterLevel) {
+                    surface.biome = Biome.Water;
+                }
+                else if (surface.height <= beachLimit) {
+                    surface.biome = Biome.Beach;
+                }
+                else {
+                    surface.biome = Biome.Grassland;
+                }
             }
         }
         for (let y = 0; y < this._depth; y++) {
             for (let x = 0; x < this._width; x++) {
-                let type = this.calcType(x, y);
-                let shape = this.calcShape(x, y);
-                let z = this._surface[x][y].terrace;
-                this._worldTerrain.addRaisedTerrain(x, y, z, type, shape);
-                let height = this.calcRelativeHeight(x, y);
-                while (height > 0) {
+                let terrainType = this.calcType(x, y);
+                let terrainShape = this.calcShape(x, y);
+                let z = this._surface[y][x].terrace;
+                this._worldTerrain.addRaisedTerrain(x, y, z, terrainType, terrainShape);
+            }
+        }
+        for (let y = 0; y < this._depth; y++) {
+            for (let x = 0; x < this._width; x++) {
+                let z = this.calcRelativeHeight(x, y);
+                let terrain = this._worldTerrain.getTerrain(x, y, z);
+                while (z > 0) {
                     z--;
-                    this._worldTerrain.addRaisedTerrain(x, y, z, type, TerrainShape.Flat);
+                    this._worldTerrain.addRaisedTerrain(x, y, z, terrain.type, TerrainShape.Flat);
                 }
             }
         }

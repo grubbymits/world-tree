@@ -1,10 +1,17 @@
-import { Point } from "./map.js";
 import { Terrain } from "./terrain.js";
 export var CoordSystem;
 (function (CoordSystem) {
     CoordSystem[CoordSystem["Cartisan"] = 0] = "Cartisan";
     CoordSystem[CoordSystem["Isometric"] = 1] = "Isometric";
 })(CoordSystem || (CoordSystem = {}));
+export class Point {
+    constructor(_x, _y) {
+        this._x = _x;
+        this._y = _y;
+    }
+    get x() { return this._x; }
+    get y() { return this._y; }
+}
 export class SpriteSheet {
     constructor(name) {
         this._image = new Image();
@@ -15,11 +22,16 @@ export class SpriteSheet {
             throw new Error("No filename passed");
         }
         console.log("load", name);
+        SpriteSheet.add(this);
+    }
+    static add(sheet) {
+        this._sheets.push(sheet);
     }
     get image() {
         return this._image;
     }
 }
+SpriteSheet._sheets = new Array();
 export class Sprite {
     constructor(_sheet, _offsetX, _offsetY, _width, _height) {
         this._sheet = _sheet;
@@ -27,11 +39,23 @@ export class Sprite {
         this._offsetY = _offsetY;
         this._width = _width;
         this._height = _height;
+        this._id = Sprite.sprites.length;
+        Sprite.add(this);
+    }
+    static add(sprite) {
+        this._sprites.push(sprite);
+    }
+    static get sprites() {
+        return this._sprites;
     }
     draw(coord, ctx) {
         ctx.drawImage(this._sheet.image, this._offsetX, this._offsetY, this._width, this._height, coord.x, coord.y, this._width, this._height);
     }
+    get id() {
+        return this._id;
+    }
 }
+Sprite._sprites = new Array();
 export class GraphicComponent {
     constructor(_currentSpriteId) {
         this._currentSpriteId = _currentSpriteId;
@@ -46,9 +70,8 @@ export class StaticGraphicComponent extends GraphicComponent {
     }
 }
 export class Renderer {
-    constructor(_canvas, _sprites) {
+    constructor(_canvas) {
         this._canvas = _canvas;
-        this._sprites = _sprites;
         this._visible = this._canvas.getContext("2d", { alpha: false });
         this._width = _canvas.width;
         this._height = _canvas.height;
@@ -57,53 +80,35 @@ export class Renderer {
         this._offscreenCanvas.height = this._height;
         this._ctx = this._offscreenCanvas.getContext("2d", { alpha: false });
     }
-    draw(coord, id) {
-        this._sprites[id].draw(coord, this._ctx);
-    }
-    drawObject(gameObj, camera) {
-        let coord = this.getDrawCoord(gameObj);
+    drawObject(entity, camera) {
+        let coord = this.getDrawCoord(entity);
         if (!camera.isOnScreen(coord)) {
             return;
         }
         coord = camera.getDrawCoord(coord);
-        let spriteId = gameObj.graphicsComponent.update();
-        this.draw(coord, spriteId);
+        let spriteId = entity.graphicsComponent.update();
+        Sprite.sprites[spriteId].draw(coord, this._ctx);
     }
-    drawAll(objects, camera) {
-        this.sortGameObjects(objects);
-        for (let i in objects) {
-            this.drawObject(objects[i], camera);
-        }
-    }
-    update(objects, gameMap, camera) {
+    update(entities, gameMap, camera) {
         this._ctx.clearRect(0, 0, this._width, this._height);
-        this.drawFloor(gameMap, camera);
-        this.drawAll(objects, camera);
+        this.sortEntitys(entities);
+        for (let i in entities) {
+            this.drawObject(entities[i], camera);
+        }
     }
     render() {
         this._visible.drawImage(this._offscreenCanvas, 0, 0);
     }
 }
 export class CartisanRenderer extends Renderer {
-    constructor(canvas, sprites) {
-        super(canvas, sprites);
+    constructor(canvas) {
+        super(canvas);
     }
-    getDrawCoord(object) {
-        return new Point(object.x, object.y - object.z);
+    getDrawCoord(entity) {
+        return new Point(entity.x, entity.y - entity.z);
     }
-    drawFloor(gameMap, camera) {
-        for (let y = 0; y < gameMap.height; y++) {
-            for (let x = 0; x < gameMap.width; x++) {
-                let gameObj = gameMap.getFloor(x, y);
-                let coord = this.getDrawCoord(gameObj);
-                coord = camera.getDrawCoord(coord);
-                let spriteId = gameObj.graphicsComponent.update();
-                this.draw(coord, spriteId);
-            }
-        }
-    }
-    sortGameObjects(objects) {
-        objects.sort((a, b) => {
+    sortEntitys(entities) {
+        entities.sort((a, b) => {
             if (a.z < b.z) {
                 return 1;
             }
@@ -128,24 +133,16 @@ function convertToIsometric(x, y) {
     return new Point(drawX, drawY);
 }
 export class IsometricRenderer extends Renderer {
-    constructor(canvas, sprites) {
-        super(canvas, sprites);
+    constructor(canvas) {
+        super(canvas);
     }
     getDrawCoord(gameObj) {
         let loc = Terrain.scaleLocation(gameObj.location);
         let coord = convertToIsometric(loc.x + loc.z, loc.y - loc.z);
         return coord;
     }
-    drawFloor(gameMap, camera) {
-        for (let y = 0; y < gameMap.height; y++) {
-            for (let x = gameMap.width - 1; x >= 0; x--) {
-                let terrain = gameMap.getFloor(x, y);
-                this.drawObject(terrain, camera);
-            }
-        }
-    }
-    sortGameObjects(objects) {
-        objects.sort((a, b) => {
+    sortEntitys(entities) {
+        entities.sort((a, b) => {
             if (a.z > b.z) {
                 return 1;
             }

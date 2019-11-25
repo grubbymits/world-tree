@@ -1,21 +1,12 @@
-import { Location } from "./entity.js"
+import { Location } from "./physics.js"
 import { Terrain, TerrainShape, TerrainType } from "./terrain.js"
-import { GraphicComponent } from "./graphics.js"
-
-export class Point {
-  constructor(private readonly _x: number,
-              private readonly _y: number) { }
-  get x() { return this._x; }
-  get y() { return this._y; }
-}
+import { Point, GraphicComponent } from "./graphics.js"
 
 export class SquareGrid {
   private readonly _neighbourOffsets: Array<Point> =
     [ new Point(-1, -1), new Point(0, -1), new Point(1, -1),
       new Point(-1, 0),                    new Point(1, 0),
       new Point(-1, 1),  new Point(0, 1),  new Point(1, 1), ];
-
-  private _floor: Array<Array<Terrain>>;
 
   // FIXME How to declare multi-dimensional map
   private _raisedTerrain: any;
@@ -25,14 +16,8 @@ export class SquareGrid {
   constructor(private readonly _width: number,
               private readonly _height: number) {
     this._raisedTerrain = new Map();
-    this._floor = new Array<Array<Terrain>>();
     this._allTerrain = new Map<number, Terrain>();
-
     console.log("creating map", _width, _height);
-
-    for (let x = 0; x < this._width; x++) {
-      this._floor[x] = new Array<Terrain>();
-    }
   }
 
   get width(): number {
@@ -41,10 +26,6 @@ export class SquareGrid {
 
   get height(): number {
     return this._height;
-  }
-
-  get raisedTerrain(): Array<Terrain> {
-    return this._raisedTerrain;
   }
 
   addRaisedTerrain(x: number, y: number, z: number, type: TerrainType,
@@ -65,8 +46,8 @@ export class SquareGrid {
     this._allTerrain.set(terrain.id, terrain);
   }
 
-  getFloor(x: number, y: number): Terrain {
-    return this._floor[x][y];
+  get allTerrain(): Map<number, Terrain> {
+    return this._allTerrain;
   }
 
   getTerrain(x: number, y: number, z: number): Terrain | null {
@@ -75,9 +56,6 @@ export class SquareGrid {
     }
     if (y < 0 || y >= this.height) {
       return null;
-    }
-    if (z == 0) {
-      return this.getFloor(x, y);
     }
     if (z < 0) {
       return null;

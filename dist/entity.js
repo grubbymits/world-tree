@@ -1,20 +1,4 @@
-export class Location {
-    constructor(_x, _y, _z) {
-        this._x = _x;
-        this._y = _y;
-        this._z = _z;
-    }
-    get x() {
-        return this._x;
-    }
-    get y() {
-        return this._y;
-    }
-    get z() {
-        return this._z;
-    }
-}
-export class GameObject {
+export class Entity {
     constructor(_location, _width, _depth, _height, _blocking, _graphicsComponent) {
         this._location = _location;
         this._width = _width;
@@ -22,8 +6,8 @@ export class GameObject {
         this._height = _height;
         this._blocking = _blocking;
         this._graphicsComponent = _graphicsComponent;
-        this._id = GameObject._ids;
-        GameObject._ids++;
+        this._id = Entity._ids;
+        Entity._ids++;
     }
     get x() {
         return this._location.x;
@@ -56,8 +40,8 @@ export class GameObject {
         return this._graphicsComponent;
     }
 }
-GameObject._ids = 0;
-export class GameActor extends GameObject {
+Entity._ids = 0;
+export class Actor extends Entity {
     constructor(location, width, depth, height, graphics) {
         super(location, width, depth, height, true, graphics);
     }

@@ -1,4 +1,20 @@
 import { TerrainShape, Terrain } from "./terrain.js";
+export class Location {
+    constructor(_x, _y, _z) {
+        this._x = _x;
+        this._y = _y;
+        this._z = _z;
+    }
+    get x() {
+        return this._x;
+    }
+    get y() {
+        return this._y;
+    }
+    get z() {
+        return this._z;
+    }
+}
 class MovementCost {
     constructor(_terrain, _cost) {
         this._terrain = _terrain;
