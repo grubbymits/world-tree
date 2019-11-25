@@ -15,25 +15,18 @@ export class Context {
               canvas: HTMLCanvasElement) {
 
     this._controller = new MouseController(canvas);
+
     this._entities = new Array<Entity>();
     let terrain = _worldMap.allTerrain;
     Array.from(terrain.values()).forEach(value => this._entities.push(value));
+
     this._gfx = sys == CoordSystem.Cartisan ?
       new CartisanRenderer(canvas) :
       new IsometricRenderer(canvas);
   }
 
-  get map(): SquareGrid {
-    return this._worldMap;
-  }
-
-  getTerrain(x: number, y: number): Terrain | null {
-    return this._worldMap.getTerrain(x, y, 0);
-  }
-
   update(): void {
-    this._gfx.update(this._entities, this._worldMap, this._controller.camera);
-    this._gfx.render();
+    this._gfx.render(this._entities, this._controller.camera);
   }
 
   run(): void {

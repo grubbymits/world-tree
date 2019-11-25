@@ -11,15 +11,8 @@ export class Context {
             new CartisanRenderer(canvas) :
             new IsometricRenderer(canvas);
     }
-    get map() {
-        return this._worldMap;
-    }
-    getTerrain(x, y) {
-        return this._worldMap.getTerrain(x, y, 0);
-    }
     update() {
-        this._gfx.update(this._entities, this._worldMap, this._controller.camera);
-        this._gfx.render();
+        this._gfx.render(this._entities, this._controller.camera);
     }
     run() {
         let context = this;

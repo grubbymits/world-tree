@@ -53,7 +53,6 @@ window.onload = function begin() {
   var update = function update() {
     if (document.hasFocus()) {
       context.update();
-      context.render();
     }
     window.requestAnimationFrame(update);
   }

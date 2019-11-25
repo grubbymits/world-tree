@@ -51,9 +51,9 @@ export class Camera {
     this._upperY = Math.floor(this._y + this._height);
   }
 
-  isOnScreen(coord : Point) : boolean {
-    if (coord.x < this._lowerX || coord.y < this._lowerY ||
-        coord.x > this._upperX || coord.y > this._upperY) {
+  isOnScreen(coord : Point, width: number, depth: number) : boolean {
+    if (coord.x + width < this._lowerX || coord.y + depth < this._lowerY ||
+        coord.x - width > this._upperX || coord.y - depth > this._upperY) {
       return false;
     }
     return true;

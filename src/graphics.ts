@@ -96,43 +96,30 @@ export class StaticGraphicComponent extends GraphicComponent {
 export abstract class Renderer {
   protected readonly _width: number;
   protected readonly _height: number;
-  protected _offscreenCanvas: HTMLCanvasElement;
   protected _ctx: CanvasRenderingContext2D;
-  protected _visible: CanvasRenderingContext2D;
   
   constructor(protected _canvas: HTMLCanvasElement) {
-    this._visible = this._canvas.getContext("2d", { alpha: false })!;
     this._width = _canvas.width;
     this._height = _canvas.height;
-    this._offscreenCanvas = document.createElement('canvas');
-    this._offscreenCanvas.width = this._width;
-    this._offscreenCanvas.height = this._height;
-    this._ctx = this._offscreenCanvas.getContext("2d", { alpha: false })!;
-  }
-
-  drawObject(entity: Entity, camera: Camera) {
-    let coord = this.getDrawCoord(entity);
-    if (!camera.isOnScreen(coord)) {
-      return;
-    }
-    coord = camera.getDrawCoord(coord);
-    let spriteId = entity.graphicsComponent.update();
-    Sprite.sprites[spriteId].draw(coord, this._ctx);
+    this._ctx = this._canvas.getContext("2d", { alpha: false })!;
   }
 
   abstract getDrawCoord(object: Entity): Point;
   abstract sortEntitys(objects: Array<Entity>): void;
 
-  update(entities: Array<Entity>, gameMap: SquareGrid, camera: Camera) {
-    this._ctx.clearRect(0, 0, this._width, this._height);
+  render(entities: Array<Entity>, camera: Camera) {
     this.sortEntitys(entities);
+    this._ctx.clearRect(0, 0, this._width, this._height);
     for (let i in entities) {
-      this.drawObject(entities[i], camera);
+      let entity = entities[i];
+      let coord = this.getDrawCoord(entity);
+      if (!camera.isOnScreen(coord, entity.width, entity.depth)) {
+        continue;
+      }
+      coord = camera.getDrawCoord(coord);
+      let spriteId = entity.graphicsComponent.update();
+      Sprite.sprites[spriteId].draw(coord, this._ctx);
     }
-  }
-
-  render(): void {
-    this._visible.drawImage(this._offscreenCanvas, 0, 0);
   }
 }
 
