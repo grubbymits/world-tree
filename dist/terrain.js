@@ -94,21 +94,24 @@ export class Terrain extends Entity {
     static scaleLocation(loc) {
         return new Location(Math.floor(loc.x / this.tileWidth), Math.floor(loc.y / this.tileDepth), Math.floor(loc.z / this.tileHeight));
     }
-    get shape() {
-        return this._shape;
-    }
-    get type() {
-        return this._type;
-    }
+    get gridX() { return this._gridX; }
+    get gridY() { return this._gridY; }
+    get gridZ() { return this._gridZ; }
+    get shape() { return this._shape; }
+    get type() { return this._type; }
 }
 Terrain._terrainGraphics = new Map();
 class TerrainAttributes {
-    constructor(_height, _terrace) {
+    constructor(_x, _y, _height, _terrace) {
+        this._x = _x;
+        this._y = _y;
         this._height = _height;
         this._terrace = _terrace;
         this._moisture = 0.0;
         this._biome = Biome.Water;
     }
+    get x() { return this._x; }
+    get y() { return this._y; }
     get terrace() { return this._terrace; }
     get height() { return this._height; }
     get moisture() { return this._moisture; }
@@ -135,9 +138,8 @@ export class TerrainBuilder {
         }
         return Math.floor(height / ((1.0 - this._waterLevel) / this._terraces));
     }
-    calcRelativeHeight(centreX, centreY) {
-        let centre = this._surface[centreY][centreX];
-        let relativeHeight = 0;
+    getNeighbours(centreX, centreY) {
+        let neighbours = new Array();
         for (let yDiff = -1; yDiff < 2; yDiff++) {
             let y = centreY + yDiff;
             if (y < 0 || y >= this._depth) {
@@ -148,11 +150,19 @@ export class TerrainBuilder {
                 if (x < 0 || x >= this._width) {
                     continue;
                 }
-                let neighbour = this._surface[y][x];
-                if (neighbour.terrace < centre.terrace) {
-                    if (centre.terrace - neighbour.terrace > relativeHeight) {
-                        relativeHeight = centre.terrace - neighbour.terrace;
-                    }
+                neighbours.push(this._surface[y][x]);
+            }
+        }
+        return neighbours;
+    }
+    calcRelativeHeight(x, y) {
+        let neighbours = this.getNeighbours(x, y);
+        let relativeHeight = 0;
+        let centre = this._surface[y][x];
+        for (let neighbour of neighbours) {
+            if (neighbour.terrace < centre.terrace) {
+                if (centre.terrace - neighbour.terrace > relativeHeight) {
+                    relativeHeight = centre.terrace - neighbour.terrace;
                 }
             }
         }
@@ -178,7 +188,33 @@ export class TerrainBuilder {
         return TerrainType.Water;
     }
     calcShape(x, y) {
+        let neighbours = this.getNeighbours(x, y);
         let shapeType = TerrainShape.Flat;
+        let centre = this._surface[y][x];
+        for (let neighbour of neighbours) {
+            if (neighbour.terrace == centre.terrace) {
+                continue;
+            }
+            if (Math.abs(neighbour.terrace - centre.terrace) > 1) {
+                continue;
+            }
+            if ((neighbour.x != centre.x) && (neighbour.y != centre.y)) {
+                continue;
+            }
+            let moveDown = neighbour.terrace < centre.terrace;
+            if (neighbour.y < centre.y) {
+                shapeType = moveDown ? TerrainShape.RampUpSouth : TerrainShape.RampUpNorth;
+                break;
+            }
+            else if (neighbour.x > centre.x) {
+                shapeType = moveDown ? TerrainShape.RampUpWest : TerrainShape.RampUpEast;
+                break;
+            }
+            else if (neighbour.y < centre.y) {
+                shapeType = moveDown ? TerrainShape.RampUpEast : TerrainShape.RampUpWest;
+                break;
+            }
+        }
         return shapeType;
     }
     build(heightMap) {
@@ -186,7 +222,7 @@ export class TerrainBuilder {
             this._surface.push(new Array());
             for (let x = 0; x < this._width; x++) {
                 let height = heightMap[y][x];
-                this._surface[y].push(new TerrainAttributes(height, this.calcTerrace(height)));
+                this._surface[y].push(new TerrainAttributes(x, y, height, this.calcTerrace(height)));
             }
         }
         let landRange = 1.0 - this._waterLevel;
@@ -213,13 +249,18 @@ export class TerrainBuilder {
                 let terrainShape = this.calcShape(x, y);
                 let z = this._surface[y][x].terrace;
                 this._worldTerrain.addRaisedTerrain(x, y, z, terrainType, terrainShape);
+                console.log("adding terrain at", x, y, z);
             }
         }
         for (let y = 0; y < this._depth; y++) {
             for (let x = 0; x < this._width; x++) {
-                let z = this.calcRelativeHeight(x, y);
+                let z = this._surface[y][x].terrace;
+                let zStop = z - this.calcRelativeHeight(x, y);
                 let terrain = this._worldTerrain.getTerrain(x, y, z);
-                while (z > 0) {
+                if (terrain == null) {
+                    console.error("didn't find terrain in map at", x, y, z);
+                }
+                while (z > zStop) {
                     z--;
                     this._worldTerrain.addRaisedTerrain(x, y, z, terrain.type, TerrainShape.Flat);
                 }

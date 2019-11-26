@@ -11,26 +11,25 @@ export class SquareGrid {
         this._allTerrain = new Map();
         console.log("creating map", _width, _height);
     }
-    get width() {
-        return this._width;
-    }
-    get height() {
-        return this._height;
-    }
+    get width() { return this._width; }
+    get height() { return this._height; }
     addRaisedTerrain(x, y, z, type, shape) {
         let terrain = new Terrain(x, y, z, type, shape);
         if (!this._raisedTerrain.has(x)) {
-            this._raisedTerrain[x] = new Map();
-            this._raisedTerrain[x][y] = new Array();
-            this._raisedTerrain[x][y].push(terrain);
+            console.log("Grid: created a new terrain map for x =", x);
+            this._raisedTerrain.set(x, new Map());
+            this._raisedTerrain.get(x).set(y, new Array());
+            console.log("Grid: created a new terrain arry for y =", y);
+            this._raisedTerrain.get(x).get(y).push(terrain);
         }
         else {
-            if (this._raisedTerrain[x].has(y)) {
-                this._raisedTerrain[x][y].push(terrain);
+            if (this._raisedTerrain.get(x).has(y)) {
+                this._raisedTerrain.get(x).get(y).push(terrain);
             }
             else {
-                this._raisedTerrain[x][y] = new Array();
-                this._raisedTerrain[x][y].push(terrain);
+                this._raisedTerrain.get(x).set(y, new Array());
+                console.log("Grid: created a new terrain arry for y =", y);
+                this._raisedTerrain.get(x).get(y).push(terrain);
             }
         }
         this._allTerrain.set(terrain.id, terrain);
@@ -39,19 +38,17 @@ export class SquareGrid {
         return this._allTerrain;
     }
     getTerrain(x, y, z) {
-        if (x < 0 || x >= this.width) {
+        if ((x < 0 || x >= this.width) ||
+            (y < 0 || y >= this.height) ||
+            (z < 0)) {
+            console.log("SquareGrid: terrain coordinates out-of-range");
             return null;
         }
-        if (y < 0 || y >= this.height) {
-            return null;
-        }
-        if (z < 0) {
-            return null;
-        }
-        let raised = this._raisedTerrain[x][y];
-        for (let i in raised) {
-            if (raised[i].z == z) {
-                return raised[i];
+        let raised = this._raisedTerrain.get(x).get(y);
+        for (let terrain of raised) {
+            console.log("Grid: inspecting terrain", terrain);
+            if (terrain.gridZ == z) {
+                return terrain;
             }
         }
         return null;
