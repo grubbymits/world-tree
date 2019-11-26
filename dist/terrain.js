@@ -60,8 +60,8 @@ function getTypeName(terrain) {
     }
 }
 export class Terrain extends Entity {
-    constructor(_gridX, _gridY, _gridZ, _type, _shape) {
-        super(new Location(_gridX * Terrain.tileWidth, _gridY * Terrain.tileDepth, _gridZ * Terrain.tileHeight), Terrain.tileWidth, Terrain.tileDepth, Terrain.tileHeight, true, Terrain.graphics(_type, _shape));
+    constructor(_gridX, _gridY, _gridZ, width, depth, height, _type, _shape) {
+        super(new Location(_gridX * width, _gridY * depth, _gridZ * height), width, depth, height, true, Terrain.graphics(_type, _shape));
         this._gridX = _gridX;
         this._gridY = _gridY;
         this._gridZ = _gridZ;
@@ -82,17 +82,22 @@ export class Terrain extends Entity {
         console.assert(shape < this._terrainGraphics.get(terrainType).length, "undefined terrain graphic for TerrainShape:", getShapeName(shape));
         return this._terrainGraphics.get(terrainType)[shape];
     }
-    static get tileWidth() {
-        return this._tileWidth;
-    }
-    static get tileHeight() {
-        return this._tileHeight;
-    }
-    static get tileDepth() {
-        return this._tileDepth;
-    }
+    static get tileWidth() { return this._tileWidth; }
+    static get tileHeight() { return this._tileHeight; }
+    static get tileDepth() { return this._tileDepth; }
     static scaleLocation(loc) {
         return new Location(Math.floor(loc.x / this.tileWidth), Math.floor(loc.y / this.tileDepth), Math.floor(loc.z / this.tileHeight));
+    }
+    static create(x, y, z, type, shape) {
+        let height = this.tileHeight;
+        switch (shape) {
+            default:
+                break;
+            case TerrainShape.RampUpEast:
+                height = Math.floor(this.tileHeight * 0.75);
+                break;
+        }
+        return new Terrain(x, y, z, this.tileWidth, this.tileDepth, this.tileHeight, type, shape);
     }
     get gridX() { return this._gridX; }
     get gridY() { return this._gridY; }
@@ -195,24 +200,28 @@ export class TerrainBuilder {
             if (neighbour.terrace == centre.terrace) {
                 continue;
             }
-            if (Math.abs(neighbour.terrace - centre.terrace) > 1) {
+            if (neighbour.terrace > centre.terrace) {
+                continue;
+            }
+            if ((neighbour.terrace - centre.terrace) > 1) {
                 continue;
             }
             if ((neighbour.x != centre.x) && (neighbour.y != centre.y)) {
                 continue;
             }
-            let moveDown = neighbour.terrace < centre.terrace;
             if (neighbour.y < centre.y) {
-                shapeType = moveDown ? TerrainShape.RampUpSouth : TerrainShape.RampUpNorth;
                 break;
+                return TerrainShape.RampUpNorth;
+            }
+            else if (neighbour.x < centre.x) {
+                return TerrainShape.RampUpEast;
             }
             else if (neighbour.x > centre.x) {
-                shapeType = moveDown ? TerrainShape.RampUpWest : TerrainShape.RampUpEast;
-                break;
+                return TerrainShape.RampUpWest;
             }
             else if (neighbour.y < centre.y) {
-                shapeType = moveDown ? TerrainShape.RampUpEast : TerrainShape.RampUpWest;
                 break;
+                return TerrainShape.RampUpWest;
             }
         }
         return shapeType;

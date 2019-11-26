@@ -16,42 +16,15 @@ export class Entity {
     Entity._ids++;
   }
   
-  get x(): number {
-    return this._location.x;
-  }
-
-  get y(): number {
-    return this._location.y;
-  }
-
-  get z(): number {
-    return this._location.z;
-  }
-
-  get width(): number {
-    return this._width;
-  }
-
-  get height(): number {
-    return this._height;
-  }
-
-  get depth(): number {
-    return this._depth;
-  }
-
-  get location(): Location {
-    return this._location;
-  }
-
-  get blocking(): boolean {
-    return this._blocking;
-  }
-
-  get id(): number {
-    return this._id;
-  }
-
+  get x(): number { return this._location.x; }
+  get y(): number { return this._location.y; }
+  get z(): number { return this._location.z; }
+  get width(): number { return this._width; }
+  get height(): number { return this._height; }
+  get depth(): number { return this._depth; }
+  get location(): Location { return this._location; }
+  get blocking(): boolean { return this._blocking; }
+  get id(): number { return this._id; }
   get graphicsComponent(): GraphicComponent {
     return this._graphicsComponent;
   }

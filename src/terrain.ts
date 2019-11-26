@@ -92,17 +92,9 @@ export class Terrain extends Entity {
     return this._terrainGraphics.get(terrainType)![shape];
   }
 
-  static get tileWidth(): number {
-    return this._tileWidth;
-  }
-
-  static get tileHeight(): number {
-    return this._tileHeight;
-  }
-
-  static get tileDepth(): number {
-    return this._tileDepth;
-  }
+  static get tileWidth(): number { return this._tileWidth; }
+  static get tileHeight(): number { return this._tileHeight; }
+  static get tileDepth(): number { return this._tileDepth; }
 
   static scaleLocation(loc: Location): Location {
     return new Location(Math.floor(loc.x / this.tileWidth),
@@ -110,15 +102,30 @@ export class Terrain extends Entity {
                         Math.floor(loc.z / this.tileHeight));
   }
 
+  static create(x: number, y: number, z: number,
+                type: TerrainType, shape: TerrainShape) : Terrain {
+    let height = this.tileHeight;
+    switch (shape) {
+    default:
+      break;
+    case TerrainShape.RampUpEast:
+      height = Math.floor(this.tileHeight * 0.75);
+      break;
+    }
+    return new Terrain(x, y, z, this.tileWidth, this.tileDepth, this.tileHeight,
+                       type, shape);
+  }
+
   constructor(private readonly _gridX: number,
               private readonly _gridY: number,
               private readonly _gridZ: number,
+              width: number,
+              depth: number,
+              height: number,
               private readonly _type: TerrainType,
               private readonly _shape: TerrainShape) {
-    super(new Location(_gridX * Terrain.tileWidth,
-                       _gridY * Terrain.tileDepth,
-                       _gridZ * Terrain.tileHeight),
-          Terrain.tileWidth, Terrain.tileDepth, Terrain.tileHeight, true,
+    super(new Location(_gridX * width, _gridY * depth, _gridZ * height),
+          width, depth, height, true,
           Terrain.graphics(_type, _shape));
   }
 
@@ -241,7 +248,10 @@ export class TerrainBuilder {
       if (neighbour.terrace == centre.terrace) {
         continue;
       }
-      if (Math.abs(neighbour.terrace - centre.terrace) > 1) {
+      if (neighbour.terrace > centre.terrace) {
+        continue;
+      }
+      if ((neighbour.terrace - centre.terrace) > 1) {
         continue;
       }
       if ((neighbour.x != centre.x) && (neighbour.y != centre.y)) {
@@ -251,16 +261,16 @@ export class TerrainBuilder {
       // TODO: This logic only considers the first neighbour that has a
       // different terrace. This is probably fine, but I don't think the
       // iteration order is deterministic...
-      let moveDown: boolean = neighbour.terrace < centre.terrace;
       if (neighbour.y < centre.y) {
-        shapeType = moveDown ? TerrainShape.RampUpSouth : TerrainShape.RampUpNorth;
         break;
+        return TerrainShape.RampUpNorth;
+      } else if (neighbour.x < centre.x) {
+        return TerrainShape.RampUpEast;
       } else if (neighbour.x > centre.x) {
-        shapeType = moveDown ? TerrainShape.RampUpWest : TerrainShape.RampUpEast;
-        break;
+        return TerrainShape.RampUpWest;
       } else if (neighbour.y < centre.y) {
-        shapeType = moveDown ? TerrainShape.RampUpEast : TerrainShape.RampUpWest;
         break;
+        return TerrainShape.RampUpSouth;
       }
     }
 

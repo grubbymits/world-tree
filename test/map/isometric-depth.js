@@ -43,7 +43,7 @@ window.onload = function begin() {
   let water = new Array(0.0, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0);
   let edge = new Array(0.0, 0.11, 0.12, 0.13, 0.14, 0.15, 0.14, 0.13, 0.12, 0.11, 0.10, 0.0);
   let ground = new Array(0.0, 0.11, 0.12, 0.23, 0.24, 0.25, 0.24, 0.23, 0.12, 0.11, 0.10, 0.0);
-  let hill = new Array(0.0, 0.11, 0.22, 0.33, 0.44, 0.55, 0.44, 0.33, 0.22, 0.11, 0.10, 0.0);
+  let hill = new Array(0.0, 0.11, 0.22, 0.33, 0.54, 0.55, 0.54, 0.33, 0.22, 0.11, 0.10, 0.0);
   let heightMap = new Array(water, edge, ground, hill, hill, hill,
                             hill, hill, ground, ground, edge, water);
   let builder = new WT.TerrainBuilder(cellsX, cellsY, terraces,

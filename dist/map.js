@@ -14,12 +14,10 @@ export class SquareGrid {
     get width() { return this._width; }
     get height() { return this._height; }
     addRaisedTerrain(x, y, z, type, shape) {
-        let terrain = new Terrain(x, y, z, type, shape);
+        let terrain = Terrain.create(x, y, z, type, shape);
         if (!this._raisedTerrain.has(x)) {
-            console.log("Grid: created a new terrain map for x =", x);
             this._raisedTerrain.set(x, new Map());
             this._raisedTerrain.get(x).set(y, new Array());
-            console.log("Grid: created a new terrain arry for y =", y);
             this._raisedTerrain.get(x).get(y).push(terrain);
         }
         else {
@@ -28,7 +26,6 @@ export class SquareGrid {
             }
             else {
                 this._raisedTerrain.get(x).set(y, new Array());
-                console.log("Grid: created a new terrain arry for y =", y);
                 this._raisedTerrain.get(x).get(y).push(terrain);
             }
         }
@@ -46,7 +43,6 @@ export class SquareGrid {
         }
         let raised = this._raisedTerrain.get(x).get(y);
         for (let terrain of raised) {
-            console.log("Grid: inspecting terrain", terrain);
             if (terrain.gridZ == z) {
                 return terrain;
             }

@@ -23,7 +23,7 @@ export class SquareGrid {
 
   addRaisedTerrain(x: number, y: number, z: number, type: TerrainType,
                    shape: TerrainShape) {
-    let terrain = new Terrain(x, y, z, type, shape);
+    let terrain = Terrain.create(x, y, z, type, shape);
     if (!this._raisedTerrain.has(x)) {
       this._raisedTerrain.set(x, new Map<number, Array<Terrain>>());
       this._raisedTerrain.get(x)!.set(y, new Array<Terrain>());

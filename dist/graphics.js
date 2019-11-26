@@ -127,10 +127,9 @@ export class IsometricRenderer extends Renderer {
     constructor(canvas) {
         super(canvas);
     }
-    getDrawCoord(gameObj) {
-        let loc = Terrain.scaleLocation(gameObj.location);
-        let coord = convertToIsometric(loc.x + loc.z, loc.y - loc.z);
-        return coord;
+    getDrawCoord(entity) {
+        let loc = Terrain.scaleLocation(entity.location);
+        return convertToIsometric(loc.x + loc.z, loc.y - loc.z);
     }
     sortEntitys(entities) {
         entities.sort((a, b) => {

@@ -9,33 +9,15 @@ export class Entity {
         this._id = Entity._ids;
         Entity._ids++;
     }
-    get x() {
-        return this._location.x;
-    }
-    get y() {
-        return this._location.y;
-    }
-    get z() {
-        return this._location.z;
-    }
-    get width() {
-        return this._width;
-    }
-    get height() {
-        return this._height;
-    }
-    get depth() {
-        return this._depth;
-    }
-    get location() {
-        return this._location;
-    }
-    get blocking() {
-        return this._blocking;
-    }
-    get id() {
-        return this._id;
-    }
+    get x() { return this._location.x; }
+    get y() { return this._location.y; }
+    get z() { return this._location.z; }
+    get width() { return this._width; }
+    get height() { return this._height; }
+    get depth() { return this._depth; }
+    get location() { return this._location; }
+    get blocking() { return this._blocking; }
+    get id() { return this._id; }
     get graphicsComponent() {
         return this._graphicsComponent;
     }
