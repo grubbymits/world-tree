@@ -239,13 +239,20 @@ export class TerrainBuilder {
     }
     let neighbours = this.getNeighbours(x, y);
     let toEvaluate = new Array<TerrainAttributes>();
+    let adjacentToLower: boolean = false;
     for (let neighbour of neighbours) {
+      if (neighbour.x != centre.x && neighbour.y != centre.y) {
+        continue;
+      }
+      if (neighbour.terrace < centre.terrace) {
+        adjacentToLower = true;
+      }
       if (neighbour.shape != TerrainShape.Flat) {
         toEvaluate.push(neighbour);
       }
     }
     // Don't have a corner to smooth out.
-    if (toEvaluate.length < 2) {
+    if (toEvaluate.length < 2 || !adjacentToLower) {
       return;
     }
     console.log("smoothing terrain", centre);
@@ -286,7 +293,6 @@ export class TerrainBuilder {
     } else if (neighbour.x > centre.x) {
       return TerrainShape.RampUpWest;
     } else if (neighbour.y < centre.y) {
-      return TerrainShape.Flat;
       return TerrainShape.RampUpSouth;
     }
 
