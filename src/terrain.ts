@@ -314,8 +314,7 @@ export class TerrainBuilder {
 
     // Add moisture
     
-    // Calculate biome
-    // Calculate type and shape
+    // Calculate biome, type and shape.
     let landRange = 1.0 - this._waterLevel;
     let terraceSpacing = landRange / this._terraces;
     let beachLimit = this._waterLevel + (landRange / 10);
