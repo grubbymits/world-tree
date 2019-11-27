@@ -89,14 +89,6 @@ export class Terrain extends Entity {
         return new Location(Math.floor(loc.x / this.tileWidth), Math.floor(loc.y / this.tileDepth), Math.floor(loc.z / this.tileHeight));
     }
     static create(x, y, z, type, shape) {
-        let height = this.tileHeight;
-        switch (shape) {
-            default:
-                break;
-            case TerrainShape.RampUpEast:
-                height = Math.floor(this.tileHeight * 0.75);
-                break;
-        }
         return new Terrain(x, y, z, this.tileWidth, this.tileDepth, this.tileHeight, type, shape);
     }
     get gridX() { return this._gridX; }
@@ -114,13 +106,20 @@ class TerrainAttributes {
         this._terrace = _terrace;
         this._moisture = 0.0;
         this._biome = Biome.Water;
+        this._type = TerrainType.Water;
+        this._shape = TerrainShape.Flat;
     }
     get x() { return this._x; }
     get y() { return this._y; }
-    get terrace() { return this._terrace; }
     get height() { return this._height; }
+    get terrace() { return this._terrace; }
+    get type() { return this._type; }
+    get shape() { return this._shape; }
     get moisture() { return this._moisture; }
     get biome() { return this._biome; }
+    set terrace(t) { this._terrace = t; }
+    set type(t) { this._type = t; }
+    set shape(s) { this._shape = s; }
     set biome(b) { this._biome = b; }
 }
 export class TerrainBuilder {
@@ -136,12 +135,6 @@ export class TerrainBuilder {
     }
     get terrain() {
         return this._worldTerrain;
-    }
-    calcTerrace(height) {
-        if (height <= this._waterLevel) {
-            return 0;
-        }
-        return Math.floor(height / ((1.0 - this._waterLevel) / this._terraces));
     }
     getNeighbours(centreX, centreY) {
         let neighbours = new Array();
@@ -192,10 +185,29 @@ export class TerrainBuilder {
         console.assert(surface.biome == Biome.Water);
         return TerrainType.Water;
     }
+    smoothEdge(x, y) {
+        let centre = this._surface[y][x];
+        if (centre.shape != TerrainShape.Flat || centre.terrace == 0) {
+            return;
+        }
+        let neighbours = this.getNeighbours(x, y);
+        let toEvaluate = new Array();
+        for (let neighbour of neighbours) {
+            if (neighbour.shape != TerrainShape.Flat) {
+                toEvaluate.push(neighbour);
+            }
+        }
+        if (toEvaluate.length < 2) {
+            return;
+        }
+        console.log("smoothing terrain", centre);
+        centre.terrace = centre.terrace - 1;
+    }
     calcShape(x, y) {
         let neighbours = this.getNeighbours(x, y);
         let shapeType = TerrainShape.Flat;
         let centre = this._surface[y][x];
+        let toEvaluate = new Array();
         for (let neighbour of neighbours) {
             if (neighbour.terrace == centre.terrace) {
                 continue;
@@ -209,29 +221,36 @@ export class TerrainBuilder {
             if ((neighbour.x != centre.x) && (neighbour.y != centre.y)) {
                 continue;
             }
-            if (neighbour.y < centre.y) {
-                break;
-                return TerrainShape.RampUpNorth;
-            }
-            else if (neighbour.x < centre.x) {
-                return TerrainShape.RampUpEast;
-            }
-            else if (neighbour.x > centre.x) {
-                return TerrainShape.RampUpWest;
-            }
-            else if (neighbour.y < centre.y) {
-                break;
-                return TerrainShape.RampUpWest;
-            }
+            toEvaluate.push(neighbour);
         }
-        return shapeType;
+        if (toEvaluate.length == 0 || toEvaluate.length > 1) {
+            return TerrainShape.Flat;
+        }
+        let neighbour = toEvaluate[0];
+        if (neighbour.y > centre.y) {
+            return TerrainShape.RampUpNorth;
+        }
+        else if (neighbour.x < centre.x) {
+            return TerrainShape.RampUpEast;
+        }
+        else if (neighbour.x > centre.x) {
+            return TerrainShape.RampUpWest;
+        }
+        else if (neighbour.y < centre.y) {
+            return TerrainShape.Flat;
+            return TerrainShape.RampUpSouth;
+        }
+        return TerrainShape.Flat;
     }
     build(heightMap) {
         for (let y = 0; y < this._depth; y++) {
             this._surface.push(new Array());
             for (let x = 0; x < this._width; x++) {
                 let height = heightMap[y][x];
-                this._surface[y].push(new TerrainAttributes(x, y, height, this.calcTerrace(height)));
+                let terrace = (height <= this._waterLevel) ?
+                    0 : Math.floor(height / ((1.0 - this._waterLevel) / this._terraces));
+                this._surface[y].push(new TerrainAttributes(x, y, height, terrace));
+                console.log("created surface", this._surface[y][x]);
             }
         }
         let landRange = 1.0 - this._waterLevel;
@@ -250,15 +269,22 @@ export class TerrainBuilder {
                 else {
                     surface.biome = Biome.Grassland;
                 }
+                surface.type = this.calcType(x, y);
+                surface.shape = this.calcShape(x, y);
+                if (surface.shape != TerrainShape.Flat) {
+                    console.log("modified surface shape", surface);
+                }
             }
         }
         for (let y = 0; y < this._depth; y++) {
             for (let x = 0; x < this._width; x++) {
-                let terrainType = this.calcType(x, y);
-                let terrainShape = this.calcShape(x, y);
-                let z = this._surface[y][x].terrace;
-                this._worldTerrain.addRaisedTerrain(x, y, z, terrainType, terrainShape);
-                console.log("adding terrain at", x, y, z);
+                this.smoothEdge(x, y);
+            }
+        }
+        for (let y = 0; y < this._depth; y++) {
+            for (let x = 0; x < this._width; x++) {
+                let surface = this._surface[y][x];
+                this._worldTerrain.addRaisedTerrain(x, y, surface.terrace, surface.type, surface.shape);
             }
         }
         for (let y = 0; y < this._depth; y++) {

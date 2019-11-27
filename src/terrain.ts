@@ -104,14 +104,6 @@ export class Terrain extends Entity {
 
   static create(x: number, y: number, z: number,
                 type: TerrainType, shape: TerrainShape) : Terrain {
-    let height = this.tileHeight;
-    switch (shape) {
-    default:
-      break;
-    case TerrainShape.RampUpEast:
-      height = Math.floor(this.tileHeight * 0.75);
-      break;
-    }
     return new Terrain(x, y, z, this.tileWidth, this.tileDepth, this.tileHeight,
                        type, shape);
   }
@@ -125,8 +117,7 @@ export class Terrain extends Entity {
               private readonly _type: TerrainType,
               private readonly _shape: TerrainShape) {
     super(new Location(_gridX * width, _gridY * depth, _gridZ * height),
-          width, depth, height, true,
-          Terrain.graphics(_type, _shape));
+          width, depth, height, true, Terrain.graphics(_type, _shape));
   }
 
   get gridX(): number { return this._gridX; }
@@ -139,22 +130,31 @@ export class Terrain extends Entity {
 class TerrainAttributes {
   private _moisture: number;
   private _biome: Biome;
+  private _type: TerrainType;
+  private _shape: TerrainShape;
   
   constructor(private readonly _x: number,
               private readonly _y: number,
               private readonly _height: number,
-              private readonly _terrace: number) {
+              private _terrace: number) {
     this._moisture = 0.0;
     this._biome = Biome.Water;
+    this._type = TerrainType.Water;
+    this._shape = TerrainShape.Flat;
   }
   
   get x(): number { return this._x; }
   get y(): number { return this._y; }
-  get terrace(): number { return this._terrace; }
   get height(): number { return this._height; }
+  get terrace(): number { return this._terrace; }
+  get type(): TerrainType { return this._type; }
+  get shape(): TerrainShape { return this._shape; }
   get moisture(): number { return this._moisture; }
   get biome(): Biome { return this._biome; }
 
+  set terrace(t: number) { this._terrace = t; }
+  set type(t: TerrainType) { this._type = t; }
+  set shape(s: TerrainShape) { this._shape = s; }
   set biome(b: Biome) { this._biome = b; }
 }
 
@@ -179,13 +179,6 @@ export class TerrainBuilder {
     return this._worldTerrain;
   }
   
-  calcTerrace(height: number): number {
-    if (height <= this._waterLevel) {
-      return 0;
-    }
-    return Math.floor(height / ((1.0 - this._waterLevel) / this._terraces));
-  }
-
   private getNeighbours(centreX: number, centreY: number): Array<TerrainAttributes> {
     let neighbours = new Array<TerrainAttributes>();
     for (let yDiff = -1; yDiff < 2; yDiff++) {
@@ -238,11 +231,32 @@ export class TerrainBuilder {
     console.assert(surface.biome == Biome.Water);
     return TerrainType.Water;
   }
-  
+
+  smoothEdge(x: number, y: number) {
+    let centre = this._surface[y][x];
+    if (centre.shape != TerrainShape.Flat || centre.terrace == 0) {
+      return;
+    }
+    let neighbours = this.getNeighbours(x, y);
+    let toEvaluate = new Array<TerrainAttributes>();
+    for (let neighbour of neighbours) {
+      if (neighbour.shape != TerrainShape.Flat) {
+        toEvaluate.push(neighbour);
+      }
+    }
+    // Don't have a corner to smooth out.
+    if (toEvaluate.length < 2) {
+      return;
+    }
+    console.log("smoothing terrain", centre);
+    centre.terrace = centre.terrace - 1;
+  }
+
   calcShape(x: number, y: number): TerrainShape {
     let neighbours = this.getNeighbours(x, y);
     let shapeType = TerrainShape.Flat;
     let centre = this._surface[y][x];
+    let toEvaluate = new Array<TerrainAttributes>();
 
     for (let neighbour of neighbours) {
       if (neighbour.terrace == centre.terrace) {
@@ -257,24 +271,26 @@ export class TerrainBuilder {
       if ((neighbour.x != centre.x) && (neighbour.y != centre.y)) {
         continue;
       }
-
-      // TODO: This logic only considers the first neighbour that has a
-      // different terrace. This is probably fine, but I don't think the
-      // iteration order is deterministic...
-      if (neighbour.y < centre.y) {
-        break;
-        return TerrainShape.RampUpNorth;
-      } else if (neighbour.x < centre.x) {
-        return TerrainShape.RampUpEast;
-      } else if (neighbour.x > centre.x) {
-        return TerrainShape.RampUpWest;
-      } else if (neighbour.y < centre.y) {
-        break;
-        return TerrainShape.RampUpSouth;
-      }
+      toEvaluate.push(neighbour);
     }
 
-    return shapeType;
+    if (toEvaluate.length == 0 || toEvaluate.length > 1) {
+      return TerrainShape.Flat;
+    }
+
+    let neighbour = toEvaluate[0];
+    if (neighbour.y > centre.y) {
+      return TerrainShape.RampUpNorth;
+    } else if (neighbour.x < centre.x) {
+      return TerrainShape.RampUpEast;
+    } else if (neighbour.x > centre.x) {
+      return TerrainShape.RampUpWest;
+    } else if (neighbour.y < centre.y) {
+      return TerrainShape.Flat;
+      return TerrainShape.RampUpSouth;
+    }
+
+    return TerrainShape.Flat;
   }
 
   build(heightMap: Array<Array<number>>): void {
@@ -283,14 +299,17 @@ export class TerrainBuilder {
       this._surface.push(new Array<TerrainAttributes>());
       for (let x = 0; x < this._width; x++) {
         let height = heightMap[y][x];
-        this._surface[y].push(new TerrainAttributes(x, y, height,
-                                                    this.calcTerrace(height)));
+        let terrace = (height <= this._waterLevel) ?
+          0 : Math.floor(height / ((1.0 - this._waterLevel) / this._terraces));
+        this._surface[y].push(new TerrainAttributes(x, y, height, terrace));
+        console.log("created surface", this._surface[y][x]);
       }
     }
-    
+
     // Add moisture
     
     // Calculate biome
+    // Calculate type and shape
     let landRange = 1.0 - this._waterLevel;
     let terraceSpacing = landRange / this._terraces;
     let beachLimit = this._waterLevel + (landRange / 10);
@@ -305,17 +324,29 @@ export class TerrainBuilder {
         } else {
           surface.biome = Biome.Grassland;
         }
+
+        surface.type = this.calcType(x, y);
+        surface.shape = this.calcShape(x, y);
+        if (surface.shape != TerrainShape.Flat) {
+          console.log("modified surface shape", surface);
+        }
+      }
+    }
+
+    // After terraces and shapes have been calculated, smooth out the terrace
+    // corners after some edges have been turned into ramps. 
+    for (let y = 0; y < this._depth; y++) {
+      for (let x = 0; x < this._width; x++) {
+        this.smoothEdge(x, y);
       }
     }
     
     // Add terrain objects that will be visible.
     for (let y = 0; y < this._depth; y++) {
       for (let x = 0; x < this._width; x++) {
-        let terrainType = this.calcType(x, y);
-        let terrainShape = this.calcShape(x, y);
-        let z = this._surface[y][x].terrace;
-        this._worldTerrain.addRaisedTerrain(x, y, z, terrainType, terrainShape);
-        console.log("adding terrain at", x, y, z);
+        let surface = this._surface[y][x];
+        this._worldTerrain.addRaisedTerrain(x, y, surface.terrace,
+                                            surface.type, surface.shape);
       }
     }
 
