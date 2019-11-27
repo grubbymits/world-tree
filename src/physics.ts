@@ -1,6 +1,7 @@
 import { Entity } from "./entity.js"
 import { TerrainType, TerrainShape, Terrain } from "./terrain.js"
 import { SquareGrid } from "./map.js"
+import { Point } from "./graphics.js"
 
 export enum Direction {
   North,
@@ -11,6 +12,72 @@ export enum Direction {
   SouthWest,
   West,
   NorthWest,
+  Max,
+}
+
+export function getDirectionName(direction: Direction): string {
+  switch (direction) {
+  default:
+    break;
+  case Direction.North:
+    return "north";
+  case Direction.NorthEast:
+    return "north east";
+  case Direction.East:
+    return "east";
+  case Direction.SouthEast:
+    return "south east";
+  case Direction.South:
+    return "south";
+  case Direction.SouthWest:
+    return "south west";
+  case Direction.West:
+    return "west";
+  case Direction.NorthWest:
+    return "north west";
+  }
+  console.error("unhandled direction when getting name");
+  return "";
+}
+
+export function getDirectionCoords(x: number, y: number,
+                                   direction: Direction): Point {
+  let xDiff: number = 0;
+  let yDiff: number = 0;
+  switch(direction) {
+  default:
+    console.error("unhandled cloud direction");
+    break;
+  case Direction.North:
+    yDiff = -1;
+    break;
+  case Direction.NorthEast:
+    xDiff = 1;
+    yDiff = -1;
+    break;
+  case Direction.East:
+    xDiff = 1;
+    break;
+  case Direction.SouthEast:
+    xDiff = 1;
+    yDiff = 1;
+    break;
+  case Direction.South:
+    yDiff = 1;
+    break;
+  case Direction.SouthWest:
+    xDiff = -1;
+    yDiff = 1;
+    break;
+  case Direction.West:
+    xDiff = -1;
+    break;
+  case Direction.NorthWest:
+    xDiff = -1;
+    yDiff = -1;
+    break;
+  }
+  return new Point(x + xDiff, y + yDiff);
 }
 
 export class Location {

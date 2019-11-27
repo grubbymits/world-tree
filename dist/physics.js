@@ -1,4 +1,5 @@
 import { TerrainShape, Terrain } from "./terrain.js";
+import { Point } from "./graphics.js";
 export var Direction;
 (function (Direction) {
     Direction[Direction["North"] = 0] = "North";
@@ -9,7 +10,70 @@ export var Direction;
     Direction[Direction["SouthWest"] = 5] = "SouthWest";
     Direction[Direction["West"] = 6] = "West";
     Direction[Direction["NorthWest"] = 7] = "NorthWest";
+    Direction[Direction["Max"] = 8] = "Max";
 })(Direction || (Direction = {}));
+export function getDirectionName(direction) {
+    switch (direction) {
+        default:
+            break;
+        case Direction.North:
+            return "north";
+        case Direction.NorthEast:
+            return "north east";
+        case Direction.East:
+            return "east";
+        case Direction.SouthEast:
+            return "south east";
+        case Direction.South:
+            return "south";
+        case Direction.SouthWest:
+            return "south west";
+        case Direction.West:
+            return "west";
+        case Direction.NorthWest:
+            return "north west";
+    }
+    console.error("unhandled direction when getting name");
+    return "";
+}
+export function getDirectionCoords(x, y, direction) {
+    let xDiff = 0;
+    let yDiff = 0;
+    switch (direction) {
+        default:
+            console.error("unhandled cloud direction");
+            break;
+        case Direction.North:
+            yDiff = -1;
+            break;
+        case Direction.NorthEast:
+            xDiff = 1;
+            yDiff = -1;
+            break;
+        case Direction.East:
+            xDiff = 1;
+            break;
+        case Direction.SouthEast:
+            xDiff = 1;
+            yDiff = 1;
+            break;
+        case Direction.South:
+            yDiff = 1;
+            break;
+        case Direction.SouthWest:
+            xDiff = -1;
+            yDiff = 1;
+            break;
+        case Direction.West:
+            xDiff = -1;
+            break;
+        case Direction.NorthWest:
+            xDiff = -1;
+            yDiff = -1;
+            break;
+    }
+    return new Point(x + xDiff, y + yDiff);
+}
 export class Location {
     constructor(_x, _y, _z) {
         this._x = _x;

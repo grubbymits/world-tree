@@ -1,6 +1,7 @@
 import { Location, Direction } from "./physics.js"
+import { Rain } from "./weather.js"
 import { Entity } from "./entity.js"
-import { GraphicComponent } from "./graphics.js"
+import { Point, GraphicComponent } from "./graphics.js"
 import { SquareGrid } from "./map.js"
 
 export enum TerrainShape {
@@ -15,14 +16,15 @@ export enum TerrainType {
   Water,
   Sand,
   Mud,
-  Grass,
+  DryGrass,
+  WetGrass,
   Rock,
 }
 
 export enum Biome {
   Water,
   Beach,
-  Swamp,
+  Marshland,
   Grassland,
   Woodland,
   Tundra,
@@ -56,8 +58,10 @@ function getTypeName(terrain: TerrainType): string {
     return "sand";
   case TerrainType.Mud:
     return "mud";
-  case TerrainType.Grass:
-    return "grass";
+  case TerrainType.DryGrass:
+    return "dry grass";
+  case TerrainType.WetGrass:
+    return "wet grass";
   case TerrainType.Rock:
     return "rock";
   }
@@ -127,7 +131,7 @@ export class Terrain extends Entity {
   get type(): TerrainType { return this._type; }
 }
 
-class TerrainAttributes {
+export class TerrainAttributes {
   private _moisture: number;
   private _terrace: number;
   private _biome: Biome;
@@ -153,63 +157,14 @@ class TerrainAttributes {
   get moisture(): number { return this._moisture; }
   get biome(): Biome { return this._biome; }
 
+  set moisture(m: number) { this._moisture = m; }
   set terrace(t: number) { this._terrace = t; }
   set type(t: TerrainType) { this._type = t; }
   set shape(s: TerrainShape) { this._shape = s; }
   set biome(b: Biome) { this._biome = b; }
 }
 
-class Cloud {
-  constructor(_x: number, _y: number,
-              private _moisture: number,
-              private _direction: Direction,
-              private _surface: Array<Array<TerrainAttributes>>) { }
-
-  update(): boolean {
-    if (this._moisture <= 0) {
-      return true;
-    }
-
-    let xDiff = 0;
-    let yDiff = 0;
-    switch(this._direction) {
-    default:
-      console.error("unhandled cloud direction");
-      break;
-    case Direction.North:
-      yDiff = -1;
-      break;
-    case Direction.NorthEast:
-      xDiff = 1;
-      yDiff = -1;
-      break;
-    case Direction.East:
-      xDiff = 1;
-      break;
-    case Direction.SouthEast:
-      xDiff = 1;
-      yDiff = 1;
-      break;
-    case Direction.South:
-      yDiff = 1;
-      break;
-    case Direction.SouthWest:
-      xDiff = -1;
-      yDiff = 1;
-      break;
-    case Direction.West:
-      xDiff = -1;
-      break;
-    case Direction.NorthWest:
-      xDiff = -1;
-      yDiff = -1;
-      break;
-    }
-    return false;
-  }
-}
-
-class Surface {
+export class Surface {
   private _surface: Array<Array<TerrainAttributes>>;
 
   constructor(private readonly _width: number,
@@ -226,9 +181,15 @@ class Surface {
       for (let x = 0; x < this._width; x++) {
         let height = heightMap[y][x];
         this._surface[y].push(new TerrainAttributes(x, y, height));
-        console.log("created surface", this._surface[y][x]);
       }
     }
+  }
+
+  inbounds(coord: Point): boolean {
+    if (coord.x < 0 || coord.x >= this._width ||
+        coord.y < 0 || coord.y >= this._depth)
+      return false;
+    return true;
   }
 
   at(x: number, y: number): TerrainAttributes {
@@ -298,11 +259,12 @@ export class TerrainBuilder {
       case Biome.Beach:
       case Biome.Desert:
         return TerrainType.Sand;
-      case Biome.Swamp:
+      case Biome.Marshland:
+        return TerrainType.WetGrass;
       case Biome.Woodland:
         return TerrainType.Mud;
       case Biome.Grassland:
-        return TerrainType.Grass;
+        return TerrainType.DryGrass;
       case Biome.Tundra:
         return TerrainType.Rock;
     }
@@ -390,12 +352,26 @@ export class TerrainBuilder {
       }
     }
 
-    // Add moisture
+    // Add moisture:
+    // - clouds are added at the 'bottom' of the map and move northwards.
+    let water = 3.0;
+    for (let x = 0; x < this._surface.width; x++) {
+      Rain.add(x, this._surface.depth - 1, water, this._waterLevel,
+               this._waterMultiplier, Direction.North, this._surface);
+    }
+
+    for (let i = 0; i < Rain.clouds.length; i++) {
+      let cloud = Rain.clouds[i];
+      while (!cloud.update()) { }
+    }
     
     // Calculate biome, type and shape.
     let landRange = 1.0 - this._waterLevel;
     let terraceSpacing = landRange / this._terraces;
     let beachLimit = this._waterLevel + (landRange / 10);
+    let dryLimit = 0.02;
+    let wetLimit = 0.15;
+    let treeLimit = 0.6;
     for (let y = 0; y < this._surface.depth; y++) {
       for (let x = 0; x < this._surface.width; x++) {
         let biome = Biome.Water;
@@ -405,7 +381,13 @@ export class TerrainBuilder {
         } else if (surface.height <= beachLimit) {
           surface.biome = Biome.Beach;
         } else {
-          surface.biome = Biome.Grassland;
+          if (surface.height > treeLimit) {
+            surface.biome = Biome.Tundra;
+          } else {
+            surface.biome = surface.moisture > wetLimit ?
+              Biome.Marshland : surface.moisture > dryLimit ?
+              Biome.Grassland : Biome.Desert;
+          }
         }
 
         surface.type = this.calcType(x, y);

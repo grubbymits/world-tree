@@ -27,14 +27,31 @@ window.onload = function begin() {
   let waterMultiplier = 1.0;
   let waterLevel = 0.1;
 
-  let sprites = new Array("../../../res/img/light-grass-sand-flat",
+  WT.Terrain.addTerrainGraphics(WT.TerrainType.Water, createGraphic("../../../res/img/light-water-flat"));
+  let sprites = new Array("../../../res/img/sand-flat",
+                          "../../../res/img/sand-ramp-north",
+                          "../../../res/img/sand-ramp-east",
+                          "../../../res/img/sand-ramp-south",
+                          "../../../res/img/sand-ramp-west");
+  WT.Terrain.addTerrainGraphics(WT.TerrainType.Sand, createGraphics(sprites));
+  sprites = new Array("../../../res/img/light-grass-sand-flat",
                           "../../../res/img/light-grass-sand-ramp-north",
                           "../../../res/img/light-grass-sand-ramp-east",
                           "../../../res/img/sand-ramp-south",
                           "../../../res/img/sand-ramp-west");
-  WT.Terrain.addTerrainGraphics(WT.TerrainType.Grass, createGraphics(sprites));
-  WT.Terrain.addTerrainGraphics(WT.TerrainType.Water, createGraphic("../../../res/img/light-water-flat"));
-  WT.Terrain.addTerrainGraphics(WT.TerrainType.Sand, createGraphic("../../../res/img/sand-flat"));
+  WT.Terrain.addTerrainGraphics(WT.TerrainType.DryGrass, createGraphics(sprites));
+  sprites = new Array("../../../res/img/light-grass-rock-flat",
+                          "../../../res/img/light-grass-rock-ramp-north",
+                          "../../../res/img/light-grass-rock-ramp-east",
+                          "../../../res/img/rock-ramp-south-128",
+                          "../../../res/img/rock-ramp-west-128");
+  WT.Terrain.addTerrainGraphics(WT.TerrainType.Rock, createGraphics(sprites));
+  sprites = new Array("../../../res/img/dark-grass-sand-flat",
+                      "../../../res/img/dark-grass-sand-ramp-north",
+                      "../../../res/img/dark-grass-sand-ramp-east",
+                      "../../../res/img/sand-ramp-south",
+                      "../../../res/img/sand-ramp-west");
+  WT.Terrain.addTerrainGraphics(WT.TerrainType.WetGrass, createGraphics(sprites));
 
   let water =  new Array(0.0, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0);
   let edge  =  new Array(0.0, 0.11, 0.12, 0.13, 0.14, 0.15, 0.14, 0.13, 0.12, 0.11, 0.10, 0.0,  0.0,  0.0,  0.0);

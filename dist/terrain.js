@@ -1,4 +1,5 @@
 import { Location, Direction } from "./physics.js";
+import { Rain } from "./weather.js";
 import { Entity } from "./entity.js";
 import { SquareGrid } from "./map.js";
 export var TerrainShape;
@@ -14,14 +15,15 @@ export var TerrainType;
     TerrainType[TerrainType["Water"] = 0] = "Water";
     TerrainType[TerrainType["Sand"] = 1] = "Sand";
     TerrainType[TerrainType["Mud"] = 2] = "Mud";
-    TerrainType[TerrainType["Grass"] = 3] = "Grass";
-    TerrainType[TerrainType["Rock"] = 4] = "Rock";
+    TerrainType[TerrainType["DryGrass"] = 3] = "DryGrass";
+    TerrainType[TerrainType["WetGrass"] = 4] = "WetGrass";
+    TerrainType[TerrainType["Rock"] = 5] = "Rock";
 })(TerrainType || (TerrainType = {}));
 export var Biome;
 (function (Biome) {
     Biome[Biome["Water"] = 0] = "Water";
     Biome[Biome["Beach"] = 1] = "Beach";
-    Biome[Biome["Swamp"] = 2] = "Swamp";
+    Biome[Biome["Marshland"] = 2] = "Marshland";
     Biome[Biome["Grassland"] = 3] = "Grassland";
     Biome[Biome["Woodland"] = 4] = "Woodland";
     Biome[Biome["Tundra"] = 5] = "Tundra";
@@ -53,8 +55,10 @@ function getTypeName(terrain) {
             return "sand";
         case TerrainType.Mud:
             return "mud";
-        case TerrainType.Grass:
-            return "grass";
+        case TerrainType.DryGrass:
+            return "dry grass";
+        case TerrainType.WetGrass:
+            return "wet grass";
         case TerrainType.Rock:
             return "rock";
     }
@@ -98,7 +102,7 @@ export class Terrain extends Entity {
     get type() { return this._type; }
 }
 Terrain._terrainGraphics = new Map();
-class TerrainAttributes {
+export class TerrainAttributes {
     constructor(_x, _y, _height) {
         this._x = _x;
         this._y = _y;
@@ -117,60 +121,13 @@ class TerrainAttributes {
     get shape() { return this._shape; }
     get moisture() { return this._moisture; }
     get biome() { return this._biome; }
+    set moisture(m) { this._moisture = m; }
     set terrace(t) { this._terrace = t; }
     set type(t) { this._type = t; }
     set shape(s) { this._shape = s; }
     set biome(b) { this._biome = b; }
 }
-class Cloud {
-    constructor(_x, _y, _moisture, _direction, _surface) {
-        this._moisture = _moisture;
-        this._direction = _direction;
-        this._surface = _surface;
-    }
-    update() {
-        if (this._moisture <= 0) {
-            return true;
-        }
-        let xDiff = 0;
-        let yDiff = 0;
-        switch (this._direction) {
-            default:
-                console.error("unhandled cloud direction");
-                break;
-            case Direction.North:
-                yDiff = -1;
-                break;
-            case Direction.NorthEast:
-                xDiff = 1;
-                yDiff = -1;
-                break;
-            case Direction.East:
-                xDiff = 1;
-                break;
-            case Direction.SouthEast:
-                xDiff = 1;
-                yDiff = 1;
-                break;
-            case Direction.South:
-                yDiff = 1;
-                break;
-            case Direction.SouthWest:
-                xDiff = -1;
-                yDiff = 1;
-                break;
-            case Direction.West:
-                xDiff = -1;
-                break;
-            case Direction.NorthWest:
-                xDiff = -1;
-                yDiff = -1;
-                break;
-        }
-        return false;
-    }
-}
-class Surface {
+export class Surface {
     constructor(_width, _depth) {
         this._width = _width;
         this._depth = _depth;
@@ -184,9 +141,14 @@ class Surface {
             for (let x = 0; x < this._width; x++) {
                 let height = heightMap[y][x];
                 this._surface[y].push(new TerrainAttributes(x, y, height));
-                console.log("created surface", this._surface[y][x]);
             }
         }
+    }
+    inbounds(coord) {
+        if (coord.x < 0 || coord.x >= this._width ||
+            coord.y < 0 || coord.y >= this._depth)
+            return false;
+        return true;
     }
     at(x, y) {
         return this._surface[y][x];
@@ -242,11 +204,12 @@ export class TerrainBuilder {
             case Biome.Beach:
             case Biome.Desert:
                 return TerrainType.Sand;
-            case Biome.Swamp:
+            case Biome.Marshland:
+                return TerrainType.WetGrass;
             case Biome.Woodland:
                 return TerrainType.Mud;
             case Biome.Grassland:
-                return TerrainType.Grass;
+                return TerrainType.DryGrass;
             case Biome.Tundra:
                 return TerrainType.Rock;
         }
@@ -326,9 +289,20 @@ export class TerrainBuilder {
                 surface.terrace = terrace;
             }
         }
+        let water = 3.0;
+        for (let x = 0; x < this._surface.width; x++) {
+            Rain.add(x, this._surface.depth - 1, water, this._waterLevel, this._waterMultiplier, Direction.North, this._surface);
+        }
+        for (let i = 0; i < Rain.clouds.length; i++) {
+            let cloud = Rain.clouds[i];
+            while (!cloud.update()) { }
+        }
         let landRange = 1.0 - this._waterLevel;
         let terraceSpacing = landRange / this._terraces;
         let beachLimit = this._waterLevel + (landRange / 10);
+        let dryLimit = 0.02;
+        let wetLimit = 0.15;
+        let treeLimit = 0.6;
         for (let y = 0; y < this._surface.depth; y++) {
             for (let x = 0; x < this._surface.width; x++) {
                 let biome = Biome.Water;
@@ -340,7 +314,14 @@ export class TerrainBuilder {
                     surface.biome = Biome.Beach;
                 }
                 else {
-                    surface.biome = Biome.Grassland;
+                    if (surface.height > treeLimit) {
+                        surface.biome = Biome.Tundra;
+                    }
+                    else {
+                        surface.biome = surface.moisture > wetLimit ?
+                            Biome.Marshland : surface.moisture > dryLimit ?
+                            Biome.Grassland : Biome.Desert;
+                    }
                 }
                 surface.type = this.calcType(x, y);
                 surface.shape = this.calcShape(x, y);
