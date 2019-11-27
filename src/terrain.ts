@@ -1,4 +1,4 @@
-import { Location } from "./physics.js"
+import { Location, Direction } from "./physics.js"
 import { Entity } from "./entity.js"
 import { GraphicComponent } from "./graphics.js"
 import { SquareGrid } from "./map.js"
@@ -129,16 +129,17 @@ export class Terrain extends Entity {
 
 class TerrainAttributes {
   private _moisture: number;
+  private _terrace: number;
   private _biome: Biome;
   private _type: TerrainType;
   private _shape: TerrainShape;
   
   constructor(private readonly _x: number,
               private readonly _y: number,
-              private readonly _height: number,
-              private _terrace: number) {
+              private readonly _height: number) {
     this._moisture = 0.0;
     this._biome = Biome.Water;
+    this._terrace = 0;
     this._type = TerrainType.Water;
     this._shape = TerrainShape.Flat;
   }
@@ -158,28 +159,83 @@ class TerrainAttributes {
   set biome(b: Biome) { this._biome = b; }
 }
 
-export class TerrainBuilder {
+class Cloud {
+  constructor(_x: number, _y: number,
+              private _moisture: number,
+              private _direction: Direction,
+              private _surface: Array<Array<TerrainAttributes>>) { }
+
+  update(): boolean {
+    if (this._moisture <= 0) {
+      return true;
+    }
+
+    let xDiff = 0;
+    let yDiff = 0;
+    switch(this._direction) {
+    default:
+      console.error("unhandled cloud direction");
+      break;
+    case Direction.North:
+      yDiff = -1;
+      break;
+    case Direction.NorthEast:
+      xDiff = 1;
+      yDiff = -1;
+      break;
+    case Direction.East:
+      xDiff = 1;
+      break;
+    case Direction.SouthEast:
+      xDiff = 1;
+      yDiff = 1;
+      break;
+    case Direction.South:
+      yDiff = 1;
+      break;
+    case Direction.SouthWest:
+      xDiff = -1;
+      yDiff = 1;
+      break;
+    case Direction.West:
+      xDiff = -1;
+      break;
+    case Direction.NorthWest:
+      xDiff = -1;
+      yDiff = -1;
+      break;
+    }
+    return false;
+  }
+}
+
+class Surface {
   private _surface: Array<Array<TerrainAttributes>>;
-  private _worldTerrain: SquareGrid;
-  
+
   constructor(private readonly _width: number,
-              private readonly _depth: number,
-              private readonly _terraces: number,
-              private readonly _waterMultiplier: number,
-              private readonly _waterLevel: number,
-              tileWidth: number,
-              tileHeight: number,
-              tileDepth: number) {
-    Terrain.init(tileWidth, tileDepth, tileHeight);
-    this._worldTerrain = new SquareGrid(_width, _depth);
+              private readonly _depth: number) {
     this._surface = new Array<Array<TerrainAttributes>>();
   }
 
-  get terrain(): SquareGrid {
-    return this._worldTerrain;
+  get width(): number { return this._width; }
+  get depth(): number { return this._depth; }
+
+  init(heightMap: Array<Array<number>>) {
+    for (let y = 0; y < this._depth; y++) {
+      this._surface.push(new Array<TerrainAttributes>());
+      for (let x = 0; x < this._width; x++) {
+        let height = heightMap[y][x];
+        this._surface[y].push(new TerrainAttributes(x, y, height));
+        console.log("created surface", this._surface[y][x]);
+      }
+    }
   }
-  
-  private getNeighbours(centreX: number, centreY: number): Array<TerrainAttributes> {
+
+  at(x: number, y: number): TerrainAttributes {
+    return this._surface[y][x];
+  }
+
+  getNeighbours(centreX: number, centreY: number): Array<TerrainAttributes> {
     let neighbours = new Array<TerrainAttributes>();
     for (let yDiff = -1; yDiff < 2; yDiff++) {
       let y = centreY + yDiff;
@@ -196,11 +252,33 @@ export class TerrainBuilder {
     }
     return neighbours;
   }
+}
 
+export class TerrainBuilder {
+  private _worldTerrain: SquareGrid;
+  private _surface: Surface;
+  
+  constructor(width: number,
+              depth: number,
+              private readonly _terraces: number,
+              private readonly _waterMultiplier: number,
+              private readonly _waterLevel: number,
+              tileWidth: number,
+              tileHeight: number,
+              tileDepth: number) {
+    Terrain.init(tileWidth, tileDepth, tileHeight);
+    this._surface = new Surface(width, depth);
+    this._worldTerrain = new SquareGrid(width, depth);
+  }
+
+  get terrain(): SquareGrid {
+    return this._worldTerrain;
+  }
+  
   calcRelativeHeight(x: number, y: number): number {
-    let neighbours = this.getNeighbours(x, y);
+    let neighbours = this._surface.getNeighbours(x, y);
     let relativeHeight: number = 0;
-    let centre = this._surface[y][x];
+    let centre = this._surface.at(x, y);
    
     for (let neighbour of neighbours) { 
       if (neighbour.terrace < centre.terrace) {
@@ -213,7 +291,7 @@ export class TerrainBuilder {
   }
   
   calcType(x: number, y: number): TerrainType {
-    let surface = this._surface[y][x];
+    let surface = this._surface.at(x, y);
     switch (surface.biome) {
       default:
       break;
@@ -233,11 +311,11 @@ export class TerrainBuilder {
   }
 
   smoothEdge(x: number, y: number) {
-    let centre = this._surface[y][x];
+    let centre = this._surface.at(x, y);
     if (centre.shape != TerrainShape.Flat || centre.terrace == 0) {
       return;
     }
-    let neighbours = this.getNeighbours(x, y);
+    let neighbours = this._surface.getNeighbours(x, y);
     let toEvaluate = new Array<TerrainAttributes>();
     let adjacentToLower: boolean = false;
     for (let neighbour of neighbours) {
@@ -260,9 +338,9 @@ export class TerrainBuilder {
   }
 
   calcShape(x: number, y: number): TerrainShape {
-    let neighbours = this.getNeighbours(x, y);
+    let neighbours = this._surface.getNeighbours(x, y);
     let shapeType = TerrainShape.Flat;
-    let centre = this._surface[y][x];
+    let centre = this._surface.at(x, y);
     let toEvaluate = new Array<TerrainAttributes>();
 
     for (let neighbour of neighbours) {
@@ -300,15 +378,15 @@ export class TerrainBuilder {
   }
 
   build(heightMap: Array<Array<number>>): void {
+    this._surface.init(heightMap);
+
     // Calculate the terraces.
-    for (let y = 0; y < this._depth; y++) {
-      this._surface.push(new Array<TerrainAttributes>());
-      for (let x = 0; x < this._width; x++) {
-        let height = heightMap[y][x];
-        let terrace = (height <= this._waterLevel) ?
-          0 : Math.floor(height / ((1.0 - this._waterLevel) / this._terraces));
-        this._surface[y].push(new TerrainAttributes(x, y, height, terrace));
-        console.log("created surface", this._surface[y][x]);
+    for (let y = 0; y < this._surface.depth; y++) {
+      for (let x = 0; x < this._surface.width; x++) {
+        let surface = this._surface.at(x, y);
+        let terrace = surface.height <= this._waterLevel ? 0 :
+          Math.floor(surface.height / ((1.0 - this._waterLevel) / this._terraces));
+        surface.terrace = terrace;
       }
     }
 
@@ -318,10 +396,10 @@ export class TerrainBuilder {
     let landRange = 1.0 - this._waterLevel;
     let terraceSpacing = landRange / this._terraces;
     let beachLimit = this._waterLevel + (landRange / 10);
-    for (let y = 0; y < this._depth; y++) {
-      for (let x = 0; x < this._width; x++) {
+    for (let y = 0; y < this._surface.depth; y++) {
+      for (let x = 0; x < this._surface.width; x++) {
         let biome = Biome.Water;
-        let surface = this._surface[y][x];
+        let surface = this._surface.at(x, y);
         if (surface.height <= this._waterLevel) {
           surface.biome = Biome.Water;
         } else if (surface.height <= beachLimit) {
@@ -340,25 +418,25 @@ export class TerrainBuilder {
 
     // After terraces and shapes have been calculated, smooth out the terrace
     // corners after some edges have been turned into ramps. 
-    for (let y = 0; y < this._depth; y++) {
-      for (let x = 0; x < this._width; x++) {
+    for (let y = 0; y < this._surface.depth; y++) {
+      for (let x = 0; x < this._surface.width; x++) {
         this.smoothEdge(x, y);
       }
     }
     
     // Add terrain objects that will be visible.
-    for (let y = 0; y < this._depth; y++) {
-      for (let x = 0; x < this._width; x++) {
-        let surface = this._surface[y][x];
+    for (let y = 0; y < this._surface.depth; y++) {
+      for (let x = 0; x < this._surface.width; x++) {
+        let surface = this._surface.at(x, y);
         this._worldTerrain.addRaisedTerrain(x, y, surface.terrace,
                                             surface.type, surface.shape);
       }
     }
 
     // Create a column of visible terrain below the surface tile.
-    for (let y = 0; y < this._depth; y++) {
-      for (let x = 0; x < this._width; x++) {
-        let z = this._surface[y][x].terrace;
+    for (let y = 0; y < this._surface.depth; y++) {
+      for (let x = 0; x < this._surface.width; x++) {
+        let z = this._surface.at(x, y).terrace;
         let zStop = z - this.calcRelativeHeight(x, y);
         let terrain = this._worldTerrain.getTerrain(x, y, z)!;
         if (terrain == null) {

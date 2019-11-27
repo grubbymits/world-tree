@@ -2,6 +2,17 @@ import { Entity } from "./entity.js"
 import { TerrainType, TerrainShape, Terrain } from "./terrain.js"
 import { SquareGrid } from "./map.js"
 
+export enum Direction {
+  North,
+  NorthEast,
+  East,
+  SouthEast,
+  South,
+  SouthWest,
+  West,
+  NorthWest,
+}
+
 export class Location {
   constructor(private _x: number,
               private _y: number,

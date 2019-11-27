@@ -15,7 +15,6 @@ export class Context {
               canvas: HTMLCanvasElement) {
 
     this._controller = new MouseController(canvas);
-
     this._entities = new Array<Entity>();
     let terrain = _worldMap.allTerrain;
     Array.from(terrain.values()).forEach(value => this._entities.push(value));
