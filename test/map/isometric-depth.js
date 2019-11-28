@@ -1,4 +1,5 @@
-import * as WT from '../../dist/world-tree.js';
+import * as WT from "../../dist/world-tree.js";
+import OpenSimplexNoise from "../../libs/open-simplex-noise/index.js";
 
 function createGraphic(path) {
   let sheet = new WT.SpriteSheet(path);
@@ -58,6 +59,7 @@ window.onload = function begin() {
   let ground = new Array(0.0, 0.11, 0.12, 0.23, 0.24, 0.25, 0.26, 0.27, 0.26, 0.24, 0.23, 0.12, 0.11, 0.10, 0.0);
   let raised = new Array(0.0, 0.11, 0.22, 0.25, 0.3,  0.35, 0.40, 0.35, 0.3,  0.25, 0.20, 0.22, 0.11, 0.10, 0.0);
   let hill =   new Array(0.0, 0.11, 0.22, 0.33, 0.44, 0.55, 0.6,  0.7,  0.6,  0.50, 0.33, 0.22, 0.11, 0.10, 0.0);
+  /*
   let heightMap = new Array(water,
                             edge,
                             ground,
@@ -72,9 +74,20 @@ window.onload = function begin() {
                             ground,
                             edge,
                             water);
+  */
   let builder = new WT.TerrainBuilder(cellsX, cellsY, terraces,
                                       waterMultiplier, waterLevel,
                                       tileWidth, tileHeight, tileDepth);
+
+  const openSimplex = new OpenSimplexNoise(Date.now());
+  let heightMap = new Array();
+  for (let y = 0; y < cellsY; y++) {
+    heightMap[y] = new Array();
+    for (let x = 0; x < cellsX; x++) {
+      heightMap[y].push(openSimplex.noise2D(x, y));
+    }
+  }
+
   builder.build(heightMap);
   let canvas = document.getElementById("testCanvas");
   let context = new WT.Context(builder.terrain, WT.CoordSystem.Isometric, canvas);
