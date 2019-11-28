@@ -43,8 +43,8 @@ window.onload = function begin() {
   sprites = new Array("../../../res/img/light-grass-rock-flat",
                           "../../../res/img/light-grass-rock-ramp-north",
                           "../../../res/img/light-grass-rock-ramp-east",
-                          "../../../res/img/rock-ramp-south-128",
-                          "../../../res/img/rock-ramp-west-128");
+                          "../../../res/img/rock-ramp-south",
+                          "../../../res/img/rock-ramp-west");
   WT.Terrain.addTerrainGraphics(WT.TerrainType.Rock, createGraphics(sprites));
   sprites = new Array("../../../res/img/dark-grass-sand-flat",
                       "../../../res/img/dark-grass-sand-ramp-north",

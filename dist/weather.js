@@ -49,31 +49,9 @@ export class Rain {
         if (next.terrace > current.terrace) {
             let dirA = (this._direction + 1) % Direction.Max;
             let dirB = (this._direction + Direction.NorthWest) % Direction.Max;
-            let pointA = getDirectionCoords(this._x, this._y, dirA);
-            let pointB = getDirectionCoords(this._x, this._y, dirB);
-            let newSpawn;
-            let newDir;
-            if (this._surface.inbounds(pointA) && this._surface.inbounds(pointB)) {
-                let terrainA = this._surface.at(pointA.x, pointA.y);
-                let terrainB = this._surface.at(pointB.x, pointB.y);
-                newSpawn = terrainA.height > terrainB.height ? pointB : pointA;
-                newDir = terrainA.height > terrainB.height ? dirB : dirA;
-            }
-            else if (this._surface.inbounds(pointA)) {
-                newSpawn = pointA;
-                newDir = dirA;
-            }
-            else if (this._surface.inbounds(pointB)) {
-                newSpawn = pointB;
-                newDir = dirB;
-            }
-            else {
-                this._x = nextCoord.x;
-                this._y = nextCoord.y;
-                return this._finished;
-            }
-            Rain.add(newSpawn.x, newSpawn.y, this._moisture, this._waterLevel, this._booster, newDir, this._surface);
-            this._moisture /= 2;
+            Rain.add(current.x, current.y, this._moisture / 3, this._waterLevel, this._booster, dirA, this._surface);
+            Rain.add(current.x, current.y, this._moisture / 3, this._waterLevel, this._booster, dirB, this._surface);
+            this._moisture /= 3;
         }
         this._x = nextCoord.x;
         this._y = nextCoord.y;
