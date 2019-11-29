@@ -19,15 +19,6 @@ function createGraphics(paths) {
 }
 
 window.onload = function begin() {
-  let tileWidth = 128;
-  let tileHeight = 64;
-  let tileDepth = 64;
-  let cellsX = 15;
-  let cellsY = 14;
-  let terraces = 3;
-  let waterMultiplier = 1.0;
-  let waterLevel = 0.1;
-
   WT.Terrain.addTerrainGraphics(WT.TerrainType.Water, createGraphic("../../../res/img/light-water-flat"));
   let sprites = new Array("../../../res/img/sand-flat",
                           "../../../res/img/sand-ramp-north",
@@ -54,40 +45,24 @@ window.onload = function begin() {
                       "../../../res/img/sand-ramp-west");
   WT.Terrain.addTerrainGraphics(WT.TerrainType.WetGrass, createGraphics(sprites));
 
-  let water =  new Array(0.0, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0);
-  let edge  =  new Array(0.0, 0.11, 0.12, 0.13, 0.14, 0.15, 0.14, 0.13, 0.12, 0.11, 0.10, 0.0,  0.0,  0.0,  0.0);
-  let ground = new Array(0.0, 0.11, 0.12, 0.23, 0.24, 0.25, 0.26, 0.27, 0.26, 0.24, 0.23, 0.12, 0.11, 0.10, 0.0);
-  let raised = new Array(0.0, 0.11, 0.22, 0.25, 0.3,  0.35, 0.40, 0.35, 0.3,  0.25, 0.20, 0.22, 0.11, 0.10, 0.0);
-  let hill =   new Array(0.0, 0.11, 0.22, 0.33, 0.44, 0.55, 0.6,  0.7,  0.6,  0.50, 0.33, 0.22, 0.11, 0.10, 0.0);
-  /*
-  let heightMap = new Array(water,
-                            edge,
-                            ground,
-                            raised,
-                            hill,
-                            hill,
-                            hill,
-                            hill,
-                            hill,
-                            raised,
-                            ground,
-                            ground,
-                            edge,
-                            water);
-  */
-  let builder = new WT.TerrainBuilder(cellsX, cellsY, terraces,
-                                      waterMultiplier, waterLevel,
-                                      tileWidth, tileHeight, tileDepth);
-
+  let tileDepth = 64;
+  let cellsX = 15;
+  let cellsY = 14;
+  let terraces = 3;
+  let waterMultiplier = 1.0;
   const openSimplex = new OpenSimplexNoise(Date.now());
   let heightMap = new Array();
   for (let y = 0; y < cellsY; y++) {
     heightMap[y] = new Array();
     for (let x = 0; x < cellsX; x++) {
-      heightMap[y].push(openSimplex.noise2D(x, y));
+      heightMap[y].push(openSimplex.noise2D(x, y) + 1); // value between 0-2.
     }
   }
 
+  let tileWidth = 128;
+  let tileHeight = 64;
+  let builder = new WT.TerrainBuilder(cellsX, cellsY, terraces, waterMultiplier,
+                                      tileWidth, tileHeight, tileDepth);
   builder.build(heightMap);
   let canvas = document.getElementById("testCanvas");
   let context = new WT.Context(builder.terrain, WT.CoordSystem.Isometric, canvas);

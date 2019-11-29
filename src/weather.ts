@@ -52,7 +52,7 @@ export class Rain {
     let next = this._surface.at(nextCoord.x, nextCoord.y);
     let multiplier = (next.height / current.height) * this._booster;
     // Add 5%, plus the multiplier, of the available moisture.
-    let total = 0.05 * this._moisture * multiplier;
+    let total = 0.01 + (0.05 * this._moisture * multiplier);
     if (total > this._moisture) {
       current.moisture += this._moisture;
       this._finished = true;
@@ -69,16 +69,10 @@ export class Rain {
     if (next.terrace > current.terrace) {
       let dirA: Direction = (this._direction + 1) % Direction.Max;
       let dirB: Direction = (this._direction + Direction.NorthWest) % Direction.Max;
-
       let pointA: Point = getDirectionCoords(this._x, this._y, dirA);
       let pointB: Point = getDirectionCoords(this._x, this._y, dirB);
-      let newSpawn: Point;
-      let newDir: Direction;
       let numClouds: number = 2;
       if (this._surface.inbounds(pointA) && this._surface.inbounds(pointB)) {
-        let terrainA: TerrainAttributes = this._surface.at(pointA.x, pointA.y);
-        if (terrainA.terrace == terrainB.terrace == current.terrace) {
-        let terrainB: TerrainAttributes = this._surface.at(pointB.x, pointB.y);
         Rain.add(pointA.x, pointA.y, this._moisture / 3, this._waterLevel,
                   this._booster, dirA, this._surface);
         Rain.add(pointB.x, pointB.y, this._moisture / 3, this._waterLevel,

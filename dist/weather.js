@@ -33,7 +33,7 @@ export class Rain {
         }
         let next = this._surface.at(nextCoord.x, nextCoord.y);
         let multiplier = (next.height / current.height) * this._booster;
-        let total = 0.05 * this._moisture * multiplier;
+        let total = 0.01 + (0.05 * this._moisture * multiplier);
         if (total > this._moisture) {
             current.moisture += this._moisture;
             this._finished = true;
@@ -49,9 +49,26 @@ export class Rain {
         if (next.terrace > current.terrace) {
             let dirA = (this._direction + 1) % Direction.Max;
             let dirB = (this._direction + Direction.NorthWest) % Direction.Max;
-            Rain.add(current.x, current.y, this._moisture / 3, this._waterLevel, this._booster, dirA, this._surface);
-            Rain.add(current.x, current.y, this._moisture / 3, this._waterLevel, this._booster, dirB, this._surface);
-            this._moisture /= 3;
+            let pointA = getDirectionCoords(this._x, this._y, dirA);
+            let pointB = getDirectionCoords(this._x, this._y, dirB);
+            let numClouds = 2;
+            if (this._surface.inbounds(pointA) && this._surface.inbounds(pointB)) {
+                Rain.add(pointA.x, pointA.y, this._moisture / 3, this._waterLevel, this._booster, dirA, this._surface);
+                Rain.add(pointB.x, pointB.y, this._moisture / 3, this._waterLevel, this._booster, dirB, this._surface);
+                numClouds = 3;
+            }
+            else if (this._surface.inbounds(pointA)) {
+                Rain.add(pointA.x, pointA.y, this._moisture / 2, this._waterLevel, this._booster, dirA, this._surface);
+            }
+            else if (this._surface.inbounds(pointB)) {
+                Rain.add(pointB.x, pointB.y, this._moisture / 2, this._waterLevel, this._booster, dirB, this._surface);
+            }
+            else {
+                this._x = nextCoord.x;
+                this._y = nextCoord.y;
+                return this._finished;
+            }
+            this._moisture /= numClouds;
         }
         this._x = nextCoord.x;
         this._y = nextCoord.y;
