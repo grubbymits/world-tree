@@ -181,7 +181,6 @@ export class Surface {
       this._surface.push(new Array<TerrainAttributes>());
       for (let x = 0; x < this._width; x++) {
         let height = heightMap[y][x];
-        console.log("height", height);
         this._surface[y].push(new TerrainAttributes(x, y, height));
       }
     }
@@ -221,8 +220,8 @@ export class TerrainBuilder {
   private _worldTerrain: SquareGrid;
   private _surface: Surface;
   private readonly _terraceSpacing: number;
-  private readonly _ceiling: number = 2.0;
-  private readonly _waterLevel: number = 1.0;
+  private readonly _ceiling: number = 1.0;
+  private readonly _waterLevel: number = 0.0;
   private readonly _landRange: number = this._ceiling - this._waterLevel;
   private readonly _beachLimit: number = this._waterLevel + (this._landRange / 10);
   private readonly _dryLimit: number = 0.02;
@@ -240,6 +239,8 @@ export class TerrainBuilder {
     this._surface = new Surface(width, depth);
     this._worldTerrain = new SquareGrid(width, depth);
     this._terraceSpacing = this._landRange / this._terraces;
+    console.log("Terrain builder with", this._terraces, "terraces, and",
+                this._terraceSpacing, "terrace spacing");
   }
 
   get terrain(): SquareGrid {
@@ -252,6 +253,8 @@ export class TerrainBuilder {
     let centre = this._surface.at(x, y);
    
     for (let neighbour of neighbours) { 
+      console.assert(neighbour.terrace >= 0,
+                     "Found neighbour with negative terrace!", neighbour.terrace);
       if (neighbour.terrace < centre.terrace) {
         if (centre.terrace - neighbour.terrace > relativeHeight) {
           relativeHeight = centre.terrace - neighbour.terrace;
@@ -260,7 +263,7 @@ export class TerrainBuilder {
     }
     console.assert(relativeHeight <= this._terraces,
                    "impossible relative height:", relativeHeight,
-                   "centre terrace:", centre.terrace);
+                   "\ncentre:", centre);
     return relativeHeight;
   }
   
@@ -287,7 +290,8 @@ export class TerrainBuilder {
 
   smoothEdge(x: number, y: number) {
     let centre = this._surface.at(x, y);
-    if (centre.shape != TerrainShape.Flat || centre.terrace <= 0) {
+    console.assert(centre.terrace >= 0, "Found negative terrace");
+    if (centre.shape != TerrainShape.Flat || centre.terrace == 0) {
       return;
     }
     let neighbours = this._surface.getNeighbours(x, y);
@@ -308,9 +312,8 @@ export class TerrainBuilder {
     if (toEvaluate.length < 2 || !adjacentToLower) {
       return;
     }
+    console.log("decreasing terrace height at", x, y);
     centre.terrace = centre.terrace - 1;
-    console.assert(centre.terrace <= this._terraces && centre.terrace >= 0,
-                   "terrace out of range after smoothing:", centre.terrace);
   }
 
   calcShape(x: number, y: number): TerrainShape {
@@ -326,7 +329,7 @@ export class TerrainBuilder {
       if (neighbour.terrace > centre.terrace) {
         continue;
       }
-      if ((neighbour.terrace - centre.terrace) > 1) {
+      if ((centre.terrace - neighbour.terrace) > 1) {
         continue;
       }
       if ((neighbour.x != centre.x) && (neighbour.y != centre.y)) {
@@ -363,7 +366,7 @@ export class TerrainBuilder {
       for (let x = 0; x < this._surface.width; x++) {
         let surface = this._surface.at(x, y);
         let terrace = surface.height <= this._waterLevel ? 0 :
-          Math.floor(surface.height / (this._landRange / this._terraces));
+          Math.floor((surface.height - this._waterLevel) / this._terraceSpacing);
         console.assert(terrace <= this._terraces && terrace >= 0,
                        "terrace out of range:", terrace);
         surface.terrace = terrace;

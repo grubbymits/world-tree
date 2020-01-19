@@ -49,13 +49,18 @@ window.onload = function begin() {
   let cellsX = 15;
   let cellsY = 14;
   let terraces = 3;
-  let waterMultiplier = 1.0;
+  let waterMultiplier = 0.0;
+  let freq = 0.1;
   const openSimplex = new OpenSimplexNoise(Date.now());
   let heightMap = new Array();
   for (let y = 0; y < cellsY; y++) {
     heightMap[y] = new Array();
     for (let x = 0; x < cellsX; x++) {
-      heightMap[y].push(openSimplex.noise2D(x, y) + 1); // value between 0-2.
+      let height =  openSimplex.noise2D(freq * x, freq * y) +
+                    0.50 * openSimplex.noise2D(2 * freq * x, 2 * freq * y) +
+                    0.25 * openSimplex.noise2D(4 * freq * x, 4 * freq * y) +
+                    0.125 * openSimplex.noise2D(8 * freq * x, 8 * freq * y);
+      heightMap[y].push(height);
     }
   }
 
