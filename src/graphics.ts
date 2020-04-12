@@ -163,16 +163,6 @@ export class CartisanRenderer extends Renderer {
   }
 }
 
-/*
-function convertToIsometric(x: number, y: number): Point {
-  let width = Terrain.tileWidth;
-  let height = Terrain.tileHeight;
-  let drawX = Math.floor(x * width / 2) + Math.floor(y * width / 2);
-  let drawY = Math.floor(y * height / 2) - Math.floor(x * height / 2);
-  return new Point(drawX, drawY);
-}
-*/
-
 export class IsometricRenderer extends Renderer {
   constructor(canvas: HTMLCanvasElement) {
     super(canvas);

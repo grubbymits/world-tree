@@ -35,9 +35,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="131.01343"
-     inkscape:cy="527.56633"
+     inkscape:zoom="5.6"
+     inkscape:cx="178.57007"
+     inkscape:cy="612.04048"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -46,7 +46,7 @@
      inkscape:window-width="3360"
      inkscape:window-height="2076"
      inkscape:window-x="471"
-     inkscape:window-y="45"
+     inkscape:window-y="47"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="axonomgrid"
@@ -73,8 +73,88 @@
      id="layer1"
      transform="translate(0,-87)">
     <g
+       id="g7122"
+       transform="translate(-13.748153,-5.291676)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-north.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path6341"
+         d="M 59.575337,170.00001 25.204948,150.15626 59.575337,143.54168 Z"
+         style="fill:#c79232;fill-opacity:1;stroke:#c79232;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6353"
+         d="M 59.57533,170.00001 93.945715,150.15626 V 123.69793 L 59.575331,143.54168 Z"
+         style="fill:#c77f32;fill-opacity:1;stroke:#c77f32;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6351"
+         d="m 25.204946,150.15626 34.370385,-19.84375 34.370384,-6.61458 -34.370384,19.84375 z"
+         style="fill:#788244;fill-opacity:1;stroke:#747e41;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6355"
+         d="m 93.945715,123.69793 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.291359,-1.32292 v 2.64584 l -2.291359,-1.32292 v 2.64583 l -2.291359,-1.32291 v 2.64583 l -2.291359,-1.32292 v 2.64584 l -2.291359,-1.32292 v 2.64583 l -2.291359,-1.32291 v 2.64583 l -2.291358,-1.32292 v 2.64584 l -2.291359,-1.32292 v 2.64583 l -2.291359,-1.32291 v 2.64583 l -2.291359,-1.32292 v 2.64584 l -2.291359,-1.32292 v 2.64583 l -2.291359,-1.32291 v 2.64583 l -2.291359,-1.32292 v 2.64584 l -2.291358,-1.32292 z"
+         style="fill:#788244;fill-opacity:1;stroke:#747e41;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6373"
+         d="m 29.787666,147.51043 v 2.64583 l 2.291358,-1.32291 z"
+         style="fill:#788244;fill-opacity:1;stroke:#747e41;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6375"
+         d="m 34.370381,147.51043 v 2.64583 l 4.58272,-2.64583 z"
+         style="fill:#788244;fill-opacity:1;stroke:#747e41;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6377"
+         d="m 48.118536,144.8646 v 2.64583 l 4.582717,-2.64583 z"
+         style="fill:#788244;fill-opacity:1;stroke:#747e41;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6379"
+         d="m 43.535818,144.86459 v 2.64584 l 2.291359,-1.32292 z"
+         style="fill:#788244;fill-opacity:1;stroke:#747e41;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6381"
+         d="m 57.28397,142.21876 v 2.64583 l 2.291361,-1.32291 z"
+         style="fill:#788244;fill-opacity:1;stroke:#747e41;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6383"
+         d="m 54.992612,143.54168 v 2.64583 l 2.29136,-3.96875 z"
+         style="fill:#788244;fill-opacity:1;stroke:#747e41;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6569"
+         d="m 59.57533,140.89584 4.582718,-2.64583 H 59.57533 Z"
+         style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6569-5"
+         d="m 75.614842,131.63542 4.582718,-2.64583 h -4.582718 z"
+         style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6569-0"
+         d="m 59.57533,135.60417 4.582718,-2.64583 H 59.57533 Z"
+         style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6569-0-3"
+         d="m 43.535818,144.86459 4.582718,-2.64583 h -4.582718 z"
+         style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
        id="g6465"
-       transform="translate(1.2215682e-7,13.229164)">
+       transform="translate(11.456798,6.614584)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-east.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          inkscape:connector-curvature="0"
          id="path6397"
@@ -184,61 +264,11 @@
          style="fill:#6a733b;fill-opacity:1;stroke:#6a733b;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
     </g>
     <g
-       id="g6423">
-      <path
-         inkscape:connector-curvature="0"
-         id="path6341"
-         d="M 57.283979,171.32292 22.91359,151.47917 57.283979,144.86459 Z"
-         style="fill:#c79232;fill-opacity:1;stroke:#c79232;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6353"
-         d="M 57.283972,171.32292 91.654357,151.47917 V 125.02084 L 57.283973,144.86459 Z"
-         style="fill:#c77f32;fill-opacity:1;stroke:#c77f32;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6351"
-         d="m 22.913588,151.47917 34.370385,-19.84375 34.370384,-6.61458 -34.370384,19.84375 z"
-         style="fill:#8f8739;fill-opacity:1;stroke:#8f8739;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6355"
-         d="m 91.654357,125.02084 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.291359,-1.32292 v 2.64584 l -2.291359,-1.32292 v 2.64583 l -2.291359,-1.32291 v 2.64583 l -2.291359,-1.32292 v 2.64584 l -2.291359,-1.32292 v 2.64583 l -2.291359,-1.32291 v 2.64583 l -2.291358,-1.32292 v 2.64584 l -2.291359,-1.32292 v 2.64583 l -2.291359,-1.32291 v 2.64583 l -2.291359,-1.32292 v 2.64584 l -2.291359,-1.32292 v 2.64583 l -2.291359,-1.32291 v 2.64583 l -2.291359,-1.32292 v 2.64584 l -2.291358,-1.32292 z"
-         style="fill:#8f8739;fill-opacity:1;stroke:#8f8739;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6373"
-         d="m 27.496308,148.83334 v 2.64583 l 2.291358,-1.32291 z"
-         style="fill:#8f8739;fill-opacity:1;stroke:#8f8739;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6375"
-         d="m 32.079023,148.83334 v 2.64583 l 4.58272,-2.64583 z"
-         style="fill:#8f8739;fill-opacity:1;stroke:#8f8739;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6377"
-         d="m 45.827178,146.18751 v 2.64583 l 4.582717,-2.64583 z"
-         style="fill:#8f8739;fill-opacity:1;stroke:#8f8739;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6379"
-         d="m 41.24446,146.1875 v 2.64584 l 2.291359,-1.32292 z"
-         style="fill:#8f8739;fill-opacity:1;stroke:#8f8739;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6381"
-         d="m 54.992612,143.54167 v 2.64583 l 2.291361,-1.32291 z"
-         style="fill:#8f8739;fill-opacity:1;stroke:#8f8739;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6383"
-         d="m 52.701254,144.86459 v 2.64583 l 2.29136,-3.96875 z"
-         style="fill:#8f8739;fill-opacity:1;stroke:#8f8739;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-    </g>
-    <g
        id="g6305"
-       transform="translate(-11.456796,-59.53125)">
+       transform="translate(-11.456792,-59.531247)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-flat.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          inkscape:connector-curvature="0"
          id="path4660"
@@ -265,9 +295,108 @@
          d="m 103.11115,224.23959 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29135,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29135,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 z"
          style="fill:#747e41;fill-opacity:1;stroke:#747e41;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
     </g>
+    <path
+       style="fill:#c79232;fill-opacity:1;stroke:#c79232;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 171.85191,211.01043 v 26.45833 l 34.37038,19.84375 z"
+       id="path4672"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#707a3f;fill-opacity:1;stroke:#747e41;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 206.22229,257.3125 34.37038,-19.84375 -34.37038,-46.30208 -34.37038,19.84375"
+       id="path4674"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#707a3f;fill-opacity:1;stroke:#707a3f;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 171.85191,211.01043 v 2.64583 l 2.29136,-1.32291 z"
+       id="path6255"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#707a3f;fill-opacity:1;stroke:#707a3f;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 174.14327,212.33334 v 0 2.64584 l 2.29136,-1.32292 -2.29136,-1.32291"
+       id="path6257"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#707a3f;fill-opacity:1;stroke:#707a3f;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 176.43463,216.30209 v 2.64584 l 2.29136,-1.32292 z"
+       id="path6259"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#707a3f;fill-opacity:1;stroke:#707a3f;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 181.01735,221.59376 v 2.64583 l 2.29136,-1.32291 z"
+       id="path6261"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#707a3f;fill-opacity:1;stroke:#707a3f;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 183.3087,225.56251 v 2.64583 l 2.29137,-1.32291 z"
+       id="path6263"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#707a3f;fill-opacity:1;stroke:#707a3f;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 185.60006,229.53126 v 2.64583 l 2.29136,-1.32291 z"
+       id="path6265"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#707a3f;fill-opacity:1;stroke:#707a3f;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 190.18278,234.82293 v 2.64583 l 2.29136,-1.32291 z"
+       id="path6267"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#707a3f;fill-opacity:1;stroke:#707a3f;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 194.7655,240.11459 v 2.64584 l 2.29136,-1.32292 z"
+       id="path6269"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#707a3f;fill-opacity:1;stroke:#707a3f;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 197.05686,244.08334 v 2.64584 l 2.29136,-1.32292 z"
+       id="path6271"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#707a3f;fill-opacity:1;stroke:#707a3f;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 201.63957,249.37501 v 2.64583 l 2.29137,-1.32291 z"
+       id="path6273"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <g
        id="g6433"
-       transform="translate(-1.8847006e-6,6.3329624e-6)">
+       transform="translate(-11.456796,6.6145929)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-west.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          inkscape:connector-curvature="0"
          id="path4676"
@@ -289,73 +418,289 @@
          d="m 91.654355,204.39583 v 2.64583 l -2.291358,-1.32291 z"
          style="fill:#747e41;fill-opacity:1;stroke:#747e41;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
     </g>
-    <g
-       id="g6339"
-       transform="translate(-34.370378,-19.84375)">
-      <g
-         transform="translate(-34.370385,17.19792)"
-         id="g6324">
-        <path
-           style="fill:#c79232;fill-opacity:1;stroke:#c79232;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
-           d="m 229.13589,207.04168 v 26.45833 l 34.37038,19.84375 z"
-           id="path4672"
-           inkscape:connector-curvature="0" />
-        <path
-           style="fill:#6a733b;fill-opacity:1;stroke:#747e41;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
-           d="M 263.50627,253.34375 297.87665,233.5 263.50627,187.19792 229.13589,207.04167"
-           id="path4674"
-           inkscape:connector-curvature="0" />
-      </g>
-      <path
-         inkscape:connector-curvature="0"
-         id="path6255"
-         d="m 194.7655,224.23959 v 2.64583 l 2.29136,-1.32291 z"
-         style="fill:#6a733b;fill-opacity:1;stroke:#6a733b;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6257"
-         d="m 197.05686,225.5625 v 0 2.64584 l 2.29136,-1.32292 -2.29136,-1.32291"
-         style="fill:#6a733b;fill-opacity:1;stroke:#6a733b;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6259"
-         d="m 199.34822,229.53125 v 2.64584 l 2.29136,-1.32292 z"
-         style="fill:#6a733b;fill-opacity:1;stroke:#6a733b;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6261"
-         d="m 203.93094,234.82292 v 2.64583 l 2.29136,-1.32291 z"
-         style="fill:#6a733b;fill-opacity:1;stroke:#6a733b;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6263"
-         d="m 206.22229,238.79167 v 2.64583 l 2.29137,-1.32291 z"
-         style="fill:#6a733b;fill-opacity:1;stroke:#6a733b;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6265"
-         d="m 208.51365,242.76042 v 2.64583 l 2.29136,-1.32291 z"
-         style="fill:#6a733b;fill-opacity:1;stroke:#6a733b;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6267"
-         d="m 213.09637,248.05209 v 2.64583 l 2.29136,-1.32291 z"
-         style="fill:#6a733b;fill-opacity:1;stroke:#6a733b;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6269"
-         d="m 217.67909,253.34375 v 2.64584 l 2.29136,-1.32292 z"
-         style="fill:#6a733b;fill-opacity:1;stroke:#6a733b;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6271"
-         d="m 219.97045,257.3125 v 2.64584 l 2.29136,-1.32292 z"
-         style="fill:#6a733b;fill-opacity:1;stroke:#6a733b;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path6273"
-         d="M 224.55316,262.60417 V 265.25 l 2.29137,-1.32291 z"
-         style="fill:#6a733b;fill-opacity:1;stroke:#6a733b;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1" />
-    </g>
+    <path
+       style="fill:#82802a;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:0;stroke-dasharray:none;fill-opacity:1"
+       d="m 50.409895,207.04167 4.58271,2.64583 -4.58271,2.64584 z"
+       id="path6557"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-west.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:0;stroke-dasharray:none;fill-opacity:1"
+       d="m 194.76549,216.30209 -4.58271,-2.64584 4.58272,-2.64583 z"
+       id="path6563"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="M 123.73338,172.64583 128.31609,170 l 4.58272,2.64584 -4.58271,2.64583 z"
+       id="path6567"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-flat.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#82802a;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 203.93094,134.28126 4.58271,2.64583 10e-6,-2.64583 z"
+       id="path6571"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-east.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 222.26181,226.88542 -4.58271,-2.64584 4.58272,-2.64583 z"
+       id="path6563-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 210.80501,246.72917 -4.58271,-2.64584 4.58272,-2.64583 z"
+       id="path6563-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 45.827185,230.85418 4.58271,2.64583 -4.58271,2.64584 z"
+       id="path6557-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-west.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 27.496314,228.20834 4.58271,2.64583 -4.58271,2.64584 z"
+       id="path6557-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-west.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 146.64697,164.70834 4.58271,-2.64583 4.58272,2.64584 -4.58271,2.64583 z"
+       id="path6567-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-flat.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 116.85931,158.09375 4.58271,-2.64583 4.58272,2.64584 -4.58271,2.64583 z"
+       id="path6567-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-flat.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:0;stroke-dasharray:none;fill-opacity:1"
+       d="m 206.22229,222.91668 v 5.29166 l 4.58272,2.64584 v -5.29167 z"
+       id="path6651"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:0;stroke-dasharray:none;fill-opacity:1"
+       d="m 48.118536,218.94792 -4.58271,2.64584 v 5.29167 l 4.58272,-2.64584 z"
+       id="path6653"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-west.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:0;stroke-dasharray:none;fill-opacity:1"
+       d="m 206.22229,214.97917 2.29136,-1.32292 10e-6,2.64584 z"
+       id="path6655"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:0;stroke-dasharray:none;fill-opacity:1"
+       d="m 61.866689,216.30209 2.291358,1.32291 -2.291358,1.32292 z"
+       id="path6657"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-west.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:0;stroke-dasharray:none;fill-opacity:1"
+       d="m 112.27658,168.67709 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-flat.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 130.60745,160.73959 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-flat.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 137.48153,172.64584 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-flat.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 123.73338,151.47918 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-flat.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 107.69386,160.73959 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-flat.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 194.7655,229.53126 2.29136,-1.32292 1e-5,2.64584 z"
+       id="path6655-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 224.55316,236.14584 2.29136,-1.32292 1e-5,2.64584 z"
+       id="path6655-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 201.63957,201.75 2.29136,-1.32292 1e-5,2.64584 z"
+       id="path6655-28"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 178.72599,212.33334 2.29135,-1.32292 1e-5,2.64584 z"
+       id="path6655-97"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-south.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 38.9531,213.65626 2.291358,1.32291 -2.291358,1.32292 z"
+       id="path6657-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-west.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 38.9531,240.11459 2.291358,1.32291 -2.291358,1.32292 z"
+       id="path6657-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-west.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 18.33087,233.50001 2.291358,1.32291 -2.291358,1.32292 z"
+       id="path6657-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-west.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 45.827176,196.45834 2.291358,1.32291 -2.291358,1.32292 z"
+       id="path6657-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-west.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 64.158047,207.04167 2.291358,1.32291 -2.291358,1.32292 z"
+       id="path6657-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-west.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 43.535817,250.69792 2.291358,1.32291 -2.291358,1.32292 z"
+       id="path6657-31"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-west.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 57.28397,229.53126 2.291358,1.32291 -2.291358,1.32292 z"
+       id="path6657-94"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-west.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#82802a;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 213.09637,134.28126 4.58271,2.64583 1e-5,-2.64583 z"
+       id="path6571-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-east.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#82802a;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 185.60006,123.69792 4.58271,2.64583 1e-5,-2.64583 z"
+       id="path6571-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-east.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#82802a;fill-opacity:1;stroke:#82802a;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 201.63958,127.66667 4.58271,2.64583 1e-5,-2.64583 z"
+       id="path6571-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-sand-east.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#c77f32;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:0;stroke-dasharray:none;fill-opacity:1"
+       d="m 98.52843,187.19792 6.87408,3.96875 v 2.64584 l -6.874079,-3.96875 z"
+       id="path7126"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:#c77f32;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:0;stroke-dasharray:none;fill-opacity:1"
+       d="m 98.528431,176.61459 v 2.64583 l 2.291359,1.32292 v -2.64583 z"
+       id="path7128"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:#c77f32;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:0;stroke-dasharray:none;fill-opacity:1"
+       d="m 114.56794,183.22917 v 5.29167 l 6.87408,3.96875 v -5.29167 z"
+       id="path7130"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:#c77f32;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:0;stroke-dasharray:none;fill-opacity:1"
+       d="m 116.8593,197.78126 v 2.64583 l 2.29136,1.32292 v -2.64583 z"
+       id="path7128-6"
+       inkscape:connector-curvature="0" />
   </g>
 </svg>
