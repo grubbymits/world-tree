@@ -183,11 +183,13 @@ export class IsometricRenderer extends Renderer {
     // - sides equal length = 1,
     // - the short diagonal is length = 1,
     // - the long diagonal is length = sqrt(3) ~= 1.73.
+    // We're allowing the height to vary, so its a cuboid, not a cube, but with
+    // a square top.
 
     // Tiles are placed overlapping each other by half.
     // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
     let dx = Math.floor(0.5 * Math.sqrt(3) * (entity.x + entity.y));
-    let dy = Math.floor(0.5 * (entity.y - entity.x));
+    let dy = Math.floor((0.5 * (entity.y - entity.x)) - entity.z);
     return new Point(dx, dy);
   }
 

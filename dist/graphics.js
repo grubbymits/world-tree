@@ -131,7 +131,7 @@ export class IsometricRenderer extends Renderer {
     }
     static getDrawCoord(entity) {
         let dx = Math.floor(0.5 * Math.sqrt(3) * (entity.x + entity.y));
-        let dy = Math.floor(0.5 * (entity.y - entity.x));
+        let dy = Math.floor((0.5 * (entity.y - entity.x)) - entity.z);
         return new Point(dx, dy);
     }
     getDrawCoord(entity) {

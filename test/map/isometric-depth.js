@@ -1,8 +1,8 @@
 import * as WT from "../../dist/world-tree.js";
 import OpenSimplexNoise from "../../libs/open-simplex-noise/index.js";
 
-const spriteWidth = 260;
-const spriteHeight = 250;
+const spriteWidth = 261;
+const spriteHeight = 251;
 
 function createGraphic(path) {
   let sheet = new WT.SpriteSheet(path);
@@ -55,9 +55,9 @@ window.onload = function begin() {
   */
   WT.Terrain.addTerrainGraphics(WT.TerrainType.WetGrass, createGraphics(sprites));
 
-  let cellsX = 5;
-  let cellsY = 5;
-  let terraces = 4;
+  let cellsX = 20;
+  let cellsY = 20;
+  let terraces = 2;
   let waterMultiplier = 0.0;
   let freq = 0.1;
   const openSimplex = new OpenSimplexNoise(Date.now());
@@ -65,21 +65,16 @@ window.onload = function begin() {
   for (let y = 0; y < cellsY; y++) {
     heightMap[y] = new Array();
     for (let x = 0; x < cellsX; x++) {
-      let height = 0.2;//0.1 + (x/10);
-                    //openSimplex.noise2D(freq * x, freq * y) +
-                    //0.50 * openSimplex.noise2D(2 * freq * x, 2 * freq * y) +
-                    //0.25 * openSimplex.noise2D(4 * freq * x, 4 * freq * y) +
-                    //0.125 * openSimplex.noise2D(8 * freq * x, 8 * freq * y);
+      let height = openSimplex.noise2D(freq * x, freq * y) +
+                   0.50 * openSimplex.noise2D(2 * freq * x, 2 * freq * y) +
+                   0.25 * openSimplex.noise2D(4 * freq * x, 4 * freq * y) +
+                   0.125 * openSimplex.noise2D(8 * freq * x, 8 * freq * y);
       heightMap[y].push(height);
     }
   }
 
-  //let tileDepth = 1;//Math.floor(spriteHeight / 2);
-  //let tileHeight = Math.floor(spriteHeight / 2);
-  //let tileWidth = spriteWidth;
-  //let tileHeight = spriteHeight; //Math.floor(1.5 * (spriteHeight / 5));
-  // surface / height ratio?
-  let heightRatio = 2/5;
+  // width / height ratio
+  let heightRatio = 2/3;
   console.log("heightRatio:", heightRatio);
   let builder = new WT.TerrainBuilder(cellsX, cellsY, terraces, waterMultiplier,
                                       spriteWidth, spriteHeight, heightRatio,
