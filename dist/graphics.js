@@ -1,4 +1,3 @@
-import { Terrain } from "./terrain.js";
 export var CoordSystem;
 (function (CoordSystem) {
     CoordSystem[CoordSystem["Cartisan"] = 0] = "Cartisan";
@@ -81,7 +80,14 @@ export class Renderer {
         this._ctx.clearRect(0, 0, this._width, this._height);
         for (let i in entities) {
             let entity = entities[i];
-            let coord = this.getDrawCoord(entity);
+            let coord;
+            if (entity.static) {
+                let staticEntity = (entity);
+                coord = staticEntity.drawCoord;
+            }
+            else {
+                coord = this.getDrawCoord(entity);
+            }
             if (!camera.isOnScreen(coord, entity.width, entity.depth)) {
                 continue;
             }
@@ -95,8 +101,11 @@ export class CartisanRenderer extends Renderer {
     constructor(canvas) {
         super(canvas);
     }
-    getDrawCoord(entity) {
+    static getDrawCoord(entity) {
         return new Point(entity.x, entity.y - entity.z);
+    }
+    getDrawCoord(entity) {
+        return CartisanRenderer.getDrawCoord(entity);
     }
     sortEntitys(entities) {
         entities.sort((a, b) => {
@@ -116,20 +125,17 @@ export class CartisanRenderer extends Renderer {
         });
     }
 }
-function convertToIsometric(x, y) {
-    let width = Terrain.tileWidth;
-    let height = Terrain.tileHeight;
-    let drawX = Math.floor(x * width / 2) + Math.floor(y * width / 2);
-    let drawY = Math.floor(y * height / 2) - Math.floor(x * height / 2);
-    return new Point(drawX, drawY);
-}
 export class IsometricRenderer extends Renderer {
     constructor(canvas) {
         super(canvas);
     }
+    static getDrawCoord(entity) {
+        let dx = Math.floor(0.5 * Math.sqrt(3) * (entity.x + entity.y));
+        let dy = Math.floor(0.5 * (entity.y - entity.x));
+        return new Point(dx, dy);
+    }
     getDrawCoord(entity) {
-        let loc = Terrain.scaleLocation(entity.location);
-        return convertToIsometric(loc.x + loc.z, loc.y - loc.z);
+        return IsometricRenderer.getDrawCoord(entity);
     }
     sortEntitys(entities) {
         entities.sort((a, b) => {

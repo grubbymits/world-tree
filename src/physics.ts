@@ -85,16 +85,48 @@ export class Location {
               private _y: number,
               private _z: number) { }
 
-  get x(): number {
-    return this._x;
-  }
+  get x(): number { return this._x; }
+  get y(): number { return this._y; }
+  get z(): number { return this._z; }
+}
 
-  get y(): number {
-    return this._y;
-  }
+export class Dimensions {
+  constructor(protected readonly _width: number,
+              protected readonly _depth: number,
+              protected readonly _height: number) { }
 
-  get z(): number {
-    return this._z;
+  get width(): number { return this._width; }
+  get depth(): number { return this._depth; }
+  get height(): number { return this._height; }
+}
+
+// Given a rectangular sprite, representing a flat or oblique floor tile,
+// calculate the dimensions that the image contains.
+export class CartisanDimensionsFromSprite extends Dimensions {
+  constructor(spriteWidth: number,
+              spriteHeight: number,
+              heightRatio: number) {
+    // FIXME: Use a proper calculation.
+    let height = spriteHeight * heightRatio;
+    let depth = spriteHeight - height;
+    super(spriteWidth, depth, height);
+  }
+}
+
+export class IsometricDimensionsFromSprite extends Dimensions {
+  constructor(spriteWidth: number,
+              spriteHeight: number,
+              heightRatio: number) {
+    // An isometric square has:
+    // - sides equal length = 1,
+    // - the short diagonal is length = 1,
+    // - the long diagonal is length = sqrt(3) ~= 1.73.
+    //let width = Math.floor(Math.pow(spriteWidth, 3) / 3);
+    let widthRatio = Math.sqrt(3);
+    let width = Math.floor(spriteWidth / widthRatio);
+    let depth = width;
+    let height = Math.floor((spriteWidth / widthRatio) * heightRatio);
+    super(width, depth, height);
   }
 }
 

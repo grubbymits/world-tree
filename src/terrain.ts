@@ -1,7 +1,13 @@
-import { Location, Direction } from "./physics.js"
+import { Location,
+         Dimensions,
+         CartisanDimensionsFromSprite,
+         IsometricDimensionsFromSprite,
+         Direction } from "./physics.js"
 import { Rain } from "./weather.js"
-import { Entity } from "./entity.js"
-import { Point, GraphicComponent } from "./graphics.js"
+import { StaticEntity } from "./entity.js"
+import { Point,
+         CoordSystem,
+         GraphicComponent } from "./graphics.js"
 import { SquareGrid } from "./map.js"
 
 export enum TerrainShape {
@@ -67,16 +73,14 @@ function getTypeName(terrain: TerrainType): string {
   }
 }
 
-export class Terrain extends Entity {
-  private static _tileWidth: number;
-  private static _tileDepth: number;
-  private static _tileHeight: number;
+export class Terrain extends StaticEntity {
+  private static _dimensions: Dimensions;
+  private static _sys: CoordSystem;
   private static _terrainGraphics = new Map<TerrainType, Array<GraphicComponent>>();
 
-  static init(width: number, depth: number, height: number) {
-    this._tileWidth = width;
-    this._tileDepth = depth;
-    this._tileHeight = height;
+  static init(dims: Dimensions, sys: CoordSystem) {
+    this._dimensions = dims;
+    this._sys = sys;
   }
   
   static addTerrainGraphics(terrainType: TerrainType,
@@ -96,32 +100,36 @@ export class Terrain extends Entity {
     return this._terrainGraphics.get(terrainType)![shape];
   }
 
-  static get tileWidth(): number { return this._tileWidth; }
-  static get tileHeight(): number { return this._tileHeight; }
-  static get tileDepth(): number { return this._tileDepth; }
+  static get width(): number { return this._dimensions.width; }
+  static get depth(): number { return this._dimensions.depth; }
+  static get height(): number { return this._dimensions.height; }
+  static get sys(): CoordSystem { return this._sys; }
 
   static scaleLocation(loc: Location): Location {
-    return new Location(Math.floor(loc.x / this.tileWidth),
-                        Math.floor(loc.y / this.tileDepth),
-                        Math.floor(loc.z / this.tileHeight));
+    return new Location(Math.floor(loc.x / this.width),
+                        Math.floor(loc.y / this.depth),
+                        Math.floor(loc.z / this.height));
   }
 
   static create(x: number, y: number, z: number,
                 type: TerrainType, shape: TerrainShape) : Terrain {
-    return new Terrain(x, y, z, this.tileWidth, this.tileDepth, this.tileHeight,
-                       type, shape);
+    return new Terrain(x, y, z, this._dimensions, type, shape);
   }
 
   constructor(private readonly _gridX: number,
               private readonly _gridY: number,
               private readonly _gridZ: number,
-              width: number,
-              depth: number,
-              height: number,
+              dimensions: Dimensions,
               private readonly _type: TerrainType,
               private readonly _shape: TerrainShape) {
-    super(new Location(_gridX * width, _gridY * depth, _gridZ * height),
-          width, depth, height, true, Terrain.graphics(_type, _shape));
+    super(new Location(_gridX * dimensions.width,
+                       _gridY * dimensions.depth,
+                       _gridZ * dimensions.height),
+          dimensions, true, Terrain.graphics(_type, _shape), Terrain.sys);
+    console.log("created terrain at (x,y,z):",
+                _gridX * dimensions.width,
+                _gridY * dimensions.depth,
+                _gridZ * dimensions.height);
   }
 
   get gridX(): number { return this._gridX; }
@@ -232,10 +240,14 @@ export class TerrainBuilder {
               depth: number,
               private readonly _terraces: number,
               private readonly _waterMultiplier: number,
-              tileWidth: number,
-              tileHeight: number,
-              tileDepth: number) {
-    Terrain.init(tileWidth, tileDepth, tileHeight);
+              spriteWidth: number,
+              spriteHeight: number,
+              spriteHeightRatio: number,
+              sys: CoordSystem) {
+    let dims = sys == CoordSystem.Isometric ?
+      new IsometricDimensionsFromSprite(spriteWidth, spriteHeight, spriteHeightRatio) :
+      new CartisanDimensionsFromSprite(spriteWidth, spriteHeight, spriteHeightRatio);
+    Terrain.init(dims, sys);
     this._surface = new Surface(width, depth);
     this._worldTerrain = new SquareGrid(width, depth);
     this._terraceSpacing = this._landRange / this._terraces;

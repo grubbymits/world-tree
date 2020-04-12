@@ -80,14 +80,34 @@ export class Location {
         this._y = _y;
         this._z = _z;
     }
-    get x() {
-        return this._x;
+    get x() { return this._x; }
+    get y() { return this._y; }
+    get z() { return this._z; }
+}
+export class Dimensions {
+    constructor(_width, _depth, _height) {
+        this._width = _width;
+        this._depth = _depth;
+        this._height = _height;
     }
-    get y() {
-        return this._y;
+    get width() { return this._width; }
+    get depth() { return this._depth; }
+    get height() { return this._height; }
+}
+export class CartisanDimensionsFromSprite extends Dimensions {
+    constructor(spriteWidth, spriteHeight, heightRatio) {
+        let height = spriteHeight * heightRatio;
+        let depth = spriteHeight - height;
+        super(spriteWidth, depth, height);
     }
-    get z() {
-        return this._z;
+}
+export class IsometricDimensionsFromSprite extends Dimensions {
+    constructor(spriteWidth, spriteHeight, heightRatio) {
+        let widthRatio = Math.sqrt(3);
+        let width = Math.floor(spriteWidth / widthRatio);
+        let depth = width;
+        let height = Math.floor((spriteWidth / widthRatio) * heightRatio);
+        super(width, depth, height);
     }
 }
 class MovementCost {

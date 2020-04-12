@@ -1,5 +1,6 @@
 import { SquareGrid } from "./map.js"
-import { Entity } from "./entity.js"
+import { Entity,
+         StaticEntity } from "./entity.js"
 import { Location } from "./physics.js"
 import { Terrain } from "./terrain.js"
 import { Camera } from "./camera.js"
@@ -112,7 +113,13 @@ export abstract class Renderer {
     this._ctx.clearRect(0, 0, this._width, this._height);
     for (let i in entities) {
       let entity = entities[i];
-      let coord = this.getDrawCoord(entity);
+      let coord: Point;
+      if (entity.static) {
+        let staticEntity = <StaticEntity>(entity);
+        coord = staticEntity.drawCoord;
+      } else {
+        coord = this.getDrawCoord(entity);
+      }
       if (!camera.isOnScreen(coord, entity.width, entity.depth)) {
         continue;
       }
@@ -128,8 +135,12 @@ export class CartisanRenderer extends Renderer {
     super(canvas);
   }
 
-  getDrawCoord(entity: Entity): Point {
+  static getDrawCoord(entity: Entity): Point {
     return new Point(entity.x, entity.y - entity.z);
+  }
+
+  getDrawCoord(entity: Entity): Point {
+    return CartisanRenderer.getDrawCoord(entity);
   }
 
   sortEntitys(entities: Array<Entity>): void {
@@ -152,6 +163,7 @@ export class CartisanRenderer extends Renderer {
   }
 }
 
+/*
 function convertToIsometric(x: number, y: number): Point {
   let width = Terrain.tileWidth;
   let height = Terrain.tileHeight;
@@ -159,15 +171,28 @@ function convertToIsometric(x: number, y: number): Point {
   let drawY = Math.floor(y * height / 2) - Math.floor(x * height / 2);
   return new Point(drawX, drawY);
 }
+*/
 
 export class IsometricRenderer extends Renderer {
   constructor(canvas: HTMLCanvasElement) {
     super(canvas);
   }
 
+  static getDrawCoord(entity: Entity): Point {
+    // An isometric square has:
+    // - sides equal length = 1,
+    // - the short diagonal is length = 1,
+    // - the long diagonal is length = sqrt(3) ~= 1.73.
+
+    // Tiles are placed overlapping each other by half.
+    // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
+    let dx = Math.floor(0.5 * Math.sqrt(3) * (entity.x + entity.y));
+    let dy = Math.floor(0.5 * (entity.y - entity.x));
+    return new Point(dx, dy);
+  }
+
   getDrawCoord(entity: Entity): Point {
-    let loc = Terrain.scaleLocation(entity.location);
-    return convertToIsometric(loc.x + loc.z, loc.y - loc.z);
+    return IsometricRenderer.getDrawCoord(entity);
   }
 
   sortEntitys(entities: Array<Entity>): void {

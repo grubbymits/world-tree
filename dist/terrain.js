@@ -1,6 +1,7 @@
-import { Location, Direction } from "./physics.js";
+import { Location, CartisanDimensionsFromSprite, IsometricDimensionsFromSprite, Direction } from "./physics.js";
 import { Rain } from "./weather.js";
-import { Entity } from "./entity.js";
+import { StaticEntity } from "./entity.js";
+import { CoordSystem } from "./graphics.js";
 import { SquareGrid } from "./map.js";
 export var TerrainShape;
 (function (TerrainShape) {
@@ -63,19 +64,19 @@ function getTypeName(terrain) {
             return "rock";
     }
 }
-export class Terrain extends Entity {
-    constructor(_gridX, _gridY, _gridZ, width, depth, height, _type, _shape) {
-        super(new Location(_gridX * width, _gridY * depth, _gridZ * height), width, depth, height, true, Terrain.graphics(_type, _shape));
+export class Terrain extends StaticEntity {
+    constructor(_gridX, _gridY, _gridZ, dimensions, _type, _shape) {
+        super(new Location(_gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height), dimensions, true, Terrain.graphics(_type, _shape), Terrain.sys);
         this._gridX = _gridX;
         this._gridY = _gridY;
         this._gridZ = _gridZ;
         this._type = _type;
         this._shape = _shape;
+        console.log("created terrain at (x,y,z):", _gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height);
     }
-    static init(width, depth, height) {
-        this._tileWidth = width;
-        this._tileDepth = depth;
-        this._tileHeight = height;
+    static init(dims, sys) {
+        this._dimensions = dims;
+        this._sys = sys;
     }
     static addTerrainGraphics(terrainType, graphics) {
         console.log("adding graphics for", getTypeName(terrainType), graphics);
@@ -86,14 +87,15 @@ export class Terrain extends Entity {
         console.assert(shape < this._terrainGraphics.get(terrainType).length, "undefined terrain graphic for TerrainShape:", getShapeName(shape));
         return this._terrainGraphics.get(terrainType)[shape];
     }
-    static get tileWidth() { return this._tileWidth; }
-    static get tileHeight() { return this._tileHeight; }
-    static get tileDepth() { return this._tileDepth; }
+    static get width() { return this._dimensions.width; }
+    static get depth() { return this._dimensions.depth; }
+    static get height() { return this._dimensions.height; }
+    static get sys() { return this._sys; }
     static scaleLocation(loc) {
-        return new Location(Math.floor(loc.x / this.tileWidth), Math.floor(loc.y / this.tileDepth), Math.floor(loc.z / this.tileHeight));
+        return new Location(Math.floor(loc.x / this.width), Math.floor(loc.y / this.depth), Math.floor(loc.z / this.height));
     }
     static create(x, y, z, type, shape) {
-        return new Terrain(x, y, z, this.tileWidth, this.tileDepth, this.tileHeight, type, shape);
+        return new Terrain(x, y, z, this._dimensions, type, shape);
     }
     get gridX() { return this._gridX; }
     get gridY() { return this._gridY; }
@@ -173,7 +175,7 @@ export class Surface {
     }
 }
 export class TerrainBuilder {
-    constructor(width, depth, _terraces, _waterMultiplier, tileWidth, tileHeight, tileDepth) {
+    constructor(width, depth, _terraces, _waterMultiplier, spriteWidth, spriteHeight, spriteHeightRatio, sys) {
         this._terraces = _terraces;
         this._waterMultiplier = _waterMultiplier;
         this._ceiling = 1.0;
@@ -183,7 +185,10 @@ export class TerrainBuilder {
         this._dryLimit = 0.02;
         this._wetLimit = 0.15;
         this._treeLimit = 0.6;
-        Terrain.init(tileWidth, tileDepth, tileHeight);
+        let dims = sys == CoordSystem.Isometric ?
+            new IsometricDimensionsFromSprite(spriteWidth, spriteHeight, spriteHeightRatio) :
+            new CartisanDimensionsFromSprite(spriteWidth, spriteHeight, spriteHeightRatio);
+        Terrain.init(dims, sys);
         this._surface = new Surface(width, depth);
         this._worldTerrain = new SquareGrid(width, depth);
         this._terraceSpacing = this._landRange / this._terraces;

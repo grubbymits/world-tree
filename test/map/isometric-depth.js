@@ -1,9 +1,12 @@
 import * as WT from "../../dist/world-tree.js";
 import OpenSimplexNoise from "../../libs/open-simplex-noise/index.js";
 
+const spriteWidth = 260;
+const spriteHeight = 250;
+
 function createGraphic(path) {
   let sheet = new WT.SpriteSheet(path);
-  let sprite = new WT.Sprite(sheet, 0, 0, 128, 128);
+  let sprite = new WT.Sprite(sheet, 0, 0, spriteWidth, spriteHeight);
   return new Array(new WT.StaticGraphicComponent(sprite.id));
 }
 
@@ -12,43 +15,49 @@ function createGraphics(paths) {
   for (let i in paths) {
     let path = paths[i];
     let sheet = new WT.SpriteSheet(path);
-    let sprite = new WT.Sprite(sheet, 0, 0, 128, 128);
+    let sprite = new WT.Sprite(sheet, 0, 0, spriteWidth, spriteHeight);
     graphics.push(new WT.StaticGraphicComponent(sprite.id));
   }
   return graphics;
 }
 
 window.onload = function begin() {
-  WT.Terrain.addTerrainGraphics(WT.TerrainType.Water, createGraphic("../../../res/img/light-water-flat"));
+  //WT.Terrain.addTerrainGraphics(WT.TerrainType.Water, createGraphic("../../../res/img/light-water-flat"));
+  /*
   let sprites = new Array("../../../res/img/sand-flat",
                           "../../../res/img/sand-ramp-north",
                           "../../../res/img/sand-ramp-east",
                           "../../../res/img/sand-ramp-south",
                           "../../../res/img/sand-ramp-west");
+  */
+  WT.Terrain.addTerrainGraphics(WT.TerrainType.Water, createGraphic("../../../res/img/light-grass-sand-flat"));
+  let sprites = new Array("../../../res/img/light-grass-sand-flat",
+                          "../../../res/img/light-grass-sand-south",
+                          "../../../res/img/light-grass-sand-west",
+                          "../../../res/img/light-grass-sand-north",
+                          "../../../res/img/light-grass-sand-east");
   WT.Terrain.addTerrainGraphics(WT.TerrainType.Sand, createGraphics(sprites));
-  sprites = new Array("../../../res/img/light-grass-sand-flat",
-                          "../../../res/img/light-grass-sand-ramp-north",
-                          "../../../res/img/light-grass-sand-ramp-east",
-                          "../../../res/img/sand-ramp-south",
-                          "../../../res/img/sand-ramp-west");
   WT.Terrain.addTerrainGraphics(WT.TerrainType.DryGrass, createGraphics(sprites));
+  /*
   sprites = new Array("../../../res/img/light-grass-rock-flat",
                           "../../../res/img/light-grass-rock-ramp-north",
                           "../../../res/img/light-grass-rock-ramp-east",
                           "../../../res/img/rock-ramp-south",
                           "../../../res/img/rock-ramp-west");
+  */
   WT.Terrain.addTerrainGraphics(WT.TerrainType.Rock, createGraphics(sprites));
+  /*
   sprites = new Array("../../../res/img/dark-grass-sand-flat",
                       "../../../res/img/dark-grass-sand-ramp-north",
                       "../../../res/img/dark-grass-sand-ramp-east",
                       "../../../res/img/sand-ramp-south",
                       "../../../res/img/sand-ramp-west");
+  */
   WT.Terrain.addTerrainGraphics(WT.TerrainType.WetGrass, createGraphics(sprites));
 
-  let tileDepth = 64;
-  let cellsX = 15;
-  let cellsY = 14;
-  let terraces = 3;
+  let cellsX = 5;
+  let cellsY = 5;
+  let terraces = 4;
   let waterMultiplier = 0.0;
   let freq = 0.1;
   const openSimplex = new OpenSimplexNoise(Date.now());
@@ -56,18 +65,25 @@ window.onload = function begin() {
   for (let y = 0; y < cellsY; y++) {
     heightMap[y] = new Array();
     for (let x = 0; x < cellsX; x++) {
-      let height =  openSimplex.noise2D(freq * x, freq * y) +
-                    0.50 * openSimplex.noise2D(2 * freq * x, 2 * freq * y) +
-                    0.25 * openSimplex.noise2D(4 * freq * x, 4 * freq * y) +
-                    0.125 * openSimplex.noise2D(8 * freq * x, 8 * freq * y);
+      let height = 0.2;//0.1 + (x/10);
+                    //openSimplex.noise2D(freq * x, freq * y) +
+                    //0.50 * openSimplex.noise2D(2 * freq * x, 2 * freq * y) +
+                    //0.25 * openSimplex.noise2D(4 * freq * x, 4 * freq * y) +
+                    //0.125 * openSimplex.noise2D(8 * freq * x, 8 * freq * y);
       heightMap[y].push(height);
     }
   }
 
-  let tileWidth = 128;
-  let tileHeight = 64;
+  //let tileDepth = 1;//Math.floor(spriteHeight / 2);
+  //let tileHeight = Math.floor(spriteHeight / 2);
+  //let tileWidth = spriteWidth;
+  //let tileHeight = spriteHeight; //Math.floor(1.5 * (spriteHeight / 5));
+  // surface / height ratio?
+  let heightRatio = 2/5;
+  console.log("heightRatio:", heightRatio);
   let builder = new WT.TerrainBuilder(cellsX, cellsY, terraces, waterMultiplier,
-                                      tileWidth, tileHeight, tileDepth);
+                                      spriteWidth, spriteHeight, heightRatio,
+                                      WT.CoordSystem.Isometric);
   builder.build(heightMap);
   let canvas = document.getElementById("testCanvas");
   let context = new WT.Context(builder.terrain, WT.CoordSystem.Isometric, canvas);

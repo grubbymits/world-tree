@@ -1,30 +1,36 @@
+import { CoordSystem, CartisanRenderer, IsometricRenderer } from "./graphics.js";
 export class Entity {
-    constructor(_location, _width, _depth, _height, _blocking, _graphicsComponent) {
+    constructor(_location, _dimensions, _blocking, _graphicsComponent, _static) {
         this._location = _location;
-        this._width = _width;
-        this._depth = _depth;
-        this._height = _height;
+        this._dimensions = _dimensions;
         this._blocking = _blocking;
         this._graphicsComponent = _graphicsComponent;
+        this._static = _static;
         this._id = Entity._ids;
         Entity._ids++;
     }
     get x() { return this._location.x; }
     get y() { return this._location.y; }
     get z() { return this._location.z; }
-    get width() { return this._width; }
-    get height() { return this._height; }
-    get depth() { return this._depth; }
+    get width() { return this._dimensions.width; }
+    get depth() { return this._dimensions.depth; }
+    get height() { return this._dimensions.height; }
     get location() { return this._location; }
+    get dimensions() { return this._dimensions; }
     get blocking() { return this._blocking; }
     get id() { return this._id; }
+    get static() { return this._static; }
     get graphicsComponent() {
         return this._graphicsComponent;
     }
 }
 Entity._ids = 0;
-export class Actor extends Entity {
-    constructor(location, width, depth, height, graphics) {
-        super(location, width, depth, height, true, graphics);
+export class StaticEntity extends Entity {
+    constructor(location, dimensions, blocking, graphicsComponent, sys) {
+        super(location, dimensions, blocking, graphicsComponent, true);
+        this._drawCoord = sys == CoordSystem.Isometric ?
+            IsometricRenderer.getDrawCoord(this) :
+            CartisanRenderer.getDrawCoord(this);
     }
+    get drawCoord() { return this._drawCoord; }
 }
