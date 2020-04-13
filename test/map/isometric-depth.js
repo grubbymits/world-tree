@@ -21,47 +21,8 @@ function createGraphics(paths) {
   return graphics;
 }
 
-window.onload = function begin() {
-  //WT.Terrain.addTerrainGraphics(WT.TerrainType.Water, createGraphic("../../../res/img/light-water-flat"));
-  /*
-  let sprites = new Array("../../../res/img/sand-flat",
-                          "../../../res/img/sand-ramp-north",
-                          "../../../res/img/sand-ramp-east",
-                          "../../../res/img/sand-ramp-south",
-                          "../../../res/img/sand-ramp-west");
-  */
-  WT.Terrain.addTerrainGraphics(WT.TerrainType.Water, createGraphic("../../../res/img/light-grass-sand/flat"));
-  let sprites = new Array("../../../res/img/light-grass-sand/flat",
-                          "../../../res/img/light-grass-sand/flat-north-edge",
-                          "../../../res/img/light-grass-sand/flat-north-east-edge",
-                          "../../../res/img/light-grass-sand/flat-east-edge",
-                          "../../../res/img/light-grass-sand/south",
-                          "../../../res/img/light-grass-sand/south-edge",
-                          "../../../res/img/light-grass-sand/west",
-                          "../../../res/img/light-grass-sand/west-edge",
-                          "../../../res/img/light-grass-sand/north",
-                          "../../../res/img/light-grass-sand/north-edge",
-                          "../../../res/img/light-grass-sand/east",
-                          "../../../res/img/light-grass-sand/east-edge");
-  WT.Terrain.addTerrainGraphics(WT.TerrainType.Sand, createGraphics(sprites));
-  WT.Terrain.addTerrainGraphics(WT.TerrainType.DryGrass, createGraphics(sprites));
-  /*
-  sprites = new Array("../../../res/img/light-grass-rock-flat",
-                          "../../../res/img/light-grass-rock-ramp-north",
-                          "../../../res/img/light-grass-rock-ramp-east",
-                          "../../../res/img/rock-ramp-south",
-                          "../../../res/img/rock-ramp-west");
-  */
-  WT.Terrain.addTerrainGraphics(WT.TerrainType.Rock, createGraphics(sprites));
-  /*
-  sprites = new Array("../../../res/img/dark-grass-sand-flat",
-                      "../../../res/img/dark-grass-sand-ramp-north",
-                      "../../../res/img/dark-grass-sand-ramp-east",
-                      "../../../res/img/sand-ramp-south",
-                      "../../../res/img/sand-ramp-west");
-  */
-  WT.Terrain.addTerrainGraphics(WT.TerrainType.WetGrass, createGraphics(sprites));
-
+window.onload = (event) => {
+  console.log("loaded");
   let cellsX = 20;
   let cellsY = 20;
   let terraces = 3;
@@ -99,4 +60,49 @@ window.onload = function begin() {
   window.requestAnimationFrame(update);
   console.log("done");
   context.run();
-}
+};
+
+WT.Terrain.addTerrainGraphics(WT.TerrainType.Water, createGraphic("../../../res/img/water/flat"));
+let sprites = new Array("../../../res/img/sand/flat",
+                        "../../../res/img/sand/flat-north-edge",
+                        "../../../res/img/sand/flat-north-east-edge",
+                        "../../../res/img/sand/flat-east-edge",
+                        "../../../res/img/sand/south",
+                        "../../../res/img/sand/south-edge",
+                        "../../../res/img/sand/west",
+                        "../../../res/img/sand/west-edge",
+                        "../../../res/img/sand/north",
+                        "../../../res/img/sand/north-edge",
+                        "../../../res/img/sand/east",
+                        "../../../res/img/sand/east-edge");
+WT.Terrain.addTerrainGraphics(WT.TerrainType.Sand, createGraphics(sprites));
+sprites = new Array("../../../res/img/light-grass-sand/flat",
+                    "../../../res/img/light-grass-sand/flat-north-edge",
+                    "../../../res/img/light-grass-sand/flat-north-east-edge",
+                    "../../../res/img/light-grass-sand/flat-east-edge",
+                    "../../../res/img/light-grass-sand/south",
+                    "../../../res/img/light-grass-sand/south-edge",
+                    "../../../res/img/light-grass-sand/west",
+                    "../../../res/img/light-grass-sand/west-edge",
+                    "../../../res/img/light-grass-sand/north",
+                    "../../../res/img/light-grass-sand/north-edge",
+                    "../../../res/img/light-grass-sand/east",
+                    "../../../res/img/light-grass-sand/east-edge");
+  WT.Terrain.addTerrainGraphics(WT.TerrainType.DryGrass, createGraphics(sprites));
+  /*
+  sprites = new Array("../../../res/img/light-grass-rock-flat",
+                          "../../../res/img/light-grass-rock-ramp-north",
+                          "../../../res/img/light-grass-rock-ramp-east",
+                          "../../../res/img/rock-ramp-south",
+                          "../../../res/img/rock-ramp-west");
+  */
+  WT.Terrain.addTerrainGraphics(WT.TerrainType.Rock, createGraphics(sprites));
+  /*
+  sprites = new Array("../../../res/img/dark-grass-sand-flat",
+                      "../../../res/img/dark-grass-sand-ramp-north",
+                      "../../../res/img/dark-grass-sand-ramp-east",
+                      "../../../res/img/sand-ramp-south",
+                      "../../../res/img/sand-ramp-west");
+  */
+  WT.Terrain.addTerrainGraphics(WT.TerrainType.WetGrass, createGraphics(sprites));
+
