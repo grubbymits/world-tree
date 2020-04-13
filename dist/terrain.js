@@ -270,7 +270,7 @@ export class TerrainBuilder {
         const coordOffsets = [new Point(0, -1),
             new Point(1, 0),
             new Point(0, 1),
-            new Point(0, -1)];
+            new Point(-1, 0)];
         const ramps = [TerrainShape.RampUpNorth,
             TerrainShape.RampUpEast,
             TerrainShape.RampUpSouth,
@@ -280,14 +280,15 @@ export class TerrainBuilder {
         for (let y = filterDepth; y < this._surface.depth - filterDepth; y++) {
             for (let x = filterDepth; x < this._surface.width - filterDepth; x++) {
                 let centre = this._surface.at(x, y);
-                if (centre.shape != TerrainShape.Flat) {
+                if (!isFlat(centre.shape)) {
                     continue;
                 }
                 let numDiffTerraces = 0;
                 for (let i in coordOffsets) {
                     let offset = coordOffsets[i];
                     let neighbour = this._surface.at(x + offset.x, y + offset.y);
-                    if (neighbour.terrace != centre.terrace) {
+                    if (neighbour.terrace != centre.terrace ||
+                        !isFlat(neighbour.shape)) {
                         ++numDiffTerraces;
                     }
                 }
@@ -297,7 +298,7 @@ export class TerrainBuilder {
                 for (let i in coordOffsets) {
                     let offset = coordOffsets[i];
                     let neighbour = this._surface.at(x + offset.x, y + offset.y);
-                    if (neighbour.shape != TerrainShape.Flat) {
+                    if (!isFlat(neighbour.shape)) {
                         break;
                     }
                     if (centre.terrace == neighbour.terrace) {
