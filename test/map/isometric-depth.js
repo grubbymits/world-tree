@@ -30,12 +30,19 @@ window.onload = function begin() {
                           "../../../res/img/sand-ramp-south",
                           "../../../res/img/sand-ramp-west");
   */
-  WT.Terrain.addTerrainGraphics(WT.TerrainType.Water, createGraphic("../../../res/img/light-grass-sand-flat"));
-  let sprites = new Array("../../../res/img/light-grass-sand-flat",
-                          "../../../res/img/light-grass-sand-south",
-                          "../../../res/img/light-grass-sand-west",
-                          "../../../res/img/light-grass-sand-north",
-                          "../../../res/img/light-grass-sand-east");
+  WT.Terrain.addTerrainGraphics(WT.TerrainType.Water, createGraphic("../../../res/img/light-grass-sand/flat"));
+  let sprites = new Array("../../../res/img/light-grass-sand/flat",
+                          "../../../res/img/light-grass-sand/flat-north-edge",
+                          "../../../res/img/light-grass-sand/flat-north-east-edge",
+                          "../../../res/img/light-grass-sand/flat-east-edge",
+                          "../../../res/img/light-grass-sand/south",
+                          "../../../res/img/light-grass-sand/south-edge",
+                          "../../../res/img/light-grass-sand/west",
+                          "../../../res/img/light-grass-sand/west-edge",
+                          "../../../res/img/light-grass-sand/north",
+                          "../../../res/img/light-grass-sand/north-edge",
+                          "../../../res/img/light-grass-sand/east",
+                          "../../../res/img/light-grass-sand/east-edge");
   WT.Terrain.addTerrainGraphics(WT.TerrainType.Sand, createGraphics(sprites));
   WT.Terrain.addTerrainGraphics(WT.TerrainType.DryGrass, createGraphics(sprites));
   /*
@@ -57,7 +64,7 @@ window.onload = function begin() {
 
   let cellsX = 20;
   let cellsY = 20;
-  let terraces = 2;
+  let terraces = 3;
   let waterMultiplier = 0.0;
   let freq = 0.1;
   const openSimplex = new OpenSimplexNoise(Date.now());

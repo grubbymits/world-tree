@@ -121,7 +121,6 @@ export class IsometricDimensionsFromSprite extends Dimensions {
     // - sides equal length = 1,
     // - the short diagonal is length = 1,
     // - the long diagonal is length = sqrt(3) ~= 1.73.
-    //let width = Math.floor(Math.pow(spriteWidth, 3) / 3);
     let widthRatio = Math.sqrt(3);
     let width = Math.floor(spriteWidth / widthRatio);
     let depth = width;

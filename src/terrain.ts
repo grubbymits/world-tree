@@ -12,10 +12,17 @@ import { SquareGrid } from "./map.js"
 
 export enum TerrainShape {
   Flat,
+  FlatNorthEdge,
+  FlatNorthEastEdge,
+  FlatEastEdge,
   RampUpNorth,
+  RampUpNorthEdge,
   RampUpEast,
+  RampUpEastEdge,
   RampUpSouth,
+  RampUpSouthEdge,
   RampUpWest,
+  RampUpWestEdge,
 }
 
 export enum TerrainType {
@@ -43,14 +50,28 @@ function getShapeName(terrain: TerrainShape): string {
     console.error("unhandled terrain shape:", terrain);
   case TerrainShape.Flat:
     return "flat";
+  case TerrainShape.FlatNorthEdge:
+    return "flat north edge";
+  case TerrainShape.FlatNorthEastEdge:
+    return "flat north east edge";
+  case TerrainShape.FlatEastEdge:
+    return "flat east edge";
   case TerrainShape.RampUpNorth:
     return "ramp up north";
+  case TerrainShape.RampUpNorthEdge:
+    return "ramp up north edge";
   case TerrainShape.RampUpEast:
     return "ramp up east";
+  case TerrainShape.RampUpEastEdge:
+    return "ramp up east edge";
   case TerrainShape.RampUpSouth:
     return "ramp up south";
+  case TerrainShape.RampUpSouthEdge:
+    return "ramp up south edge";
   case TerrainShape.RampUpWest:
     return "ramp up west";
+  case TerrainShape.RampUpWestEdge:
+    return "ramp up west edge";
   }
 }
 
@@ -71,6 +92,19 @@ function getTypeName(terrain: TerrainType): string {
   case TerrainType.Rock:
     return "rock";
   }
+}
+
+function isFlat(terrain: TerrainShape): boolean {
+  switch (terrain) {
+  default:
+    break;
+  case TerrainShape.Flat:
+  case TerrainShape.FlatNorthEdge:
+  case TerrainShape.FlatNorthEastEdge:
+  case TerrainShape.FlatEastEdge:
+    return true;
+  }
+  return false;
 }
 
 export class Terrain extends StaticEntity {
@@ -126,10 +160,6 @@ export class Terrain extends StaticEntity {
                        _gridY * dimensions.depth,
                        _gridZ * dimensions.height),
           dimensions, true, Terrain.graphics(_type, _shape), Terrain.sys);
-    console.log("created terrain at (x,y,z):",
-                _gridX * dimensions.width,
-                _gridY * dimensions.depth,
-                _gridZ * dimensions.height);
   }
 
   get gridX(): number { return this._gridX; }
@@ -205,6 +235,7 @@ export class Surface {
     return this._surface[y][x];
   }
 
+  // Return surface neighbours in a 3x3 radius.
   getNeighbours(centreX: number, centreY: number): Array<TerrainAttributes> {
     let neighbours = new Array<TerrainAttributes>();
     for (let yDiff = -1; yDiff < 2; yDiff++) {
@@ -300,72 +331,123 @@ export class TerrainBuilder {
     return TerrainType.Water;
   }
 
-  smoothEdge(x: number, y: number) {
-    let centre = this._surface.at(x, y);
-    console.assert(centre.terrace >= 0, "Found negative terrace");
-    if (centre.shape != TerrainShape.Flat || centre.terrace == 0) {
-      return;
-    }
-    let neighbours = this._surface.getNeighbours(x, y);
-    let toEvaluate = new Array<TerrainAttributes>();
-    let adjacentToLower: boolean = false;
-    for (let neighbour of neighbours) {
-      if (neighbour.x != centre.x && neighbour.y != centre.y) {
-        continue;
+  addRamps() {
+    console.log("adding ramps");
+    const filterDepth: number = 3;
+    const coordOffsets: Array<Point> = [ new Point(0, -1),
+                                         new Point(1, 0),
+                                         new Point(0, 1),
+                                         new Point(0, -1) ];
+    const ramps: Array<TerrainShape> = [ TerrainShape.RampUpNorth,
+                                         TerrainShape.RampUpEast,
+                                         TerrainShape.RampUpSouth,
+                                         TerrainShape.RampUpWest ];
+    const direction = [ "north", "east", "south", "west" ];
+    const filterCoeffs: Array<number> = [ 0.15, 0.1 ];
+
+    for (let y = filterDepth; y < this._surface.depth - filterDepth; y++) {
+      for (let x = filterDepth; x < this._surface.width - filterDepth; x++) {
+        let centre: TerrainAttributes = this._surface.at(x, y);
+        if (centre.shape != TerrainShape.Flat) {
+          continue;
+        }
+
+        // First pass to filter out tiles with too many neighbours on different
+        // terraces.
+        // TODO: Maybe use a low-pass filter to average out the terraces first.
+        let numDiffTerraces = 0;
+        for (let i in coordOffsets) {
+          let offset: Point = coordOffsets[i];
+          let neighbour: TerrainAttributes =
+            this._surface.at(x + offset.x, y + offset.y);
+          if (neighbour.terrace != centre.terrace) {
+            ++numDiffTerraces;
+          }
+        }
+        if (numDiffTerraces > 2) {
+          continue;
+        }
+
+        for (let i in coordOffsets) {
+          let offset: Point = coordOffsets[i];
+          let neighbour: TerrainAttributes =
+            this._surface.at(x + offset.x, y + offset.y);
+
+          if (neighbour.shape != TerrainShape.Flat) {
+            break;
+          }
+
+          if (centre.terrace == neighbour.terrace) {
+            continue;
+          }
+
+          let result: number = centre.terrace * 0.45 + neighbour.terrace * 0.3;
+          let next: TerrainAttributes = neighbour;
+          for (let d = 0; d < filterDepth - 1; d++) {
+            next = this._surface.at(next.x + offset.x, next.y + offset.y);
+            result += next.terrace * filterCoeffs[d];
+          }
+
+          result = Math.round(result);
+          if (result > centre.terrace) {
+            centre.shape = ramps[i];
+            centre.terrace = result;
+            console.log("adding ramp at (x,y):", x, y);
+            console.log("direction:", direction[i]);
+            console.log("ramp shape:", getShapeName(centre.shape));
+            break;
+          }
+        }
       }
-      if (neighbour.terrace < centre.terrace) {
-        adjacentToLower = true;
-      }
-      if (neighbour.shape != TerrainShape.Flat) {
-        toEvaluate.push(neighbour);
-      }
     }
-    // Don't have a corner to smooth out.
-    if (toEvaluate.length < 2 || !adjacentToLower) {
-      return;
-    }
-    console.log("decreasing terrace height at", x, y);
-    centre.terrace = centre.terrace - 1;
   }
 
-  calcShape(x: number, y: number): TerrainShape {
-    let neighbours = this._surface.getNeighbours(x, y);
-    let shapeType = TerrainShape.Flat;
+  calcEdge(x: number, y: number): TerrainShape {
     let centre = this._surface.at(x, y);
-    let toEvaluate = new Array<TerrainAttributes>();
+    let neighbours = this._surface.getNeighbours(x, y);
+    let shapeType = centre.shape;
 
+    let northEdge: boolean = false;
+    let eastEdge: boolean = false;
     for (let neighbour of neighbours) {
-      if (neighbour.terrace == centre.terrace) {
-        continue;
-      }
+      // Only look at lower neighbours
       if (neighbour.terrace > centre.terrace) {
         continue;
       }
-      if ((centre.terrace - neighbour.terrace) > 1) {
-        continue;
-      }
+      // Don't look at diagonal neighbours.
       if ((neighbour.x != centre.x) && (neighbour.y != centre.y)) {
         continue;
       }
-      toEvaluate.push(neighbour);
+      // we may have an edge against a ramp, though it is in the same terrace.
+      if (neighbour.terrace == centre.terrace &&
+         (isFlat(centre.shape) == isFlat(neighbour.shape))) {
+        continue;
+      }
+
+      northEdge = northEdge || neighbour.y < centre.y;
+      eastEdge = eastEdge || neighbour.x > centre.x;
+      if (northEdge && eastEdge)
+        break;
     }
 
-    if (toEvaluate.length == 0 || toEvaluate.length > 1) {
-      return TerrainShape.Flat;
+    if (shapeType == TerrainShape.Flat) {
+      if (northEdge && eastEdge) {
+        shapeType = TerrainShape.FlatNorthEastEdge;
+      } else if (northEdge) {
+        shapeType = TerrainShape.FlatNorthEdge;
+      } else if (eastEdge) {
+        shapeType = TerrainShape.FlatEastEdge;
+      }
+    } else if (shapeType == TerrainShape.RampUpNorth && eastEdge) {
+      shapeType = TerrainShape.RampUpNorthEdge;
+    } else if (shapeType == TerrainShape.RampUpEast && northEdge) {
+      shapeType = TerrainShape.RampUpEastEdge;
+    } else if (shapeType == TerrainShape.RampUpSouth && eastEdge) {
+      shapeType = TerrainShape.RampUpSouthEdge;
+    } else if (shapeType == TerrainShape.RampUpWest && northEdge) {
+      shapeType = TerrainShape.RampUpWestEdge;
     }
-
-    let neighbour = toEvaluate[0];
-    if (neighbour.y > centre.y) {
-      return TerrainShape.RampUpNorth;
-    } else if (neighbour.x < centre.x) {
-      return TerrainShape.RampUpEast;
-    } else if (neighbour.x > centre.x) {
-      return TerrainShape.RampUpWest;
-    } else if (neighbour.y < centre.y) {
-      return TerrainShape.RampUpSouth;
-    }
-
-    return TerrainShape.Flat;
+    return shapeType;
   }
 
   build(heightMap: Array<Array<number>>): void {
@@ -384,6 +466,7 @@ export class TerrainBuilder {
         surface.terrace = terrace;
       }
     }
+    this.addRamps();
 
     console.log("adding rain");
     // Add moisture:
@@ -420,19 +503,10 @@ export class TerrainBuilder {
         }
 
         surface.type = this.calcType(x, y);
-        surface.shape = this.calcShape(x, y);
+        surface.shape = this.calcEdge(x, y);
       }
     }
 
-    console.log("smoothing terrain edges");
-    // After terraces and shapes have been calculated, smooth out the terrace
-    // corners after some edges have been turned into ramps. 
-    for (let y = 0; y < this._surface.depth; y++) {
-      for (let x = 0; x < this._surface.width; x++) {
-        this.smoothEdge(x, y);
-      }
-    }
-   
     console.log("adding surface terrain entities"); 
     // Add terrain objects that will be visible.
     for (let y = 0; y < this._surface.depth; y++) {

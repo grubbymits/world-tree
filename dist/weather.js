@@ -1,4 +1,4 @@
-import { Direction, getDirectionName, getDirectionCoords } from "./physics.js";
+import { Direction, getDirectionCoords } from "./physics.js";
 export class Rain {
     constructor(_x, _y, _moisture, _waterLevel, _booster, _direction, _surface) {
         this._x = _x;
@@ -12,7 +12,6 @@ export class Rain {
     }
     static get clouds() { return this._clouds; }
     static add(x, y, moisture, waterLevel, booster, direction, surface) {
-        console.log("adding new cloud at", x, y, "heading", getDirectionName(direction));
         this._clouds.push(new Rain(x, y, moisture, waterLevel, booster, direction, surface));
     }
     get finished() { return this._finished; }

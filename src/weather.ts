@@ -11,7 +11,7 @@ export class Rain {
   static add(x: number, y: number, moisture: number,
              waterLevel: number, booster: number,
              direction: Direction, surface: Surface): void {
-    console.log("adding new cloud at", x, y, "heading", getDirectionName(direction));
+    //console.log("adding new cloud at", x, y, "heading", getDirectionName(direction));
     this._clouds.push(
       new Rain(x, y, moisture, waterLevel, booster, direction, surface)
     );

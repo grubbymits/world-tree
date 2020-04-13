@@ -1,15 +1,22 @@
 import { Location, CartisanDimensionsFromSprite, IsometricDimensionsFromSprite, Direction } from "./physics.js";
 import { Rain } from "./weather.js";
 import { StaticEntity } from "./entity.js";
-import { CoordSystem } from "./graphics.js";
+import { Point, CoordSystem } from "./graphics.js";
 import { SquareGrid } from "./map.js";
 export var TerrainShape;
 (function (TerrainShape) {
     TerrainShape[TerrainShape["Flat"] = 0] = "Flat";
-    TerrainShape[TerrainShape["RampUpNorth"] = 1] = "RampUpNorth";
-    TerrainShape[TerrainShape["RampUpEast"] = 2] = "RampUpEast";
-    TerrainShape[TerrainShape["RampUpSouth"] = 3] = "RampUpSouth";
-    TerrainShape[TerrainShape["RampUpWest"] = 4] = "RampUpWest";
+    TerrainShape[TerrainShape["FlatNorthEdge"] = 1] = "FlatNorthEdge";
+    TerrainShape[TerrainShape["FlatNorthEastEdge"] = 2] = "FlatNorthEastEdge";
+    TerrainShape[TerrainShape["FlatEastEdge"] = 3] = "FlatEastEdge";
+    TerrainShape[TerrainShape["RampUpNorth"] = 4] = "RampUpNorth";
+    TerrainShape[TerrainShape["RampUpNorthEdge"] = 5] = "RampUpNorthEdge";
+    TerrainShape[TerrainShape["RampUpEast"] = 6] = "RampUpEast";
+    TerrainShape[TerrainShape["RampUpEastEdge"] = 7] = "RampUpEastEdge";
+    TerrainShape[TerrainShape["RampUpSouth"] = 8] = "RampUpSouth";
+    TerrainShape[TerrainShape["RampUpSouthEdge"] = 9] = "RampUpSouthEdge";
+    TerrainShape[TerrainShape["RampUpWest"] = 10] = "RampUpWest";
+    TerrainShape[TerrainShape["RampUpWestEdge"] = 11] = "RampUpWestEdge";
 })(TerrainShape || (TerrainShape = {}));
 export var TerrainType;
 (function (TerrainType) {
@@ -36,14 +43,28 @@ function getShapeName(terrain) {
             console.error("unhandled terrain shape:", terrain);
         case TerrainShape.Flat:
             return "flat";
+        case TerrainShape.FlatNorthEdge:
+            return "flat north edge";
+        case TerrainShape.FlatNorthEastEdge:
+            return "flat north east edge";
+        case TerrainShape.FlatEastEdge:
+            return "flat east edge";
         case TerrainShape.RampUpNorth:
             return "ramp up north";
+        case TerrainShape.RampUpNorthEdge:
+            return "ramp up north edge";
         case TerrainShape.RampUpEast:
             return "ramp up east";
+        case TerrainShape.RampUpEastEdge:
+            return "ramp up east edge";
         case TerrainShape.RampUpSouth:
             return "ramp up south";
+        case TerrainShape.RampUpSouthEdge:
+            return "ramp up south edge";
         case TerrainShape.RampUpWest:
             return "ramp up west";
+        case TerrainShape.RampUpWestEdge:
+            return "ramp up west edge";
     }
 }
 function getTypeName(terrain) {
@@ -64,6 +85,18 @@ function getTypeName(terrain) {
             return "rock";
     }
 }
+function isFlat(terrain) {
+    switch (terrain) {
+        default:
+            break;
+        case TerrainShape.Flat:
+        case TerrainShape.FlatNorthEdge:
+        case TerrainShape.FlatNorthEastEdge:
+        case TerrainShape.FlatEastEdge:
+            return true;
+    }
+    return false;
+}
 export class Terrain extends StaticEntity {
     constructor(_gridX, _gridY, _gridZ, dimensions, _type, _shape) {
         super(new Location(_gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height), dimensions, true, Terrain.graphics(_type, _shape), Terrain.sys);
@@ -72,7 +105,6 @@ export class Terrain extends StaticEntity {
         this._gridZ = _gridZ;
         this._type = _type;
         this._shape = _shape;
-        console.log("created terrain at (x,y,z):", _gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height);
     }
     static init(dims, sys) {
         this._dimensions = dims;
@@ -232,69 +264,110 @@ export class TerrainBuilder {
         console.assert(surface.biome == Biome.Water);
         return TerrainType.Water;
     }
-    smoothEdge(x, y) {
-        let centre = this._surface.at(x, y);
-        console.assert(centre.terrace >= 0, "Found negative terrace");
-        if (centre.shape != TerrainShape.Flat || centre.terrace == 0) {
-            return;
-        }
-        let neighbours = this._surface.getNeighbours(x, y);
-        let toEvaluate = new Array();
-        let adjacentToLower = false;
-        for (let neighbour of neighbours) {
-            if (neighbour.x != centre.x && neighbour.y != centre.y) {
-                continue;
+    addRamps() {
+        console.log("adding ramps");
+        const filterDepth = 3;
+        const coordOffsets = [new Point(0, -1),
+            new Point(1, 0),
+            new Point(0, 1),
+            new Point(0, -1)];
+        const ramps = [TerrainShape.RampUpNorth,
+            TerrainShape.RampUpEast,
+            TerrainShape.RampUpSouth,
+            TerrainShape.RampUpWest];
+        const direction = ["north", "east", "south", "west"];
+        const filterCoeffs = [0.15, 0.1];
+        for (let y = filterDepth; y < this._surface.depth - filterDepth; y++) {
+            for (let x = filterDepth; x < this._surface.width - filterDepth; x++) {
+                let centre = this._surface.at(x, y);
+                if (centre.shape != TerrainShape.Flat) {
+                    continue;
+                }
+                let numDiffTerraces = 0;
+                for (let i in coordOffsets) {
+                    let offset = coordOffsets[i];
+                    let neighbour = this._surface.at(x + offset.x, y + offset.y);
+                    if (neighbour.terrace != centre.terrace) {
+                        ++numDiffTerraces;
+                    }
+                }
+                if (numDiffTerraces > 2) {
+                    continue;
+                }
+                for (let i in coordOffsets) {
+                    let offset = coordOffsets[i];
+                    let neighbour = this._surface.at(x + offset.x, y + offset.y);
+                    if (neighbour.shape != TerrainShape.Flat) {
+                        break;
+                    }
+                    if (centre.terrace == neighbour.terrace) {
+                        continue;
+                    }
+                    let result = centre.terrace * 0.45 + neighbour.terrace * 0.3;
+                    let next = neighbour;
+                    for (let d = 0; d < filterDepth - 1; d++) {
+                        next = this._surface.at(next.x + offset.x, next.y + offset.y);
+                        result += next.terrace * filterCoeffs[d];
+                    }
+                    result = Math.round(result);
+                    if (result > centre.terrace) {
+                        centre.shape = ramps[i];
+                        centre.terrace = result;
+                        console.log("adding ramp at (x,y):", x, y);
+                        console.log("direction:", direction[i]);
+                        console.log("ramp shape:", getShapeName(centre.shape));
+                        break;
+                    }
+                }
             }
-            if (neighbour.terrace < centre.terrace) {
-                adjacentToLower = true;
-            }
-            if (neighbour.shape != TerrainShape.Flat) {
-                toEvaluate.push(neighbour);
-            }
         }
-        if (toEvaluate.length < 2 || !adjacentToLower) {
-            return;
-        }
-        console.log("decreasing terrace height at", x, y);
-        centre.terrace = centre.terrace - 1;
     }
-    calcShape(x, y) {
-        let neighbours = this._surface.getNeighbours(x, y);
-        let shapeType = TerrainShape.Flat;
+    calcEdge(x, y) {
         let centre = this._surface.at(x, y);
-        let toEvaluate = new Array();
+        let neighbours = this._surface.getNeighbours(x, y);
+        let shapeType = centre.shape;
+        let northEdge = false;
+        let eastEdge = false;
         for (let neighbour of neighbours) {
-            if (neighbour.terrace == centre.terrace) {
-                continue;
-            }
             if (neighbour.terrace > centre.terrace) {
-                continue;
-            }
-            if ((centre.terrace - neighbour.terrace) > 1) {
                 continue;
             }
             if ((neighbour.x != centre.x) && (neighbour.y != centre.y)) {
                 continue;
             }
-            toEvaluate.push(neighbour);
+            if (neighbour.terrace == centre.terrace &&
+                (isFlat(centre.shape) == isFlat(neighbour.shape))) {
+                continue;
+            }
+            northEdge = northEdge || neighbour.y < centre.y;
+            eastEdge = eastEdge || neighbour.x > centre.x;
+            if (northEdge && eastEdge)
+                break;
         }
-        if (toEvaluate.length == 0 || toEvaluate.length > 1) {
-            return TerrainShape.Flat;
+        if (shapeType == TerrainShape.Flat) {
+            if (northEdge && eastEdge) {
+                shapeType = TerrainShape.FlatNorthEastEdge;
+            }
+            else if (northEdge) {
+                shapeType = TerrainShape.FlatNorthEdge;
+            }
+            else if (eastEdge) {
+                shapeType = TerrainShape.FlatEastEdge;
+            }
         }
-        let neighbour = toEvaluate[0];
-        if (neighbour.y > centre.y) {
-            return TerrainShape.RampUpNorth;
+        else if (shapeType == TerrainShape.RampUpNorth && eastEdge) {
+            shapeType = TerrainShape.RampUpNorthEdge;
         }
-        else if (neighbour.x < centre.x) {
-            return TerrainShape.RampUpEast;
+        else if (shapeType == TerrainShape.RampUpEast && northEdge) {
+            shapeType = TerrainShape.RampUpEastEdge;
         }
-        else if (neighbour.x > centre.x) {
-            return TerrainShape.RampUpWest;
+        else if (shapeType == TerrainShape.RampUpSouth && eastEdge) {
+            shapeType = TerrainShape.RampUpSouthEdge;
         }
-        else if (neighbour.y < centre.y) {
-            return TerrainShape.RampUpSouth;
+        else if (shapeType == TerrainShape.RampUpWest && northEdge) {
+            shapeType = TerrainShape.RampUpWestEdge;
         }
-        return TerrainShape.Flat;
+        return shapeType;
     }
     build(heightMap) {
         console.log("build terrain from height map");
@@ -309,6 +382,7 @@ export class TerrainBuilder {
                 surface.terrace = terrace;
             }
         }
+        this.addRamps();
         console.log("adding rain");
         let water = 3.0;
         for (let x = 0; x < this._surface.width; x++) {
@@ -340,13 +414,7 @@ export class TerrainBuilder {
                     }
                 }
                 surface.type = this.calcType(x, y);
-                surface.shape = this.calcShape(x, y);
-            }
-        }
-        console.log("smoothing terrain edges");
-        for (let y = 0; y < this._surface.depth; y++) {
-            for (let x = 0; x < this._surface.width; x++) {
-                this.smoothEdge(x, y);
+                surface.shape = this.calcEdge(x, y);
             }
         }
         console.log("adding surface terrain entities");
