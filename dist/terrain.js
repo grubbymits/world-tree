@@ -37,6 +37,26 @@ export var Biome;
     Biome[Biome["Tundra"] = 5] = "Tundra";
     Biome[Biome["Desert"] = 6] = "Desert";
 })(Biome || (Biome = {}));
+function getBiomeName(biome) {
+    switch (biome) {
+        default:
+            console.error("unhandled biome type:", biome);
+        case Biome.Water:
+            return "water";
+        case Biome.Beach:
+            return "beach";
+        case Biome.Marshland:
+            return "marshland";
+        case Biome.Grassland:
+            return "grassland";
+        case Biome.Woodland:
+            return "woodland";
+        case Biome.Tundra:
+            return "tundra";
+        case Biome.Desert:
+            return "desert";
+    }
+}
 function getShapeName(terrain) {
     switch (terrain) {
         default:
@@ -97,6 +117,74 @@ function isFlat(terrain) {
     }
     return false;
 }
+function mean(grid) {
+    let total = 0;
+    let numElements = 0;
+    for (let row of grid) {
+        let acc = row.reduce(function (acc, value) {
+            return acc + value;
+        }, 0);
+        total += acc;
+        numElements += row.length;
+    }
+    return total / numElements;
+}
+function standardDev(grid) {
+    let avg = mean(grid);
+    let total = 0;
+    let diffsSquared = new Array();
+    for (let i in grid) {
+        let row = grid[i];
+        diffsSquared[i] = row.map(function (value) {
+            let diff = value - avg;
+            return diff * diff;
+        });
+    }
+    return Math.sqrt(mean(diffsSquared));
+}
+function gaussianBlur(grid, width, depth) {
+    let sigma = standardDev(grid);
+    let sigmaSquared = sigma * sigma;
+    const offsets = [-2, -1, 0, 1, 2];
+    const distancesSquared = [4, 1, 0, 1, 4];
+    const denominator = Math.sqrt(2 * Math.PI * sigmaSquared);
+    let filter = new Float32Array(5);
+    for (let i in distancesSquared) {
+        let numerator = Math.exp(-distancesSquared[i] / 2 * sigmaSquared);
+        filter[i] = numerator / denominator;
+    }
+    let result = new Array();
+    for (let y = 0; y < 2; y++) {
+        result[y] = grid[y];
+    }
+    for (let y = depth - 2; y < depth; y++) {
+        result[y] = grid[y];
+    }
+    for (let y = 2; y < depth - 2; y++) {
+        result[y] = new Uint8Array(width);
+        for (let x = 0; x < 2; x++) {
+            result[y][x] = grid[y][x];
+        }
+        for (let x = width - 2; x < width; x++) {
+            result[y][x] = grid[y][x];
+        }
+        for (let x = 2; x < width - 2; x++) {
+            console.log("value being blurred:", grid[y][x]);
+            let blurred = 0;
+            for (let i in offsets) {
+                let dx = offsets[i];
+                blurred += grid[y][x + dx] * filter[i];
+            }
+            for (let i in offsets) {
+                let dy = offsets[i];
+                blurred += grid[y + dy][x] * filter[i];
+            }
+            console.log("result:", Math.ceil(blurred));
+            result[y][x] = Math.floor(blurred);
+        }
+    }
+    return result;
+}
 export class Terrain extends StaticEntity {
     constructor(_gridX, _gridY, _gridZ, dimensions, _type, _shape) {
         super(new Location(_gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height), dimensions, true, Terrain.graphics(_type, _shape), Terrain.sys);
@@ -116,7 +204,7 @@ export class Terrain extends StaticEntity {
     }
     static graphics(terrainType, shape) {
         console.assert(this._terrainGraphics.has(terrainType), "undefined terrain graphic for TerrainType:", getTypeName(terrainType));
-        console.assert(shape < this._terrainGraphics.get(terrainType).length, "undefined terrain graphic for TerrainShape:", getShapeName(shape));
+        console.assert(shape < this._terrainGraphics.get(terrainType).length, "undefined terrain graphic for:", getTypeName(terrainType), getShapeName(shape));
         return this._terrainGraphics.get(terrainType)[shape];
     }
     static get width() { return this._dimensions.width; }
@@ -280,7 +368,7 @@ export class TerrainBuilder {
         for (let y = filterDepth; y < this._surface.depth - filterDepth; y++) {
             for (let x = filterDepth; x < this._surface.width - filterDepth; x++) {
                 let centre = this._surface.at(x, y);
-                if (!isFlat(centre.shape)) {
+                if (!isFlat(centre.shape) || centre.biome == Biome.Water) {
                     continue;
                 }
                 let numDiffTerraces = 0;
@@ -394,34 +482,37 @@ export class TerrainBuilder {
             while (!cloud.update()) { }
         }
         console.log("calculating terrain biomes");
+        let biomes = new Array();
         for (let y = 0; y < this._surface.depth; y++) {
+            biomes[y] = new Uint8Array(this._surface.width);
             for (let x = 0; x < this._surface.width; x++) {
-                let biome = Biome.Water;
                 let surface = this._surface.at(x, y);
                 if (surface.height <= this._waterLevel) {
-                    surface.biome = Biome.Water;
+                    biomes[y][x] = Biome.Water;
                 }
                 else if (surface.height <= this._beachLimit) {
-                    surface.biome = Biome.Beach;
+                    biomes[y][x] = Biome.Beach;
                 }
                 else {
                     if (surface.height > this._treeLimit) {
-                        surface.biome = Biome.Tundra;
+                        biomes[y][x] = Biome.Tundra;
                     }
                     else {
-                        surface.biome = surface.moisture > this._wetLimit ?
+                        biomes[y][x] = surface.moisture > this._wetLimit ?
                             Biome.Marshland : surface.moisture > this._dryLimit ?
                             Biome.Grassland : Biome.Desert;
                     }
                 }
-                surface.type = this.calcType(x, y);
-                surface.shape = this.calcEdge(x, y);
             }
         }
+        let blurred = gaussianBlur(biomes, this._surface.width, this._surface.depth);
         console.log("adding surface terrain entities");
         for (let y = 0; y < this._surface.depth; y++) {
             for (let x = 0; x < this._surface.width; x++) {
                 let surface = this._surface.at(x, y);
+                surface.biome = blurred[y][x];
+                surface.type = this.calcType(x, y);
+                surface.shape = this.calcEdge(x, y);
                 console.assert(surface.terrace <= this._terraces && surface.terrace >= 0, "terrace out-of-range", surface.terrace);
                 this._worldTerrain.addRaisedTerrain(x, y, surface.terrace, surface.type, surface.shape);
             }

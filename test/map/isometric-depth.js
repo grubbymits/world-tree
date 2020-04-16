@@ -30,6 +30,13 @@ window.onload = (event) => {
   let freq = 0.1;
   const openSimplex = new OpenSimplexNoise(Date.now());
   let heightMap = new Array();
+
+  let cx = cellsX / 2;
+  let cy = cellsY / 2;
+  let edgeUp = 0.07
+  let edgeDown = 0.5
+  let falloff = 1.5
+
   for (let y = 0; y < cellsY; y++) {
     heightMap[y] = new Array();
     for (let x = 0; x < cellsX; x++) {
@@ -37,6 +44,12 @@ window.onload = (event) => {
                    0.50 * openSimplex.noise2D(2 * freq * x, 2 * freq * y) +
                    0.25 * openSimplex.noise2D(4 * freq * x, 4 * freq * y) +
                    0.125 * openSimplex.noise2D(8 * freq * x, 8 * freq * y);
+
+      // bias the heights to make an island in the middle
+      let nx = (cx - x) / cx;
+      let ny = (cy - y) / cy;
+      let distance = 2 * Math.max(Math.abs(nx), Math.abs(ny));
+      height += edgeUp - edgeDown * Math.pow(distance, falloff);
       heightMap[y].push(height);
     }
   }
@@ -89,20 +102,7 @@ sprites = new Array("../../../res/img/light-grass-sand/flat",
                     "../../../res/img/light-grass-sand/east",
                     "../../../res/img/light-grass-sand/east-edge");
   WT.Terrain.addTerrainGraphics(WT.TerrainType.DryGrass, createGraphics(sprites));
-  /*
-  sprites = new Array("../../../res/img/light-grass-rock-flat",
-                          "../../../res/img/light-grass-rock-ramp-north",
-                          "../../../res/img/light-grass-rock-ramp-east",
-                          "../../../res/img/rock-ramp-south",
-                          "../../../res/img/rock-ramp-west");
-  */
+  WT.Terrain.addTerrainGraphics(WT.TerrainType.Mud, createGraphics(sprites));
   WT.Terrain.addTerrainGraphics(WT.TerrainType.Rock, createGraphics(sprites));
-  /*
-  sprites = new Array("../../../res/img/dark-grass-sand-flat",
-                      "../../../res/img/dark-grass-sand-ramp-north",
-                      "../../../res/img/dark-grass-sand-ramp-east",
-                      "../../../res/img/sand-ramp-south",
-                      "../../../res/img/sand-ramp-west");
-  */
   WT.Terrain.addTerrainGraphics(WT.TerrainType.WetGrass, createGraphics(sprites));
 

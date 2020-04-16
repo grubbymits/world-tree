@@ -44,6 +44,27 @@ export enum Biome {
   Desert,
 }
 
+function getBiomeName(biome: Biome): string {
+  switch (biome) {
+  default:
+    console.error("unhandled biome type:", biome);
+  case Biome.Water:
+    return "water";
+  case Biome.Beach:
+    return "beach";
+  case Biome.Marshland:
+    return "marshland";
+  case Biome.Grassland:
+    return "grassland";
+  case Biome.Woodland:
+    return "woodland";
+  case Biome.Tundra:
+    return "tundra";
+  case Biome.Desert:
+    return "desert";
+  }
+}
+
 function getShapeName(terrain: TerrainShape): string {
   switch (terrain) {
   default:
@@ -107,6 +128,89 @@ function isFlat(terrain: TerrainShape): boolean {
   return false;
 }
 
+function mean(grid: Array<Uint8Array>): number {
+  let total: number = 0;
+  let numElements: number = 0;
+  for (let row of grid) {
+    let acc = row.reduce(function (acc: number, value: number) {
+      return acc + value;
+    }, 0);
+    total += acc;
+    numElements += row.length;
+  }
+  return total / numElements;
+}
+
+function standardDev(grid: Array<Uint8Array>): number {
+  let avg: number = mean(grid);
+  let total: number = 0;
+  let diffsSquared = new Array<Uint8Array>();
+
+  for (let i in grid) {
+    let row = grid[i];
+    diffsSquared[i] = row.map(function(value: number) {
+      let diff = value - avg;
+      return diff * diff;
+    });
+  }
+  return Math.sqrt(mean(diffsSquared));
+}
+
+function gaussianBlur(grid: Array<Uint8Array>,
+                      width: number, depth: number): Array<Uint8Array> {
+
+  let sigma: number = standardDev(grid);
+  let sigmaSquared = sigma * sigma;
+  const offsets: Array<number> = [ -2, -1, 0, 1, 2 ];
+  const distancesSquared: Array<number> = [ 4, 1, 0, 1, 4];
+  const denominator: number = Math.sqrt(2 * Math.PI * sigmaSquared);
+  let filter = new Float32Array(5);
+
+  for (let i in distancesSquared) {
+    let numerator: number = Math.exp(-distancesSquared[i] / 2 * sigmaSquared);
+    filter[i] = numerator / denominator;
+  }
+
+  let result = new Array<Uint8Array>();
+  for (let y = 0; y < 2; y++) {
+    result[y] = grid[y];
+  }
+  for (let y = depth - 2; y < depth; y++) {
+    result[y] = grid[y];
+  }
+
+  for (let y = 2; y < depth - 2; y++) {
+    result[y] = new Uint8Array(width);
+
+    // Just copy the edge values.
+    for (let x = 0; x < 2; x++) {
+      result[y][x] = grid[y][x];
+    }
+    for (let x = width - 2; x < width; x++) {
+      result[y][x] = grid[y][x];
+    }
+
+    for (let x = 2; x < width - 2; x++) {
+      console.log("value being blurred:", grid[y][x]);
+      let blurred: number = 0;
+
+      for (let i in offsets) {
+        let dx = offsets[i];
+        blurred += grid[y][x + dx] * filter[i];
+      }
+
+      for (let i in offsets) {
+        let dy = offsets[i];
+        blurred += grid[y + dy][x] * filter[i];
+      }
+      console.log("result:", Math.ceil(blurred));
+      result[y][x] = Math.floor(blurred);
+    }
+  }
+
+  return result;
+}
+
 export class Terrain extends StaticEntity {
   private static _dimensions: Dimensions;
   private static _sys: CoordSystem;
@@ -129,7 +233,7 @@ export class Terrain extends StaticEntity {
                    "undefined terrain graphic for TerrainType:",
                    getTypeName(terrainType));
     console.assert(shape < this._terrainGraphics.get(terrainType)!.length,
-                   "undefined terrain graphic for TerrainShape:",
+                   "undefined terrain graphic for:", getTypeName(terrainType),
                    getShapeName(shape));
     return this._terrainGraphics.get(terrainType)![shape];
   }
@@ -348,7 +452,7 @@ export class TerrainBuilder {
     for (let y = filterDepth; y < this._surface.depth - filterDepth; y++) {
       for (let x = filterDepth; x < this._surface.width - filterDepth; x++) {
         let centre: TerrainAttributes = this._surface.at(x, y);
-        if (!isFlat(centre.shape)) {
+        if (!isFlat(centre.shape) || centre.biome == Biome.Water) {
           continue;
         }
 
@@ -485,34 +589,38 @@ export class TerrainBuilder {
    
     console.log("calculating terrain biomes"); 
     // Calculate biome, type and shape.
+    let biomes = new Array<Uint8Array>();
     for (let y = 0; y < this._surface.depth; y++) {
+      biomes[y] = new Uint8Array(this._surface.width);
       for (let x = 0; x < this._surface.width; x++) {
-        let biome = Biome.Water;
         let surface = this._surface.at(x, y);
         if (surface.height <= this._waterLevel) {
-          surface.biome = Biome.Water;
+          biomes[y][x] = <any>Biome.Water;
         } else if (surface.height <= this._beachLimit) {
-          surface.biome = Biome.Beach;
+          biomes[y][x] = <any>Biome.Beach;
         } else {
           if (surface.height > this._treeLimit) {
-            surface.biome = Biome.Tundra;
+            biomes[y][x] = <any>Biome.Tundra;
           } else {
-            surface.biome = surface.moisture > this._wetLimit ?
-              Biome.Marshland : surface.moisture > this._dryLimit ?
-              Biome.Grassland : Biome.Desert;
+            biomes[y][x] = surface.moisture > this._wetLimit ?
+              <any>Biome.Marshland : surface.moisture > this._dryLimit ?
+              <any>Biome.Grassland : <any>Biome.Desert;
           }
         }
-
-        surface.type = this.calcType(x, y);
-        surface.shape = this.calcEdge(x, y);
       }
     }
+
+    let blurred = gaussianBlur(biomes,
+                               this._surface.width, this._surface.depth);
 
     console.log("adding surface terrain entities"); 
     // Add terrain objects that will be visible.
     for (let y = 0; y < this._surface.depth; y++) {
       for (let x = 0; x < this._surface.width; x++) {
         let surface = this._surface.at(x, y);
+        surface.biome = blurred[y][x];
+        surface.type = this.calcType(x, y);
+        surface.shape = this.calcEdge(x, y);
         console.assert(surface.terrace <= this._terraces && surface.terrace >= 0,
                        "terrace out-of-range", surface.terrace);
         this._worldTerrain.addRaisedTerrain(x, y, surface.terrace,
