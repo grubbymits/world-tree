@@ -191,20 +191,22 @@ function gaussianBlur(grid: Array<Uint8Array>,
     }
 
     for (let x = 2; x < width - 2; x++) {
-      console.log("value being blurred:", grid[y][x]);
+      //console.log("value being blurred:", grid[y][x]);
       let blurred: number = 0;
 
       for (let i in offsets) {
         let dx = offsets[i];
+        //console.log("neighbour:", grid[y][x + dx]);
         blurred += grid[y][x + dx] * filter[i];
       }
 
       for (let i in offsets) {
         let dy = offsets[i];
+        //console.log("neighbour:", grid[y + dy][x]);
         blurred += grid[y + dy][x] * filter[i];
       }
-      console.log("result:", Math.ceil(blurred));
-      result[y][x] = Math.floor(blurred);
+      //console.log("result:", Math.ceil(blurred));
+      result[y][x] = Math.min(Math.floor(blurred), <number>Biome.Desert);
     }
   }
 
@@ -363,7 +365,6 @@ export class TerrainBuilder {
   private _worldTerrain: SquareGrid;
   private _surface: Surface;
   private readonly _terraceSpacing: number;
-  private readonly _ceiling: number = 1.0;
   private readonly _waterLevel: number = 0.0;
   private readonly _landRange: number = this._ceiling - this._waterLevel;
   private readonly _beachLimit: number = this._waterLevel + (this._landRange / 10);
@@ -373,6 +374,7 @@ export class TerrainBuilder {
   
   constructor(width: number,
               depth: number,
+              private readonly _ceiling: number,
               private readonly _terraces: number,
               private readonly _waterMultiplier: number,
               spriteWidth: number,
@@ -431,11 +433,12 @@ export class TerrainBuilder {
       case Biome.Tundra:
         return TerrainType.Rock;
     }
+    console.log("default biome:", getBiomeName(surface.biome));
     console.assert(surface.biome == Biome.Water);
     return TerrainType.Water;
   }
 
-  addRamps() {
+  calcShapes() {
     console.log("adding ramps");
     const filterDepth: number = 3;
     const coordOffsets: Array<Point> = [ new Point(0, -1),
@@ -497,9 +500,9 @@ export class TerrainBuilder {
           if (result > centre.terrace) {
             centre.shape = ramps[i];
             centre.terrace = result;
-            console.log("adding ramp at (x,y):", x, y);
-            console.log("direction:", direction[i]);
-            console.log("ramp shape:", getShapeName(centre.shape));
+            //console.log("adding ramp at (x,y):", x, y);
+            //console.log("direction:", direction[i]);
+            //console.log("ramp shape:", getShapeName(centre.shape));
             break;
           }
         }
@@ -511,6 +514,10 @@ export class TerrainBuilder {
     let centre = this._surface.at(x, y);
     let neighbours = this._surface.getNeighbours(x, y);
     let shapeType = centre.shape;
+
+    if (centre.type == TerrainType.Water) {
+      return shapeType;
+    }
 
     let northEdge: boolean = false;
     let eastEdge: boolean = false;
@@ -571,7 +578,6 @@ export class TerrainBuilder {
         surface.terrace = terrace;
       }
     }
-    this.addRamps();
 
     console.log("adding rain");
     // Add moisture:
@@ -612,6 +618,13 @@ export class TerrainBuilder {
 
     let blurred = gaussianBlur(biomes,
                                this._surface.width, this._surface.depth);
+    for (let y = 0; y < this._surface.depth; y++) {
+      for (let x = 0; x < this._surface.width; x++) {
+        let surface = this._surface.at(x, y);
+        surface.biome = blurred[y][x];
+      }
+    }
+    this.calcShapes();
 
     console.log("adding surface terrain entities"); 
     // Add terrain objects that will be visible.

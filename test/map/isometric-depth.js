@@ -23,33 +23,32 @@ function createGraphics(paths) {
 
 window.onload = (event) => {
   console.log("loaded");
-  let cellsX = 20;
-  let cellsY = 20;
+  let cellsX = 40;
+  let cellsY = 40;
   let terraces = 3;
   let waterMultiplier = 0.0;
-  let freq = 0.1;
+  let freq = 0.2;
   const openSimplex = new OpenSimplexNoise(Date.now());
   let heightMap = new Array();
 
   let cx = cellsX / 2;
   let cy = cellsY / 2;
-  let edgeUp = 0.07
-  let edgeDown = 0.5
-  let falloff = 1.5
+  let factor = 0.1;
+  let falloff = 1.01;
+  let ceiling = 1;
 
   for (let y = 0; y < cellsY; y++) {
     heightMap[y] = new Array();
     for (let x = 0; x < cellsX; x++) {
-      let height = openSimplex.noise2D(freq * x, freq * y) +
-                   0.50 * openSimplex.noise2D(2 * freq * x, 2 * freq * y) +
-                   0.25 * openSimplex.noise2D(4 * freq * x, 4 * freq * y) +
-                   0.125 * openSimplex.noise2D(8 * freq * x, 8 * freq * y);
-
-      // bias the heights to make an island in the middle
-      let nx = (cx - x) / cx;
-      let ny = (cy - y) / cy;
-      let distance = 2 * Math.max(Math.abs(nx), Math.abs(ny));
-      height += edgeUp - edgeDown * Math.pow(distance, falloff);
+      let height = 0.75;
+      height += 0.40 * openSimplex.noise2D(freq * x, freq * y) +
+                0.20 * openSimplex.noise2D(freq * 2 * x, freq * 2 * y) +
+                0.10 * openSimplex.noise2D(freq * 4 * x, freq * 4 * y);
+                0.05 * openSimplex.noise2D(freq * 8 * x, freq * 8 * y);
+      let nx = Math.abs(x - cx);
+      let ny = Math.abs(y - cy);
+      let distance = Math.sqrt(Math.pow(nx, 2) + Math.pow(ny, 2));
+      height -= factor * distance;
       heightMap[y].push(height);
     }
   }
@@ -57,7 +56,7 @@ window.onload = (event) => {
   // width / height ratio
   let heightRatio = 2/3;
   console.log("heightRatio:", heightRatio);
-  let builder = new WT.TerrainBuilder(cellsX, cellsY, terraces, waterMultiplier,
+  let builder = new WT.TerrainBuilder(cellsX, cellsY, ceiling, terraces, waterMultiplier,
                                       spriteWidth, spriteHeight, heightRatio,
                                       WT.CoordSystem.Isometric);
   builder.build(heightMap);
