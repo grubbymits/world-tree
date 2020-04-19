@@ -128,7 +128,7 @@ function isFlat(terrain: TerrainShape): boolean {
   return false;
 }
 
-function mean(grid: Array<Uint8Array>): number {
+function mean(grid: Array<Float32Array>): number {
   let total: number = 0;
   let numElements: number = 0;
   for (let row of grid) {
@@ -141,46 +141,65 @@ function mean(grid: Array<Uint8Array>): number {
   return total / numElements;
 }
 
-function standardDev(grid: Array<Uint8Array>): number {
-  let avg: number = mean(grid);
+function meanWindow(grid: Array<Float32Array>, centreX: number, centreY: number,
+                    offsets: Array<number>): number {
   let total: number = 0;
-  let diffsSquared = new Array<Uint8Array>();
+  let numElements: number = offsets.length * offsets.length;
+  for (let dy in offsets) {
+    let y = centreY + offsets[dy];
+    for (let dx in offsets) {
+      let x = centreX + offsets[dx];
+      total += grid[y][x];
+    }
+  }
+  return total / numElements;
+}
 
-  for (let i in grid) {
-    let row = grid[i];
-    diffsSquared[i] = row.map(function(value: number) {
-      let diff = value - avg;
-      return diff * diff;
-    });
+function standardDevWindow(grid: Array<Float32Array>, centreX: number, centreY: number,
+                           offsets: Array<number>): number {
+
+  let avg: number = meanWindow(grid, centreX, centreY, offsets);
+  if (avg == 0) {
+    return 0;
+  }
+  let total: number = 0;
+  let diffsSquared = new Array<Float32Array>();
+  let size = offsets.length;
+
+  for (let dy in offsets) {
+    let y = centreY + offsets[dy];
+    let row = new Float32Array(size);
+    let wx: number = 0;
+    for (let dx in offsets) {
+      let x = centreX + offsets[dx];
+      let diff = grid[y][x] - avg;
+      row[wx] = diff * diff;
+      wx++;
+    }
+    diffsSquared.push(row);
   }
   return Math.sqrt(mean(diffsSquared));
 }
 
-function gaussianBlur(grid: Array<Uint8Array>,
-                      width: number, depth: number): Array<Uint8Array> {
+function gaussianBlur(grid: Array<Float32Array>, width: number,
+                      depth: number) : Array<Float32Array> {
 
-  let sigma: number = standardDev(grid);
-  let sigmaSquared = sigma * sigma;
   const offsets: Array<number> = [ -2, -1, 0, 1, 2 ];
   const distancesSquared: Array<number> = [ 4, 1, 0, 1, 4];
-  const denominator: number = Math.sqrt(2 * Math.PI * sigmaSquared);
-  let filter = new Float32Array(5);
 
-  for (let i in distancesSquared) {
-    let numerator: number = Math.exp(-distancesSquared[i] / 2 * sigmaSquared);
-    filter[i] = numerator / denominator;
-  }
-
-  let result = new Array<Uint8Array>();
+  let result = new Array<Float32Array>();
+  // Just copy the two left columns
   for (let y = 0; y < 2; y++) {
     result[y] = grid[y];
   }
+  // Just copy the two right columns.
   for (let y = depth - 2; y < depth; y++) {
     result[y] = grid[y];
   }
 
+  let filter = new Float32Array(5);
   for (let y = 2; y < depth - 2; y++) {
-    result[y] = new Uint8Array(width);
+    result[y] = new Float32Array(width);
 
     // Just copy the edge values.
     for (let x = 0; x < 2; x++) {
@@ -191,22 +210,35 @@ function gaussianBlur(grid: Array<Uint8Array>,
     }
 
     for (let x = 2; x < width - 2; x++) {
-      //console.log("value being blurred:", grid[y][x]);
-      let blurred: number = 0;
+      let sigma: number = standardDevWindow(grid, x, y, offsets);
+      if (sigma == 0) {
+        continue;
+      }
 
+      let sigmaSquared = sigma * sigma;
+      const denominator: number = Math.sqrt(2 * Math.PI * sigmaSquared);
+
+      let sum: number = 0;
+      for (let i in distancesSquared) {
+        let numerator: number = Math.exp(-(distancesSquared[i] / (2 * sigmaSquared)));
+        filter[i] = numerator / denominator;
+        sum += filter[i];
+      }
+      for (let coeff of filter) {
+        coeff /= sum;
+      }
+
+      let blurred: number = 0;
       for (let i in offsets) {
         let dx = offsets[i];
-        //console.log("neighbour:", grid[y][x + dx]);
         blurred += grid[y][x + dx] * filter[i];
       }
 
       for (let i in offsets) {
         let dy = offsets[i];
-        //console.log("neighbour:", grid[y + dy][x]);
         blurred += grid[y + dy][x] * filter[i];
       }
-      //console.log("result:", Math.ceil(blurred));
-      result[y][x] = Math.min(Math.floor(blurred), <number>Biome.Desert);
+      result[y][x] = blurred; //Math.floor(blurred);
     }
   }
 
@@ -368,15 +400,15 @@ export class TerrainBuilder {
   private readonly _waterLevel: number = 0.0;
   private readonly _landRange: number = this._ceiling - this._waterLevel;
   private readonly _beachLimit: number = this._waterLevel + (this._landRange / 10);
-  private readonly _dryLimit: number = 0.02;
-  private readonly _wetLimit: number = 0.15;
   private readonly _treeLimit: number = 0.6;
   
   constructor(width: number,
               depth: number,
               private readonly _ceiling: number,
               private readonly _terraces: number,
-              private readonly _waterMultiplier: number,
+              private readonly _water: number,
+              private readonly _wetLimit: number,
+              private readonly _dryLimit: number,
               spriteWidth: number,
               spriteHeight: number,
               spriteHeightRatio: number,
@@ -579,51 +611,48 @@ export class TerrainBuilder {
       }
     }
 
+
     console.log("adding rain");
     // Add moisture:
     // - clouds are added at the 'bottom' of the map and move northwards.
-    let water = 3.0;
+    Rain.init(this._waterLevel, this._surface);
     for (let x = 0; x < this._surface.width; x++) {
-      Rain.add(x, this._surface.depth - 1, water, this._waterLevel,
-               this._waterMultiplier, Direction.North, this._surface);
+      Rain.add(x, this._surface.depth - 1, this._water, Direction.North);
     }
 
     for (let i = 0; i < Rain.clouds.length; i++) {
       let cloud = Rain.clouds[i];
       while (!cloud.update()) { }
     }
+
+    console.log("total clouds added:", Rain.totalClouds);
+    let blurredMoisture = gaussianBlur(Rain.moistureGrid, this._surface.width,
+                                       this._surface.depth);
    
     console.log("calculating terrain biomes"); 
     // Calculate biome, type and shape.
-    let biomes = new Array<Uint8Array>();
     for (let y = 0; y < this._surface.depth; y++) {
-      biomes[y] = new Uint8Array(this._surface.width);
       for (let x = 0; x < this._surface.width; x++) {
         let surface = this._surface.at(x, y);
+        surface.moisture = blurredMoisture[y][x];
+        let biome: Biome = Biome.Water;
         if (surface.height <= this._waterLevel) {
-          biomes[y][x] = <any>Biome.Water;
+          biome = Biome.Water;
         } else if (surface.height <= this._beachLimit) {
-          biomes[y][x] = <any>Biome.Beach;
+          biome = Biome.Beach;
         } else {
           if (surface.height > this._treeLimit) {
-            biomes[y][x] = <any>Biome.Tundra;
+            biome = Biome.Tundra;
           } else {
-            biomes[y][x] = surface.moisture > this._wetLimit ?
-              <any>Biome.Marshland : surface.moisture > this._dryLimit ?
-              <any>Biome.Grassland : <any>Biome.Desert;
+            biome = surface.moisture > this._wetLimit ?
+              Biome.Marshland : surface.moisture > this._dryLimit ?
+              Biome.Grassland : Biome.Desert;
           }
         }
+        surface.biome = biome;
       }
     }
 
-    let blurred = gaussianBlur(biomes,
-                               this._surface.width, this._surface.depth);
-    for (let y = 0; y < this._surface.depth; y++) {
-      for (let x = 0; x < this._surface.width; x++) {
-        let surface = this._surface.at(x, y);
-        surface.biome = blurred[y][x];
-      }
-    }
     this.calcShapes();
 
     console.log("adding surface terrain entities"); 
@@ -631,7 +660,7 @@ export class TerrainBuilder {
     for (let y = 0; y < this._surface.depth; y++) {
       for (let x = 0; x < this._surface.width; x++) {
         let surface = this._surface.at(x, y);
-        surface.biome = blurred[y][x];
+        //surface.biome = blurred[y][x];
         surface.type = this.calcType(x, y);
         surface.shape = this.calcEdge(x, y);
         console.assert(surface.terrace <= this._terraces && surface.terrace >= 0,

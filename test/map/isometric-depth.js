@@ -25,8 +25,6 @@ window.onload = (event) => {
   console.log("loaded");
   let cellsX = 40;
   let cellsY = 40;
-  let terraces = 3;
-  let waterMultiplier = 0.0;
   let freq = 0.2;
   const openSimplex = new OpenSimplexNoise(Date.now());
   let heightMap = new Array();
@@ -44,7 +42,7 @@ window.onload = (event) => {
       height += 0.40 * openSimplex.noise2D(freq * x, freq * y) +
                 0.20 * openSimplex.noise2D(freq * 2 * x, freq * 2 * y) +
                 0.10 * openSimplex.noise2D(freq * 4 * x, freq * 4 * y);
-                0.05 * openSimplex.noise2D(freq * 8 * x, freq * 8 * y);
+                //0.05 * openSimplex.noise2D(freq * 8 * x, freq * 8 * y);
       let nx = Math.abs(x - cx);
       let ny = Math.abs(y - cy);
       let distance = Math.sqrt(Math.pow(nx, 2) + Math.pow(ny, 2));
@@ -56,7 +54,14 @@ window.onload = (event) => {
   // width / height ratio
   let heightRatio = 2/3;
   console.log("heightRatio:", heightRatio);
-  let builder = new WT.TerrainBuilder(cellsX, cellsY, ceiling, terraces, waterMultiplier,
+
+  let terraces = 3;
+  let water = 3;
+  let dryLimit = 0.2;
+  let wetLimit = 1;
+
+  let builder = new WT.TerrainBuilder(cellsX, cellsY, ceiling, terraces,
+                                      water, wetLimit, dryLimit,
                                       spriteWidth, spriteHeight, heightRatio,
                                       WT.CoordSystem.Isometric);
   builder.build(heightMap);

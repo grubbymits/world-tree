@@ -5,28 +5,43 @@ import { Point } from "./graphics.js"
 export class Rain {
   private static readonly rain: number = 0.5;
   private static _clouds = Array<Rain>();
+  private static _totalClouds: number = 0;
+  private static _surface: Surface;
+  private static _waterLevel: number;
+  private static _moistureGrid: Array<Float32Array>;
+
+  static init(waterLevel: number, surface: Surface) {
+    this._waterLevel = waterLevel;
+    this._surface = surface;
+    this._moistureGrid = new Array<Float32Array>();
+    for (let y = 0; y < surface.depth; y++) {
+      this._moistureGrid.push(new Float32Array(surface.width));
+    }
+  }
 
   static get clouds(): Array<Rain> { return this._clouds; }
 
-  static add(x: number, y: number, moisture: number,
-             waterLevel: number, booster: number,
-             direction: Direction, surface: Surface): void {
-    //console.log("adding new cloud at", x, y, "heading", getDirectionName(direction));
-    this._clouds.push(
-      new Rain(x, y, moisture, waterLevel, booster, direction, surface)
-    );
+  static get totalClouds(): number { return this._totalClouds; }
+
+  static get moistureGrid(): Array<Float32Array> { return this._moistureGrid; }
+
+  static add(x: number, y: number, moisture: number, direction: Direction): void {
+    this._clouds.push(new Rain(x, y, moisture, direction));
+    this._totalClouds++;
   }
 
   private _finished: boolean = false;
 
-  constructor(private _x: number, private _y: number,
-              private _moisture: number,
-              private _waterLevel: number,
-              private _booster: number,
-              private _direction: Direction,
-              private _surface: Surface) { }
+  constructor(private _x: number, private _y: number, private _moisture: number,
+              private _direction: Direction) { }
 
   get finished(): boolean { return this._finished; }
+
+  dropMoisture(moisture: number): boolean {
+    Rain.moistureGrid[this._y][this._x] += moisture;
+    this._moisture -= moisture;
+    return this._moisture <= 0;
+  }
 
   update(): boolean {
     if (this._finished) {
@@ -36,31 +51,25 @@ export class Rain {
     let nextCoord = getDirectionCoords(this._x, this._y, this._direction);
 
     // Cloud may have left the map.
-    if (!this._surface.inbounds(nextCoord)) {
+    if (!Rain._surface.inbounds(nextCoord)) {
       this._finished = true;
       return true;
     }
 
-    let current = this._surface.at(this._x, this._y);
+    let current = Rain._surface.at(this._x, this._y);
     // Don't start raining until we've reached land.
-    if (current.height <= this._waterLevel) {
+    if (current.height <= Rain._waterLevel) {
       this._x = nextCoord.x;
       this._y = nextCoord.y;
       return false;
     }
 
-    let next = this._surface.at(nextCoord.x, nextCoord.y);
-    let multiplier = (next.height / current.height) * this._booster;
+    let next = Rain._surface.at(nextCoord.x, nextCoord.y);
+    let multiplier = (next.height / current.height);// * Rain._booster;
     // Add 5%, plus the multiplier, of the available moisture.
     let total = 0.01 + (0.05 * this._moisture * multiplier);
-    if (total > this._moisture) {
-      current.moisture += this._moisture;
-      this._finished = true;
-    } else  {
-      current.moisture += total;
-      this._moisture -= total;
-      this._finished = this._moisture <= 0;
-    }
+    let available = Math.min(this._moisture, total);
+    this._finished = this.dropMoisture(available);
     if (this._finished) {
       return true;
     }
@@ -72,27 +81,24 @@ export class Rain {
       let pointA: Point = getDirectionCoords(this._x, this._y, dirA);
       let pointB: Point = getDirectionCoords(this._x, this._y, dirB);
       let numClouds: number = 2;
-      if (this._surface.inbounds(pointA) && this._surface.inbounds(pointB)) {
-        Rain.add(pointA.x, pointA.y, this._moisture / 3, this._waterLevel,
-                  this._booster, dirA, this._surface);
-        Rain.add(pointB.x, pointB.y, this._moisture / 3, this._waterLevel,
-                  this._booster, dirB, this._surface);
+      if (Rain._surface.inbounds(pointA) && Rain._surface.inbounds(pointB)) {
+        Rain.add(pointA.x, pointA.y, this._moisture / 3, dirA);
+        Rain.add(pointB.x, pointB.y, this._moisture / 3, dirB);
         numClouds = 3;
-      } else if (this._surface.inbounds(pointA)) {
-        Rain.add(pointA.x, pointA.y, this._moisture / 2, this._waterLevel,
-                  this._booster, dirA, this._surface);
-      } else if (this._surface.inbounds(pointB)) {
-        Rain.add(pointB.x, pointB.y, this._moisture / 2, this._waterLevel,
-                  this._booster, dirB, this._surface);
+        console.log("splitting a cloud into three parts");
+      } else if (Rain._surface.inbounds(pointA)) {
+        Rain.add(pointA.x, pointA.y, this._moisture / 2, dirA);
+      } else if (Rain._surface.inbounds(pointB)) {
+        Rain.add(pointB.x, pointB.y, this._moisture / 2, dirB);
       } else {
         this._x = nextCoord.x;
         this._y = nextCoord.y;
-        return this._finished;
+        return false;
       }
       this._moisture /= numClouds;
     }
     this._x = nextCoord.x;
     this._y = nextCoord.y;
-    return this._finished;
+    return false;
   }
 }

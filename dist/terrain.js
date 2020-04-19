@@ -129,30 +129,43 @@ function mean(grid) {
     }
     return total / numElements;
 }
-function standardDev(grid) {
-    let avg = mean(grid);
+function meanWindow(grid, centreX, centreY, offsets) {
+    let total = 0;
+    let numElements = offsets.length * offsets.length;
+    for (let dy in offsets) {
+        let y = centreY + offsets[dy];
+        for (let dx in offsets) {
+            let x = centreX + offsets[dx];
+            total += grid[y][x];
+        }
+    }
+    return total / numElements;
+}
+function standardDevWindow(grid, centreX, centreY, offsets) {
+    let avg = meanWindow(grid, centreX, centreY, offsets);
+    if (avg == 0) {
+        return 0;
+    }
     let total = 0;
     let diffsSquared = new Array();
-    for (let i in grid) {
-        let row = grid[i];
-        diffsSquared[i] = row.map(function (value) {
-            let diff = value - avg;
-            return diff * diff;
-        });
+    let size = offsets.length;
+    for (let dy in offsets) {
+        let y = centreY + offsets[dy];
+        let row = new Float32Array(size);
+        let wx = 0;
+        for (let dx in offsets) {
+            let x = centreX + offsets[dx];
+            let diff = grid[y][x] - avg;
+            row[wx] = diff * diff;
+            wx++;
+        }
+        diffsSquared.push(row);
     }
     return Math.sqrt(mean(diffsSquared));
 }
 function gaussianBlur(grid, width, depth) {
-    let sigma = standardDev(grid);
-    let sigmaSquared = sigma * sigma;
     const offsets = [-2, -1, 0, 1, 2];
     const distancesSquared = [4, 1, 0, 1, 4];
-    const denominator = Math.sqrt(2 * Math.PI * sigmaSquared);
-    let filter = new Float32Array(5);
-    for (let i in distancesSquared) {
-        let numerator = Math.exp(-distancesSquared[i] / 2 * sigmaSquared);
-        filter[i] = numerator / denominator;
-    }
     let result = new Array();
     for (let y = 0; y < 2; y++) {
         result[y] = grid[y];
@@ -160,8 +173,9 @@ function gaussianBlur(grid, width, depth) {
     for (let y = depth - 2; y < depth; y++) {
         result[y] = grid[y];
     }
+    let filter = new Float32Array(5);
     for (let y = 2; y < depth - 2; y++) {
-        result[y] = new Uint8Array(width);
+        result[y] = new Float32Array(width);
         for (let x = 0; x < 2; x++) {
             result[y][x] = grid[y][x];
         }
@@ -169,6 +183,21 @@ function gaussianBlur(grid, width, depth) {
             result[y][x] = grid[y][x];
         }
         for (let x = 2; x < width - 2; x++) {
+            let sigma = standardDevWindow(grid, x, y, offsets);
+            if (sigma == 0) {
+                continue;
+            }
+            let sigmaSquared = sigma * sigma;
+            const denominator = Math.sqrt(2 * Math.PI * sigmaSquared);
+            let sum = 0;
+            for (let i in distancesSquared) {
+                let numerator = Math.exp(-(distancesSquared[i] / (2 * sigmaSquared)));
+                filter[i] = numerator / denominator;
+                sum += filter[i];
+            }
+            for (let coeff of filter) {
+                coeff /= sum;
+            }
             let blurred = 0;
             for (let i in offsets) {
                 let dx = offsets[i];
@@ -178,7 +207,7 @@ function gaussianBlur(grid, width, depth) {
                 let dy = offsets[i];
                 blurred += grid[y + dy][x] * filter[i];
             }
-            result[y][x] = Math.min(Math.floor(blurred), Biome.Desert);
+            result[y][x] = blurred;
         }
     }
     return result;
@@ -293,15 +322,15 @@ export class Surface {
     }
 }
 export class TerrainBuilder {
-    constructor(width, depth, _ceiling, _terraces, _waterMultiplier, spriteWidth, spriteHeight, spriteHeightRatio, sys) {
+    constructor(width, depth, _ceiling, _terraces, _water, _wetLimit, _dryLimit, spriteWidth, spriteHeight, spriteHeightRatio, sys) {
         this._ceiling = _ceiling;
         this._terraces = _terraces;
-        this._waterMultiplier = _waterMultiplier;
+        this._water = _water;
+        this._wetLimit = _wetLimit;
+        this._dryLimit = _dryLimit;
         this._waterLevel = 0.0;
         this._landRange = this._ceiling - this._waterLevel;
         this._beachLimit = this._waterLevel + (this._landRange / 10);
-        this._dryLimit = 0.02;
-        this._wetLimit = 0.15;
         this._treeLimit = 0.6;
         let dims = sys == CoordSystem.Isometric ?
             new IsometricDimensionsFromSprite(spriteWidth, spriteHeight, spriteHeightRatio) :
@@ -471,43 +500,39 @@ export class TerrainBuilder {
             }
         }
         console.log("adding rain");
-        let water = 3.0;
+        Rain.init(this._waterLevel, this._surface);
         for (let x = 0; x < this._surface.width; x++) {
-            Rain.add(x, this._surface.depth - 1, water, this._waterLevel, this._waterMultiplier, Direction.North, this._surface);
+            Rain.add(x, this._surface.depth - 1, this._water, Direction.North);
         }
         for (let i = 0; i < Rain.clouds.length; i++) {
             let cloud = Rain.clouds[i];
             while (!cloud.update()) { }
         }
+        console.log("total clouds added:", Rain.totalClouds);
+        let blurredMoisture = gaussianBlur(Rain.moistureGrid, this._surface.width, this._surface.depth);
         console.log("calculating terrain biomes");
-        let biomes = new Array();
         for (let y = 0; y < this._surface.depth; y++) {
-            biomes[y] = new Uint8Array(this._surface.width);
             for (let x = 0; x < this._surface.width; x++) {
                 let surface = this._surface.at(x, y);
+                surface.moisture = blurredMoisture[y][x];
+                let biome = Biome.Water;
                 if (surface.height <= this._waterLevel) {
-                    biomes[y][x] = Biome.Water;
+                    biome = Biome.Water;
                 }
                 else if (surface.height <= this._beachLimit) {
-                    biomes[y][x] = Biome.Beach;
+                    biome = Biome.Beach;
                 }
                 else {
                     if (surface.height > this._treeLimit) {
-                        biomes[y][x] = Biome.Tundra;
+                        biome = Biome.Tundra;
                     }
                     else {
-                        biomes[y][x] = surface.moisture > this._wetLimit ?
+                        biome = surface.moisture > this._wetLimit ?
                             Biome.Marshland : surface.moisture > this._dryLimit ?
                             Biome.Grassland : Biome.Desert;
                     }
                 }
-            }
-        }
-        let blurred = gaussianBlur(biomes, this._surface.width, this._surface.depth);
-        for (let y = 0; y < this._surface.depth; y++) {
-            for (let x = 0; x < this._surface.width; x++) {
-                let surface = this._surface.at(x, y);
-                surface.biome = blurred[y][x];
+                surface.biome = biome;
             }
         }
         this.calcShapes();
@@ -515,7 +540,6 @@ export class TerrainBuilder {
         for (let y = 0; y < this._surface.depth; y++) {
             for (let x = 0; x < this._surface.width; x++) {
                 let surface = this._surface.at(x, y);
-                surface.biome = blurred[y][x];
                 surface.type = this.calcType(x, y);
                 surface.shape = this.calcEdge(x, y);
                 console.assert(surface.terrace <= this._terraces && surface.terrace >= 0, "terrace out-of-range", surface.terrace);
