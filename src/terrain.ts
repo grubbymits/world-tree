@@ -400,7 +400,7 @@ export class TerrainBuilder {
   private readonly _waterLevel: number = 0.0;
   private readonly _landRange: number = this._ceiling - this._waterLevel;
   private readonly _beachLimit: number = this._waterLevel + (this._landRange / 10);
-  private readonly _treeLimit: number = 0.6;
+  private readonly _treeLimit: number = this._ceiling - (this._landRange / 20);
   
   constructor(width: number,
               depth: number,
@@ -420,8 +420,10 @@ export class TerrainBuilder {
     this._surface = new Surface(width, depth);
     this._worldTerrain = new SquareGrid(width, depth);
     this._terraceSpacing = this._landRange / this._terraces;
-    console.log("Terrain builder with", this._terraces, "terraces, and",
-                this._terraceSpacing, "terrace spacing");
+    console.log("Terrain builder",
+                "- with a ceiling of:", this._ceiling, "\n",
+                "- ", this._terraces, "terraces\n",
+                "- ", this._terraceSpacing, "terrace spacing");
   }
 
   get terrain(): SquareGrid {
@@ -636,18 +638,20 @@ export class TerrainBuilder {
         let surface = this._surface.at(x, y);
         surface.moisture = blurredMoisture[y][x];
         let biome: Biome = Biome.Water;
+
         if (surface.height <= this._waterLevel) {
           biome = Biome.Water;
         } else if (surface.height <= this._beachLimit) {
           biome = Biome.Beach;
+        } else if (surface.height > this._treeLimit) {
+          biome = surface.moisture > this._dryLimit ?
+            Biome.Grassland : Biome.Tundra
+        } else if (surface.moisture < this._dryLimit) {
+          biome = Biome.Desert;
+        } else if (surface.moisture > this._wetLimit) {
+          biome = Biome.Marshland;
         } else {
-          if (surface.height > this._treeLimit) {
-            biome = Biome.Tundra;
-          } else {
-            biome = surface.moisture > this._wetLimit ?
-              Biome.Marshland : surface.moisture > this._dryLimit ?
-              Biome.Grassland : Biome.Desert;
-          }
+          biome = Biome.Woodland;
         }
         surface.biome = biome;
       }

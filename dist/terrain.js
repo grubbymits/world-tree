@@ -331,7 +331,7 @@ export class TerrainBuilder {
         this._waterLevel = 0.0;
         this._landRange = this._ceiling - this._waterLevel;
         this._beachLimit = this._waterLevel + (this._landRange / 10);
-        this._treeLimit = 0.6;
+        this._treeLimit = this._ceiling - (this._landRange / 20);
         let dims = sys == CoordSystem.Isometric ?
             new IsometricDimensionsFromSprite(spriteWidth, spriteHeight, spriteHeightRatio) :
             new CartisanDimensionsFromSprite(spriteWidth, spriteHeight, spriteHeightRatio);
@@ -339,7 +339,7 @@ export class TerrainBuilder {
         this._surface = new Surface(width, depth);
         this._worldTerrain = new SquareGrid(width, depth);
         this._terraceSpacing = this._landRange / this._terraces;
-        console.log("Terrain builder with", this._terraces, "terraces, and", this._terraceSpacing, "terrace spacing");
+        console.log("Terrain builder", "- with a ceiling of:", this._ceiling, "\n", "- ", this._terraces, "terraces\n", "- ", this._terraceSpacing, "terrace spacing");
     }
     get terrain() {
         return this._worldTerrain;
@@ -522,15 +522,18 @@ export class TerrainBuilder {
                 else if (surface.height <= this._beachLimit) {
                     biome = Biome.Beach;
                 }
+                else if (surface.height > this._treeLimit) {
+                    biome = surface.moisture > this._dryLimit ?
+                        Biome.Grassland : Biome.Tundra;
+                }
+                else if (surface.moisture < this._dryLimit) {
+                    biome = Biome.Desert;
+                }
+                else if (surface.moisture > this._wetLimit) {
+                    biome = Biome.Marshland;
+                }
                 else {
-                    if (surface.height > this._treeLimit) {
-                        biome = Biome.Tundra;
-                    }
-                    else {
-                        biome = surface.moisture > this._wetLimit ?
-                            Biome.Marshland : surface.moisture > this._dryLimit ?
-                            Biome.Grassland : Biome.Desert;
-                    }
+                    biome = Biome.Woodland;
                 }
                 surface.biome = biome;
             }

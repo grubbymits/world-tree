@@ -55,7 +55,7 @@ window.onload = (event) => {
   let heightRatio = 2/3;
   console.log("heightRatio:", heightRatio);
 
-  let terraces = 3;
+  let terraces = 4;
   let water = 3;
   let dryLimit = 0.2;
   let wetLimit = 1;
