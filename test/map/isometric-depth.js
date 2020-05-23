@@ -4,23 +4,6 @@ import OpenSimplexNoise from "../../libs/open-simplex-noise/index.js";
 const spriteWidth = 261;
 const spriteHeight = 251;
 
-function createGraphic(path) {
-  let sheet = new WT.SpriteSheet(path);
-  let sprite = new WT.Sprite(sheet, 0, 0, spriteWidth, spriteHeight);
-  return new Array(new WT.StaticGraphicComponent(sprite.id));
-}
-
-function createGraphics(paths) {
-  let graphics = new Array();
-  for (let i in paths) {
-    let path = paths[i];
-    let sheet = new WT.SpriteSheet(path);
-    let sprite = new WT.Sprite(sheet, 0, 0, spriteWidth, spriteHeight);
-    graphics.push(new WT.StaticGraphicComponent(sprite.id));
-  }
-  return graphics;
-}
-
 window.onload = (event) => {
   console.log("loaded");
   let cellsX = 40;
@@ -79,74 +62,11 @@ window.onload = (event) => {
   context.run();
 };
 
-WT.Terrain.addTerrainGraphics(WT.TerrainType.Water, createGraphic("../../../res/img/water/flat"));
-let sprites = new Array("../../../res/img/sand/flat",
-                        "../../../res/img/sand/flat-north-edge",
-                        "../../../res/img/sand/flat-north-east-edge",
-                        "../../../res/img/sand/flat-east-edge",
-                        "../../../res/img/sand/south",
-                        "../../../res/img/sand/south-edge",
-                        "../../../res/img/sand/west",
-                        "../../../res/img/sand/west-edge",
-                        "../../../res/img/sand/north",
-                        "../../../res/img/sand/north-edge",
-                        "../../../res/img/sand/east",
-                        "../../../res/img/sand/east-edge");
-WT.Terrain.addTerrainGraphics(WT.TerrainType.Sand, createGraphics(sprites));
-
-sprites = new Array("../../../res/img/mud/flat",
-                    "../../../res/img/mud/flat-north-edge",
-                    "../../../res/img/mud/flat-north-east-edge",
-                    "../../../res/img/mud/flat-east-edge",
-                    "../../../res/img/mud/south",
-                    "../../../res/img/mud/south-edge",
-                    "../../../res/img/mud/west",
-                    "../../../res/img/mud/west-edge",
-                    "../../../res/img/mud/north",
-                    "../../../res/img/mud/north-edge",
-                    "../../../res/img/mud/east",
-                    "../../../res/img/mud/east-edge");
-WT.Terrain.addTerrainGraphics(WT.TerrainType.Mud, createGraphics(sprites));
-
-sprites = new Array("../../../res/img/light-grass-sand/flat",
-                    "../../../res/img/light-grass-sand/flat-north-edge",
-                    "../../../res/img/light-grass-sand/flat-north-east-edge",
-                    "../../../res/img/light-grass-sand/flat-east-edge",
-                    "../../../res/img/light-grass-sand/south",
-                    "../../../res/img/light-grass-sand/south-edge",
-                    "../../../res/img/light-grass-sand/west",
-                    "../../../res/img/light-grass-sand/west-edge",
-                    "../../../res/img/light-grass-sand/north",
-                    "../../../res/img/light-grass-sand/north-edge",
-                    "../../../res/img/light-grass-sand/east",
-                    "../../../res/img/light-grass-sand/east-edge");
-WT.Terrain.addTerrainGraphics(WT.TerrainType.DryGrass, createGraphics(sprites));
-
-sprites = new Array("../../../res/img/rock/flat",
-                    "../../../res/img/rock/flat-north-edge",
-                    "../../../res/img/rock/flat-north-east-edge",
-                    "../../../res/img/rock/flat-east-edge",
-                    "../../../res/img/rock/south",
-                    "../../../res/img/rock/south-edge",
-                    "../../../res/img/rock/west",
-                    "../../../res/img/rock/west-edge",
-                    "../../../res/img/rock/north",
-                    "../../../res/img/rock/north-edge",
-                    "../../../res/img/rock/east",
-                    "../../../res/img/rock/east-edge");
-WT.Terrain.addTerrainGraphics(WT.TerrainType.Rock, createGraphics(sprites));
-
-sprites = new Array("../../../res/img/dark-grass-sand/flat",
-                    "../../../res/img/dark-grass-sand/flat-north-edge",
-                    "../../../res/img/dark-grass-sand/flat-north-east-edge",
-                    "../../../res/img/dark-grass-sand/flat-east-edge",
-                    "../../../res/img/dark-grass-sand/south",
-                    "../../../res/img/dark-grass-sand/south-edge",
-                    "../../../res/img/dark-grass-sand/west",
-                    "../../../res/img/dark-grass-sand/west-edge",
-                    "../../../res/img/dark-grass-sand/north",
-                    "../../../res/img/dark-grass-sand/north-edge",
-                    "../../../res/img/dark-grass-sand/east",
-                    "../../../res/img/dark-grass-sand/east-edge");
-WT.Terrain.addTerrainGraphics(WT.TerrainType.WetGrass, createGraphics(sprites));
+let sheet = new WT.SpriteSheet("../../../res/img/light-grass-rock");
+WT.Terrain.addGraphics(WT.TerrainType.DryGrass, sheet, spriteWidth, spriteHeight);
+WT.Terrain.addGraphics(WT.TerrainType.WetGrass, sheet, spriteWidth, spriteHeight);
+WT.Terrain.addGraphics(WT.TerrainType.Water, sheet, spriteWidth, spriteHeight);
+WT.Terrain.addGraphics(WT.TerrainType.Sand, sheet, spriteWidth, spriteHeight);
+WT.Terrain.addGraphics(WT.TerrainType.Mud, sheet, spriteWidth, spriteHeight);
+WT.Terrain.addGraphics(WT.TerrainType.Rock, sheet, spriteWidth, spriteHeight);
 

@@ -1,3 +1,4 @@
+/*
 export class Plant extends StaticEntity {
   private static _graphics = new Map<PlantType, GraphicComponent>();
 
@@ -12,4 +13,4 @@ export class Plant extends StaticEntity {
               plantType: PlantType) {
     super(location, dimensions, blocking, Plant.graphics.get(PlantType)!);
   }
-}
+}*/

@@ -11,6 +11,9 @@ export class Context {
             new CartisanRenderer(canvas) :
             new IsometricRenderer(canvas);
     }
+    addEntity(entity) {
+        this._entities.push(entity);
+    }
     update() {
         this._gfx.render(this._entities, this._controller.camera);
     }
