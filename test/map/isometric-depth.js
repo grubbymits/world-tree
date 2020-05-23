@@ -6,26 +6,25 @@ const spriteHeight = 251;
 
 window.onload = (event) => {
   console.log("loaded");
-  let cellsX = 40;
-  let cellsY = 40;
+  let cellsX = 50;
+  let cellsY = 50;
   let freq = 0.2;
   const openSimplex = new OpenSimplexNoise(Date.now());
   let heightMap = new Array();
 
-  let cx = cellsX / 2;
-  let cy = cellsY / 2;
-  let factor = 0.1;
-  let falloff = 1.01;
+  let cx = Math.floor(cellsX / 2);
+  let cy = Math.floor(cellsY / 2);
+  let defaultHeight = 0.75;
+  let factor = 0.05;
   let ceiling = 1;
 
   for (let y = 0; y < cellsY; y++) {
     heightMap[y] = new Array();
     for (let x = 0; x < cellsX; x++) {
-      let height = 0.75;
+      let height = defaultHeight;
       height += 0.40 * openSimplex.noise2D(freq * x, freq * y) +
                 0.20 * openSimplex.noise2D(freq * 2 * x, freq * 2 * y) +
                 0.10 * openSimplex.noise2D(freq * 4 * x, freq * 4 * y);
-                //0.05 * openSimplex.noise2D(freq * 8 * x, freq * 8 * y);
       let nx = Math.abs(x - cx);
       let ny = Math.abs(y - cy);
       let distance = Math.sqrt(Math.pow(nx, 2) + Math.pow(ny, 2));

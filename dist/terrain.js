@@ -493,6 +493,9 @@ export class TerrainBuilder {
                     if (result > centre.terrace) {
                         centre.shape = ramps[i];
                         centre.terrace = result;
+                        if (centre.biome == Biome.Beach) {
+                            centre.biome = neighbour.biome;
+                        }
                         break;
                     }
                 }
@@ -616,7 +619,7 @@ export class TerrainBuilder {
                 if (surface.height <= this._waterLevel) {
                     biome = Biome.Water;
                 }
-                else if (surface.height <= this._beachLimit) {
+                else if (surface.terrace < 1) {
                     biome = Biome.Beach;
                 }
                 else if (surface.height > this._treeLimit) {
