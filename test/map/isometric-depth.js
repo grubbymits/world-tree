@@ -62,11 +62,20 @@ window.onload = (event) => {
   context.run();
 };
 
-let sheet = new WT.SpriteSheet("../../../res/img/light-grass-rock");
-WT.Terrain.addGraphics(WT.TerrainType.DryGrass, sheet, spriteWidth, spriteHeight);
-WT.Terrain.addGraphics(WT.TerrainType.WetGrass, sheet, spriteWidth, spriteHeight);
-WT.Terrain.addGraphics(WT.TerrainType.Water, sheet, spriteWidth, spriteHeight);
+let sheet = new WT.SpriteSheet("../../../res/img/water");
+WT.Terrain.addGraphic(WT.TerrainType.Water, sheet, spriteWidth, spriteHeight);
+
+sheet = new WT.SpriteSheet("../../../res/img/sand");
 WT.Terrain.addGraphics(WT.TerrainType.Sand, sheet, spriteWidth, spriteHeight);
-WT.Terrain.addGraphics(WT.TerrainType.Mud, sheet, spriteWidth, spriteHeight);
+
+sheet = new WT.SpriteSheet("../../../res/img/rock");
 WT.Terrain.addGraphics(WT.TerrainType.Rock, sheet, spriteWidth, spriteHeight);
+
+sheet = new WT.SpriteSheet("../../../res/img/light-grass-rock");
+WT.Terrain.addGraphics(WT.TerrainType.DryGrass, sheet, spriteWidth, spriteHeight);
+
+WT.Terrain.addGraphics(WT.TerrainType.WetGrass, sheet, spriteWidth, spriteHeight);
+WT.Terrain.addGraphics(WT.TerrainType.Mud, sheet, spriteWidth, spriteHeight);
+
+
 

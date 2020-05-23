@@ -14,12 +14,12 @@ import { Point,
 import { SquareGrid } from "./map.js"
 
 export enum TerrainShape {
+  Flat,
+  FlatWest,
+  FlatEast,
   FlatNorthWest,
   FlatNorth,
   FlatNorthEast,
-  FlatWest,
-  Flat,
-  FlatEast,
   FlatSouthWest,
   FlatSouth,
   FlatSouthEast,
@@ -309,6 +309,20 @@ export class Terrain extends StaticEntity {
     return this._terrainGraphics.get(terrainType)![shape];
   }
 
+  static addGraphic(terrainType: TerrainType,
+                    sheet: SpriteSheet,
+                    width: number,
+                    height: number) {
+    console.assert(terrainType == TerrainType.Water,
+                   "water is the only type supported");
+    console.log("adding graphics for type:", getTypeName(terrainType));
+    this._terrainGraphics.set(terrainType, new Array<GraphicComponent>());
+    let graphics = this._terrainGraphics.get(terrainType)!;
+    let sprite = new Sprite(sheet, 0, 0, width, height);
+    graphics.push(new StaticGraphicComponent(sprite.id));
+    console.log("added sprite for shape: flat");
+  }
+
   static addGraphics(terrainType: TerrainType,
                      sheet: SpriteSheet,
                      width: number,
@@ -517,7 +531,6 @@ export class TerrainBuilder {
       default:
       break;
       case Biome.Beach:
-      case Biome.Desert:
         return TerrainType.Sand;
       case Biome.Marshland:
         return TerrainType.WetGrass;
@@ -526,6 +539,7 @@ export class TerrainBuilder {
       case Biome.Grassland:
         return TerrainType.DryGrass;
       case Biome.Tundra:
+      case Biome.Desert:
         return TerrainType.Rock;
     }
     console.log("default biome:", getBiomeName(surface.biome));
