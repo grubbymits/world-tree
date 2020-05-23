@@ -255,8 +255,8 @@ export class Terrain extends StaticEntity {
     this._sys = sys;
   }
   
-  static addTerrainGraphics(terrainType: TerrainType,
-                            graphics: Array<GraphicComponent>) {
+  static addGraphics(terrainType: TerrainType,
+                     graphics: Array<GraphicComponent>) {
     console.log("adding graphics for", getTypeName(terrainType), graphics);
     this._terrainGraphics.set(terrainType, graphics);
   }

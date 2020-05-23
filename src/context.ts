@@ -24,6 +24,10 @@ export class Context {
       new IsometricRenderer(canvas);
   }
 
+  addEntity(entity: Entity): void {
+    this._entities.push(entity);
+  }
+
   update(): void {
     this._gfx.render(this._entities, this._controller.camera);
   }
