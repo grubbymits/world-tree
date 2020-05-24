@@ -55,9 +55,25 @@ export var TerrainFeature;
     TerrainFeature[TerrainFeature["ShorelineEast"] = 4] = "ShorelineEast";
     TerrainFeature[TerrainFeature["ShorelineSouth"] = 8] = "ShorelineSouth";
     TerrainFeature[TerrainFeature["ShorelineWest"] = 16] = "ShorelineWest";
+    TerrainFeature[TerrainFeature["Grass"] = 32] = "Grass";
 })(TerrainFeature || (TerrainFeature = {}));
 function hasFeature(features, mask) {
     return (features & mask) == mask;
+}
+function getFeatureName(feature) {
+    switch (feature) {
+        default:
+            break;
+        case TerrainFeature.Shoreline:
+        case TerrainFeature.ShorelineNorth:
+        case TerrainFeature.ShorelineEast:
+        case TerrainFeature.ShorelineSouth:
+        case TerrainFeature.ShorelineWest:
+            return "Shoreline";
+        case TerrainFeature.Grass:
+            return "Grass";
+    }
+    return "None";
 }
 function getBiomeName(biome) {
     switch (biome) {
@@ -282,6 +298,9 @@ export class Terrain extends StaticEntity {
             if (hasFeature(features, TerrainFeature.ShorelineWest))
                 this.addGraphic(Terrain.featureGraphics(TerrainFeature.ShorelineWest));
         }
+        if (_type == TerrainType.WetGrass && _shape == TerrainShape.Flat) {
+            this.addGraphic(Terrain.featureGraphics(TerrainFeature.Grass));
+        }
     }
     static init(dims, sys) {
         this._dimensions = dims;
@@ -324,6 +343,7 @@ export class Terrain extends StaticEntity {
         console.log("added sprite for shape:", getShapeName(shapeType));
     }
     static addFeatureGraphics(feature, graphics) {
+        console.log("adding feature graphics for", getFeatureName(feature));
         this._featureGraphics.set(feature, graphics);
     }
     static get width() { return this._dimensions.width; }

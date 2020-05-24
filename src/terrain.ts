@@ -65,10 +65,27 @@ export enum TerrainFeature {
   ShorelineEast = 1 << 2,
   ShorelineSouth = 1 << 3,
   ShorelineWest = 1 << 4,
+  Grass = 1 << 5,
 }
 
 function hasFeature(features: number, mask: TerrainFeature): boolean {
   return (features & <number>mask) == <number>mask;
+}
+
+function getFeatureName(feature: TerrainFeature): string {
+  switch (feature) {
+  default:
+    break;
+  case TerrainFeature.Shoreline:
+  case TerrainFeature.ShorelineNorth:
+  case TerrainFeature.ShorelineEast:
+  case TerrainFeature.ShorelineSouth:
+  case TerrainFeature.ShorelineWest:
+    return "Shoreline";
+  case TerrainFeature.Grass:
+    return "Grass";
+  }
+  return "None";
 }
 
 function getBiomeName(biome: Biome): string {
@@ -370,6 +387,7 @@ export class Terrain extends StaticEntity {
 
   static addFeatureGraphics(feature: TerrainFeature,
                             graphics: GraphicComponent) {
+    console.log("adding feature graphics for", getFeatureName(feature));
     this._featureGraphics.set(feature, graphics);
   }
 
@@ -410,6 +428,9 @@ export class Terrain extends StaticEntity {
         this.addGraphic(Terrain.featureGraphics(TerrainFeature.ShorelineEast));
       if (hasFeature(features, TerrainFeature.ShorelineWest))
         this.addGraphic(Terrain.featureGraphics(TerrainFeature.ShorelineWest));
+    }
+    if (_type == TerrainType.WetGrass && _shape == TerrainShape.Flat) {
+      this.addGraphic(Terrain.featureGraphics(TerrainFeature.Grass));
     }
   }
 

@@ -99,3 +99,12 @@ for (let y in features) {
   WT.Terrain.addFeatureGraphics(feature, waves);
 }
 
+sheet = new WT.SpriteSheet("../../../res/img/grass");
+let grassSprites = new Array();
+for (let x = 0; x < 4; x++) {
+  grassSprites.push(new WT.Sprite(sheet, x * spriteWidth, 0,
+                                  spriteWidth, spriteHeight));
+}
+let grass = new WT.OssilateGraphicComponent(grassSprites, 333);
+WT.Terrain.addFeatureGraphics(WT.TerrainFeature.Grass, grass);
+
