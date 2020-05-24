@@ -94,6 +94,43 @@ export class StaticGraphicComponent extends GraphicComponent {
   }
 }
 
+export class OssilateGraphicComponent extends GraphicComponent {
+  private _increase: boolean = true;
+  private _startId: number = 0;
+  private _endId: number = 0;
+  private _nextUpdate: number = 0;
+
+  constructor(sprites: Array<Sprite>,
+              private readonly _interval: number) {
+    super(sprites[0].id);
+    this._startId = sprites[0].id;
+    this._endId = sprites[sprites.length - 1].id;
+    this._currentSpriteId = Math.floor(Math.random() * (this._endId - this._startId) + this._startId);
+    this._nextUpdate = Date.now() + _interval;
+  }
+
+  update(): number {
+    if (this._nextUpdate > Date.now()) {
+      return this._currentSpriteId;
+    }
+
+    if (this._increase) {
+      if (this._currentSpriteId != this._endId) {
+        this._currentSpriteId++;
+      } else {
+        this._increase = false;
+      }
+    } else if (this._currentSpriteId != this._startId) {
+      this._currentSpriteId--;
+    } else {
+      this._increase = true;
+    }
+
+    this._nextUpdate = Date.now() + this._interval;
+    return this._currentSpriteId;
+  }
+}
+
 export abstract class Renderer {
   protected readonly _width: number;
   protected readonly _height: number;
@@ -124,8 +161,11 @@ export abstract class Renderer {
         continue;
       }
       coord = camera.getDrawCoord(coord);
-      let spriteId = entity.graphicsComponent.update();
-      Sprite.sprites[spriteId].draw(coord, this._ctx);
+      for (let i in entity.graphics) {
+        let component = entity.graphics[i];
+        let spriteId = component.update();
+        Sprite.sprites[spriteId].draw(coord, this._ctx);
+      }
     }
   }
 }

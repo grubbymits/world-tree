@@ -1,13 +1,14 @@
 import { CoordSystem, CartisanRenderer, IsometricRenderer } from "./graphics.js";
 export class Entity {
-    constructor(_location, _dimensions, _blocking, _graphicsComponent, _static) {
+    constructor(_location, _dimensions, _blocking, graphicComponent, _static) {
         this._location = _location;
         this._dimensions = _dimensions;
         this._blocking = _blocking;
-        this._graphicsComponent = _graphicsComponent;
         this._static = _static;
         this._id = Entity._ids;
         Entity._ids++;
+        this._graphicComponents = new Array();
+        this._graphicComponents.push(graphicComponent);
     }
     get x() { return this._location.x; }
     get y() { return this._location.y; }
@@ -20,8 +21,8 @@ export class Entity {
     get blocking() { return this._blocking; }
     get id() { return this._id; }
     get static() { return this._static; }
-    get graphicsComponent() {
-        return this._graphicsComponent;
+    get graphics() {
+        return this._graphicComponents;
     }
 }
 Entity._ids = 0;
@@ -33,4 +34,7 @@ export class StaticEntity extends Entity {
             CartisanRenderer.getDrawCoord(this);
     }
     get drawCoord() { return this._drawCoord; }
+    addGraphic(graphic) {
+        this._graphicComponents.push(graphic);
+    }
 }

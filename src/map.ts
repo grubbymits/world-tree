@@ -1,5 +1,8 @@
 import { Location } from "./physics.js"
-import { Terrain, TerrainShape, TerrainType } from "./terrain.js"
+import { Terrain,
+         TerrainShape,
+         TerrainType,
+         TerrainFeature } from "./terrain.js"
 import { Point, GraphicComponent } from "./graphics.js"
 
 export class SquareGrid {
@@ -22,8 +25,8 @@ export class SquareGrid {
   get height(): number { return this._height; }
 
   addRaisedTerrain(x: number, y: number, z: number, type: TerrainType,
-                   shape: TerrainShape) {
-    let terrain = Terrain.create(x, y, z, type, shape);
+                   shape: TerrainShape, feature: TerrainFeature) {
+    let terrain = Terrain.create(x, y, z, type, shape, feature);
     if (!this._raisedTerrain.has(x)) {
       this._raisedTerrain.set(x, new Map<number, Array<Terrain>>());
       this._raisedTerrain.get(x)!.set(y, new Array<Terrain>());

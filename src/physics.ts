@@ -80,6 +80,29 @@ export function getDirectionCoords(x: number, y: number,
   return new Point(x + xDiff, y + yDiff);
 }
 
+export function getDirection(from: Point, to: Point): Direction {
+  let xDiff = from.x - to.x;
+  let yDiff = from.y - to.y;
+
+  if (xDiff < 0 && yDiff < 0) {
+    return Direction.NorthWest;
+  } else if (xDiff == 0 && yDiff < 0) {
+    return Direction.North;
+  } else if (xDiff > 0 && yDiff < 0) {
+    return Direction.NorthEast;
+  } else if (xDiff < 0 && yDiff == 0) {
+    return Direction.West;
+  } else if (xDiff > 0 && yDiff == 0) {
+    return Direction.East;
+  } else if (xDiff < 0 && yDiff > 0) {
+    return Direction.SouthWest;
+  } else if (xDiff == 0 && yDiff > 0) {
+    return Direction.South;
+  }
+  console.assert(xDiff > 0 && yDiff > 0, "unhandled direction", xDiff, yDiff);
+  return Direction.SouthEast;
+}
+
 export class Location {
   constructor(private _x: number,
               private _y: number,

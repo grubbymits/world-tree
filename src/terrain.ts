@@ -2,7 +2,8 @@ import { Location,
          Dimensions,
          CartisanDimensionsFromSprite,
          IsometricDimensionsFromSprite,
-         Direction } from "./physics.js"
+         Direction,
+         getDirection } from "./physics.js"
 import { Rain } from "./weather.js"
 import { StaticEntity } from "./entity.js"
 import { Point,
@@ -55,6 +56,19 @@ export enum Biome {
   Woodland,
   Tundra,
   Desert,
+}
+
+export enum TerrainFeature {
+  None,
+  Shoreline = 1,
+  ShorelineNorth = 1 << 1,
+  ShorelineEast = 1 << 2,
+  ShorelineSouth = 1 << 3,
+  ShorelineWest = 1 << 4,
+}
+
+function hasFeature(features: number, mask: TerrainFeature): boolean {
+  return (features & <number>mask) == <number>mask;
 }
 
 function getBiomeName(biome: Biome): string {
@@ -292,6 +306,7 @@ export class Terrain extends StaticEntity {
   private static _dimensions: Dimensions;
   private static _sys: CoordSystem;
   private static _terrainGraphics = new Map<TerrainType, Array<GraphicComponent>>();
+  private static _featureGraphics = new Map<TerrainFeature, GraphicComponent>();
 
   static init(dims: Dimensions, sys: CoordSystem) {
     this._dimensions = dims;
@@ -307,6 +322,12 @@ export class Terrain extends StaticEntity {
                    "undefined terrain graphic for:", getTypeName(terrainType),
                    getShapeName(shape));
     return this._terrainGraphics.get(terrainType)![shape];
+  }
+
+  static featureGraphics(terrainFeature: TerrainFeature): GraphicComponent {
+    console.assert(this._featureGraphics.has(terrainFeature),
+                   "missing terrain feature");
+    return this._featureGraphics.get(terrainFeature)!;
   }
 
   static addGraphic(terrainType: TerrainType,
@@ -347,6 +368,11 @@ export class Terrain extends StaticEntity {
     getShapeName(<TerrainShape>shapeType));
   }
 
+  static addFeatureGraphics(feature: TerrainFeature,
+                            graphics: GraphicComponent) {
+    this._featureGraphics.set(feature, graphics);
+  }
+
   static get width(): number { return this._dimensions.width; }
   static get depth(): number { return this._dimensions.depth; }
   static get height(): number { return this._dimensions.height; }
@@ -359,8 +385,9 @@ export class Terrain extends StaticEntity {
   }
 
   static create(x: number, y: number, z: number,
-                type: TerrainType, shape: TerrainShape) : Terrain {
-    return new Terrain(x, y, z, this._dimensions, type, shape);
+                type: TerrainType, shape: TerrainShape,
+                feature: TerrainFeature) : Terrain {
+    return new Terrain(x, y, z, this._dimensions, type, shape, feature);
   }
 
   constructor(private readonly _gridX: number,
@@ -368,11 +395,22 @@ export class Terrain extends StaticEntity {
               private readonly _gridZ: number,
               dimensions: Dimensions,
               private readonly _type: TerrainType,
-              private readonly _shape: TerrainShape) {
+              private readonly _shape: TerrainShape,
+              features: number) {
     super(new Location(_gridX * dimensions.width,
                        _gridY * dimensions.depth,
                        _gridZ * dimensions.height),
           dimensions, true, Terrain.graphics(_type, _shape), Terrain.sys);
+    if (features != TerrainFeature.None) {
+      if (hasFeature(features, TerrainFeature.ShorelineNorth))
+        this.addGraphic(Terrain.featureGraphics(TerrainFeature.ShorelineNorth));
+      if (hasFeature(features, TerrainFeature.ShorelineSouth))
+        this.addGraphic(Terrain.featureGraphics(TerrainFeature.ShorelineSouth));
+      if (hasFeature(features, TerrainFeature.ShorelineEast))
+        this.addGraphic(Terrain.featureGraphics(TerrainFeature.ShorelineEast));
+      if (hasFeature(features, TerrainFeature.ShorelineWest))
+        this.addGraphic(Terrain.featureGraphics(TerrainFeature.ShorelineWest));
+    }
   }
 
   get gridX(): number { return this._gridX; }
@@ -388,6 +426,7 @@ export class TerrainAttributes {
   private _biome: Biome;
   private _type: TerrainType;
   private _shape: TerrainShape;
+  private _features: number;
   
   constructor(private readonly _x: number,
               private readonly _y: number,
@@ -397,14 +436,17 @@ export class TerrainAttributes {
     this._terrace = 0;
     this._type = TerrainType.Water;
     this._shape = TerrainShape.Flat;
+    this._features = <number>TerrainFeature.None;
   }
   
   get x(): number { return this._x; }
   get y(): number { return this._y; }
+  get pos(): Point { return new Point(this._x, this._y); }
   get height(): number { return this._height; }
   get terrace(): number { return this._terrace; }
   get type(): TerrainType { return this._type; }
   get shape(): TerrainShape { return this._shape; }
+  get features(): number { return this._features; }
   get moisture(): number { return this._moisture; }
   get biome(): Biome { return this._biome; }
 
@@ -412,6 +454,7 @@ export class TerrainAttributes {
   set terrace(t: number) { this._terrace = t; }
   set type(t: TerrainType) { this._type = t; }
   set shape(s: TerrainShape) { this._shape = s; }
+  set features(f: number) { this._features |= f; }
   set biome(b: Biome) { this._biome = b; }
 }
 
@@ -459,6 +502,9 @@ export class Surface {
       for (let xDiff = -1; xDiff < 2; xDiff++) {
         let x = centreX + xDiff;
         if (x < 0 || x >= this._width) {
+          continue;
+        }
+        if (x == centreX && y == centreY) {
           continue;
         }
         neighbours.push(this._surface[y][x]);
@@ -700,6 +746,39 @@ export class TerrainBuilder {
     return shapeType;
   }
 
+  addShoreline(): void {
+    for (let y = 0; y < this._surface.depth; y++) {
+      for (let x = 0; x < this._surface.width; x++) {
+        let centre = this._surface.at(x, y);
+        if (centre.biome != Biome.Beach) {
+          continue;
+        }
+        let neighbours = this._surface.getNeighbours(centre.x, centre.y);
+        for (let neighbour of neighbours) {
+          if (neighbour.biome != Biome.Water) {
+            continue;
+          }
+          switch (getDirection(neighbour.pos, centre.pos)) {
+          default:
+            break;
+          case Direction.North:
+            centre.features |= TerrainFeature.ShorelineNorth;
+            break;
+          case Direction.East:
+            centre.features |= TerrainFeature.ShorelineEast;
+            break;
+          case Direction.South:
+            centre.features |= TerrainFeature.ShorelineSouth;
+            break;
+          case Direction.West:
+            centre.features |= TerrainFeature.ShorelineWest;
+            break;
+          }
+        }
+      }
+    }
+  }
+
   build(heightMap: Array<Array<number>>): void {
     console.log("build terrain from height map");
     this._surface.init(heightMap);
@@ -716,7 +795,6 @@ export class TerrainBuilder {
         surface.terrace = terrace;
       }
     }
-
 
     console.log("adding rain");
     // Add moisture:
@@ -762,6 +840,7 @@ export class TerrainBuilder {
     }
 
     this.calcShapes();
+    this.addShoreline();
 
     console.log("adding surface terrain entities"); 
     // Add terrain objects that will be visible.
@@ -774,7 +853,8 @@ export class TerrainBuilder {
         console.assert(surface.terrace <= this._terraces && surface.terrace >= 0,
                        "terrace out-of-range", surface.terrace);
         this._worldTerrain.addRaisedTerrain(x, y, surface.terrace,
-                                            surface.type, surface.shape);
+                                            surface.type, surface.shape,
+                                            surface.features);
       }
     }
 
@@ -791,7 +871,8 @@ export class TerrainBuilder {
         while (z > zStop) {
           z--;
           this._worldTerrain.addRaisedTerrain(x, y, z, terrain.type,
-                                              TerrainShape.Flat);
+                                              TerrainShape.Flat,
+                                              TerrainFeature.None);
         }
       }
     }

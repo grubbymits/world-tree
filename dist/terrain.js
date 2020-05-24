@@ -1,4 +1,4 @@
-import { Location, CartisanDimensionsFromSprite, IsometricDimensionsFromSprite, Direction } from "./physics.js";
+import { Location, CartisanDimensionsFromSprite, IsometricDimensionsFromSprite, Direction, getDirection } from "./physics.js";
 import { Rain } from "./weather.js";
 import { StaticEntity } from "./entity.js";
 import { Point, CoordSystem, Sprite, StaticGraphicComponent } from "./graphics.js";
@@ -47,6 +47,18 @@ export var Biome;
     Biome[Biome["Tundra"] = 5] = "Tundra";
     Biome[Biome["Desert"] = 6] = "Desert";
 })(Biome || (Biome = {}));
+export var TerrainFeature;
+(function (TerrainFeature) {
+    TerrainFeature[TerrainFeature["None"] = 0] = "None";
+    TerrainFeature[TerrainFeature["Shoreline"] = 1] = "Shoreline";
+    TerrainFeature[TerrainFeature["ShorelineNorth"] = 2] = "ShorelineNorth";
+    TerrainFeature[TerrainFeature["ShorelineEast"] = 4] = "ShorelineEast";
+    TerrainFeature[TerrainFeature["ShorelineSouth"] = 8] = "ShorelineSouth";
+    TerrainFeature[TerrainFeature["ShorelineWest"] = 16] = "ShorelineWest";
+})(TerrainFeature || (TerrainFeature = {}));
+function hasFeature(features, mask) {
+    return (features & mask) == mask;
+}
 function getBiomeName(biome) {
     switch (biome) {
         default:
@@ -253,13 +265,23 @@ function gaussianBlur(grid, width, depth) {
     return result;
 }
 export class Terrain extends StaticEntity {
-    constructor(_gridX, _gridY, _gridZ, dimensions, _type, _shape) {
+    constructor(_gridX, _gridY, _gridZ, dimensions, _type, _shape, features) {
         super(new Location(_gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height), dimensions, true, Terrain.graphics(_type, _shape), Terrain.sys);
         this._gridX = _gridX;
         this._gridY = _gridY;
         this._gridZ = _gridZ;
         this._type = _type;
         this._shape = _shape;
+        if (features != TerrainFeature.None) {
+            if (hasFeature(features, TerrainFeature.ShorelineNorth))
+                this.addGraphic(Terrain.featureGraphics(TerrainFeature.ShorelineNorth));
+            if (hasFeature(features, TerrainFeature.ShorelineSouth))
+                this.addGraphic(Terrain.featureGraphics(TerrainFeature.ShorelineSouth));
+            if (hasFeature(features, TerrainFeature.ShorelineEast))
+                this.addGraphic(Terrain.featureGraphics(TerrainFeature.ShorelineEast));
+            if (hasFeature(features, TerrainFeature.ShorelineWest))
+                this.addGraphic(Terrain.featureGraphics(TerrainFeature.ShorelineWest));
+        }
     }
     static init(dims, sys) {
         this._dimensions = dims;
@@ -269,6 +291,10 @@ export class Terrain extends StaticEntity {
         console.assert(this._terrainGraphics.has(terrainType), "undefined terrain graphic for TerrainType:", getTypeName(terrainType));
         console.assert(shape < this._terrainGraphics.get(terrainType).length, "undefined terrain graphic for:", getTypeName(terrainType), getShapeName(shape));
         return this._terrainGraphics.get(terrainType)[shape];
+    }
+    static featureGraphics(terrainFeature) {
+        console.assert(this._featureGraphics.has(terrainFeature), "missing terrain feature");
+        return this._featureGraphics.get(terrainFeature);
     }
     static addGraphic(terrainType, sheet, width, height) {
         console.assert(terrainType == TerrainType.Water, "water is the only type supported");
@@ -297,6 +323,9 @@ export class Terrain extends StaticEntity {
         graphics.push(new StaticGraphicComponent(sprite.id));
         console.log("added sprite for shape:", getShapeName(shapeType));
     }
+    static addFeatureGraphics(feature, graphics) {
+        this._featureGraphics.set(feature, graphics);
+    }
     static get width() { return this._dimensions.width; }
     static get depth() { return this._dimensions.depth; }
     static get height() { return this._dimensions.height; }
@@ -304,8 +333,8 @@ export class Terrain extends StaticEntity {
     static scaleLocation(loc) {
         return new Location(Math.floor(loc.x / this.width), Math.floor(loc.y / this.depth), Math.floor(loc.z / this.height));
     }
-    static create(x, y, z, type, shape) {
-        return new Terrain(x, y, z, this._dimensions, type, shape);
+    static create(x, y, z, type, shape, feature) {
+        return new Terrain(x, y, z, this._dimensions, type, shape, feature);
     }
     get gridX() { return this._gridX; }
     get gridY() { return this._gridY; }
@@ -314,6 +343,7 @@ export class Terrain extends StaticEntity {
     get type() { return this._type; }
 }
 Terrain._terrainGraphics = new Map();
+Terrain._featureGraphics = new Map();
 export class TerrainAttributes {
     constructor(_x, _y, _height) {
         this._x = _x;
@@ -324,19 +354,23 @@ export class TerrainAttributes {
         this._terrace = 0;
         this._type = TerrainType.Water;
         this._shape = TerrainShape.Flat;
+        this._features = TerrainFeature.None;
     }
     get x() { return this._x; }
     get y() { return this._y; }
+    get pos() { return new Point(this._x, this._y); }
     get height() { return this._height; }
     get terrace() { return this._terrace; }
     get type() { return this._type; }
     get shape() { return this._shape; }
+    get features() { return this._features; }
     get moisture() { return this._moisture; }
     get biome() { return this._biome; }
     set moisture(m) { this._moisture = m; }
     set terrace(t) { this._terrace = t; }
     set type(t) { this._type = t; }
     set shape(s) { this._shape = s; }
+    set features(f) { this._features |= f; }
     set biome(b) { this._biome = b; }
 }
 export class Surface {
@@ -376,6 +410,9 @@ export class Surface {
             for (let xDiff = -1; xDiff < 2; xDiff++) {
                 let x = centreX + xDiff;
                 if (x < 0 || x >= this._width) {
+                    continue;
+                }
+                if (x == centreX && y == centreY) {
                     continue;
                 }
                 neighbours.push(this._surface[y][x]);
@@ -586,6 +623,38 @@ export class TerrainBuilder {
         }
         return shapeType;
     }
+    addShoreline() {
+        for (let y = 0; y < this._surface.depth; y++) {
+            for (let x = 0; x < this._surface.width; x++) {
+                let centre = this._surface.at(x, y);
+                if (centre.biome != Biome.Beach) {
+                    continue;
+                }
+                let neighbours = this._surface.getNeighbours(centre.x, centre.y);
+                for (let neighbour of neighbours) {
+                    if (neighbour.biome != Biome.Water) {
+                        continue;
+                    }
+                    switch (getDirection(neighbour.pos, centre.pos)) {
+                        default:
+                            break;
+                        case Direction.North:
+                            centre.features |= TerrainFeature.ShorelineNorth;
+                            break;
+                        case Direction.East:
+                            centre.features |= TerrainFeature.ShorelineEast;
+                            break;
+                        case Direction.South:
+                            centre.features |= TerrainFeature.ShorelineSouth;
+                            break;
+                        case Direction.West:
+                            centre.features |= TerrainFeature.ShorelineWest;
+                            break;
+                    }
+                }
+            }
+        }
+    }
     build(heightMap) {
         console.log("build terrain from height map");
         this._surface.init(heightMap);
@@ -639,6 +708,7 @@ export class TerrainBuilder {
             }
         }
         this.calcShapes();
+        this.addShoreline();
         console.log("adding surface terrain entities");
         for (let y = 0; y < this._surface.depth; y++) {
             for (let x = 0; x < this._surface.width; x++) {
@@ -646,7 +716,7 @@ export class TerrainBuilder {
                 surface.type = this.calcType(x, y);
                 surface.shape = this.calcEdge(x, y);
                 console.assert(surface.terrace <= this._terraces && surface.terrace >= 0, "terrace out-of-range", surface.terrace);
-                this._worldTerrain.addRaisedTerrain(x, y, surface.terrace, surface.type, surface.shape);
+                this._worldTerrain.addRaisedTerrain(x, y, surface.terrace, surface.type, surface.shape, surface.features);
             }
         }
         console.log("adding subterranean entities");
@@ -660,7 +730,7 @@ export class TerrainBuilder {
                 }
                 while (z > zStop) {
                     z--;
-                    this._worldTerrain.addRaisedTerrain(x, y, z, terrain.type, TerrainShape.Flat);
+                    this._worldTerrain.addRaisedTerrain(x, y, z, terrain.type, TerrainShape.Flat, TerrainFeature.None);
                 }
             }
         }

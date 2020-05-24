@@ -38,9 +38,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.6203868"
-     inkscape:cx="35.86381"
-     inkscape:cy="-533.81339"
+     inkscape:zoom="2.5600001"
+     inkscape:cx="121.41908"
+     inkscape:cy="-45.037006"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -4800,6 +4800,9 @@
        style="fill:none;stroke:#747e41;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="M 11.456794,475.59375 -22.913588,455.75"
        id="path1473"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-rock.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
   </g>
 </svg>

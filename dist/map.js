@@ -13,8 +13,8 @@ export class SquareGrid {
     }
     get width() { return this._width; }
     get height() { return this._height; }
-    addRaisedTerrain(x, y, z, type, shape) {
-        let terrain = Terrain.create(x, y, z, type, shape);
+    addRaisedTerrain(x, y, z, type, shape, feature) {
+        let terrain = Terrain.create(x, y, z, type, shape, feature);
         if (!this._raisedTerrain.has(x)) {
             this._raisedTerrain.set(x, new Map());
             this._raisedTerrain.get(x).set(y, new Array());

@@ -11,13 +11,17 @@ export class Entity {
 
   private readonly _id: number;
 
+  protected _graphicComponents: Array<GraphicComponent>;
+
   constructor(protected _location: Location,
               protected readonly _dimensions: Dimensions,
               protected readonly _blocking: boolean,
-              protected _graphicsComponent: GraphicComponent,
+              graphicComponent: GraphicComponent,
               protected readonly _static: boolean) {
     this._id = Entity._ids;
     Entity._ids++;
+    this._graphicComponents = new Array<GraphicComponent>();
+    this._graphicComponents.push(graphicComponent);
   }
   
   get x(): number { return this._location.x; }
@@ -31,8 +35,8 @@ export class Entity {
   get blocking(): boolean { return this._blocking; }
   get id(): number { return this._id; }
   get static(): boolean { return this._static; }
-  get graphicsComponent(): GraphicComponent {
-    return this._graphicsComponent;
+  get graphics(): Array<GraphicComponent> {
+    return this._graphicComponents;
   }
 }
 
@@ -54,5 +58,9 @@ export class StaticEntity extends Entity {
   }
 
   get drawCoord(): Point { return this._drawCoord; }
+
+  addGraphic(graphic: GraphicComponent): void {
+    this._graphicComponents.push(graphic);
+  }
 }
 

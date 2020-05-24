@@ -4775,6 +4775,9 @@
        style="fill:none;stroke:#000000;stroke-width:0.26458333;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:0.25;stroke-miterlimit:4;stroke-dasharray:0.26458333, 0.26458333000000001;stroke-dashoffset:0"
        d="m 9.1654354,238.79167 h 4.5827176 l 29.787665,17.19791 0,2.64584"
        id="path1466"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/rock.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
   </g>
 </svg>

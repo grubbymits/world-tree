@@ -1,8 +1,8 @@
 import * as WT from "../../dist/world-tree.js";
 import OpenSimplexNoise from "../../libs/open-simplex-noise/index.js";
 
-const spriteWidth = 261;
-const spriteHeight = 251;
+const spriteWidth = 256;
+const spriteHeight = 246;
 
 window.onload = (event) => {
   console.log("loaded");
@@ -47,6 +47,8 @@ window.onload = (event) => {
                                       spriteWidth, spriteHeight, heightRatio,
                                       WT.CoordSystem.Isometric);
   builder.build(heightMap);
+  //builder.addFeature(WT.TerrainFeature.Shoreline);
+
   let canvas = document.getElementById("testCanvas");
   let context = new WT.Context(builder.terrain, WT.CoordSystem.Isometric, canvas);
 
@@ -76,5 +78,24 @@ WT.Terrain.addGraphics(WT.TerrainType.DryGrass, sheet, spriteWidth, spriteHeight
 WT.Terrain.addGraphics(WT.TerrainType.WetGrass, sheet, spriteWidth, spriteHeight);
 WT.Terrain.addGraphics(WT.TerrainType.Mud, sheet, spriteWidth, spriteHeight);
 
+sheet = new WT.SpriteSheet("../../../res/img/waves");
 
+
+let features = [ WT.TerrainFeature.ShorelineNorth,
+                 WT.TerrainFeature.ShorelineWest,
+                 WT.TerrainFeature.ShorelineEast,
+                 WT.TerrainFeature.ShorelineSouth, ];
+
+for (let y in features) {               
+  let waveSprites = new Array();
+  for (let x = 0; x < 3; x++) {
+    waveSprites.push(new WT.Sprite(sheet,
+                                   x * spriteWidth,
+                                   y * spriteHeight,
+                                   spriteWidth, spriteHeight));
+  }
+  let waves = new WT.OssilateGraphicComponent(waveSprites, 500);
+  let feature = features[y];
+  WT.Terrain.addFeatureGraphics(feature, waves);
+}
 
