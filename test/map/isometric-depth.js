@@ -4,6 +4,63 @@ import OpenSimplexNoise from "../../libs/open-simplex-noise/index.js";
 const spriteWidth = 256;
 const spriteHeight = 246;
 
+let sheet = new WT.SpriteSheet("../../../res/img/water");
+WT.Terrain.addGraphic(WT.TerrainType.Water, sheet, spriteWidth, spriteHeight);
+
+sheet = new WT.SpriteSheet("../../../res/img/sand");
+WT.Terrain.addGraphics(WT.TerrainType.Sand, sheet, spriteWidth, spriteHeight);
+
+sheet = new WT.SpriteSheet("../../../res/img/rock");
+WT.Terrain.addGraphics(WT.TerrainType.Rock, sheet, spriteWidth, spriteHeight);
+
+sheet = new WT.SpriteSheet("../../../res/img/light-grass-rock");
+WT.Terrain.addGraphics(WT.TerrainType.DryGrass, sheet, spriteWidth, spriteHeight);
+
+WT.Terrain.addGraphics(WT.TerrainType.WetGrass, sheet, spriteWidth, spriteHeight);
+WT.Terrain.addGraphics(WT.TerrainType.Mud, sheet, spriteWidth, spriteHeight);
+
+sheet = new WT.SpriteSheet("../../../res/img/waves");
+
+let features = [ WT.TerrainFeature.ShorelineNorth,
+                 WT.TerrainFeature.ShorelineWest,
+                 WT.TerrainFeature.ShorelineEast,
+                 WT.TerrainFeature.ShorelineSouth, ];
+
+for (let y in features) {               
+  let waveSprites = new Array();
+  for (let x = 0; x < 3; x++) {
+    waveSprites.push(new WT.Sprite(sheet,
+                                   x * spriteWidth,
+                                   y * spriteHeight,
+                                   spriteWidth, spriteHeight));
+  }
+  let waves = new WT.OssilateGraphicComponent(waveSprites, 500);
+  let feature = features[y];
+  WT.Terrain.addFeatureGraphics(feature, waves);
+}
+
+sheet = new WT.SpriteSheet("../../../res/img/grass");
+let grassSprites = new Array();
+for (let x = 0; x < 4; x++) {
+  grassSprites.push(new WT.Sprite(sheet, x * spriteWidth, 0,
+                                  spriteWidth, spriteHeight));
+}
+let grass = new WT.OssilateGraphicComponent(grassSprites, 333);
+WT.Terrain.addFeatureGraphics(WT.TerrainFeature.WetGrass, grass);
+
+grassSprites = new Array();
+for (let x = 0; x < 4; x++) {
+  grassSprites.push(new WT.Sprite(sheet, x * spriteWidth, 148,
+                                  spriteWidth, spriteHeight));
+}
+grass = new WT.OssilateGraphicComponent(grassSprites, 333);
+WT.Terrain.addFeatureGraphics(WT.TerrainFeature.DryGrass, grass);
+
+//sheet = new WT.SpriteSheet("../../../res/img/mud");
+//let mudSprite = new WT.Sprite(sheet, 0, 0, spriteWidth, 149);
+//let mud = new WT.StaticGraphicComponent(mudSprite);
+//WT.Terrain.addFeatureGraphics(WT.TerrainFeature.Mud, mud);
+
 window.onload = (event) => {
   console.log("loaded");
   let cellsX = 50;
@@ -46,8 +103,9 @@ window.onload = (event) => {
                                       water, wetLimit, dryLimit,
                                       spriteWidth, spriteHeight, heightRatio,
                                       WT.CoordSystem.Isometric);
-  builder.build(heightMap);
-  //builder.addFeature(WT.TerrainFeature.Shoreline);
+  builder.initialise(heightMap);
+  builder.addRain();
+  builder.populate();
 
   let canvas = document.getElementById("testCanvas");
   let context = new WT.Context(builder.terrain, WT.CoordSystem.Isometric, canvas);
@@ -62,49 +120,4 @@ window.onload = (event) => {
   console.log("done");
   context.run();
 };
-
-let sheet = new WT.SpriteSheet("../../../res/img/water");
-WT.Terrain.addGraphic(WT.TerrainType.Water, sheet, spriteWidth, spriteHeight);
-
-sheet = new WT.SpriteSheet("../../../res/img/sand");
-WT.Terrain.addGraphics(WT.TerrainType.Sand, sheet, spriteWidth, spriteHeight);
-
-sheet = new WT.SpriteSheet("../../../res/img/rock");
-WT.Terrain.addGraphics(WT.TerrainType.Rock, sheet, spriteWidth, spriteHeight);
-
-sheet = new WT.SpriteSheet("../../../res/img/light-grass-rock");
-WT.Terrain.addGraphics(WT.TerrainType.DryGrass, sheet, spriteWidth, spriteHeight);
-
-WT.Terrain.addGraphics(WT.TerrainType.WetGrass, sheet, spriteWidth, spriteHeight);
-WT.Terrain.addGraphics(WT.TerrainType.Mud, sheet, spriteWidth, spriteHeight);
-
-sheet = new WT.SpriteSheet("../../../res/img/waves");
-
-
-let features = [ WT.TerrainFeature.ShorelineNorth,
-                 WT.TerrainFeature.ShorelineWest,
-                 WT.TerrainFeature.ShorelineEast,
-                 WT.TerrainFeature.ShorelineSouth, ];
-
-for (let y in features) {               
-  let waveSprites = new Array();
-  for (let x = 0; x < 3; x++) {
-    waveSprites.push(new WT.Sprite(sheet,
-                                   x * spriteWidth,
-                                   y * spriteHeight,
-                                   spriteWidth, spriteHeight));
-  }
-  let waves = new WT.OssilateGraphicComponent(waveSprites, 500);
-  let feature = features[y];
-  WT.Terrain.addFeatureGraphics(feature, waves);
-}
-
-sheet = new WT.SpriteSheet("../../../res/img/grass");
-let grassSprites = new Array();
-for (let x = 0; x < 4; x++) {
-  grassSprites.push(new WT.Sprite(sheet, x * spriteWidth, 0,
-                                  spriteWidth, spriteHeight));
-}
-let grass = new WT.OssilateGraphicComponent(grassSprites, 333);
-WT.Terrain.addFeatureGraphics(WT.TerrainFeature.Grass, grass);
 

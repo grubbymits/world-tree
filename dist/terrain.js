@@ -55,7 +55,9 @@ export var TerrainFeature;
     TerrainFeature[TerrainFeature["ShorelineEast"] = 4] = "ShorelineEast";
     TerrainFeature[TerrainFeature["ShorelineSouth"] = 8] = "ShorelineSouth";
     TerrainFeature[TerrainFeature["ShorelineWest"] = 16] = "ShorelineWest";
-    TerrainFeature[TerrainFeature["Grass"] = 32] = "Grass";
+    TerrainFeature[TerrainFeature["DryGrass"] = 32] = "DryGrass";
+    TerrainFeature[TerrainFeature["WetGrass"] = 64] = "WetGrass";
+    TerrainFeature[TerrainFeature["Mud"] = 128] = "Mud";
 })(TerrainFeature || (TerrainFeature = {}));
 function hasFeature(features, mask) {
     return (features & mask) == mask;
@@ -70,8 +72,12 @@ function getFeatureName(feature) {
         case TerrainFeature.ShorelineSouth:
         case TerrainFeature.ShorelineWest:
             return "Shoreline";
-        case TerrainFeature.Grass:
-            return "Grass";
+        case TerrainFeature.DryGrass:
+            return "Dry Grass";
+        case TerrainFeature.WetGrass:
+            return "Wet Grass";
+        case TerrainFeature.Mud:
+            return "Mud";
     }
     return "None";
 }
@@ -288,18 +294,18 @@ export class Terrain extends StaticEntity {
         this._gridZ = _gridZ;
         this._type = _type;
         this._shape = _shape;
-        if (features != TerrainFeature.None) {
-            if (hasFeature(features, TerrainFeature.ShorelineNorth))
-                this.addGraphic(Terrain.featureGraphics(TerrainFeature.ShorelineNorth));
-            if (hasFeature(features, TerrainFeature.ShorelineSouth))
-                this.addGraphic(Terrain.featureGraphics(TerrainFeature.ShorelineSouth));
-            if (hasFeature(features, TerrainFeature.ShorelineEast))
-                this.addGraphic(Terrain.featureGraphics(TerrainFeature.ShorelineEast));
-            if (hasFeature(features, TerrainFeature.ShorelineWest))
-                this.addGraphic(Terrain.featureGraphics(TerrainFeature.ShorelineWest));
+        if (features == TerrainFeature.None) {
+            return;
         }
-        if (_type == TerrainType.WetGrass && _shape == TerrainShape.Flat) {
-            this.addGraphic(Terrain.featureGraphics(TerrainFeature.Grass));
+        for (let key in TerrainFeature) {
+            if (typeof TerrainFeature[key] === "number") {
+                let feature = TerrainFeature[key];
+                if (Terrain.isSupportedFeature(feature) &&
+                    hasFeature(features, feature)) {
+                    console.log("adding feature:", key);
+                    this.addGraphic(Terrain.featureGraphics(feature));
+                }
+            }
         }
     }
     static init(dims, sys) {
@@ -312,7 +318,7 @@ export class Terrain extends StaticEntity {
         return this._terrainGraphics.get(terrainType)[shape];
     }
     static featureGraphics(terrainFeature) {
-        console.assert(this._featureGraphics.has(terrainFeature), "missing terrain feature");
+        console.assert(this._featureGraphics.has(terrainFeature), "missing terrain feature", getFeatureName(terrainFeature));
         return this._featureGraphics.get(terrainFeature);
     }
     static addGraphic(terrainType, sheet, width, height) {
@@ -343,7 +349,7 @@ export class Terrain extends StaticEntity {
         console.log("added sprite for shape:", getShapeName(shapeType));
     }
     static addFeatureGraphics(feature, graphics) {
-        console.log("adding feature graphics for", getFeatureName(feature));
+        console.log("adding feature graphics for:", getFeatureName(feature));
         this._featureGraphics.set(feature, graphics);
     }
     static get width() { return this._dimensions.width; }
@@ -355,6 +361,9 @@ export class Terrain extends StaticEntity {
     }
     static create(x, y, z, type, shape, feature) {
         return new Terrain(x, y, z, this._dimensions, type, shape, feature);
+    }
+    static isSupportedFeature(feature) {
+        return this._featureGraphics.has(feature);
     }
     get gridX() { return this._gridX; }
     get gridY() { return this._gridY; }
@@ -643,39 +652,7 @@ export class TerrainBuilder {
         }
         return shapeType;
     }
-    addShoreline() {
-        for (let y = 0; y < this._surface.depth; y++) {
-            for (let x = 0; x < this._surface.width; x++) {
-                let centre = this._surface.at(x, y);
-                if (centre.biome != Biome.Beach) {
-                    continue;
-                }
-                let neighbours = this._surface.getNeighbours(centre.x, centre.y);
-                for (let neighbour of neighbours) {
-                    if (neighbour.biome != Biome.Water) {
-                        continue;
-                    }
-                    switch (getDirection(neighbour.pos, centre.pos)) {
-                        default:
-                            break;
-                        case Direction.North:
-                            centre.features |= TerrainFeature.ShorelineNorth;
-                            break;
-                        case Direction.East:
-                            centre.features |= TerrainFeature.ShorelineEast;
-                            break;
-                        case Direction.South:
-                            centre.features |= TerrainFeature.ShorelineSouth;
-                            break;
-                        case Direction.West:
-                            centre.features |= TerrainFeature.ShorelineWest;
-                            break;
-                    }
-                }
-            }
-        }
-    }
-    build(heightMap) {
+    initialise(heightMap) {
         console.log("build terrain from height map");
         this._surface.init(heightMap);
         console.log("calculating terraces");
@@ -688,6 +665,8 @@ export class TerrainBuilder {
                 surface.terrace = terrace;
             }
         }
+    }
+    addRain() {
         console.log("adding rain");
         Rain.init(this._waterLevel, this._surface);
         for (let x = 0; x < this._surface.width; x++) {
@@ -704,6 +683,13 @@ export class TerrainBuilder {
             for (let x = 0; x < this._surface.width; x++) {
                 let surface = this._surface.at(x, y);
                 surface.moisture = blurredMoisture[y][x];
+            }
+        }
+    }
+    populate() {
+        for (let y = 0; y < this._surface.depth; y++) {
+            for (let x = 0; x < this._surface.width; x++) {
+                let surface = this._surface.at(x, y);
                 let biome = Biome.Water;
                 if (surface.height <= this._waterLevel) {
                     biome = Biome.Water;
@@ -728,13 +714,51 @@ export class TerrainBuilder {
             }
         }
         this.calcShapes();
-        this.addShoreline();
         console.log("adding surface terrain entities");
         for (let y = 0; y < this._surface.depth; y++) {
             for (let x = 0; x < this._surface.width; x++) {
                 let surface = this._surface.at(x, y);
                 surface.type = this.calcType(x, y);
                 surface.shape = this.calcEdge(x, y);
+                if (isFlat(surface.shape)) {
+                    if (surface.biome == Biome.Beach) {
+                        let neighbours = this._surface.getNeighbours(surface.x, surface.y);
+                        for (let neighbour of neighbours) {
+                            if (neighbour.biome != Biome.Water) {
+                                continue;
+                            }
+                            switch (getDirection(neighbour.pos, surface.pos)) {
+                                default:
+                                    break;
+                                case Direction.North:
+                                    surface.features |= TerrainFeature.ShorelineNorth;
+                                    break;
+                                case Direction.East:
+                                    surface.features |= TerrainFeature.ShorelineEast;
+                                    break;
+                                case Direction.South:
+                                    surface.features |= TerrainFeature.ShorelineSouth;
+                                    break;
+                                case Direction.West:
+                                    surface.features |= TerrainFeature.ShorelineWest;
+                                    break;
+                            }
+                        }
+                    }
+                    else if (surface.biome == Biome.Marshland) {
+                        surface.features |= TerrainFeature.Mud;
+                        surface.features |= TerrainFeature.WetGrass;
+                    }
+                    else if (surface.biome == Biome.Grassland) {
+                        surface.features |= TerrainFeature.DryGrass;
+                    }
+                    else if (surface.biome == Biome.Tundra) {
+                        surface.features |= TerrainFeature.DryGrass;
+                    }
+                    else if (surface.biome == Biome.Woodland) {
+                        surface.features |= TerrainFeature.Mud;
+                    }
+                }
                 console.assert(surface.terrace <= this._terraces && surface.terrace >= 0, "terrace out-of-range", surface.terrace);
                 this._worldTerrain.addRaisedTerrain(x, y, surface.terrace, surface.type, surface.shape, surface.features);
             }
