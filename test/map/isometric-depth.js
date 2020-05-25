@@ -43,7 +43,7 @@ sheet = new WT.SpriteSheet("../../../res/img/grass");
 let grassSprites = new Array();
 for (let x = 0; x < 4; x++) {
   grassSprites.push(new WT.Sprite(sheet, x * spriteWidth, 0,
-                                  spriteWidth, spriteHeight));
+                                  spriteWidth, 148));
 }
 let grass = new WT.OssilateGraphicComponent(grassSprites, 333);
 WT.Terrain.addFeatureGraphics(WT.TerrainFeature.WetGrass, grass);
@@ -51,15 +51,15 @@ WT.Terrain.addFeatureGraphics(WT.TerrainFeature.WetGrass, grass);
 grassSprites = new Array();
 for (let x = 0; x < 4; x++) {
   grassSprites.push(new WT.Sprite(sheet, x * spriteWidth, 148,
-                                  spriteWidth, spriteHeight));
+                                  spriteWidth, 148));
 }
 grass = new WT.OssilateGraphicComponent(grassSprites, 333);
 WT.Terrain.addFeatureGraphics(WT.TerrainFeature.DryGrass, grass);
 
-//sheet = new WT.SpriteSheet("../../../res/img/mud");
-//let mudSprite = new WT.Sprite(sheet, 0, 0, spriteWidth, 149);
-//let mud = new WT.StaticGraphicComponent(mudSprite);
-//WT.Terrain.addFeatureGraphics(WT.TerrainFeature.Mud, mud);
+sheet = new WT.SpriteSheet("../../../res/img/mud");
+let mudSprite = new WT.Sprite(sheet, 0, 0, spriteWidth, 149);
+let mud = new WT.StaticGraphicComponent(mudSprite.id);
+WT.Terrain.addFeatureGraphics(WT.TerrainFeature.Mud, mud);
 
 window.onload = (event) => {
   console.log("loaded");

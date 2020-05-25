@@ -505,7 +505,6 @@ export class TerrainBuilder {
             case Biome.Desert:
                 return TerrainType.Rock;
         }
-        console.log("default biome:", getBiomeName(surface.biome));
         console.assert(surface.biome == Biome.Water);
         return TerrainType.Water;
     }
@@ -756,7 +755,6 @@ export class TerrainBuilder {
                         surface.features |= TerrainFeature.DryGrass;
                     }
                     else if (surface.biome == Biome.Woodland) {
-                        surface.features |= TerrainFeature.Mud;
                     }
                 }
                 console.assert(surface.terrace <= this._terraces && surface.terrace >= 0, "terrace out-of-range", surface.terrace);

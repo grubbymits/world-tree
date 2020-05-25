@@ -35,9 +35,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.6568542"
-     inkscape:cx="282.87879"
-     inkscape:cy="314.66692"
+     inkscape:zoom="2.8284271"
+     inkscape:cx="530.64415"
+     inkscape:cy="452.22163"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -1985,71 +1985,61 @@
        inkscape:export-filename="/home/samuel/src/world-tree/res/img/grass.png"
        inkscape:export-xdpi="94.547577"
        inkscape:export-ydpi="94.547577" />
+    <ellipse
+       style="fill:#755f26;fill-opacity:1;stroke:#755f26;stroke-width:0.23178411;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path1283-0"
+       cx="122.72838"
+       cy="237.55653"
+       rx="4.8967643"
+       ry="2.9691951"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/mud.png"
+       inkscape:export-xdpi="94.547577"
+       inkscape:export-ydpi="94.547577" />
     <path
        style="fill:none;fill-opacity:1;stroke:#747e41;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
-       d="M 34.370385,197.78123 68.740766,217.625 34.370385,237.46875 -3.4406356e-6,217.625 Z"
-       id="path4597-3-2-7-3"
+       d="M 34.370383,211.01041 68.740766,230.85417 34.370383,250.69792 -2.9084449e-6,230.85417 Z"
+       id="path4597-3-2-7-6-8"
        inkscape:connector-curvature="0"
        inkscape:export-filename="/home/samuel/src/world-tree/res/img/mud.png"
        inkscape:export-xdpi="94.547577"
        inkscape:export-ydpi="94.547577" />
-    <ellipse
-       style="fill:#5c5f2b;fill-opacity:1;stroke:#5c5f2b;stroke-width:0.26458332;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       id="path1283"
-       cx="51.980343"
-       cy="220.03081"
-       rx="5.7283969"
-       ry="3.3072915"
+    <path
+       style="fill:#5c5f2b;fill-opacity:1;stroke:#5c5f2b;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 32.079022,217.62499 11.456794,6.61459 -11.456794,6.61458 -11.456793,-6.61458 z"
+       id="path1754"
+       inkscape:connector-curvature="0"
        inkscape:export-filename="/home/samuel/src/world-tree/res/img/mud.png"
        inkscape:export-xdpi="94.547577"
        inkscape:export-ydpi="94.547577" />
-    <ellipse
-       style="fill:#886e2c;fill-opacity:1;stroke:#886e2c;stroke-width:0.51064301;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       id="path1283-6"
-       cx="24.013447"
-       cy="218.52353"
-       rx="10.65676"
-       ry="6.622016"
+    <path
+       style="fill:#5c5f2b;fill-opacity:1;stroke:#5c5f2b;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 45.827176,225.5625 4.582719,2.64583 4.582718,-2.64583 -4.582718,-2.64584 z"
+       id="path1756"
+       inkscape:connector-curvature="0"
        inkscape:export-filename="/home/samuel/src/world-tree/res/img/mud.png"
        inkscape:export-xdpi="94.547577"
        inkscape:export-ydpi="94.547577" />
-    <ellipse
-       style="fill:#755f26;fill-opacity:1;stroke:#755f26;stroke-width:0.38672239;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       id="path1283-0"
-       cx="24.219149"
-       cy="218.59369"
-       rx="8.4502707"
-       ry="4.7897034"
+    <path
+       style="fill:#5c5f2b;fill-opacity:1;stroke:#5c5f2b;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 25.204947,240.11458 6.874076,3.96875 4.582718,-2.64583 -6.874076,-3.96875 z"
+       id="path1758"
+       inkscape:connector-curvature="0"
        inkscape:export-filename="/home/samuel/src/world-tree/res/img/mud.png"
        inkscape:export-xdpi="94.547577"
        inkscape:export-ydpi="94.547577" />
-    <ellipse
-       style="fill:#755f26;fill-opacity:1;stroke:#755f26;stroke-width:0.25644553;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       id="path1283-0-1"
-       cx="42.244095"
-       cy="209.11913"
-       rx="5.4518318"
-       ry="3.2645881"
+    <path
+       style="fill:#5c5f2b;fill-opacity:1;stroke:#5c5f2b;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 9.1654355,230.85416 4.5827175,2.64583 4.582717,-2.64583 -4.582717,-2.64583 z"
+       id="path1760"
+       inkscape:connector-curvature="0"
        inkscape:export-filename="/home/samuel/src/world-tree/res/img/mud.png"
        inkscape:export-xdpi="94.547577"
        inkscape:export-ydpi="94.547577" />
-    <ellipse
-       style="fill:#886e2c;fill-opacity:1;stroke:#886e2c;stroke-width:0.20157285;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       id="path1283-6-5"
-       cx="32.846706"
-       cy="229.6787"
-       rx="4.1696477"
-       ry="2.6372142"
-       inkscape:export-filename="/home/samuel/src/world-tree/res/img/mud.png"
-       inkscape:export-xdpi="94.547577"
-       inkscape:export-ydpi="94.547577" />
-    <ellipse
-       style="fill:#5c5f2b;fill-opacity:1;stroke:#5c5f2b;stroke-width:0.17867948;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       id="path1283-5"
-       cx="28.832891"
-       cy="206.42427"
-       rx="3.7601452"
-       ry="2.2978697"
+    <path
+       style="fill:#5c5f2b;fill-opacity:1;stroke:#5c5f2b;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 43.535818,237.46875 4.582718,-2.64584 4.582716,2.64584 -4.582716,2.64583 z"
+       id="path1762"
+       inkscape:connector-curvature="0"
        inkscape:export-filename="/home/samuel/src/world-tree/res/img/mud.png"
        inkscape:export-xdpi="94.547577"
        inkscape:export-ydpi="94.547577" />

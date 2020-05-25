@@ -619,7 +619,6 @@ export class TerrainBuilder {
       case Biome.Desert:
         return TerrainType.Rock;
     }
-    console.log("default biome:", getBiomeName(surface.biome));
     console.assert(surface.biome == Biome.Water);
     return TerrainType.Water;
   }
@@ -889,7 +888,6 @@ export class TerrainBuilder {
           } else if (surface.biome == Biome.Tundra) {
             surface.features |= TerrainFeature.DryGrass;
           } else if (surface.biome == Biome.Woodland) {
-            surface.features |= TerrainFeature.Mud;
           }
         }
         // Add terrain objects that will be visible.
