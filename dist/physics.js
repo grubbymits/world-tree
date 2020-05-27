@@ -122,21 +122,33 @@ export class Dimensions {
     get height() { return this._height; }
 }
 export class CartisanDimensionsFromSprite extends Dimensions {
-    constructor(spriteWidth, spriteHeight, heightRatio) {
+    constructor(spriteWidth, spriteHeight, relativeDims) {
+        let heightRatio = relativeDims.width / relativeDims.height;
         let height = spriteHeight * heightRatio;
         let depth = spriteHeight - height;
         super(spriteWidth, depth, height);
     }
 }
-export class IsometricDimensionsFromSprite extends Dimensions {
-    constructor(spriteWidth, spriteHeight, heightRatio) {
-        let widthRatio = Math.sqrt(3);
-        let width = Math.floor(spriteWidth / widthRatio);
-        let depth = width;
-        let height = Math.floor((spriteWidth / widthRatio) * heightRatio);
+export class IsometricPhysicalDimensions extends Dimensions {
+    constructor(spriteWidth, relativeDims) {
+        let width = IsometricPhysicalDimensions.physicalWidth(spriteWidth);
+        let depth = IsometricPhysicalDimensions.physicalDepth(width, relativeDims);
+        let height = IsometricPhysicalDimensions.physicalHeight(width, relativeDims);
         super(width, depth, height);
     }
+    static physicalWidth(spriteWidth) {
+        return Math.floor(spriteWidth * this._widthRatio);
+    }
+    static physicalDepth(physicalWidth, relativeDims) {
+        let depthRatio = relativeDims.depth / relativeDims.width;
+        return Math.floor(physicalWidth * depthRatio);
+    }
+    static physicalHeight(physicalWidth, relativeDims) {
+        let heightRatio = relativeDims.height / relativeDims.width;
+        return Math.floor(physicalWidth * heightRatio);
+    }
 }
+IsometricPhysicalDimensions._widthRatio = 1 / Math.sqrt(3);
 class MovementCost {
     constructor(_terrain, _cost) {
         this._terrain = _terrain;

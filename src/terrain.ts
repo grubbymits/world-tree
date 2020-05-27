@@ -1,7 +1,7 @@
 import { Location,
          Dimensions,
          CartisanDimensionsFromSprite,
-         IsometricDimensionsFromSprite,
+         IsometricPhysicalDimensions,
          Direction,
          getDirection } from "./physics.js"
 import { Rain } from "./weather.js"
@@ -561,14 +561,10 @@ export class TerrainBuilder {
               private readonly _water: number,
               private readonly _wetLimit: number,
               private readonly _dryLimit: number,
-              spriteWidth: number,
-              spriteHeight: number,
-              spriteHeightRatio: number,
+              physicalDims: Dimensions,
               sys: CoordSystem) {
-    let dims = sys == CoordSystem.Isometric ?
-      new IsometricDimensionsFromSprite(spriteWidth, spriteHeight, spriteHeightRatio) :
-      new CartisanDimensionsFromSprite(spriteWidth, spriteHeight, spriteHeightRatio);
-    Terrain.init(dims, sys);
+    console.log("physical dims:", physicalDims);
+    Terrain.init(physicalDims, sys);
     this._surface = new Surface(width, depth);
     this._worldTerrain = new SquareGrid(width, depth);
     this._terraceSpacing = this._landRange / this._terraces;

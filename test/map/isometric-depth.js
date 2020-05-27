@@ -90,10 +90,10 @@ window.onload = (event) => {
     }
   }
 
-  // width / height ratio
-  let heightRatio = 2/3;
-  console.log("heightRatio:", heightRatio);
-
+  // width / height ratio => 2 cubes high, 3 wide and 3 deep.
+  let relativeDims = new WT.Dimensions(3, 3, 2);
+  let physicalDims =
+    new WT.IsometricPhysicalDimensions(spriteWidth, relativeDims);
   let terraces = 4;
   let water = 3;
   let dryLimit = 0.2;
@@ -101,7 +101,7 @@ window.onload = (event) => {
 
   let builder = new WT.TerrainBuilder(cellsX, cellsY, ceiling, terraces,
                                       water, wetLimit, dryLimit,
-                                      spriteWidth, spriteHeight, heightRatio,
+                                      physicalDims,
                                       WT.CoordSystem.Isometric);
   builder.initialise(heightMap);
   builder.addRain();

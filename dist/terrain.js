@@ -1,7 +1,7 @@
-import { Location, CartisanDimensionsFromSprite, IsometricDimensionsFromSprite, Direction, getDirection } from "./physics.js";
+import { Location, Direction, getDirection } from "./physics.js";
 import { Rain } from "./weather.js";
 import { StaticEntity } from "./entity.js";
-import { Point, CoordSystem, Sprite, StaticGraphicComponent } from "./graphics.js";
+import { Point, Sprite, StaticGraphicComponent } from "./graphics.js";
 import { SquareGrid } from "./map.js";
 export var TerrainShape;
 (function (TerrainShape) {
@@ -451,7 +451,7 @@ export class Surface {
     }
 }
 export class TerrainBuilder {
-    constructor(width, depth, _ceiling, _terraces, _water, _wetLimit, _dryLimit, spriteWidth, spriteHeight, spriteHeightRatio, sys) {
+    constructor(width, depth, _ceiling, _terraces, _water, _wetLimit, _dryLimit, physicalDims, sys) {
         this._ceiling = _ceiling;
         this._terraces = _terraces;
         this._water = _water;
@@ -461,10 +461,8 @@ export class TerrainBuilder {
         this._landRange = this._ceiling - this._waterLevel;
         this._beachLimit = this._waterLevel + (this._landRange / 10);
         this._treeLimit = this._ceiling - (this._landRange / 20);
-        let dims = sys == CoordSystem.Isometric ?
-            new IsometricDimensionsFromSprite(spriteWidth, spriteHeight, spriteHeightRatio) :
-            new CartisanDimensionsFromSprite(spriteWidth, spriteHeight, spriteHeightRatio);
-        Terrain.init(dims, sys);
+        console.log("physical dims:", physicalDims);
+        Terrain.init(physicalDims, sys);
         this._surface = new Surface(width, depth);
         this._worldTerrain = new SquareGrid(width, depth);
         this._terraceSpacing = this._landRange / this._terraces;

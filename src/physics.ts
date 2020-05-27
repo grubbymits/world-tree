@@ -128,26 +128,43 @@ export class Dimensions {
 export class CartisanDimensionsFromSprite extends Dimensions {
   constructor(spriteWidth: number,
               spriteHeight: number,
-              heightRatio: number) {
+              relativeDims: Dimensions) {
     // FIXME: Use a proper calculation.
+    let heightRatio = relativeDims.width / relativeDims.height;
     let height = spriteHeight * heightRatio;
     let depth = spriteHeight - height;
     super(spriteWidth, depth, height);
   }
 }
 
-export class IsometricDimensionsFromSprite extends Dimensions {
+// An isometric square has:
+// - sides equal length = 1,
+// - the short diagonal is length = 1,
+// - the long diagonal is length = sqrt(3) ~= 1.73.
+export class IsometricPhysicalDimensions extends Dimensions {
+  private static readonly _widthRatio: number = 1 / Math.sqrt(3);
+
+  static physicalWidth(spriteWidth: number): number {
+    return Math.floor(spriteWidth * this._widthRatio);
+  }
+
+  static physicalDepth(physicalWidth: number,
+                       relativeDims: Dimensions) {
+    let depthRatio: number = relativeDims.depth / relativeDims.width;
+    return Math.floor(physicalWidth * depthRatio);
+  }
+
+  static physicalHeight(physicalWidth: number,
+                        relativeDims: Dimensions): number {
+    let heightRatio: number = relativeDims.height / relativeDims.width;
+    return Math.floor(physicalWidth * heightRatio);
+  }
+
   constructor(spriteWidth: number,
-              spriteHeight: number,
-              heightRatio: number) {
-    // An isometric square has:
-    // - sides equal length = 1,
-    // - the short diagonal is length = 1,
-    // - the long diagonal is length = sqrt(3) ~= 1.73.
-    let widthRatio = Math.sqrt(3);
-    let width = Math.floor(spriteWidth / widthRatio);
-    let depth = width;
-    let height = Math.floor((spriteWidth / widthRatio) * heightRatio);
+              relativeDims: Dimensions) {
+    let width = IsometricPhysicalDimensions.physicalWidth(spriteWidth);
+    let depth = IsometricPhysicalDimensions.physicalDepth(width, relativeDims);
+    let height = IsometricPhysicalDimensions.physicalHeight(width, relativeDims);
     super(width, depth, height);
   }
 }
