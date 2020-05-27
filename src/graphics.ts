@@ -1,6 +1,5 @@
 import { SquareGrid } from "./map.js"
-import { Entity,
-         StaticEntity } from "./entity.js"
+import { Entity } from "./entity.js"
 import { Location } from "./physics.js"
 import { Terrain } from "./terrain.js"
 import { Camera } from "./camera.js"
@@ -144,19 +143,14 @@ export abstract class Renderer {
 
   abstract getDrawCoord(object: Entity): Point;
   abstract sortEntitys(objects: Array<Entity>): void;
+  abstract initDrawCoords(objects: Array<Entity>): void;
 
   render(entities: Array<Entity>, camera: Camera) {
     this.sortEntitys(entities);
     this._ctx.clearRect(0, 0, this._width, this._height);
     for (let i in entities) {
       let entity = entities[i];
-      let coord: Point;
-      if (entity.static) {
-        let staticEntity = <StaticEntity>(entity);
-        coord = staticEntity.drawCoord;
-      } else {
-        coord = this.getDrawCoord(entity);
-      }
+      let coord: Point = this.getDrawCoord(entity);
       if (!camera.isOnScreen(coord, entity.width, entity.depth)) {
         continue;
       }
@@ -183,6 +177,9 @@ export class CartisanRenderer extends Renderer {
     return CartisanRenderer.getDrawCoord(entity);
   }
 
+  initDrawCoords(entities: Array<Entity>): void {
+  }
+
   sortEntitys(entities: Array<Entity>): void {
     // We're drawing a 2D map, so depth is being simulated by the position on
     // the Y axis and the order in which those elements are drawn. Insert
@@ -207,6 +204,7 @@ export class IsometricRenderer extends Renderer {
   constructor(canvas: HTMLCanvasElement) {
     super(canvas);
   }
+  private static readonly _sqrt3 = Math.sqrt(3);
 
   static getDrawCoord(entity: Entity): Point {
     // An isometric square has:
@@ -218,13 +216,23 @@ export class IsometricRenderer extends Renderer {
 
     // Tiles are placed overlapping each other by half.
     // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
-    let dx = Math.floor(0.5 * Math.sqrt(3) * (entity.x + entity.y));
+    let dx = Math.floor(0.5 * this._sqrt3 * (entity.x + entity.y));
     let dy = Math.floor((0.5 * (entity.y - entity.x)) - entity.z);
     return new Point(dx, dy);
   }
 
   getDrawCoord(entity: Entity): Point {
-    return IsometricRenderer.getDrawCoord(entity);
+    if (entity.hasMoved) {
+      let coord = IsometricRenderer.getDrawCoord(entity);
+      entity.drawCoord = coord;
+    }
+    return entity.drawCoord;
+  }
+
+  initDrawCoords(entities: Array<Entity>): void {
+    for (let entity of entities) {
+      entity.drawCoord = IsometricRenderer.getDrawCoord(entity);
+    }
   }
 
   sortEntitys(entities: Array<Entity>): void {

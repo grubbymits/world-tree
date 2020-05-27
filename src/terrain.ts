@@ -5,7 +5,7 @@ import { Location,
          Direction,
          getDirection } from "./physics.js"
 import { Rain } from "./weather.js"
-import { StaticEntity } from "./entity.js"
+import { Entity } from "./entity.js"
 import { Point,
          CoordSystem,
          SpriteSheet,
@@ -325,15 +325,13 @@ function gaussianBlur(grid: Array<Float32Array>, width: number,
   return result;
 }
 
-export class Terrain extends StaticEntity {
+export class Terrain extends Entity {
   private static _dimensions: Dimensions;
-  private static _sys: CoordSystem;
   private static _terrainGraphics = new Map<TerrainType, Array<GraphicComponent>>();
   private static _featureGraphics = new Map<TerrainFeature, GraphicComponent>();
 
-  static init(dims: Dimensions, sys: CoordSystem) {
+  static init(dims: Dimensions) {
     this._dimensions = dims;
-    this._sys = sys;
   }
   
   static graphics(terrainType: TerrainType,
@@ -400,7 +398,6 @@ export class Terrain extends StaticEntity {
   static get width(): number { return this._dimensions.width; }
   static get depth(): number { return this._dimensions.depth; }
   static get height(): number { return this._dimensions.height; }
-  static get sys(): CoordSystem { return this._sys; }
 
   static scaleLocation(loc: Location): Location {
     return new Location(Math.floor(loc.x / this.width),
@@ -428,7 +425,7 @@ export class Terrain extends StaticEntity {
     super(new Location(_gridX * dimensions.width,
                        _gridY * dimensions.depth,
                        _gridZ * dimensions.height),
-          dimensions, true, Terrain.graphics(_type, _shape), Terrain.sys);
+          dimensions, true, Terrain.graphics(_type, _shape));
     if (features == TerrainFeature.None) {
       return;
     }
@@ -561,10 +558,9 @@ export class TerrainBuilder {
               private readonly _water: number,
               private readonly _wetLimit: number,
               private readonly _dryLimit: number,
-              physicalDims: Dimensions,
-              sys: CoordSystem) {
+              physicalDims: Dimensions) {
     console.log("physical dims:", physicalDims);
-    Terrain.init(physicalDims, sys);
+    Terrain.init(physicalDims);
     this._surface = new Surface(width, depth);
     this._worldTerrain = new SquareGrid(width, depth);
     this._terraceSpacing = this._landRange / this._terraces;

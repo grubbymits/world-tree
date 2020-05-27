@@ -22,6 +22,7 @@ export class Context {
     this._gfx = sys == CoordSystem.Cartisan ?
       new CartisanRenderer(canvas) :
       new IsometricRenderer(canvas);
+    this._gfx.initDrawCoords(this._entities);
   }
 
   addEntity(entity: Entity): void {

@@ -101,8 +101,7 @@ window.onload = (event) => {
 
   let builder = new WT.TerrainBuilder(cellsX, cellsY, ceiling, terraces,
                                       water, wetLimit, dryLimit,
-                                      physicalDims,
-                                      WT.CoordSystem.Isometric);
+                                      physicalDims);
   builder.initialise(heightMap);
   builder.addRain();
   builder.populate();

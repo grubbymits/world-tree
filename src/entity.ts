@@ -11,13 +11,14 @@ export class Entity {
 
   private readonly _id: number;
 
+  protected readonly _hasMoved: boolean = false;
+  protected _drawCoord: Point = new Point(0, 0);
   protected _graphicComponents: Array<GraphicComponent>;
 
   constructor(protected _location: Location,
               protected readonly _dimensions: Dimensions,
               protected readonly _blocking: boolean,
-              graphicComponent: GraphicComponent,
-              protected readonly _static: boolean) {
+              graphicComponent: GraphicComponent) {
     this._id = Entity._ids;
     Entity._ids++;
     this._graphicComponents = new Array<GraphicComponent>();
@@ -34,33 +35,15 @@ export class Entity {
   get dimensions(): Dimensions { return this._dimensions; }
   get blocking(): boolean { return this._blocking; }
   get id(): number { return this._id; }
-  get static(): boolean { return this._static; }
+  get hasMoved(): boolean { return this._hasMoved; }
+  get drawCoord(): Point { return this._drawCoord; }
   get graphics(): Array<GraphicComponent> {
     return this._graphicComponents;
   }
-}
 
-// An entity which will not change location, which allows the us to calculate
-// its render coordinates on construction.
-export class StaticEntity extends Entity {
-  protected readonly _drawCoord: Point;
-
-  constructor(location: Location,
-              dimensions: Dimensions,
-              blocking: boolean,
-              graphicsComponent: GraphicComponent,
-              sys: CoordSystem) {
-    super(location, dimensions, blocking, graphicsComponent, true);
-
-    this._drawCoord = sys == CoordSystem.Isometric ?
-      IsometricRenderer.getDrawCoord(this) :
-      CartisanRenderer.getDrawCoord(this);
-  }
-
-  get drawCoord(): Point { return this._drawCoord; }
+  set drawCoord(coord: Point) { this._drawCoord = coord; }
 
   addGraphic(graphic: GraphicComponent): void {
     this._graphicComponents.push(graphic);
   }
 }
-

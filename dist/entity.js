@@ -1,10 +1,11 @@
-import { CoordSystem, CartisanRenderer, IsometricRenderer } from "./graphics.js";
+import { Point } from "./graphics.js";
 export class Entity {
-    constructor(_location, _dimensions, _blocking, graphicComponent, _static) {
+    constructor(_location, _dimensions, _blocking, graphicComponent) {
         this._location = _location;
         this._dimensions = _dimensions;
         this._blocking = _blocking;
-        this._static = _static;
+        this._hasMoved = false;
+        this._drawCoord = new Point(0, 0);
         this._id = Entity._ids;
         Entity._ids++;
         this._graphicComponents = new Array();
@@ -20,21 +21,14 @@ export class Entity {
     get dimensions() { return this._dimensions; }
     get blocking() { return this._blocking; }
     get id() { return this._id; }
-    get static() { return this._static; }
+    get hasMoved() { return this._hasMoved; }
+    get drawCoord() { return this._drawCoord; }
     get graphics() {
         return this._graphicComponents;
     }
-}
-Entity._ids = 0;
-export class StaticEntity extends Entity {
-    constructor(location, dimensions, blocking, graphicsComponent, sys) {
-        super(location, dimensions, blocking, graphicsComponent, true);
-        this._drawCoord = sys == CoordSystem.Isometric ?
-            IsometricRenderer.getDrawCoord(this) :
-            CartisanRenderer.getDrawCoord(this);
-    }
-    get drawCoord() { return this._drawCoord; }
+    set drawCoord(coord) { this._drawCoord = coord; }
     addGraphic(graphic) {
         this._graphicComponents.push(graphic);
     }
 }
+Entity._ids = 0;

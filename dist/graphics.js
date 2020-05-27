@@ -115,14 +115,7 @@ export class Renderer {
         this._ctx.clearRect(0, 0, this._width, this._height);
         for (let i in entities) {
             let entity = entities[i];
-            let coord;
-            if (entity.static) {
-                let staticEntity = (entity);
-                coord = staticEntity.drawCoord;
-            }
-            else {
-                coord = this.getDrawCoord(entity);
-            }
+            let coord = this.getDrawCoord(entity);
             if (!camera.isOnScreen(coord, entity.width, entity.depth)) {
                 continue;
             }
@@ -144,6 +137,8 @@ export class CartisanRenderer extends Renderer {
     }
     getDrawCoord(entity) {
         return CartisanRenderer.getDrawCoord(entity);
+    }
+    initDrawCoords(entities) {
     }
     sortEntitys(entities) {
         entities.sort((a, b) => {
@@ -168,12 +163,21 @@ export class IsometricRenderer extends Renderer {
         super(canvas);
     }
     static getDrawCoord(entity) {
-        let dx = Math.floor(0.5 * Math.sqrt(3) * (entity.x + entity.y));
+        let dx = Math.floor(0.5 * this._sqrt3 * (entity.x + entity.y));
         let dy = Math.floor((0.5 * (entity.y - entity.x)) - entity.z);
         return new Point(dx, dy);
     }
     getDrawCoord(entity) {
-        return IsometricRenderer.getDrawCoord(entity);
+        if (entity.hasMoved) {
+            let coord = IsometricRenderer.getDrawCoord(entity);
+            entity.drawCoord = coord;
+        }
+        return entity.drawCoord;
+    }
+    initDrawCoords(entities) {
+        for (let entity of entities) {
+            entity.drawCoord = IsometricRenderer.getDrawCoord(entity);
+        }
     }
     sortEntitys(entities) {
         entities.sort((a, b) => {
@@ -199,3 +203,4 @@ export class IsometricRenderer extends Renderer {
         });
     }
 }
+IsometricRenderer._sqrt3 = Math.sqrt(3);

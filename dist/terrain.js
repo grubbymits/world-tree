@@ -1,6 +1,6 @@
 import { Location, Direction, getDirection } from "./physics.js";
 import { Rain } from "./weather.js";
-import { StaticEntity } from "./entity.js";
+import { Entity } from "./entity.js";
 import { Point, Sprite, StaticGraphicComponent } from "./graphics.js";
 import { SquareGrid } from "./map.js";
 export var TerrainShape;
@@ -286,9 +286,9 @@ function gaussianBlur(grid, width, depth) {
     }
     return result;
 }
-export class Terrain extends StaticEntity {
+export class Terrain extends Entity {
     constructor(_gridX, _gridY, _gridZ, dimensions, _type, _shape, features) {
-        super(new Location(_gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height), dimensions, true, Terrain.graphics(_type, _shape), Terrain.sys);
+        super(new Location(_gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height), dimensions, true, Terrain.graphics(_type, _shape));
         this._gridX = _gridX;
         this._gridY = _gridY;
         this._gridZ = _gridZ;
@@ -308,9 +308,8 @@ export class Terrain extends StaticEntity {
             }
         }
     }
-    static init(dims, sys) {
+    static init(dims) {
         this._dimensions = dims;
-        this._sys = sys;
     }
     static graphics(terrainType, shape) {
         console.assert(this._terrainGraphics.has(terrainType), "undefined terrain graphic for TerrainType:", getTypeName(terrainType));
@@ -355,7 +354,6 @@ export class Terrain extends StaticEntity {
     static get width() { return this._dimensions.width; }
     static get depth() { return this._dimensions.depth; }
     static get height() { return this._dimensions.height; }
-    static get sys() { return this._sys; }
     static scaleLocation(loc) {
         return new Location(Math.floor(loc.x / this.width), Math.floor(loc.y / this.depth), Math.floor(loc.z / this.height));
     }
@@ -451,7 +449,7 @@ export class Surface {
     }
 }
 export class TerrainBuilder {
-    constructor(width, depth, _ceiling, _terraces, _water, _wetLimit, _dryLimit, physicalDims, sys) {
+    constructor(width, depth, _ceiling, _terraces, _water, _wetLimit, _dryLimit, physicalDims) {
         this._ceiling = _ceiling;
         this._terraces = _terraces;
         this._water = _water;
@@ -462,7 +460,7 @@ export class TerrainBuilder {
         this._beachLimit = this._waterLevel + (this._landRange / 10);
         this._treeLimit = this._ceiling - (this._landRange / 20);
         console.log("physical dims:", physicalDims);
-        Terrain.init(physicalDims, sys);
+        Terrain.init(physicalDims);
         this._surface = new Surface(width, depth);
         this._worldTerrain = new SquareGrid(width, depth);
         this._terraceSpacing = this._landRange / this._terraces;
