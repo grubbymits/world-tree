@@ -123,20 +123,6 @@ export class Dimensions {
   get height(): number { return this._height; }
 }
 
-// Given a rectangular sprite, representing a flat or oblique floor tile,
-// calculate the dimensions that the image contains.
-export class CartisanDimensionsFromSprite extends Dimensions {
-  constructor(spriteWidth: number,
-              spriteHeight: number,
-              relativeDims: Dimensions) {
-    // FIXME: Use a proper calculation.
-    let heightRatio = relativeDims.width / relativeDims.height;
-    let height = spriteHeight * heightRatio;
-    let depth = spriteHeight - height;
-    super(spriteWidth, depth, height);
-  }
-}
-
 // An isometric square has:
 // - sides equal length = 1,
 // - the short diagonal is length = 1,

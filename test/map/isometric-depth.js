@@ -107,7 +107,7 @@ window.onload = (event) => {
   builder.populate();
 
   let canvas = document.getElementById("testCanvas");
-  let context = new WT.Context(builder.terrain, WT.CoordSystem.Isometric, canvas);
+  let context = new WT.Context(builder.terrain, canvas);
 
   var update = function update() {
     if (document.hasFocus()) {

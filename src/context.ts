@@ -1,17 +1,17 @@
 import { Entity } from "./entity.js"
 import { Terrain, TerrainShape, TerrainType } from "./terrain.js"
 import { SquareGrid } from "./map.js"
-import { Point, CoordSystem, Sprite,
-         Renderer, CartisanRenderer, IsometricRenderer } from "./graphics.js"
+import { Point,
+         Sprite,
+         IsometricRenderer } from "./graphics.js"
 import { MouseController } from "./controller.js"
 
 export class Context {
-  private _gfx: Renderer;
+  private _gfx: IsometricRenderer;
   private _entities : Array<Entity>;
   private _controller: MouseController;
 
   constructor(private _worldMap: SquareGrid,
-              sys: CoordSystem,
               canvas: HTMLCanvasElement) {
 
     this._controller = new MouseController(canvas);
@@ -19,18 +19,19 @@ export class Context {
     let terrain = _worldMap.allTerrain;
     Array.from(terrain.values()).forEach(value => this._entities.push(value));
 
-    this._gfx = sys == CoordSystem.Cartisan ?
-      new CartisanRenderer(canvas) :
-      new IsometricRenderer(canvas);
-    this._gfx.initDrawCoords(this._entities);
+    // Select the top right entity, at the lowest level, to be the root of the
+    // scene.
+    let root: Entity = _worldMap.getTerrain(_worldMap.width - 1, 0, 0)!;
+    this._gfx = new IsometricRenderer(canvas, root, this._entities);
   }
 
   addEntity(entity: Entity): void {
     this._entities.push(entity);
+    this._gfx.insertEntity(entity);
   }
 
   update(): void {
-    this._gfx.render(this._entities, this._controller.camera);
+    this._gfx.render(this._controller.camera);
   }
 
   run(): void {

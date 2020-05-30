@@ -1,22 +1,21 @@
-import { CoordSystem, CartisanRenderer, IsometricRenderer } from "./graphics.js";
+import { IsometricRenderer } from "./graphics.js";
 import { MouseController } from "./controller.js";
 export class Context {
-    constructor(_worldMap, sys, canvas) {
+    constructor(_worldMap, canvas) {
         this._worldMap = _worldMap;
         this._controller = new MouseController(canvas);
         this._entities = new Array();
         let terrain = _worldMap.allTerrain;
         Array.from(terrain.values()).forEach(value => this._entities.push(value));
-        this._gfx = sys == CoordSystem.Cartisan ?
-            new CartisanRenderer(canvas) :
-            new IsometricRenderer(canvas);
-        this._gfx.initDrawCoords(this._entities);
+        let root = _worldMap.getTerrain(_worldMap.width - 1, 0, 0);
+        this._gfx = new IsometricRenderer(canvas, root, this._entities);
     }
     addEntity(entity) {
         this._entities.push(entity);
+        this._gfx.insertEntity(entity);
     }
     update() {
-        this._gfx.render(this._entities, this._controller.camera);
+        this._gfx.render(this._controller.camera);
     }
     run() {
         let context = this;

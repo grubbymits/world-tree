@@ -121,14 +121,6 @@ export class Dimensions {
     get depth() { return this._depth; }
     get height() { return this._height; }
 }
-export class CartisanDimensionsFromSprite extends Dimensions {
-    constructor(spriteWidth, spriteHeight, relativeDims) {
-        let heightRatio = relativeDims.width / relativeDims.height;
-        let height = spriteHeight * heightRatio;
-        let depth = spriteHeight - height;
-        super(spriteWidth, depth, height);
-    }
-}
 export class IsometricPhysicalDimensions extends Dimensions {
     constructor(spriteWidth, relativeDims) {
         let width = IsometricPhysicalDimensions.physicalWidth(spriteWidth);

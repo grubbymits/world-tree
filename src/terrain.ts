@@ -1,13 +1,10 @@
 import { Location,
          Dimensions,
-         CartisanDimensionsFromSprite,
-         IsometricPhysicalDimensions,
          Direction,
          getDirection } from "./physics.js"
 import { Rain } from "./weather.js"
 import { Entity } from "./entity.js"
 import { Point,
-         CoordSystem,
          SpriteSheet,
          Sprite,
          GraphicComponent,

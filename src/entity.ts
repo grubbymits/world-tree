@@ -1,9 +1,7 @@
 import { Location,
          Dimensions } from "./physics.js"
 import { Point,
-         CoordSystem,
          GraphicComponent,
-         CartisanRenderer,
          IsometricRenderer } from "./graphics.js"
 
 export class Entity {
