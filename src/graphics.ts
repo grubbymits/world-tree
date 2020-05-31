@@ -159,7 +159,7 @@ export abstract class SceneGraph {
     this._height = _canvas.height;
     this._ctx = this._canvas.getContext("2d", { alpha: false })!;
     this.initDrawCoords(entities);
-    this.sortEntitys(entities);
+    entities.sort(this.drawOrder);
     this._root = new SceneNode(entities[0]);
     this._nodes.set(entities[0], this._root);
 
@@ -175,7 +175,7 @@ export abstract class SceneGraph {
   }
 
   abstract getDrawCoord(object: Entity): Point;
-  abstract sortEntitys(objects: Array<Entity>): void;
+  abstract drawOrder(a: Entity, b: Entity): number;
   abstract initDrawCoords(objects: Array<Entity>): void;
 
   render(camera: Camera) {
@@ -234,27 +234,25 @@ export class IsometricRenderer extends SceneGraph {
     }
   }
 
-  sortEntitys(entities: Array<Entity>): void {
-    // We're drawing a 2D map, so depth is being simulated by the position on
-    // the X axis and the order in which those elements are drawn. Insert
-    // the new location and sort the array by draw order.
-    entities.sort((a, b) => {
-      if (a.z > b.z) {
-        return 1;
-      } else if (b.z > a.z) {
-        return -1;
-      }
-      if (a.y > b.y) {
-        return 1;
-      } else if (b.y > a.y) {
-        return -1;
-      }
-      if (a.x < b.x) {
-        return 1;
-      } else if (b.x < a.x) {
-        return -1;
-      }
-      return 0;
-    });
+  drawOrder(a: Entity, b: Entity): number {
+    // max x, min y and min z (top right of screen, but lowest level) would be
+    // first drawn. Then from max x we could draw columns, reducing x after each
+    // column. Then z can be increased and the drawing can continue.
+    if (a.z > b.z) {
+      return 1;
+    } else if (b.z > a.z) {
+      return -1;
+    }
+    if (a.y > b.y) {
+      return 1;
+    } else if (b.y > a.y) {
+      return -1;
+    }
+    if (a.x < b.x) {
+      return 1;
+    } else if (b.x < a.x) {
+      return -1;
+    }
+    return 0;
   }
 }
