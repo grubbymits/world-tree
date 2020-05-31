@@ -131,22 +131,19 @@ export class OssilateGraphicComponent extends GraphicComponent {
 }
 
 class SceneNode {
-  private _xChild: SceneNode;
-  private _yChild: SceneNode;
-  private _zChild: SceneNode;
+  private _succ: SceneNode;
+  private _pred: SceneNode;
 
   constructor(private readonly _entity: Entity) { }
 
-  get xChild(): SceneNode { return this._xChild; }
-  get yChild(): SceneNode { return this._yChild; }
-  get zChild(): SceneNode { return this._zChild; }
   get x(): number { return this._entity.x; }
   get y(): number { return this._entity.y; }
   get z(): number { return this._entity.z; }
   get entity(): Entity { return this._entity; }
-  set xChild(x: SceneNode) { this._xChild = x; }
-  set yChild(y: SceneNode) { this._yChild = y; }
-  set zChild(z: SceneNode) { this._zChild = z; }
+  get pred(): SceneNode { return this._pred; }
+  get succ(): SceneNode { return this._succ; }
+  set succ(s: SceneNode) { this._succ = s; }
+  set pred(p: SceneNode) { this._pred = p; }
 }
 
 export abstract class SceneGraph {
@@ -154,86 +151,56 @@ export abstract class SceneGraph {
   protected readonly _height: number;
   protected _ctx: CanvasRenderingContext2D;
   protected _root: SceneNode;
+  protected _nodes: Map<Entity, SceneNode> = new Map<Entity, SceneNode>();
   
   constructor(protected _canvas: HTMLCanvasElement,
-              rootEntity: Entity,
               entities: Array<Entity>) {
     this._width = _canvas.width;
     this._height = _canvas.height;
     this._ctx = this._canvas.getContext("2d", { alpha: false })!;
     this.initDrawCoords(entities);
     this.sortEntitys(entities);
+    this._root = new SceneNode(entities[0]);
+    this._nodes.set(entities[0], this._root);
 
-    this._root = new SceneNode(rootEntity);
-    let x: number = this._root.x;
-    let y: number = this._root.y;
-    let z: number = this._root.z;
-
-    console.log("rooting scene at: (x, y, z):", x, y, z);
+    let pred = this._root;
     for (let i = 1; i < entities.length; i++) {
       let entity = entities[i];
-      if (entity == rootEntity) {
-        continue;
-      }
-      this.insertEntity(entities[i])
+      let succ = new SceneNode(entity);
+      this._nodes.set(entity, succ);
+      pred.succ = succ;
+      succ.pred = pred;
+      pred = succ;
     }
   }
 
   abstract getDrawCoord(object: Entity): Point;
   abstract sortEntitys(objects: Array<Entity>): void;
   abstract initDrawCoords(objects: Array<Entity>): void;
-  abstract insertEntity(entity: Entity): void;
-  abstract insertNode(parentNode: SceneNode,
-                      childNode: SceneNode): void;
-
-  renderEntity(entity: Entity,
-               camera: Camera): void {
-    let coord: Point = this.getDrawCoord(entity);
-    if (!camera.isOnScreen(coord, entity.width, entity.depth)) {
-      return;
-    }
-    coord = camera.getDrawCoord(coord);
-    for (let i in entity.graphics) {
-      let component = entity.graphics[i];
-      let spriteId = component.update();
-      Sprite.sprites[spriteId].draw(coord, this._ctx);
-    }
-  }
 
   render(camera: Camera) {
     this._ctx.clearRect(0, 0, this._width, this._height);
-
-    let parentNode = this._root;
-    let xNode = parentNode.xChild;
-    //console.log("rendering xNodes at y == 0");
-    while (xNode != undefined) {
-      this.renderEntity(xNode.entity, camera);
-      xNode = xNode.xChild;
-    }
-
-    let yNode = parentNode.yChild;
-    while (yNode != undefined) {
-      this.renderEntity(yNode.entity, camera);
-      xNode = yNode.xChild;
-      while (xNode != undefined) {
-        this.renderEntity(xNode.entity, camera);
-        let zNode = xNode.zChild;
-        while (zNode != undefined) {
-          this.renderEntity(zNode.entity, camera);
-          zNode = zNode.zChild;
+    let node = this._root;
+    while (node != undefined) {
+      let entity: Entity = node.entity;
+      let coord: Point = this.getDrawCoord(entity);
+      if (camera.isOnScreen(coord, entity.width, entity.depth)) {
+        coord = camera.getDrawCoord(coord);
+        for (let i in entity.graphics) {
+          let component = entity.graphics[i];
+          let spriteId = component.update();
+          Sprite.sprites[spriteId].draw(coord, this._ctx);
         }
-        xNode = xNode.xChild;
       }
-      yNode = yNode.yChild;
+      node = node.succ;
     }
   }
 }
 
 export class IsometricRenderer extends SceneGraph {
   constructor(canvas: HTMLCanvasElement,
-              rootEntity: Entity,
               entities: Array<Entity>) {
-    super(canvas, rootEntity, entities);
+    super(canvas, entities);
   }
 
   private static readonly _sqrt3 = Math.sqrt(3);
@@ -290,69 +257,4 @@ export class IsometricRenderer extends SceneGraph {
       return 0;
     });
   }
-
-  insertEntity(entity: Entity): void {
-    let newNode: SceneNode = new SceneNode(entity);
-    let parentNode: SceneNode = this._root;
-    console.log("insert entity at (x,y,z):", entity.x, entity.y, entity.z);
-
-    while (entity.y > parentNode.y) {
-      let childNode = parentNode.yChild;
-      if (childNode == undefined) {
-        parentNode.yChild = newNode;
-        console.log("for parent at (x,y,z)",
-                    parentNode.x, parentNode.y, parentNode.z);
-        console.log("inserted new y child");
-        return;
-      }
-      parentNode = childNode;
-    }
-
-    while (entity.x < parentNode.x) {
-      let childNode = parentNode.xChild;
-      if (childNode == undefined) {
-        console.log("for parent at (x,y,z)",
-                    parentNode.x, parentNode.y, parentNode.z);
-        console.log("inserted new x child");
-        parentNode.xChild = newNode;
-        return;
-      }
-      parentNode = childNode;
-    }
-
-    while (entity.z > parentNode.z) {
-      let childNode = parentNode.zChild;
-      if (childNode == undefined) {
-        console.log("for parent at (x,y,z)",
-                    parentNode.x, parentNode.y, parentNode.z);
-        console.log("inserted new z child");
-        parentNode.zChild = newNode;
-        return;
-      }
-      parentNode = childNode;
-    }
-    console.log("need to place entity between existing nodes...");
-    this.insertNode(parentNode, newNode);
-  }
-
-  insertNode(parentNode: SceneNode,
-             childNode: SceneNode): void {
-    if (parentNode.y < childNode.y) {
-      if (parentNode.yChild != undefined) {
-        childNode.yChild = parentNode.yChild;
-      }
-      parentNode.yChild = childNode;
-    } else if (parentNode.x > childNode.x) {
-      if (parentNode.xChild != undefined) {
-        childNode.xChild = parentNode.xChild;
-      }
-      parentNode.xChild = childNode;
-    } else if (parentNode.z < childNode.z) {
-      if (parentNode.zChild != undefined) {
-        childNode.zChild = parentNode.zChild;
-      }
-      parentNode.zChild = childNode;
-    }
-  }
 }
-

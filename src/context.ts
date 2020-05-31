@@ -18,16 +18,7 @@ export class Context {
     this._entities = new Array<Entity>();
     let terrain = _worldMap.allTerrain;
     Array.from(terrain.values()).forEach(value => this._entities.push(value));
-
-    // Select the top right entity, at the lowest level, to be the root of the
-    // scene.
-    let root: Entity = _worldMap.getTerrain(_worldMap.width - 1, 0, 0)!;
-    this._gfx = new IsometricRenderer(canvas, root, this._entities);
-  }
-
-  addEntity(entity: Entity): void {
-    this._entities.push(entity);
-    this._gfx.insertEntity(entity);
+    this._gfx = new IsometricRenderer(canvas, this._entities);
   }
 
   update(): void {

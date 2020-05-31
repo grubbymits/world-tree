@@ -7,12 +7,7 @@ export class Context {
         this._entities = new Array();
         let terrain = _worldMap.allTerrain;
         Array.from(terrain.values()).forEach(value => this._entities.push(value));
-        let root = _worldMap.getTerrain(_worldMap.width - 1, 0, 0);
-        this._gfx = new IsometricRenderer(canvas, root, this._entities);
-    }
-    addEntity(entity) {
-        this._entities.push(entity);
-        this._gfx.insertEntity(entity);
+        this._gfx = new IsometricRenderer(canvas, this._entities);
     }
     update() {
         this._gfx.render(this._controller.camera);
