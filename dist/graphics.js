@@ -149,6 +149,25 @@ export class SceneGraph {
             node = node.succ;
         }
     }
+    insertEntity(entity) {
+        let node = new SceneNode(entity);
+        this._nodes.set(entity, node);
+        let next = this._root;
+        let last = next;
+        while (next != undefined) {
+            if (this.drawOrder(node.entity, next.entity) == -1) {
+                node.pred = next.pred;
+                node.succ = next;
+                next.pred = node;
+                return;
+            }
+            last = next;
+            next = next.succ;
+        }
+        console.log("inserting node at end");
+        last.succ = node;
+        node.pred = last;
+    }
 }
 export class IsometricRenderer extends SceneGraph {
     constructor(canvas, entities) {

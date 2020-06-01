@@ -195,6 +195,26 @@ export abstract class SceneGraph {
       node = node.succ;
     }
   }
+
+  insertEntity(entity: Entity): void {
+    let node = new SceneNode(entity);
+    this._nodes.set(entity, node);
+    let next = this._root;
+    let last = next;
+    while (next != undefined) {
+      if (this.drawOrder(node.entity, next.entity) == -1) {
+        node.pred = next.pred;
+        node.succ = next;
+        next.pred = node;
+        return;
+      }
+      last = next;
+      next = next.succ;
+    }
+    console.log("inserting node at end");
+    last.succ = node;
+    node.pred = last;
+  }
 }
 
 export class IsometricRenderer extends SceneGraph {
@@ -235,7 +255,7 @@ export class IsometricRenderer extends SceneGraph {
   }
 
   drawOrder(a: Entity, b: Entity): number {
-    // max x, min y and min z (top right of screen, but lowest level) would be
+    // max x, min y and min z (top right of screen, lowest level) would be
     // first drawn. Then from max x we could draw columns, reducing x after each
     // column. Then z can be increased and the drawing can continue.
     if (a.z > b.z) {

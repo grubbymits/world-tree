@@ -10,7 +10,9 @@ export var Direction;
     Direction[Direction["SouthWest"] = 5] = "SouthWest";
     Direction[Direction["West"] = 6] = "West";
     Direction[Direction["NorthWest"] = 7] = "NorthWest";
-    Direction[Direction["Max"] = 8] = "Max";
+    Direction[Direction["Up"] = 8] = "Up";
+    Direction[Direction["Down"] = 9] = "Down";
+    Direction[Direction["Max"] = 10] = "Max";
 })(Direction || (Direction = {}));
 export function getDirectionName(direction) {
     switch (direction) {
@@ -32,9 +34,13 @@ export function getDirectionName(direction) {
             return "west";
         case Direction.NorthWest:
             return "north west";
+        case Direction.Up:
+            return "up";
+        case Direction.Down:
+            return "down";
     }
     console.error("unhandled direction when getting name");
-    return "";
+    return "error";
 }
 export function getDirectionCoords(x, y, direction) {
     let xDiff = 0;
@@ -223,5 +229,54 @@ export class PathFinder {
         }
         path.reverse();
         return path.splice(1);
+    }
+}
+class BoundingRectangle {
+    constructor(_centre, _dimensions) {
+        this._centre = _centre;
+        this._dimensions = _dimensions;
+        this.updateLocation(_centre);
+    }
+    get minLocation() { return this._minLocation; }
+    get maxLocation() { return this._maxLocation; }
+    get width() { return this._dimensions.width; }
+    get depth() { return this._dimensions.depth; }
+    get height() { return this._dimensions.height; }
+    updateLocation(centre) {
+        this._centre = centre;
+        let width = Math.floor(this.width / 2);
+        let depth = Math.floor(this.depth / 2);
+        let height = Math.floor(this.height / 2);
+        let x = centre.x - width;
+        let y = centre.y - depth;
+        let z = centre.z - height;
+        this._minLocation = new Location(x, y, z);
+        x = centre.x + width;
+        y = centre.y + depth;
+        z = centre.z + height;
+        this._maxLocation = new Location(x, y, z);
+    }
+    contains(location) {
+        if (location.x < this._minLocation.x ||
+            location.y < this._minLocation.y ||
+            location.z < this._minLocation.z)
+            return false;
+        if (location.x > this._maxLocation.x ||
+            location.y > this._maxLocation.y ||
+            location.z > this._maxLocation.z)
+            return false;
+        return true;
+    }
+    intersects(other) {
+        if (other.minLocation.x > this.maxLocation.x ||
+            other.maxLocation.x < this.minLocation.x)
+            return false;
+        if (other.minLocation.y > this.maxLocation.y ||
+            other.maxLocation.y < this.minLocation.y)
+            return false;
+        if (other.minLocation.z > this.maxLocation.z ||
+            other.maxLocation.z < this.minLocation.z)
+            return false;
+        return true;
     }
 }

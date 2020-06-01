@@ -893,7 +893,7 @@ export class TerrainBuilder {
     for (let y = 0; y < this._surface.depth; y++) {
       for (let x = 0; x < this._surface.width; x++) {
         let z = this._surface.at(x, y).terrace;
-        let zStop = 0; //z - this.calcRelativeHeight(x, y);
+        let zStop = z - this.calcRelativeHeight(x, y);
         let terrain = this._worldTerrain.getTerrain(x, y, z)!;
         if (terrain == null) {
           console.error("didn't find terrain in map at", x, y, z);
