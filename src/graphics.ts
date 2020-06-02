@@ -104,7 +104,8 @@ export class OssilateGraphicComponent extends GraphicComponent {
     super(sprites[0].id);
     this._startId = sprites[0].id;
     this._endId = sprites[sprites.length - 1].id;
-    this._currentSpriteId = Math.floor(Math.random() * (this._endId - this._startId) + this._startId);
+    this._currentSpriteId =
+      Math.floor(Math.random() * (this._endId - this._startId) + this._startId);
     this._nextUpdate = Date.now() + _interval;
   }
 
@@ -151,6 +152,7 @@ export abstract class SceneGraph {
   protected readonly _height: number;
   protected _ctx: CanvasRenderingContext2D;
   protected _root: SceneNode;
+  protected _leaf: SceneNode;
   protected _nodes: Map<Entity, SceneNode> = new Map<Entity, SceneNode>();
   
   constructor(protected _canvas: HTMLCanvasElement,
@@ -172,6 +174,7 @@ export abstract class SceneGraph {
       succ.pred = pred;
       pred = succ;
     }
+    this._leaf  = pred;
   }
 
   abstract getDrawCoord(object: Entity): Point;
@@ -196,6 +199,20 @@ export abstract class SceneGraph {
     }
   }
 
+  getDrawnAt(draw: Point): Entity | null {
+    console.log("getDrawnAt", draw);
+    let node = this._leaf;
+    while (node != undefined) {
+      let entity: Entity = node.entity;
+      if (this.isDrawnAt(entity, draw)) {
+        console.log("found entity at (x,y,z)", entity.x, entity.y, entity.z);
+        return entity;
+      }
+      node = node.pred;
+    }
+    return null;
+  }
+
   insertEntity(entity: Entity): void {
     let node = new SceneNode(entity);
     this._nodes.set(entity, node);
@@ -214,6 +231,7 @@ export abstract class SceneGraph {
     console.log("inserting node at end");
     last.succ = node;
     node.pred = last;
+    this._leaf = node;
   }
 }
 
@@ -224,6 +242,8 @@ export class IsometricRenderer extends SceneGraph {
   }
 
   private static readonly _sqrt3 = Math.sqrt(3);
+  private static readonly _halfSqrt3 = Math.sqrt(3) * 0.5;
+  private static readonly _recipHalfSqrt3 = 1 / this._halfSqrt3;
 
   static getDrawCoord(entity: Entity): Point {
     // An isometric square has:
@@ -235,9 +255,20 @@ export class IsometricRenderer extends SceneGraph {
 
     // Tiles are placed overlapping each other by half.
     // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
-    let dx = Math.floor(0.5 * this._sqrt3 * (entity.x + entity.y));
+    let dx = Math.floor(this._halfSqrt3 * (entity.x + entity.y));
     let dy = Math.floor((0.5 * (entity.y - entity.x)) - entity.z);
     return new Point(dx, dy);
+  }
+
+  static isDrawnAt(entity: Entity, draw: Point): number {
+    // FIXME: Think This needs adjusting considering that the top of the
+    // 'square' is actually rhobus and we're not taking into consideration the
+    // size of the sprite.
+    let xPlusY: number = Math.floor(draw.x * this._recipHalfSqrt3);
+    if (entity.x + entity.y != xPlusY) {
+      return false;
+    }
+    return entity.z == ((0.5 * (entity.y - entity.x)) - draw.y);
   }
 
   getDrawCoord(entity: Entity): Point {
