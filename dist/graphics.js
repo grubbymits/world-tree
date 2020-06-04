@@ -45,14 +45,30 @@ export class Sprite {
     draw(coord, ctx) {
         ctx.drawImage(this._sheet.image, this._offsetX, this._offsetY, this._width, this._height, coord.x, coord.y, this._width, this._height);
     }
-    get id() {
-        return this._id;
+    isTransparentAt(offset) {
+        let x = this._offsetX + offset.x;
+        let y = this._offsetY + offset.y;
+        let width = this._sheet.image.width;
+        let alpha = (y * (width * 4)) + (x * 4) + 3;
+        return alpha == 0;
     }
+    get id() { return this._id; }
+    get width() { return this._width; }
+    get height() { return this._height; }
 }
 Sprite._sprites = new Array();
 export class GraphicComponent {
     constructor(_currentSpriteId) {
         this._currentSpriteId = _currentSpriteId;
+    }
+    isTransparentAt(offset) {
+        return Sprite.sprites[this._currentSpriteId].isTransparentAt(offset);
+    }
+    get width() {
+        return Sprite.sprites[this._currentSpriteId].width;
+    }
+    get height() {
+        return Sprite.sprites[this._currentSpriteId].height;
     }
 }
 export class StaticGraphicComponent extends GraphicComponent {
@@ -73,7 +89,8 @@ export class OssilateGraphicComponent extends GraphicComponent {
         this._nextUpdate = 0;
         this._startId = sprites[0].id;
         this._endId = sprites[sprites.length - 1].id;
-        this._currentSpriteId = Math.floor(Math.random() * (this._endId - this._startId) + this._startId);
+        this._currentSpriteId =
+            Math.floor(Math.random() * (this._endId - this._startId) + this._startId);
         this._nextUpdate = Date.now() + _interval;
     }
     update() {
@@ -131,23 +148,50 @@ export class SceneGraph {
             succ.pred = pred;
             pred = succ;
         }
+        this._leaf = pred;
     }
     render(camera) {
         this._ctx.clearRect(0, 0, this._width, this._height);
         let node = this._root;
         while (node != undefined) {
             let entity = node.entity;
-            let coord = this.getDrawCoord(entity);
-            if (camera.isOnScreen(coord, entity.width, entity.depth)) {
-                coord = camera.getDrawCoord(coord);
-                for (let i in entity.graphics) {
-                    let component = entity.graphics[i];
-                    let spriteId = component.update();
-                    Sprite.sprites[spriteId].draw(coord, this._ctx);
+            if (entity.visible) {
+                let coord = this.getDrawCoord(entity);
+                if (camera.isOnScreen(coord, entity.width, entity.depth)) {
+                    coord = camera.getDrawCoord(coord);
+                    for (let i in entity.graphics) {
+                        let component = entity.graphics[i];
+                        let spriteId = component.update();
+                        Sprite.sprites[spriteId].draw(coord, this._ctx);
+                    }
                 }
             }
             node = node.succ;
         }
+    }
+    getDrawnAt(draw, camera) {
+        console.log("getDrawnAt:", draw);
+        console.log("camera cetnre: ", camera.centre);
+        let node = this._leaf;
+        while (node != undefined) {
+            let entity = node.entity;
+            if (camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
+                let entityDrawCoord = camera.getDrawCoord(entity.drawCoord);
+                if (draw.x < entityDrawCoord.x || draw.y < entityDrawCoord.y ||
+                    draw.x > entityDrawCoord.x + entity.graphic.width ||
+                    draw.y > entityDrawCoord.y + entity.graphic.height) {
+                    node = node.pred;
+                    continue;
+                }
+                let spriteOffset = new Point(draw.x - entityDrawCoord.x, draw.y - entityDrawCoord.y);
+                if (!entity.graphic.isTransparentAt(spriteOffset)) {
+                    console.log("found entity drawn at:", entityDrawCoord);
+                    return entity;
+                }
+            }
+            node = node.pred;
+        }
+        return null;
     }
     insertEntity(entity) {
         let node = new SceneNode(entity);
@@ -167,6 +211,7 @@ export class SceneGraph {
         console.log("inserting node at end");
         last.succ = node;
         node.pred = last;
+        this._leaf = node;
     }
 }
 export class IsometricRenderer extends SceneGraph {
@@ -174,7 +219,7 @@ export class IsometricRenderer extends SceneGraph {
         super(canvas, entities);
     }
     static getDrawCoord(entity) {
-        let dx = Math.floor(0.5 * this._sqrt3 * (entity.x + entity.y));
+        let dx = Math.floor(this._halfSqrt3 * (entity.x + entity.y));
         let dy = Math.floor((0.5 * (entity.y - entity.x)) - entity.z);
         return new Point(dx, dy);
     }
@@ -213,3 +258,4 @@ export class IsometricRenderer extends SceneGraph {
     }
 }
 IsometricRenderer._sqrt3 = Math.sqrt(3);
+IsometricRenderer._halfSqrt3 = Math.sqrt(3) * 0.5;

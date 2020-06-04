@@ -10,6 +10,13 @@ export class Context {
         this._gfx = new IsometricRenderer(canvas, this._entities);
     }
     update() {
+        if (this._controller.secondaryClicked) {
+            this._controller.secondaryClicked = false;
+            let entity = this._gfx.getDrawnAt(this._controller.secondaryClickedAt, this._controller.camera);
+            if (entity != undefined) {
+                entity.visible = false;
+            }
+        }
         this._gfx.render(this._controller.camera);
     }
     run() {

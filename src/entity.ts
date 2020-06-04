@@ -12,6 +12,7 @@ export class Entity {
   protected readonly _hasMoved: boolean = false;
   protected _drawCoord: Point = new Point(0, 0);
   protected _graphicComponents: Array<GraphicComponent>;
+  protected _visible: boolean = true;
 
   constructor(protected _location: Location,
               protected readonly _dimensions: Dimensions,
@@ -35,11 +36,16 @@ export class Entity {
   get id(): number { return this._id; }
   get hasMoved(): boolean { return this._hasMoved; }
   get drawCoord(): Point { return this._drawCoord; }
+  get visible(): boolean { return this._visible; }
   get graphics(): Array<GraphicComponent> {
     return this._graphicComponents;
   }
+  get graphic(): GraphicComponent {
+    return this._graphicComponents[0];
+  }
 
   set drawCoord(coord: Point) { this._drawCoord = coord; }
+  set visible(visible: boolean) { this._visible = visible; }
 
   addGraphic(graphic: GraphicComponent): void {
     this._graphicComponents.push(graphic);

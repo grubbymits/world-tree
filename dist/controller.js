@@ -3,24 +3,40 @@ import { Point } from "./graphics.js";
 export class MouseController {
     constructor(_canvas) {
         this._canvas = _canvas;
+        this._primaryClicked = false;
+        this._secondaryClicked = false;
+        this._secondaryClickedAt = new Point(0, 0);
         this._camera = new Camera(0, 0, _canvas.width, _canvas.height);
-        this._clicked = false;
         var controller = this;
         this._canvas.addEventListener('mousedown', e => {
-            controller.clicked = true;
-            controller.camera.centre = new Point(e.clientX, e.clientY);
+            if (e.button == 0) {
+                controller.primaryClicked = true;
+                controller.camera.centre = new Point(e.clientX, e.clientY);
+            }
+            else if (e.button == 2) {
+                controller.secondaryClicked = true;
+                this._secondaryClickedAt = new Point(e.clientX, e.clientY);
+            }
         });
         this._canvas.addEventListener('mouseup', e => {
-            controller.clicked = false;
+            if (e.button == 0) {
+                controller.primaryClicked = false;
+            }
+            else if (e.button == 2) {
+                controller.secondaryClicked = false;
+            }
         });
         this._canvas.addEventListener('mousemove', e => {
-            if (controller.clicked) {
+            if (controller.primaryClicked) {
                 controller.camera.x = e.clientX;
                 controller.camera.y = e.clientY;
             }
         });
     }
-    set clicked(click) { this._clicked = click; }
-    get clicked() { return this._clicked; }
+    set primaryClicked(click) { this._primaryClicked = click; }
+    set secondaryClicked(click) { this._secondaryClicked = click; }
+    get primaryClicked() { return this._primaryClicked; }
+    get secondaryClicked() { return this._secondaryClicked; }
+    get secondaryClickedAt() { return this._secondaryClickedAt; }
     get camera() { return this._camera; }
 }

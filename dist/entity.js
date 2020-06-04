@@ -6,6 +6,7 @@ export class Entity {
         this._blocking = _blocking;
         this._hasMoved = false;
         this._drawCoord = new Point(0, 0);
+        this._visible = true;
         this._id = Entity._ids;
         Entity._ids++;
         this._graphicComponents = new Array();
@@ -23,10 +24,15 @@ export class Entity {
     get id() { return this._id; }
     get hasMoved() { return this._hasMoved; }
     get drawCoord() { return this._drawCoord; }
+    get visible() { return this._visible; }
     get graphics() {
         return this._graphicComponents;
     }
+    get graphic() {
+        return this._graphicComponents[0];
+    }
     set drawCoord(coord) { this._drawCoord = coord; }
+    set visible(visible) { this._visible = visible; }
     addGraphic(graphic) {
         this._graphicComponents.push(graphic);
     }

@@ -67,9 +67,17 @@ export class Sprite {
                   this._width, this._height);
   }
 
-  get id(): number {
-    return this._id;
+  isTransparentAt(offset: Point): boolean {
+    let x: number = this._offsetX + offset.x;
+    let y: number = this._offsetY + offset.y;
+    let width: number = this._sheet.image.width;
+    let alpha: number = (y * (width * 4)) + (x * 4) + 3;
+    return alpha == 0;
   }
+
+  get id(): number { return this._id; }
+  get width(): number { return this._width; }
+  get height(): number { return this._height; }
 }
 
 // Computer graphics have their origin in the top left corner.
@@ -81,6 +89,15 @@ export abstract class GraphicComponent {
   constructor(protected _currentSpriteId: number) { }
               
   abstract update(): number;
+  isTransparentAt(offset: Point): boolean {
+    return Sprite.sprites[this._currentSpriteId].isTransparentAt(offset);
+  }
+  get width(): number { 
+    return Sprite.sprites[this._currentSpriteId].width;
+  }
+  get height(): number { 
+    return Sprite.sprites[this._currentSpriteId].height;
+  }
 }
 
 export class StaticGraphicComponent extends GraphicComponent {
@@ -186,27 +203,42 @@ export abstract class SceneGraph {
     let node = this._root;
     while (node != undefined) {
       let entity: Entity = node.entity;
-      let coord: Point = this.getDrawCoord(entity);
-      if (camera.isOnScreen(coord, entity.width, entity.depth)) {
-        coord = camera.getDrawCoord(coord);
-        for (let i in entity.graphics) {
-          let component = entity.graphics[i];
-          let spriteId = component.update();
-          Sprite.sprites[spriteId].draw(coord, this._ctx);
+      if (entity.visible) {
+        let coord: Point = this.getDrawCoord(entity);
+        if (camera.isOnScreen(coord, entity.width, entity.depth)) {
+          coord = camera.getDrawCoord(coord);
+          for (let i in entity.graphics) {
+            let component = entity.graphics[i];
+            let spriteId = component.update();
+            Sprite.sprites[spriteId].draw(coord, this._ctx);
+          }
         }
       }
       node = node.succ;
     }
   }
 
-  getDrawnAt(draw: Point): Entity | null {
-    console.log("getDrawnAt", draw);
+  getDrawnAt(draw: Point, camera: Camera): Entity | null {
+    console.log("getDrawnAt:", draw);
+    console.log("camera cetnre: ", camera.centre);
     let node = this._leaf;
     while (node != undefined) {
       let entity: Entity = node.entity;
-      if (this.isDrawnAt(entity, draw)) {
-        console.log("found entity at (x,y,z)", entity.x, entity.y, entity.z);
-        return entity;
+      if (camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
+        let entityDrawCoord: Point = camera.getDrawCoord(entity.drawCoord);
+        // Check whether inbounds of the sprite.
+        if (draw.x < entityDrawCoord.x || draw.y < entityDrawCoord.y ||
+            draw.x > entityDrawCoord.x + entity.graphic.width ||
+            draw.y > entityDrawCoord.y + entity.graphic.height) {
+          node = node.pred;
+          continue;
+        }
+        let spriteOffset: Point = 
+          new Point(draw.x - entityDrawCoord.x, draw.y - entityDrawCoord.y);
+        if (!entity.graphic.isTransparentAt(spriteOffset)) {
+          console.log("found entity drawn at:", entityDrawCoord);
+          return entity;
+        }
       }
       node = node.pred;
     }
@@ -243,7 +275,6 @@ export class IsometricRenderer extends SceneGraph {
 
   private static readonly _sqrt3 = Math.sqrt(3);
   private static readonly _halfSqrt3 = Math.sqrt(3) * 0.5;
-  private static readonly _recipHalfSqrt3 = 1 / this._halfSqrt3;
 
   static getDrawCoord(entity: Entity): Point {
     // An isometric square has:
@@ -258,17 +289,6 @@ export class IsometricRenderer extends SceneGraph {
     let dx = Math.floor(this._halfSqrt3 * (entity.x + entity.y));
     let dy = Math.floor((0.5 * (entity.y - entity.x)) - entity.z);
     return new Point(dx, dy);
-  }
-
-  static isDrawnAt(entity: Entity, draw: Point): number {
-    // FIXME: Think This needs adjusting considering that the top of the
-    // 'square' is actually rhobus and we're not taking into consideration the
-    // size of the sprite.
-    let xPlusY: number = Math.floor(draw.x * this._recipHalfSqrt3);
-    if (entity.x + entity.y != xPlusY) {
-      return false;
-    }
-    return entity.z == ((0.5 * (entity.y - entity.x)) - draw.y);
   }
 
   getDrawCoord(entity: Entity): Point {
