@@ -49,9 +49,6 @@ export class SpriteSheet {
   get canvas(): HTMLCanvasElement { return this._canvas; }
   set canvas(c: HTMLCanvasElement) { this._canvas = c; }
 
-  init(): void {
-  }
-
   isTransparentAt(x: number, y: number): boolean {
     let data = this._canvas.getContext('2d')!.getImageData(x, y, 1, 1).data;
     return data[3] == 0;
