@@ -11,7 +11,7 @@ export class MouseController {
         this._canvas.addEventListener('mousedown', e => {
             if (e.button == 0) {
                 controller.primaryClicked = true;
-                controller.camera.centre = new Point(e.clientX, e.clientY);
+                controller.camera.pivot = new Point(e.clientX, e.clientY);
             }
             else if (e.button == 2) {
                 controller.secondaryClicked = true;

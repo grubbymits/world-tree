@@ -6,7 +6,7 @@ export class Camera {
   private _lowerY : number;
   private _upperX : number;
   private _upperY : number;
-  private _centre: Point;
+  private _pivot: Point;
   static sensistivity: number = 10;
 
   constructor(private _x: number,
@@ -17,38 +17,39 @@ export class Camera {
     this._lowerY = _y;
     this._upperX = _x + _width;
     this._upperY = _y + _height;
-    this._centre = new Point(Math.floor(_width / 2), Math.floor(_height / 2));
+    this._pivot = new Point(Math.floor(_width / 2), Math.floor(_height / 2));
   }
 
-  set centre(coord: Point) {
-    this._centre = coord;
-  }
-  get centre(): Point {
-    return this._centre;
-  }
+  set pivot(coord: Point) { this._pivot = coord; }
+  get pivot(): Point { return this._pivot; }
+  get min(): Point { return new Point(this._lowerX, this._lowerY); }
 
   set x(x: number) {
-    if (x < this._centre.x) {
-      this._x += Math.floor((this.centre.x - x) / Camera.sensistivity);
-    } else if (x > this._centre.x) {
-      this._x -= Math.floor((x - this.centre.x) / Camera.sensistivity);
+    let dx: number = 0;
+    if (x < this._pivot.x) {
+      dx = Math.floor((this.pivot.x - x) / Camera.sensistivity);
+    } else if (x > this._pivot.x) {
+      dx = -Math.floor((x - this.pivot.x) / Camera.sensistivity);
     } else {
       return;
     }
-    this._lowerX = Math.floor(this._x - this._width);
-    this._upperX = Math.floor(this._x + this._width);
+    this._x += dx;
+    this._lowerX += dx;
+    this._upperX += dx;
   }
 
   set y(y: number) {
-    if (y < this._centre.y) {
-      this._y += Math.floor((this.centre.y - y) / Camera.sensistivity);
-    } else if (y > this._centre.y) {
-      this._y -= Math.floor((y - this.centre.y) / Camera.sensistivity);
+    let dy: number = 0;
+    if (y < this._pivot.y) {
+      dy = Math.floor((this.pivot.y - y) / Camera.sensistivity);
+    } else if (y > this._pivot.y) {
+      dy = -Math.floor((y - this.pivot.y) / Camera.sensistivity);
     } else {
       return;
     }
-    this._lowerY = Math.floor(this._y - this._height);
-    this._upperY = Math.floor(this._y + this._height);
+    this._y += dy;
+    this._lowerY += dy;
+    this._upperY += dy;
   }
 
   isOnScreen(coord : Point, width: number, depth: number) : boolean {

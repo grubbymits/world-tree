@@ -171,7 +171,7 @@ export class SceneGraph {
     }
     getDrawnAt(draw, camera) {
         console.log("getDrawnAt:", draw);
-        console.log("camera cetnre: ", camera.centre);
+        console.log("camera centre: ", camera.pivot);
         let node = this._leaf;
         while (node != undefined) {
             let entity = node.entity;
