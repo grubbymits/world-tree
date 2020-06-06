@@ -19,6 +19,7 @@ export class SpriteSheet {
   }
 
   private _image: HTMLImageElement;
+  private _canvas: HTMLCanvasElement;
 
   constructor(name: string) {
     this._image = new Image();
@@ -28,12 +29,32 @@ export class SpriteSheet {
     } else {
       throw new Error("No filename passed");
     }
-    console.log("load", name);
     SpriteSheet.add(this);
+
+    let sheet = this;
+    this._image.onload = function() {
+      console.log("loaded:", sheet.image.src);
+      sheet.canvas = document.createElement('canvas');
+      let width: number = sheet.width;
+      let height: number = sheet.height;
+      sheet.canvas.width = width;
+      sheet.canvas.height = height;
+      sheet.canvas.getContext('2d')!.drawImage(sheet.image, 0, 0, width, height);
+    };
   }
 
-  get image(): HTMLImageElement {
-    return this._image;
+  get image(): HTMLImageElement { return this._image;  }
+  get width(): number { return this._image.width; }
+  get height(): number { return this._image.height; }
+  get canvas(): HTMLCanvasElement { return this._canvas; }
+  set canvas(c: HTMLCanvasElement) { this._canvas = c; }
+
+  init(): void {
+  }
+
+  isTransparentAt(x: number, y: number): boolean {
+    let data = this._canvas.getContext('2d')!.getImageData(x, y, 1, 1).data;
+    return data[3] == 0;
   }
 }
 
@@ -70,9 +91,7 @@ export class Sprite {
   isTransparentAt(offset: Point): boolean {
     let x: number = this._offsetX + offset.x;
     let y: number = this._offsetY + offset.y;
-    let width: number = this._sheet.image.width;
-    let alpha: number = (y * (width * 4)) + (x * 4) + 3;
-    return alpha == 0;
+    return this._sheet.isTransparentAt(x, y);
   }
 
   get id(): number { return this._id; }
@@ -224,7 +243,8 @@ export abstract class SceneGraph {
     let node = this._leaf;
     while (node != undefined) {
       let entity: Entity = node.entity;
-      if (camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
+      if (entity.visible &&
+          camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
         let entityDrawCoord: Point = camera.getDrawCoord(entity.drawCoord);
         // Check whether inbounds of the sprite.
         if (draw.x < entityDrawCoord.x || draw.y < entityDrawCoord.y ||

@@ -354,19 +354,16 @@ export class Terrain extends Entity {
                     height: number) {
     console.assert(terrainType == TerrainType.Water,
                    "water is the only type supported");
-    console.log("adding graphics for type:", getTypeName(terrainType));
     this._terrainGraphics.set(terrainType, new Array<GraphicComponent>());
     let graphics = this._terrainGraphics.get(terrainType)!;
     let sprite = new Sprite(sheet, 0, 0, width, height);
     graphics.push(new StaticGraphicComponent(sprite.id));
-    console.log("added sprite for shape: flat");
   }
 
   static addGraphics(terrainType: TerrainType,
                      sheet: SpriteSheet,
                      width: number,
                      height: number) {
-    console.log("adding graphics for type:", getTypeName(terrainType));
     this._terrainGraphics.set(terrainType, new Array<GraphicComponent>());
     let graphics = this._terrainGraphics.get(terrainType)!;
     let shapeType = 0;
@@ -375,20 +372,15 @@ export class Terrain extends Entity {
       for (let x = 0; x < 3; x++) {
         let sprite = new Sprite(sheet, x * width, y * height, width, height);
         graphics.push(new StaticGraphicComponent(sprite.id));
-        console.log("added sprite for shape:",
-                    getShapeName(<TerrainShape>shapeType));
         shapeType++;
       }
     }
     let sprite = new Sprite(sheet, 0, y * height, width, height);
     graphics.push(new StaticGraphicComponent(sprite.id));
-    console.log("added sprite for shape:",
-    getShapeName(<TerrainShape>shapeType));
   }
 
   static addFeatureGraphics(feature: TerrainFeature,
                             graphics: GraphicComponent) {
-    console.log("adding feature graphics for:", getFeatureName(feature));
     this._featureGraphics.set(feature, graphics);
   }
 
@@ -431,7 +423,6 @@ export class Terrain extends Entity {
         let feature = <TerrainFeature><any>TerrainFeature[key];
         if (Terrain.isSupportedFeature(feature) &&
             hasFeature(features, feature)) {
-          console.log("adding feature:", key);
           this.addGraphic(Terrain.featureGraphics(feature));
         }
       }

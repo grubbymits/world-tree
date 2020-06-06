@@ -15,14 +15,31 @@ export class SpriteSheet {
         else {
             throw new Error("No filename passed");
         }
-        console.log("load", name);
         SpriteSheet.add(this);
+        let sheet = this;
+        this._image.onload = function () {
+            console.log("loaded:", sheet.image.src);
+            sheet.canvas = document.createElement('canvas');
+            let width = sheet.width;
+            let height = sheet.height;
+            sheet.canvas.width = width;
+            sheet.canvas.height = height;
+            sheet.canvas.getContext('2d').drawImage(sheet.image, 0, 0, width, height);
+        };
     }
     static add(sheet) {
         this._sheets.push(sheet);
     }
-    get image() {
-        return this._image;
+    get image() { return this._image; }
+    get width() { return this._image.width; }
+    get height() { return this._image.height; }
+    get canvas() { return this._canvas; }
+    set canvas(c) { this._canvas = c; }
+    init() {
+    }
+    isTransparentAt(x, y) {
+        let data = this._canvas.getContext('2d').getImageData(x, y, 1, 1).data;
+        return data[3] == 0;
     }
 }
 SpriteSheet._sheets = new Array();
@@ -48,9 +65,7 @@ export class Sprite {
     isTransparentAt(offset) {
         let x = this._offsetX + offset.x;
         let y = this._offsetY + offset.y;
-        let width = this._sheet.image.width;
-        let alpha = (y * (width * 4)) + (x * 4) + 3;
-        return alpha == 0;
+        return this._sheet.isTransparentAt(x, y);
     }
     get id() { return this._id; }
     get width() { return this._width; }
@@ -175,7 +190,8 @@ export class SceneGraph {
         let node = this._leaf;
         while (node != undefined) {
             let entity = node.entity;
-            if (camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
+            if (entity.visible &&
+                camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
                 let entityDrawCoord = camera.getDrawCoord(entity.drawCoord);
                 if (draw.x < entityDrawCoord.x || draw.y < entityDrawCoord.y ||
                     draw.x > entityDrawCoord.x + entity.graphic.width ||

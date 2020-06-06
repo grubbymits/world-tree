@@ -10,9 +10,7 @@ export var Direction;
     Direction[Direction["SouthWest"] = 5] = "SouthWest";
     Direction[Direction["West"] = 6] = "West";
     Direction[Direction["NorthWest"] = 7] = "NorthWest";
-    Direction[Direction["Up"] = 8] = "Up";
-    Direction[Direction["Down"] = 9] = "Down";
-    Direction[Direction["Max"] = 10] = "Max";
+    Direction[Direction["Max"] = 8] = "Max";
 })(Direction || (Direction = {}));
 export function getDirectionName(direction) {
     switch (direction) {
@@ -34,10 +32,6 @@ export function getDirectionName(direction) {
             return "west";
         case Direction.NorthWest:
             return "north west";
-        case Direction.Up:
-            return "up";
-        case Direction.Down:
-            return "down";
     }
     console.error("unhandled direction when getting name");
     return "error";

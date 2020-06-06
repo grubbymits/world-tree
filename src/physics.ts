@@ -12,8 +12,6 @@ export enum Direction {
   SouthWest,
   West,
   NorthWest,
-  Up,
-  Down,
   Max,
 }
 
@@ -37,10 +35,6 @@ export function getDirectionName(direction: Direction): string {
     return "west";
   case Direction.NorthWest:
     return "north west";
-  case Direction.Up:
-    return "up";
-  case Direction.Down:
-    return "down";
   }
   console.error("unhandled direction when getting name");
   return "error";

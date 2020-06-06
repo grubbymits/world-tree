@@ -302,7 +302,6 @@ export class Terrain extends Entity {
                 let feature = TerrainFeature[key];
                 if (Terrain.isSupportedFeature(feature) &&
                     hasFeature(features, feature)) {
-                    console.log("adding feature:", key);
                     this.addGraphic(Terrain.featureGraphics(feature));
                 }
             }
@@ -322,15 +321,12 @@ export class Terrain extends Entity {
     }
     static addGraphic(terrainType, sheet, width, height) {
         console.assert(terrainType == TerrainType.Water, "water is the only type supported");
-        console.log("adding graphics for type:", getTypeName(terrainType));
         this._terrainGraphics.set(terrainType, new Array());
         let graphics = this._terrainGraphics.get(terrainType);
         let sprite = new Sprite(sheet, 0, 0, width, height);
         graphics.push(new StaticGraphicComponent(sprite.id));
-        console.log("added sprite for shape: flat");
     }
     static addGraphics(terrainType, sheet, width, height) {
-        console.log("adding graphics for type:", getTypeName(terrainType));
         this._terrainGraphics.set(terrainType, new Array());
         let graphics = this._terrainGraphics.get(terrainType);
         let shapeType = 0;
@@ -339,16 +335,13 @@ export class Terrain extends Entity {
             for (let x = 0; x < 3; x++) {
                 let sprite = new Sprite(sheet, x * width, y * height, width, height);
                 graphics.push(new StaticGraphicComponent(sprite.id));
-                console.log("added sprite for shape:", getShapeName(shapeType));
                 shapeType++;
             }
         }
         let sprite = new Sprite(sheet, 0, y * height, width, height);
         graphics.push(new StaticGraphicComponent(sprite.id));
-        console.log("added sprite for shape:", getShapeName(shapeType));
     }
     static addFeatureGraphics(feature, graphics) {
-        console.log("adding feature graphics for:", getFeatureName(feature));
         this._featureGraphics.set(feature, graphics);
     }
     static get width() { return this._dimensions.width; }
