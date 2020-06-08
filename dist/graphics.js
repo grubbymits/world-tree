@@ -1,3 +1,4 @@
+import { Camera } from "./camera.js";
 export class Point {
     constructor(_x, _y) {
         this._x = _x;
@@ -35,8 +36,6 @@ export class SpriteSheet {
     get height() { return this._image.height; }
     get canvas() { return this._canvas; }
     set canvas(c) { this._canvas = c; }
-    init() {
-    }
     isTransparentAt(x, y) {
         let data = this._canvas.getContext('2d').getImageData(x, y, 1, 1).data;
         return data[3] == 0;
@@ -62,9 +61,9 @@ export class Sprite {
     draw(coord, ctx) {
         ctx.drawImage(this._sheet.image, this._offsetX, this._offsetY, this._width, this._height, coord.x, coord.y, this._width, this._height);
     }
-    isTransparentAt(offset) {
-        let x = this._offsetX + offset.x;
-        let y = this._offsetY + offset.y;
+    isTransparentAt(x, y) {
+        x += this._offsetX;
+        y += this._offsetY;
         return this._sheet.isTransparentAt(x, y);
     }
     get id() { return this._id; }
@@ -76,8 +75,8 @@ export class GraphicComponent {
     constructor(_currentSpriteId) {
         this._currentSpriteId = _currentSpriteId;
     }
-    isTransparentAt(offset) {
-        return Sprite.sprites[this._currentSpriteId].isTransparentAt(offset);
+    isTransparentAt(x, y) {
+        return Sprite.sprites[this._currentSpriteId].isTransparentAt(x, y);
     }
     get width() {
         return Sprite.sprites[this._currentSpriteId].width;
@@ -149,6 +148,7 @@ export class SceneGraph {
         this._nodes = new Map();
         this._width = _canvas.width;
         this._height = _canvas.height;
+        this._camera = new Camera(_canvas, 0, 0, _canvas.width, _canvas.height);
         this._ctx = this._canvas.getContext("2d", { alpha: false });
         this.initDrawCoords(entities);
         entities.sort(this.drawOrder);
@@ -165,15 +165,15 @@ export class SceneGraph {
         }
         this._leaf = pred;
     }
-    render(camera) {
+    render() {
         this._ctx.clearRect(0, 0, this._width, this._height);
         let node = this._root;
         while (node != undefined) {
             let entity = node.entity;
             if (entity.visible) {
                 let coord = this.getDrawCoord(entity);
-                if (camera.isOnScreen(coord, entity.width, entity.depth)) {
-                    coord = camera.getDrawCoord(coord);
+                if (this._camera.isOnScreen(coord, entity.width, entity.depth)) {
+                    coord = this._camera.getDrawCoord(coord);
                     for (let i in entity.graphics) {
                         let component = entity.graphics[i];
                         let spriteId = component.update();
@@ -184,23 +184,22 @@ export class SceneGraph {
             node = node.succ;
         }
     }
-    getDrawnAt(draw, camera) {
-        console.log("getDrawnAt:", draw);
-        console.log("camera centre: ", camera.pivot);
+    getDrawnAt(x, y) {
+        console.log("getDrawnAt:", x, y);
+        console.log("camera centre: ", this._camera.pivot);
         let node = this._leaf;
         while (node != undefined) {
             let entity = node.entity;
             if (entity.visible &&
-                camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
-                let entityDrawCoord = camera.getDrawCoord(entity.drawCoord);
-                if (draw.x < entityDrawCoord.x || draw.y < entityDrawCoord.y ||
-                    draw.x > entityDrawCoord.x + entity.graphic.width ||
-                    draw.y > entityDrawCoord.y + entity.graphic.height) {
+                this._camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
+                let entityDrawCoord = this._camera.getDrawCoord(entity.drawCoord);
+                if (x < entityDrawCoord.x || y < entityDrawCoord.y ||
+                    x > entityDrawCoord.x + entity.graphic.width ||
+                    y > entityDrawCoord.y + entity.graphic.height) {
                     node = node.pred;
                     continue;
                 }
-                let spriteOffset = new Point(draw.x - entityDrawCoord.x, draw.y - entityDrawCoord.y);
-                if (!entity.graphic.isTransparentAt(spriteOffset)) {
+                if (!entity.graphic.isTransparentAt(x - entityDrawCoord.x, y - entityDrawCoord.y)) {
                     console.log("found entity drawn at:", entityDrawCoord);
                     return entity;
                 }

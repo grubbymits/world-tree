@@ -85,9 +85,9 @@ export class Sprite {
                   this._width, this._height);
   }
 
-  isTransparentAt(offset: Point): boolean {
-    let x: number = this._offsetX + offset.x;
-    let y: number = this._offsetY + offset.y;
+  isTransparentAt(x: number, y: number): boolean {
+    x += this._offsetX;
+    y += this._offsetY;
     return this._sheet.isTransparentAt(x, y);
   }
 
@@ -105,8 +105,8 @@ export abstract class GraphicComponent {
   constructor(protected _currentSpriteId: number) { }
               
   abstract update(): number;
-  isTransparentAt(offset: Point): boolean {
-    return Sprite.sprites[this._currentSpriteId].isTransparentAt(offset);
+  isTransparentAt(x: number, y: number): boolean {
+    return Sprite.sprites[this._currentSpriteId].isTransparentAt(x, y);
   }
   get width(): number { 
     return Sprite.sprites[this._currentSpriteId].width;
@@ -183,6 +183,7 @@ class SceneNode {
 export abstract class SceneGraph {
   protected readonly _width: number;
   protected readonly _height: number;
+  protected  _camera : Camera;
   protected _ctx: CanvasRenderingContext2D;
   protected _root: SceneNode;
   protected _leaf: SceneNode;
@@ -192,6 +193,7 @@ export abstract class SceneGraph {
               entities: Array<Entity>) {
     this._width = _canvas.width;
     this._height = _canvas.height;
+    this._camera = new Camera(_canvas, 0, 0, _canvas.width, _canvas.height);
     this._ctx = this._canvas.getContext("2d", { alpha: false })!;
     this.initDrawCoords(entities);
     entities.sort(this.drawOrder);
@@ -214,15 +216,15 @@ export abstract class SceneGraph {
   abstract drawOrder(a: Entity, b: Entity): number;
   abstract initDrawCoords(objects: Array<Entity>): void;
 
-  render(camera: Camera) {
+  render() {
     this._ctx.clearRect(0, 0, this._width, this._height);
     let node = this._root;
     while (node != undefined) {
       let entity: Entity = node.entity;
       if (entity.visible) {
         let coord: Point = this.getDrawCoord(entity);
-        if (camera.isOnScreen(coord, entity.width, entity.depth)) {
-          coord = camera.getDrawCoord(coord);
+        if (this._camera.isOnScreen(coord, entity.width, entity.depth)) {
+          coord = this._camera.getDrawCoord(coord);
           for (let i in entity.graphics) {
             let component = entity.graphics[i];
             let spriteId = component.update();
@@ -234,25 +236,24 @@ export abstract class SceneGraph {
     }
   }
 
-  getDrawnAt(draw: Point, camera: Camera): Entity | null {
-    console.log("getDrawnAt:", draw);
-    console.log("camera centre: ", camera.pivot);
+  getDrawnAt(x: number, y: number): Entity | null {
+    console.log("getDrawnAt:", x, y);
+    console.log("camera centre: ", this._camera.pivot);
     let node = this._leaf;
     while (node != undefined) {
       let entity: Entity = node.entity;
       if (entity.visible &&
-          camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
-        let entityDrawCoord: Point = camera.getDrawCoord(entity.drawCoord);
+          this._camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
+        let entityDrawCoord: Point = this._camera.getDrawCoord(entity.drawCoord);
         // Check whether inbounds of the sprite.
-        if (draw.x < entityDrawCoord.x || draw.y < entityDrawCoord.y ||
-            draw.x > entityDrawCoord.x + entity.graphic.width ||
-            draw.y > entityDrawCoord.y + entity.graphic.height) {
+        if (x < entityDrawCoord.x || y < entityDrawCoord.y ||
+            x > entityDrawCoord.x + entity.graphic.width ||
+            y > entityDrawCoord.y + entity.graphic.height) {
           node = node.pred;
           continue;
         }
-        let spriteOffset: Point = 
-          new Point(draw.x - entityDrawCoord.x, draw.y - entityDrawCoord.y);
-        if (!entity.graphic.isTransparentAt(spriteOffset)) {
+        if (!entity.graphic.isTransparentAt(x - entityDrawCoord.x,
+                                            y - entityDrawCoord.y)) {
           console.log("found entity drawn at:", entityDrawCoord);
           return entity;
         }

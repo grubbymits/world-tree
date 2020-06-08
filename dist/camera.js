@@ -1,19 +1,40 @@
 import { Point } from "./graphics.js";
 export class Camera {
-    constructor(_x, _y, _width, _height) {
+    constructor(canvas, _x, _y, _width, _height) {
         this._x = _x;
         this._y = _y;
         this._width = _width;
         this._height = _height;
+        this._primaryClicked = false;
         this._lowerX = _x;
         this._lowerY = _y;
         this._upperX = _x + _width;
         this._upperY = _y + _height;
         this._pivot = new Point(Math.floor(_width / 2), Math.floor(_height / 2));
+        var camera = this;
+        canvas.addEventListener('mousedown', e => {
+            if (e.button == 0) {
+                camera.primaryClicked = true;
+                camera.pivot = new Point(e.clientX, e.clientY);
+            }
+        });
+        canvas.addEventListener('mouseup', e => {
+            if (e.button == 0) {
+                camera.primaryClicked = false;
+            }
+        });
+        canvas.addEventListener('mousemove', e => {
+            if (camera.primaryClicked) {
+                camera.x = e.clientX;
+                camera.y = e.clientY;
+            }
+        });
     }
+    set primaryClicked(click) { this._primaryClicked = click; }
     set pivot(coord) { this._pivot = coord; }
     get pivot() { return this._pivot; }
     get min() { return new Point(this._lowerX, this._lowerY); }
+    get primaryClicked() { return this._primaryClicked; }
     set x(x) {
         let dx = 0;
         if (x < this._pivot.x) {

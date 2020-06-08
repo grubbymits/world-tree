@@ -1,15 +1,17 @@
 import { Point } from "./graphics.js"
 
 export class Camera {
+  static sensistivity: number = 10;
 
   private _lowerX : number;
   private _lowerY : number;
   private _upperX : number;
   private _upperY : number;
   private _pivot: Point;
-  static sensistivity: number = 10;
+  private _primaryClicked: boolean = false;
 
-  constructor(private _x: number,
+  constructor(canvas: HTMLCanvasElement,
+              private _x: number,
               private _y: number,
               private _width: number,
               private _height: number) {
@@ -18,11 +20,34 @@ export class Camera {
     this._upperX = _x + _width;
     this._upperY = _y + _height;
     this._pivot = new Point(Math.floor(_width / 2), Math.floor(_height / 2));
+
+    var camera = this;
+    canvas.addEventListener('mousedown', e => {
+      if (e.button == 0) {
+        camera.primaryClicked = true;
+        camera.pivot = new Point(e.clientX, e.clientY);
+      }
+    });
+
+    canvas.addEventListener('mouseup', e => {
+      if (e.button == 0) {
+        camera.primaryClicked = false;
+      }
+    });
+
+    canvas.addEventListener('mousemove', e => {
+      if (camera.primaryClicked) {
+        camera.x = e.clientX;
+        camera.y = e.clientY;
+      }
+    });
   }
 
+  set primaryClicked(click: boolean) { this._primaryClicked = click; }
   set pivot(coord: Point) { this._pivot = coord; }
   get pivot(): Point { return this._pivot; }
   get min(): Point { return new Point(this._lowerX, this._lowerY); }
+  get primaryClicked(): boolean { return this._primaryClicked; }
 
   set x(x: number) {
     let dx: number = 0;

@@ -14,23 +14,16 @@ export class Context {
   constructor(private _worldMap: SquareGrid,
               canvas: HTMLCanvasElement) {
 
-    this._controller = new MouseController(canvas);
     this._entities = new Array<Entity>();
     let terrain = _worldMap.allTerrain;
     Array.from(terrain.values()).forEach(value => this._entities.push(value));
     this._gfx = new IsometricRenderer(canvas, this._entities);
+    this._controller = new MouseController(canvas, this._gfx);
   }
 
   update(): void {
-    if (this._controller.secondaryClicked) {
-      this._controller.secondaryClicked = false;
-      let entity = this._gfx.getDrawnAt(this._controller.secondaryClickedAt,
-                                        this._controller.camera);
-      if (entity != undefined) {
-        entity.visible = false;
-      }
-    }
-    this._gfx.render(this._controller.camera);
+    this._controller.update();
+    this._gfx.render();
   }
 
   run(): void {
