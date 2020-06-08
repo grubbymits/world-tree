@@ -1,4 +1,3 @@
-import { Camera } from "./camera.js";
 export class Point {
     constructor(_x, _y) {
         this._x = _x;
@@ -143,12 +142,12 @@ class SceneNode {
     set pred(p) { this._pred = p; }
 }
 export class SceneGraph {
-    constructor(_canvas, entities) {
+    constructor(_canvas, _camera, entities) {
         this._canvas = _canvas;
+        this._camera = _camera;
         this._nodes = new Map();
         this._width = _canvas.width;
         this._height = _canvas.height;
-        this._camera = new Camera(_canvas, 0, 0, _canvas.width, _canvas.height);
         this._ctx = this._canvas.getContext("2d", { alpha: false });
         this.initDrawCoords(entities);
         entities.sort(this.drawOrder);
@@ -186,20 +185,20 @@ export class SceneGraph {
     }
     getDrawnAt(x, y) {
         console.log("getDrawnAt:", x, y);
-        console.log("camera centre: ", this._camera.pivot);
         let node = this._leaf;
         while (node != undefined) {
             let entity = node.entity;
             if (entity.visible &&
                 this._camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
                 let entityDrawCoord = this._camera.getDrawCoord(entity.drawCoord);
+                let graphic = entity.graphic;
                 if (x < entityDrawCoord.x || y < entityDrawCoord.y ||
-                    x > entityDrawCoord.x + entity.graphic.width ||
-                    y > entityDrawCoord.y + entity.graphic.height) {
+                    x > entityDrawCoord.x + graphic.width ||
+                    y > entityDrawCoord.y + graphic.height) {
                     node = node.pred;
                     continue;
                 }
-                if (!entity.graphic.isTransparentAt(x - entityDrawCoord.x, y - entityDrawCoord.y)) {
+                if (!graphic.isTransparentAt(x - entityDrawCoord.x, y - entityDrawCoord.y)) {
                     console.log("found entity drawn at:", entityDrawCoord);
                     return entity;
                 }
@@ -230,8 +229,8 @@ export class SceneGraph {
     }
 }
 export class IsometricRenderer extends SceneGraph {
-    constructor(canvas, entities) {
-        super(canvas, entities);
+    constructor(canvas, camera, entities) {
+        super(canvas, camera, entities);
     }
     static getDrawCoord(entity) {
         let dx = Math.floor(this._halfSqrt3 * (entity.x + entity.y));

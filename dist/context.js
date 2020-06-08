@@ -1,4 +1,5 @@
 import { IsometricRenderer } from "./graphics.js";
+import { MouseCamera } from "./camera.js";
 import { MouseController } from "./controller.js";
 export class Context {
     constructor(_worldMap, canvas) {
@@ -6,7 +7,8 @@ export class Context {
         this._entities = new Array();
         let terrain = _worldMap.allTerrain;
         Array.from(terrain.values()).forEach(value => this._entities.push(value));
-        this._gfx = new IsometricRenderer(canvas, this._entities);
+        this._camera = new MouseCamera(canvas, 0, 0, canvas.width, canvas.height);
+        this._gfx = new IsometricRenderer(canvas, this._camera, this._entities);
         this._controller = new MouseController(canvas, this._gfx);
     }
     update() {

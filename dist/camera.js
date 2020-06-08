@@ -1,16 +1,27 @@
 import { Point } from "./graphics.js";
 export class Camera {
-    constructor(canvas, _x, _y, _width, _height) {
+    constructor(_x, _y, _width, _height) {
         this._x = _x;
         this._y = _y;
         this._width = _width;
         this._height = _height;
+    }
+    isOnScreen(coord, width, depth) {
+        if (coord.x + width < this._lowerX || coord.y + depth < this._lowerY ||
+            coord.x - width > this._upperX || coord.y - depth > this._upperY) {
+            return false;
+        }
+        return true;
+    }
+    getDrawCoord(coord) {
+        return new Point(coord.x - this._x, coord.y - this._y);
+    }
+}
+export class MouseCamera extends Camera {
+    constructor(canvas, x, y, width, height) {
+        super(x, y, width, height);
         this._primaryClicked = false;
-        this._lowerX = _x;
-        this._lowerY = _y;
-        this._upperX = _x + _width;
-        this._upperY = _y + _height;
-        this._pivot = new Point(Math.floor(_width / 2), Math.floor(_height / 2));
+        this._pivot = new Point(Math.floor(width / 2), Math.floor(height / 2));
         var camera = this;
         canvas.addEventListener('mousedown', e => {
             if (e.button == 0) {
@@ -38,10 +49,10 @@ export class Camera {
     set x(x) {
         let dx = 0;
         if (x < this._pivot.x) {
-            dx = Math.floor((this.pivot.x - x) / Camera.sensistivity);
+            dx = Math.floor((this.pivot.x - x) / MouseCamera.sensistivity);
         }
         else if (x > this._pivot.x) {
-            dx = -Math.floor((x - this.pivot.x) / Camera.sensistivity);
+            dx = -Math.floor((x - this.pivot.x) / MouseCamera.sensistivity);
         }
         else {
             return;
@@ -53,10 +64,10 @@ export class Camera {
     set y(y) {
         let dy = 0;
         if (y < this._pivot.y) {
-            dy = Math.floor((this.pivot.y - y) / Camera.sensistivity);
+            dy = Math.floor((this.pivot.y - y) / MouseCamera.sensistivity);
         }
         else if (y > this._pivot.y) {
-            dy = -Math.floor((y - this.pivot.y) / Camera.sensistivity);
+            dy = -Math.floor((y - this.pivot.y) / MouseCamera.sensistivity);
         }
         else {
             return;
@@ -65,15 +76,5 @@ export class Camera {
         this._lowerY += dy;
         this._upperY += dy;
     }
-    isOnScreen(coord, width, depth) {
-        if (coord.x + width < this._lowerX || coord.y + depth < this._lowerY ||
-            coord.x - width > this._upperX || coord.y - depth > this._upperY) {
-            return false;
-        }
-        return true;
-    }
-    getDrawCoord(coord) {
-        return new Point(coord.x - this._x, coord.y - this._y);
-    }
 }
-Camera.sensistivity = 10;
+MouseCamera.sensistivity = 10;

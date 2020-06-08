@@ -183,17 +183,16 @@ class SceneNode {
 export abstract class SceneGraph {
   protected readonly _width: number;
   protected readonly _height: number;
-  protected  _camera : Camera;
   protected _ctx: CanvasRenderingContext2D;
   protected _root: SceneNode;
   protected _leaf: SceneNode;
   protected _nodes: Map<Entity, SceneNode> = new Map<Entity, SceneNode>();
   
   constructor(protected _canvas: HTMLCanvasElement,
+              protected _camera: Camera,
               entities: Array<Entity>) {
     this._width = _canvas.width;
     this._height = _canvas.height;
-    this._camera = new Camera(_canvas, 0, 0, _canvas.width, _canvas.height);
     this._ctx = this._canvas.getContext("2d", { alpha: false })!;
     this.initDrawCoords(entities);
     entities.sort(this.drawOrder);
@@ -238,22 +237,22 @@ export abstract class SceneGraph {
 
   getDrawnAt(x: number, y: number): Entity | null {
     console.log("getDrawnAt:", x, y);
-    console.log("camera centre: ", this._camera.pivot);
     let node = this._leaf;
     while (node != undefined) {
       let entity: Entity = node.entity;
       if (entity.visible &&
           this._camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
         let entityDrawCoord: Point = this._camera.getDrawCoord(entity.drawCoord);
+        let graphic: GraphicComponent = entity.graphic;
         // Check whether inbounds of the sprite.
         if (x < entityDrawCoord.x || y < entityDrawCoord.y ||
-            x > entityDrawCoord.x + entity.graphic.width ||
-            y > entityDrawCoord.y + entity.graphic.height) {
+            x > entityDrawCoord.x + graphic.width ||
+            y > entityDrawCoord.y + graphic.height) {
           node = node.pred;
           continue;
         }
-        if (!entity.graphic.isTransparentAt(x - entityDrawCoord.x,
-                                            y - entityDrawCoord.y)) {
+        if (!graphic.isTransparentAt(x - entityDrawCoord.x,
+                                     y - entityDrawCoord.y)) {
           console.log("found entity drawn at:", entityDrawCoord);
           return entity;
         }
@@ -287,8 +286,9 @@ export abstract class SceneGraph {
 
 export class IsometricRenderer extends SceneGraph {
   constructor(canvas: HTMLCanvasElement,
+              camera: Camera,
               entities: Array<Entity>) {
-    super(canvas, entities);
+    super(canvas, camera, entities);
   }
 
   private static readonly _sqrt3 = Math.sqrt(3);
