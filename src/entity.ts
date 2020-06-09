@@ -1,5 +1,6 @@
 import { Location,
-         Dimensions } from "./physics.js"
+         Dimensions,
+         BoundingCuboid } from "./physics.js"
 import { Point,
          GraphicComponent,
          IsometricRenderer } from "./graphics.js"
@@ -13,6 +14,7 @@ export class Entity {
   protected _drawCoord: Point = new Point(0, 0);
   protected _graphicComponents: Array<GraphicComponent>;
   protected _visible: boolean = true;
+  protected _bounds: BoundingCuboid;
 
   constructor(protected _location: Location,
               protected readonly _dimensions: Dimensions,
@@ -22,6 +24,10 @@ export class Entity {
     Entity._ids++;
     this._graphicComponents = new Array<GraphicComponent>();
     this._graphicComponents.push(graphicComponent);
+    let centre = new Location(this.x + Math.floor(this.width / 2),
+                              this.y + Math.floor(this.depth / 2),
+                              this.z + Math.floor(this.height / 2));
+    this._bounds = new BoundingCuboid(centre, _dimensions);
   }
   
   get x(): number { return this._location.x; }
@@ -32,6 +38,8 @@ export class Entity {
   get height(): number { return this._dimensions.height; }
   get location(): Location { return this._location; }
   get dimensions(): Dimensions { return this._dimensions; }
+  get bounds(): BoundingCuboid { return this._bounds; }
+  get centre(): Location { return this._bounds.centre; }
   get blocking(): boolean { return this._blocking; }
   get id(): number { return this._id; }
   get hasMoved(): boolean { return this._hasMoved; }

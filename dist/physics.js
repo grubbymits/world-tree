@@ -225,7 +225,7 @@ export class PathFinder {
         return path.splice(1);
     }
 }
-class BoundingRectangle {
+export class BoundingCuboid {
     constructor(_centre, _dimensions) {
         this._centre = _centre;
         this._dimensions = _dimensions;
@@ -233,6 +233,7 @@ class BoundingRectangle {
     }
     get minLocation() { return this._minLocation; }
     get maxLocation() { return this._maxLocation; }
+    get centre() { return this._centre; }
     get width() { return this._dimensions.width; }
     get depth() { return this._dimensions.depth; }
     get height() { return this._dimensions.height; }
@@ -261,6 +262,10 @@ class BoundingRectangle {
             return false;
         return true;
     }
+    containsBounds(other) {
+        return this.contains(other.minLocation) &&
+            this.contains(other.maxLocation);
+    }
     intersects(other) {
         if (other.minLocation.x > this.maxLocation.x ||
             other.maxLocation.x < this.minLocation.x)
@@ -272,5 +277,39 @@ class BoundingRectangle {
             other.maxLocation.z < this.minLocation.z)
             return false;
         return true;
+    }
+    insert(other) {
+        if (this.containsBounds(other)) {
+            return;
+        }
+        let minX = other.minLocation.x < this.minLocation.x ?
+            other.minLocation.x : this.minLocation.x;
+        let minY = other.minLocation.y < this.minLocation.y ?
+            other.minLocation.y : this.minLocation.y;
+        let minZ = other.minLocation.z < this.minLocation.z ?
+            other.minLocation.z : this.minLocation.z;
+        let maxX = other.maxLocation.x > this.maxLocation.x ?
+            other.maxLocation.x : this.maxLocation.x;
+        let maxY = other.maxLocation.y > this.maxLocation.y ?
+            other.maxLocation.y : this.maxLocation.y;
+        let maxZ = other.maxLocation.z > this.maxLocation.z ?
+            other.maxLocation.z : this.maxLocation.z;
+        this._dimensions =
+            new Dimensions(maxX - minX, maxY - minY, maxZ - minZ);
+        let min = new Location(minX, minY, minZ);
+        let max = new Location(maxX, maxY, maxZ);
+        let width = Math.floor((max.x - min.x) / 2);
+        let depth = Math.floor((max.y - min.y) / 2);
+        let height = Math.floor((max.z - min.z) / 2);
+        this._centre = new Location(min.x + width, min.y + depth, min.z + height);
+        this._minLocation = min;
+        this._maxLocation = max;
+    }
+    dump() {
+        console.log("BoundingCuboid");
+        console.log(" - min (x,y,z):", this.minLocation.x, this.minLocation.y, this.minLocation.z);
+        console.log(" - max (x,y,z):", this.maxLocation.x, this.maxLocation.y, this.maxLocation.z);
+        console.log(" - centre (x,y,z):", this.centre.x, this.centre.y, this.centre.z);
+        console.log(" - dimensions (WxDxH):", this.width, this.depth, this.height);
     }
 }

@@ -1,6 +1,7 @@
 import { IsometricRenderer } from "./graphics.js";
 import { MouseCamera } from "./camera.js";
 import { MouseController } from "./controller.js";
+import { Octree } from "./tree.js";
 export class Context {
     constructor(_worldMap, canvas) {
         this._worldMap = _worldMap;
@@ -10,6 +11,8 @@ export class Context {
         this._camera = new MouseCamera(canvas, 0, 0, canvas.width, canvas.height);
         this._gfx = new IsometricRenderer(canvas, this._camera, this._entities);
         this._controller = new MouseController(canvas, this._gfx);
+        this._octree = new Octree(this._entities);
+        this._octree.verify(this._entities);
     }
     update() {
         this._controller.update();

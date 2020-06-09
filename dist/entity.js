@@ -1,3 +1,4 @@
+import { Location, BoundingCuboid } from "./physics.js";
 import { Point } from "./graphics.js";
 export class Entity {
     constructor(_location, _dimensions, _blocking, graphicComponent) {
@@ -11,6 +12,8 @@ export class Entity {
         Entity._ids++;
         this._graphicComponents = new Array();
         this._graphicComponents.push(graphicComponent);
+        let centre = new Location(this.x + Math.floor(this.width / 2), this.y + Math.floor(this.depth / 2), this.z + Math.floor(this.height / 2));
+        this._bounds = new BoundingCuboid(centre, _dimensions);
     }
     get x() { return this._location.x; }
     get y() { return this._location.y; }
@@ -20,6 +23,8 @@ export class Entity {
     get height() { return this._dimensions.height; }
     get location() { return this._location; }
     get dimensions() { return this._dimensions; }
+    get bounds() { return this._bounds; }
+    get centre() { return this._bounds.centre; }
     get blocking() { return this._blocking; }
     get id() { return this._id; }
     get hasMoved() { return this._hasMoved; }
