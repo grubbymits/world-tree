@@ -4,6 +4,10 @@ import { Entity } from "./entity.js"
 export class MouseController {
   private _entity: Entity;
 
+  // private _actor: Entity;
+  // private _action: Action;
+  // private _target: Entity;
+
   constructor(canvas: HTMLCanvasElement,
               scene: SceneGraph) {
     var controller = this;

@@ -59,3 +59,59 @@ export class Entity {
     this._graphicComponents.push(graphic);
   }
 }
+
+export enum EntityEvent {
+  Move = "move",
+}
+
+export class EventableEntity extends Entity {
+  protected _listeners = new Map<EntityEvent, Array<Function>>();
+  protected _events = new Array<EntityEvent>();
+
+  constructor(location: Location,
+              dimensions: Dimensions,
+              blocking: boolean,
+              graphicComponent: GraphicComponent) {
+    super(location, dimensions, blocking, graphicComponent);
+  }
+
+  update(): void {
+    for (let event of this._events) {
+      if (!this._listeners.has(event)) {
+        continue;
+      }
+      let callbacks = this._listeners.get(event)!;
+      for (let callback of callbacks) { 
+        callback();
+      }
+    }
+    this._events = [];
+  }
+
+  addEventListener(event: EntityEvent, callback: Function): void {
+    if (!this._listeners.has(event)) {
+      this._listeners.set(event, new Array<Function>());
+    } else {
+      // Check that the callback doesn't already exist.
+      let callbacks = this._listeners.get(event)!;
+      for (let i in callbacks) {
+        if (callbacks[i] === callback) {
+          return;
+        }
+      }
+    }
+    this._listeners.get(event)!.push(callback);
+  }
+
+  removeEventListener(event: EntityEvent, callback: Function): void {
+    if (!this._listeners.has(event)) {
+      return;
+    }
+    let callbacks = this._listeners.get(event)!;
+    const index = callbacks.indexOf(callback, 0);
+    if (index > -1) {
+      callbacks.splice(index, 1);
+    }
+  }
+}
+

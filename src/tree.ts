@@ -142,6 +142,12 @@ export class Octree {
     this._root.init();
   }
 
+  insert(entity: Entity): void {
+  }
+
+  update(entity: Entity): void {
+  }
+
   verify(entities: Array<Entity>): boolean {
     for (let entity of entities) {
       if (!this._root.containsEntity(entity)) {

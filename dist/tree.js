@@ -97,6 +97,10 @@ export class Octree {
         this._root.bounds.dump();
         this._root.init();
     }
+    insert(entity) {
+    }
+    update(entity) {
+    }
     verify(entities) {
         for (let entity of entities) {
             if (!this._root.containsEntity(entity)) {

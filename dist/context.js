@@ -1,3 +1,4 @@
+import { EntityEvent } from "./entity.js";
 import { IsometricRenderer } from "./graphics.js";
 import { MouseCamera } from "./camera.js";
 import { MouseController } from "./controller.js";
@@ -13,6 +14,14 @@ export class Context {
         this._controller = new MouseController(canvas, this._gfx);
         this._octree = new Octree(this._entities);
         this._octree.verify(this._entities);
+    }
+    add(entity) {
+        let spatialGraph = this._octree;
+        entity.addEventListener(EntityEvent.Move, function () {
+            spatialGraph.update(entity);
+        });
+        this._octree.insert(entity);
+        this._entities.push(entity);
     }
     update() {
         this._controller.update();

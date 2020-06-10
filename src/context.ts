@@ -1,4 +1,6 @@
-import { Entity } from "./entity.js"
+import { Entity,
+         EventableEntity,
+         EntityEvent } from "./entity.js"
 import { Terrain, TerrainShape, TerrainType } from "./terrain.js"
 import { SquareGrid } from "./map.js"
 import { Point,
@@ -26,6 +28,15 @@ export class Context {
     this._controller = new MouseController(canvas, this._gfx);
     this._octree = new Octree(this._entities);
     this._octree.verify(this._entities);
+  }
+
+  add(entity: EventableEntity): void {
+    let spatialGraph = this._octree;
+    entity.addEventListener(EntityEvent.Move, function() {
+      spatialGraph.update(entity);
+    });
+    this._octree.insert(entity);
+    this._entities.push(entity);
   }
 
   update(): void {
