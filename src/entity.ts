@@ -54,9 +54,19 @@ export class Entity {
 
   set drawCoord(coord: Point) { this._drawCoord = coord; }
   set visible(visible: boolean) { this._visible = visible; }
+  set location(location: Location) { this._location = location; }
 
   addGraphic(graphic: GraphicComponent): void {
     this._graphicComponents.push(graphic);
+  }
+  heightAt(location: Location): number|null {
+    // Given a world location, does this terrain define what the minimum z
+    // coordinate?
+    // If the locations is outside of the bounding cuboid, just return null.
+    if (!this._bounds.contains(location)) {
+      return null;
+    }
+    return this.z + this.height;
   }
 }
 
@@ -113,5 +123,8 @@ export class EventableEntity extends Entity {
       callbacks.splice(index, 1);
     }
   }
+}
+
+export class Actor extends EventableEntity {
 }
 

@@ -294,6 +294,13 @@ export class Terrain extends Entity {
         this._gridZ = _gridZ;
         this._type = _type;
         this._shape = _shape;
+        if (!isFlat(_shape)) {
+            let theta = Math.atan(this.height / this.depth) * 180 / Math.PI;
+            this._tanTheta = Math.tan(theta);
+        }
+        else {
+            this._tanTheta = 0;
+        }
         if (features == TerrainFeature.None) {
             return;
         }
@@ -361,6 +368,15 @@ export class Terrain extends Entity {
     get gridZ() { return this._gridZ; }
     get shape() { return this._shape; }
     get type() { return this._type; }
+    heightAt(location) {
+        if (!this._bounds.contains(location)) {
+            return null;
+        }
+        if (isFlat(this._shape)) {
+            return this.z + this.height;
+        }
+        return this.z + (location.y * this._tanTheta);
+    }
 }
 Terrain._terrainGraphics = new Map();
 Terrain._featureGraphics = new Map();

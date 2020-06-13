@@ -404,6 +404,8 @@ export class Terrain extends Entity {
     return this._featureGraphics.has(feature);
   }
 
+  private readonly _tanTheta: number;
+
   constructor(private readonly _gridX: number,
               private readonly _gridY: number,
               private readonly _gridZ: number,
@@ -415,9 +417,19 @@ export class Terrain extends Entity {
                        _gridY * dimensions.depth,
                        _gridZ * dimensions.height),
           dimensions, true, Terrain.graphics(_type, _shape));
+
+    // Pre-calculate the angle of the ramp.
+    if (!isFlat(_shape)) {
+      let theta = Math.atan(this.height / this.depth) * 180 / Math.PI;
+      this._tanTheta = Math.tan(theta);
+    } else {
+      this._tanTheta = 0;
+    }
+
     if (features == TerrainFeature.None) {
       return;
     }
+
     for (let key in TerrainFeature) {
       if (typeof TerrainFeature[key] === "number") {
         let feature = <TerrainFeature><any>TerrainFeature[key];
@@ -434,6 +446,19 @@ export class Terrain extends Entity {
   get gridZ(): number { return this._gridZ; }
   get shape(): TerrainShape { return this._shape; }
   get type(): TerrainType { return this._type; }
+
+  heightAt(location: Location): number|null {
+    // Given a world location, does this terrain define what the minimum z
+    // coordinate?
+    // If the locations is outside of the bounding cuboid, just return null.
+    if (!this._bounds.contains(location)) {
+      return null;
+    }
+    if (isFlat(this._shape)) {
+      return this.z + this.height;
+    }
+    return this.z + (location.y * this._tanTheta);
+  }
 }
 
 export class TerrainAttributes {

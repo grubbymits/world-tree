@@ -38,8 +38,15 @@ export class Entity {
     }
     set drawCoord(coord) { this._drawCoord = coord; }
     set visible(visible) { this._visible = visible; }
+    set location(location) { this._location = location; }
     addGraphic(graphic) {
         this._graphicComponents.push(graphic);
+    }
+    heightAt(location) {
+        if (!this._bounds.contains(location)) {
+            return null;
+        }
+        return this.z + this.height;
     }
 }
 Entity._ids = 0;
@@ -89,4 +96,6 @@ export class EventableEntity extends Entity {
             callbacks.splice(index, 1);
         }
     }
+}
+export class Actor extends EventableEntity {
 }
