@@ -3,7 +3,7 @@ import { Location } from "./physics.js"
 
 export abstract class Action {
   constructor(protected readonly _actor: Actor) { }
-  abstract perform(): void;
+  abstract perform(): boolean;
   get actor(): Actor { return this._actor; }
 }
 
@@ -13,17 +13,87 @@ export class MoveAction extends Action {
   private _dz: number = 0;
 
   constructor(actor: Actor,
-              private _speed: number,
+              private _step: number,
               private _destination: Location) {
     super(actor);
+    this.destination = _destination;
   }
-  set destination(dest: Location) { this._destination = dest; }
-  set speed(speed: number) { this._speed = speed; }
 
-  perform(): void {
-    let x = this.actor.x + this._dx;
-    let y = this.actor.y + this._dy;
-    let z = this.actor.z + this._dz;
+  get destination(): Location { return this._destination; }
+
+  set speed(speed: number) { this._step = Math.floor(speed); }
+
+  set destination(destination: Location) {
+    this._destination = destination;
+    let dx = destination.x - this.actor.x;
+    let dy = destination.y - this.actor.y;
+    let dz = destination.z - this.actor.z;
+
+    console.assert(dx == 0 || dy == 0 || dz == 0,
+                   "can only change distance along two axes simultaneously");
+
+    // Handle simple changes on one axis.
+    if (dx == 0 && dy == 0 && dz == 0) {
+      return;
+    } else if (dx == 0 && dz == 0) {
+      this._dx = 0;
+      this._dy = this._step;
+      this._dz = 0;
+      return;
+    } else if (dy == 0 && dz == 0) {
+      this._dy = 0;
+      this._dx = this._step;
+      this._dz = 0;
+      return;
+    } else if (dx == 0 && dy == 0) {
+      this._dx = 0;
+      this._dy = 0;
+      this._dz = this._step;
+      return;
+    }
+
+    // H == step;
+    // tan-1(O/A) = theta;
+    // sin(theta) = O/H;
+    // cos(theta) = A/H;
+    let adjacent = 0;
+    let opposite = 0;
+    if (dz == 0) {
+      adjacent = dy > 0 ? dy : dx;
+      opposite = dy > 0 ? dx : dy;
+    } else if (dx == 0) {
+      adjacent = dz > 0 ? dy : dz;
+      opposite = dz > 0 ? dz : dy;
+    } else if (dy == 0) {
+      adjacent = dz > 0 ? dx : dz;
+      opposite = dz > 0 ? dz : dx;
+    }
+    let theta = Math.atan(opposite / adjacent) * 180 / Math.PI;
+    let oppDiff = Math.sin(theta) * this._step;
+    let adjDiff = Math.cos(theta) * this._step;
+
+    if (dz == 0) {
+      this._dx = adjacent == dy ? oppDiff : adjDiff;
+      this._dy = adjacent == dy ? adjDiff : oppDiff;
+    } else if (dx == 0) {
+      this._dz = adjacent == dy ? oppDiff : adjDiff;
+      this._dy = adjacent == dy ? adjDiff : oppDiff;
+    } else if (dy == 0) {
+      this._dx = adjacent == dz ? oppDiff : adjDiff;
+      this._dz = adjacent == dz ? adjDiff : oppDiff;
+    }
+  }
+
+  perform(): boolean {
+    // Make sure we don't overshoot the destination.
+    let x = Math.abs(this.destination.x - this.actor.x) < Math.abs(this._dx) ?
+      this.destination.x : this.actor.x + this._dx;
+    let y = Math.abs(this.destination.y - this.actor.y) < Math.abs(this._dy) ?
+      this.destination.y : this.actor.y + this._dy;
+    let z = Math.abs(this.destination.z - this.actor.z) < Math.abs(this._dz) ?
+      this.destination.z : this.actor.z + this._dz;
+
     this.actor.location = new Location(x, y, z);
+    return this.actor.location.isNearlySameAs(this.destination);
   }
 }

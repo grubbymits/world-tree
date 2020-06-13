@@ -110,6 +110,14 @@ export class Location {
     get x() { return this._x; }
     get y() { return this._y; }
     get z() { return this._z; }
+    isNearlySameAs(other) {
+        return Math.floor(this.x) == Math.floor(other.x) &&
+            Math.floor(this.y) == Math.floor(other.y) &&
+            Math.floor(this.z) == Math.floor(other.z);
+    }
+    isSameAs(other) {
+        return this.x == other.x && this.y == other.y && this.z == other.z;
+    }
 }
 export class Dimensions {
     constructor(_width, _depth, _height) {

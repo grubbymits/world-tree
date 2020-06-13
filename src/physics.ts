@@ -111,6 +111,14 @@ export class Location {
   get x(): number { return this._x; }
   get y(): number { return this._y; }
   get z(): number { return this._z; }
+  isNearlySameAs(other: Location): boolean {
+    return Math.floor(this.x) == Math.floor(other.x) &&
+           Math.floor(this.y) == Math.floor(other.y) &&
+           Math.floor(this.z) == Math.floor(other.z);
+  }
+  isSameAs(other: Location): boolean {
+    return this.x == other.x && this.y == other.y && this.z == other.z;
+  }
 }
 
 export class Dimensions {
