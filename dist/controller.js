@@ -1,5 +1,11 @@
-export class MouseController {
+export class Controller {
+    constructor() {
+        this._actors = new Array();
+    }
+}
+export class MouseController extends Controller {
     constructor(canvas, scene) {
+        super();
         var controller = this;
         canvas.addEventListener('mousedown', e => {
             if (e.button == 0) {

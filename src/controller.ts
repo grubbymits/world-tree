@@ -1,7 +1,14 @@
 import { SceneGraph } from "./graphics.js"
-import { Entity } from "./entity.js"
+import { Entity,
+         Actor } from "./entity.js"
 
-export class MouseController {
+export abstract class Controller {
+  protected _actors: Array<Actor> = new Array<Actor>();
+
+  abstract update(): void;
+}
+
+export class MouseController extends Controller {
   private _entity: Entity;
 
   // private _actor: Entity;
@@ -10,6 +17,7 @@ export class MouseController {
 
   constructor(canvas: HTMLCanvasElement,
               scene: SceneGraph) {
+    super();
     var controller = this;
 
     canvas.addEventListener('mousedown', e => {
@@ -23,7 +31,7 @@ export class MouseController {
     });
   }
 
-  update() {
+  update(): void {
     if (this._entity != undefined) {
       this._entity.visible = false;
     }
@@ -31,3 +39,4 @@ export class MouseController {
 
   set entity(e: Entity) { this._entity = e; }
 }
+

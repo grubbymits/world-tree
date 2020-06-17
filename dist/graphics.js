@@ -142,42 +142,35 @@ class SceneNode {
     set pred(p) { this._pred = p; }
 }
 export class SceneGraph {
-    constructor(_canvas, _camera, entities) {
+    constructor(_canvas, _camera) {
         this._canvas = _canvas;
         this._camera = _camera;
         this._nodes = new Map();
         this._width = _canvas.width;
         this._height = _canvas.height;
         this._ctx = this._canvas.getContext("2d", { alpha: false });
-        this.initDrawCoords(entities);
-        entities.sort(this.drawOrder);
-        this._root = new SceneNode(entities[0]);
-        this._nodes.set(entities[0], this._root);
-        let pred = this._root;
-        for (let i = 1; i < entities.length; i++) {
-            let entity = entities[i];
-            let succ = new SceneNode(entity);
-            this._nodes.set(entity, succ);
-            pred.succ = succ;
-            succ.pred = pred;
-            pred = succ;
+    }
+    dump() {
+        console.log("scene graph contains number node:", this._nodes.size);
+        console.log("draw order:");
+        let node = this._root;
+        while (node != undefined) {
+            console.log(node.x, node.y, node.z);
+            node = node.succ;
         }
-        this._leaf = pred;
     }
     render() {
         this._ctx.clearRect(0, 0, this._width, this._height);
         let node = this._root;
         while (node != undefined) {
             let entity = node.entity;
-            if (entity.visible) {
-                let coord = this.getDrawCoord(entity);
-                if (this._camera.isOnScreen(coord, entity.width, entity.depth)) {
-                    coord = this._camera.getDrawCoord(coord);
-                    for (let i in entity.graphics) {
-                        let component = entity.graphics[i];
-                        let spriteId = component.update();
-                        Sprite.sprites[spriteId].draw(coord, this._ctx);
-                    }
+            if (this._camera.isOnScreen(entity.drawCoord, entity.width, entity.depth) &&
+                entity.visible) {
+                let coord = this._camera.getDrawCoord(entity.drawCoord);
+                for (let i in entity.graphics) {
+                    let component = entity.graphics[i];
+                    let spriteId = component.update();
+                    Sprite.sprites[spriteId].draw(coord, this._ctx);
                 }
             }
             node = node.succ;
@@ -208,67 +201,67 @@ export class SceneGraph {
         return null;
     }
     insertEntity(entity) {
+        this.setDrawCoord(entity);
         let node = new SceneNode(entity);
         this._nodes.set(entity, node);
-        let next = this._root;
-        let last = next;
-        while (next != undefined) {
-            if (this.drawOrder(node.entity, next.entity) == -1) {
-                node.pred = next.pred;
-                node.succ = next;
-                next.pred = node;
+        if (this._root == undefined) {
+            console.log("set initial root of the scene");
+            this._root = node;
+            this._leaf = node;
+            return;
+        }
+        let existing = this._root;
+        while (existing != undefined) {
+            if (this.drawOrder(existing.entity, node.entity) == -1) {
+                if (existing == this._root) {
+                    this._root = node;
+                    this._root.succ = existing;
+                    existing.pred = this._root;
+                }
+                else {
+                    let first = existing.pred;
+                    let second = node;
+                    let third = existing;
+                    first.succ = second;
+                    second.pred = first;
+                    second.succ = third;
+                    third.pred = second;
+                }
                 return;
             }
-            last = next;
-            next = next.succ;
+            existing = existing.succ;
         }
-        console.log("inserting node at end");
-        last.succ = node;
-        node.pred = last;
+        let last = this._leaf;
         this._leaf = node;
+        last.succ = this._leaf;
+        this._leaf.pred = last;
     }
 }
 export class IsometricRenderer extends SceneGraph {
-    constructor(canvas, camera, entities) {
-        super(canvas, camera, entities);
+    constructor(canvas, camera) {
+        super(canvas, camera);
     }
     static getDrawCoord(entity) {
         let dx = Math.floor(this._halfSqrt3 * (entity.x + entity.y));
         let dy = Math.floor((0.5 * (entity.y - entity.x)) - entity.z);
         return new Point(dx, dy);
     }
-    getDrawCoord(entity) {
-        if (entity.hasMoved) {
-            let coord = IsometricRenderer.getDrawCoord(entity);
-            entity.drawCoord = coord;
-        }
-        return entity.drawCoord;
+    setDrawCoord(entity) {
+        entity.drawCoord = IsometricRenderer.getDrawCoord(entity);
     }
-    initDrawCoords(entities) {
-        for (let entity of entities) {
-            entity.drawCoord = IsometricRenderer.getDrawCoord(entity);
+    drawOrder(first, second) {
+        let sameX = first.x == second.x;
+        let sameY = first.y == second.y;
+        let sameZ = first.z == second.z;
+        if (sameX) {
+            if (sameY) {
+                return first.z < second.z ? 1 : -1;
+            }
+            else {
+                return first.y < second.y ? 1 : -1;
+            }
         }
-    }
-    drawOrder(a, b) {
-        if (a.z > b.z) {
-            return 1;
-        }
-        else if (b.z > a.z) {
-            return -1;
-        }
-        if (a.y > b.y) {
-            return 1;
-        }
-        else if (b.y > a.y) {
-            return -1;
-        }
-        if (a.x < b.x) {
-            return 1;
-        }
-        else if (b.x < a.x) {
-            return -1;
-        }
-        return 0;
+        return first.x > second.x ? 1 : -1;
     }
 }
 IsometricRenderer._sqrt3 = Math.sqrt(3);

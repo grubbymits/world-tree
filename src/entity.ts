@@ -4,19 +4,22 @@ import { Location,
 import { Point,
          GraphicComponent,
          IsometricRenderer } from "./graphics.js"
+import { Context } from "./context.js"
+import { Action } from "./action.js"
 
 export class Entity {
   private static _ids: number = 0;
 
   private readonly _id: number;
 
-  protected readonly _hasMoved: boolean = false;
+  protected _hasMoved: boolean = false;
   protected _drawCoord: Point = new Point(0, 0);
   protected _graphicComponents: Array<GraphicComponent>;
   protected _visible: boolean = true;
   protected _bounds: BoundingCuboid;
 
-  constructor(protected _location: Location,
+  constructor(protected _context: Context,
+              protected _location: Location,
               protected readonly _dimensions: Dimensions,
               protected readonly _blocking: boolean,
               graphicComponent: GraphicComponent) {
@@ -28,6 +31,7 @@ export class Entity {
                               this.y + Math.floor(this.depth / 2),
                               this.z + Math.floor(this.height / 2));
     this._bounds = new BoundingCuboid(centre, _dimensions);
+    this._context.addEntity(this);
   }
   
   get x(): number { return this._location.x; }
@@ -72,20 +76,24 @@ export class Entity {
 
 export enum EntityEvent {
   Move = "move",
+  ActionComplete = "actionComplete",
 }
 
 export class EventableEntity extends Entity {
   protected _listeners = new Map<EntityEvent, Array<Function>>();
   protected _events = new Array<EntityEvent>();
 
-  constructor(location: Location,
+  constructor(context: Context,
+              location: Location,
               dimensions: Dimensions,
               blocking: boolean,
               graphicComponent: GraphicComponent) {
-    super(location, dimensions, blocking, graphicComponent);
+    super(context, location, dimensions, blocking, graphicComponent);
   }
 
-  update(): void {
+  update(): void { this.serviceEvents(); }
+
+  serviceEvents(): void {
     for (let event of this._events) {
       if (!this._listeners.has(event)) {
         continue;
@@ -126,5 +134,24 @@ export class EventableEntity extends Entity {
 }
 
 export class Actor extends EventableEntity {
+  protected readonly _canSwim: boolean = false;
+  protected readonly _canFly: boolean = false;
+  protected _action: Action;
+
+  constructor(context: Context,
+              location: Location,
+              dimensions: Dimensions,
+              blocking: boolean,
+              graphicComponent: GraphicComponent) {
+    super(context, location, dimensions, blocking, graphicComponent);
+    context.addActor(this);
+  }
+
+  update(): void {
+    this.serviceEvents();
+    if (this._action != undefined && this._action.perform()) {
+      this._events.push(EntityEvent.ActionComplete);
+    }
+  }
 }
 

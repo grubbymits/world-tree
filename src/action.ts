@@ -1,13 +1,34 @@
 import { Actor } from "./entity.js"
-import { Location } from "./physics.js"
+import { Location,
+         BoundingCuboid } from "./physics.js"
 
 export abstract class Action {
-  constructor(protected readonly _actor: Actor) { }
-  abstract perform(): boolean;
+  constructor(protected _actor: Actor) { }
   get actor(): Actor { return this._actor; }
+  set actor(actor: Actor) { this._actor = actor; }
+  // Returns true once the action is complete.
+  abstract perform(): boolean;
 }
 
-export class MoveAction extends Action {
+export class MoveDirection extends Action {
+  constructor(actor: Actor,
+              private readonly _dx: number,
+              private readonly _dy: number,
+              private readonly _dz: number,
+              private _bounds: BoundingCuboid) {
+    super(actor);
+  }
+
+  perform(): boolean {
+    let x = this.actor.x + this._dx;
+    let y = this.actor.y + this._dy;
+    let z = this.actor.z + this._dz;
+    this.actor.location = new Location(x, y, z);
+    return this._bounds.contains(this.actor.location)!;
+  }
+}
+
+export class MoveDestination extends Action {
   private _dx: number = 0;
   private _dy: number = 0;
   private _dz: number = 0;
@@ -21,7 +42,7 @@ export class MoveAction extends Action {
 
   get destination(): Location { return this._destination; }
 
-  set speed(speed: number) { this._step = Math.floor(speed); }
+  set speed(speed: number) { this._step = speed; }
 
   set destination(destination: Location) {
     this._destination = destination;

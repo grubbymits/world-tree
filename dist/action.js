@@ -4,8 +4,25 @@ export class Action {
         this._actor = _actor;
     }
     get actor() { return this._actor; }
+    set actor(actor) { this._actor = actor; }
 }
-export class MoveAction extends Action {
+export class MoveDirection extends Action {
+    constructor(actor, _dx, _dy, _dz, _bounds) {
+        super(actor);
+        this._dx = _dx;
+        this._dy = _dy;
+        this._dz = _dz;
+        this._bounds = _bounds;
+    }
+    perform() {
+        let x = this.actor.x + this._dx;
+        let y = this.actor.y + this._dy;
+        let z = this.actor.z + this._dz;
+        this.actor.location = new Location(x, y, z);
+        return this._bounds.contains(this.actor.location);
+    }
+}
+export class MoveDestination extends Action {
     constructor(actor, _step, _destination) {
         super(actor);
         this._step = _step;
@@ -16,7 +33,7 @@ export class MoveAction extends Action {
         this.destination = _destination;
     }
     get destination() { return this._destination; }
-    set speed(speed) { this._step = Math.floor(speed); }
+    set speed(speed) { this._step = speed; }
     set destination(destination) {
         this._destination = destination;
         let dx = destination.x - this.actor.x;

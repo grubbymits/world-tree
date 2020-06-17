@@ -1,46 +1,70 @@
 import { Entity,
          EventableEntity,
-         EntityEvent } from "./entity.js"
+         EntityEvent,
+         Actor } from "./entity.js"
 import { Terrain, TerrainShape, TerrainType } from "./terrain.js"
 import { SquareGrid } from "./map.js"
 import { Point,
          Sprite,
+         SceneGraph,
          IsometricRenderer } from "./graphics.js"
 import { MouseCamera } from "./camera.js"
-import { MouseController } from "./controller.js"
+import { Controller } from "./controller.js"
 import { Octree } from "./tree.js"
+import { BoundingCuboid } from "./physics.js"
 
 export class Context {
   private _gfx: IsometricRenderer;
-  private _entities : Array<Entity>;
+  private _entities : Array<Entity> = new Array<Entity>();
   private _camera: MouseCamera;
-  private _controller: MouseController;
+  private _controllers: Array<Controller> = new Array<Controller>();
   private _octree : Octree;
+  private _worldMap: SquareGrid;
 
-  constructor(private _worldMap: SquareGrid,
-              canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement) {
 
-    this._entities = new Array<Entity>();
-    let terrain = _worldMap.allTerrain;
-    Array.from(terrain.values()).forEach(value => this._entities.push(value));
+    //let terrain = _worldMap.allTerrain;
+    //Array.from(terrain.values()).forEach(value => this._entities.push(value));
     this._camera = new MouseCamera(canvas, 0, 0, canvas.width, canvas.height);
-    this._gfx = new IsometricRenderer(canvas, this._camera, this._entities);
-    this._controller = new MouseController(canvas, this._gfx);
-    this._octree = new Octree(this._entities);
+    this._gfx = new IsometricRenderer(canvas, this._camera);
+    this._octree = new Octree();
+  }
+
+  get gfx(): SceneGraph { return this._gfx; }
+  get bounds(): BoundingCuboid { return this._octree.bounds; }
+  get spatial(): Octree { return this._octree; }
+
+  set map(map: SquareGrid) {
+    this._worldMap = map;
+  }
+
+  verify(): void {
+    console.log("context contains num entities:", this._entities.length);
+    this._gfx.dump();
     this._octree.verify(this._entities);
   }
 
-  add(entity: EventableEntity): void {
-    let spatialGraph = this._octree;
-    entity.addEventListener(EntityEvent.Move, function() {
-      spatialGraph.update(entity);
-    });
-    this._octree.insert(entity);
+  addController(controller: Controller): void {
+    this._controllers.push(controller);
+  }
+
+  addEntity(entity: Entity): void {
     this._entities.push(entity);
+    this._octree.insert(entity);
+    this._gfx.insertEntity(entity);
+  }
+
+  addActor(actor: Actor): void {
+    let spatialGraph = this._octree;
+    actor.addEventListener(EntityEvent.Move, function() {
+      spatialGraph.update(actor);
+    });
   }
 
   update(): void {
-    this._controller.update();
+    for (let controller of this._controllers) {
+      controller.update();
+    }
     this._gfx.render();
   }
 

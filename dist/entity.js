@@ -1,7 +1,8 @@
 import { Location, BoundingCuboid } from "./physics.js";
 import { Point } from "./graphics.js";
 export class Entity {
-    constructor(_location, _dimensions, _blocking, graphicComponent) {
+    constructor(_context, _location, _dimensions, _blocking, graphicComponent) {
+        this._context = _context;
         this._location = _location;
         this._dimensions = _dimensions;
         this._blocking = _blocking;
@@ -14,6 +15,7 @@ export class Entity {
         this._graphicComponents.push(graphicComponent);
         let centre = new Location(this.x + Math.floor(this.width / 2), this.y + Math.floor(this.depth / 2), this.z + Math.floor(this.height / 2));
         this._bounds = new BoundingCuboid(centre, _dimensions);
+        this._context.addEntity(this);
     }
     get x() { return this._location.x; }
     get y() { return this._location.y; }
@@ -53,14 +55,16 @@ Entity._ids = 0;
 export var EntityEvent;
 (function (EntityEvent) {
     EntityEvent["Move"] = "move";
+    EntityEvent["ActionComplete"] = "actionComplete";
 })(EntityEvent || (EntityEvent = {}));
 export class EventableEntity extends Entity {
-    constructor(location, dimensions, blocking, graphicComponent) {
-        super(location, dimensions, blocking, graphicComponent);
+    constructor(context, location, dimensions, blocking, graphicComponent) {
+        super(context, location, dimensions, blocking, graphicComponent);
         this._listeners = new Map();
         this._events = new Array();
     }
-    update() {
+    update() { this.serviceEvents(); }
+    serviceEvents() {
         for (let event of this._events) {
             if (!this._listeners.has(event)) {
                 continue;
@@ -98,4 +102,16 @@ export class EventableEntity extends Entity {
     }
 }
 export class Actor extends EventableEntity {
+    constructor(context, location, dimensions, blocking, graphicComponent) {
+        super(context, location, dimensions, blocking, graphicComponent);
+        this._canSwim = false;
+        this._canFly = false;
+        context.addActor(this);
+    }
+    update() {
+        this.serviceEvents();
+        if (this._action != undefined && this._action.perform()) {
+            this._events.push(EntityEvent.ActionComplete);
+        }
+    }
 }

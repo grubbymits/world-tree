@@ -1,4 +1,4 @@
-import { Location, Direction, getDirection } from "./physics.js";
+import { Location, Direction, getDirection, getDirectionName } from "./physics.js";
 import { Rain } from "./weather.js";
 import { Entity } from "./entity.js";
 import { Point, Sprite, StaticGraphicComponent } from "./graphics.js";
@@ -287,8 +287,8 @@ function gaussianBlur(grid, width, depth) {
     return result;
 }
 export class Terrain extends Entity {
-    constructor(_gridX, _gridY, _gridZ, dimensions, _type, _shape, features) {
-        super(new Location(_gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height), dimensions, true, Terrain.graphics(_type, _shape));
+    constructor(context, _gridX, _gridY, _gridZ, dimensions, _type, _shape, features) {
+        super(context, new Location(_gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height), dimensions, true, Terrain.graphics(_type, _shape));
         this._gridX = _gridX;
         this._gridY = _gridY;
         this._gridZ = _gridZ;
@@ -357,8 +357,8 @@ export class Terrain extends Entity {
     static scaleLocation(loc) {
         return new Location(Math.floor(loc.x / this.width), Math.floor(loc.y / this.depth), Math.floor(loc.z / this.height));
     }
-    static create(x, y, z, type, shape, feature) {
-        return new Terrain(x, y, z, this._dimensions, type, shape, feature);
+    static create(context, x, y, z, type, shape, feature) {
+        return new Terrain(context, x, y, z, this._dimensions, type, shape, feature);
     }
     static isSupportedFeature(feature) {
         return this._featureGraphics.has(feature);
@@ -471,7 +471,6 @@ export class TerrainBuilder {
         console.log("physical dims:", physicalDims);
         Terrain.init(physicalDims);
         this._surface = new Surface(width, depth);
-        this._worldTerrain = new SquareGrid(width, depth);
         this._terraceSpacing = this._landRange / this._terraces;
         console.log("Terrain builder", "- with a ceiling of:", this._ceiling, "\n", "- ", this._terraces, "terraces\n", "- ", this._terraceSpacing, "terrace spacing");
     }
@@ -670,11 +669,11 @@ export class TerrainBuilder {
             }
         }
     }
-    addRain() {
-        console.log("adding rain");
+    addRain(towards) {
+        console.log("adding rain towards", getDirectionName(towards));
         Rain.init(this._waterLevel, this._surface);
         for (let x = 0; x < this._surface.width; x++) {
-            Rain.add(x, this._surface.depth - 1, this._water, Direction.North);
+            Rain.add(x, this._surface.depth - 1, this._water, towards);
         }
         for (let i = 0; i < Rain.clouds.length; i++) {
             let cloud = Rain.clouds[i];
@@ -690,7 +689,8 @@ export class TerrainBuilder {
             }
         }
     }
-    populate() {
+    generateMap(context) {
+        let worldTerrain = new SquareGrid(context, this._surface.width, this._surface.depth);
         for (let y = 0; y < this._surface.depth; y++) {
             for (let x = 0; x < this._surface.width; x++) {
                 let surface = this._surface.at(x, y);
@@ -763,7 +763,7 @@ export class TerrainBuilder {
                     }
                 }
                 console.assert(surface.terrace <= this._terraces && surface.terrace >= 0, "terrace out-of-range", surface.terrace);
-                this._worldTerrain.addRaisedTerrain(x, y, surface.terrace, surface.type, surface.shape, surface.features);
+                worldTerrain.addRaisedTerrain(x, y, surface.terrace, surface.type, surface.shape, surface.features);
             }
         }
         console.log("adding subterranean entities");
@@ -771,15 +771,16 @@ export class TerrainBuilder {
             for (let x = 0; x < this._surface.width; x++) {
                 let z = this._surface.at(x, y).terrace;
                 let zStop = z - this.calcRelativeHeight(x, y);
-                let terrain = this._worldTerrain.getTerrain(x, y, z);
+                let terrain = worldTerrain.getTerrain(x, y, z);
                 if (terrain == null) {
                     console.error("didn't find terrain in map at", x, y, z);
                 }
                 while (z > zStop) {
                     z--;
-                    this._worldTerrain.addRaisedTerrain(x, y, z, terrain.type, TerrainShape.Flat, TerrainFeature.None);
+                    worldTerrain.addRaisedTerrain(x, y, z, terrain.type, TerrainShape.Flat, TerrainFeature.None);
                 }
             }
         }
+        return worldTerrain;
     }
 }

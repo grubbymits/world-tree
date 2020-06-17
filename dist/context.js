@@ -1,30 +1,44 @@
 import { EntityEvent } from "./entity.js";
 import { IsometricRenderer } from "./graphics.js";
 import { MouseCamera } from "./camera.js";
-import { MouseController } from "./controller.js";
 import { Octree } from "./tree.js";
 export class Context {
-    constructor(_worldMap, canvas) {
-        this._worldMap = _worldMap;
+    constructor(canvas) {
         this._entities = new Array();
-        let terrain = _worldMap.allTerrain;
-        Array.from(terrain.values()).forEach(value => this._entities.push(value));
+        this._controllers = new Array();
         this._camera = new MouseCamera(canvas, 0, 0, canvas.width, canvas.height);
-        this._gfx = new IsometricRenderer(canvas, this._camera, this._entities);
-        this._controller = new MouseController(canvas, this._gfx);
-        this._octree = new Octree(this._entities);
+        this._gfx = new IsometricRenderer(canvas, this._camera);
+        this._octree = new Octree();
+    }
+    get gfx() { return this._gfx; }
+    get bounds() { return this._octree.bounds; }
+    get spatial() { return this._octree; }
+    set map(map) {
+        this._worldMap = map;
+    }
+    verify() {
+        console.log("context contains num entities:", this._entities.length);
+        this._gfx.dump();
         this._octree.verify(this._entities);
     }
-    add(entity) {
-        let spatialGraph = this._octree;
-        entity.addEventListener(EntityEvent.Move, function () {
-            spatialGraph.update(entity);
-        });
-        this._octree.insert(entity);
+    addController(controller) {
+        this._controllers.push(controller);
+    }
+    addEntity(entity) {
         this._entities.push(entity);
+        this._octree.insert(entity);
+        this._gfx.insertEntity(entity);
+    }
+    addActor(actor) {
+        let spatialGraph = this._octree;
+        actor.addEventListener(EntityEvent.Move, function () {
+            spatialGraph.update(actor);
+        });
     }
     update() {
-        this._controller.update();
+        for (let controller of this._controllers) {
+            controller.update();
+        }
         this._gfx.render();
     }
     run() {
