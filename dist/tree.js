@@ -11,27 +11,30 @@ class OctNode {
     get height() { return this._bounds.height; }
     get depth() { return this._bounds.depth; }
     insert(entity) {
-        if (!this._bounds.containsBounds(entity.bounds)) {
-            this._bounds.insert(entity.bounds);
-        }
+        let inserted = false;
         if (this._children.length == 0) {
             this._entities.push(entity);
             if (this._entities.length > OctNode.MaxEntities) {
-                this.split();
+                inserted = this.split();
+            }
+            else {
+                inserted = true;
             }
         }
         else {
             for (let child of this._children) {
                 if (child.containsBounds(entity.bounds)) {
-                    child.insert(entity);
+                    inserted = child.insert(entity);
                     break;
                 }
                 else if (child.containsLocation(entity.centre)) {
-                    child.insert(entity);
+                    inserted = child.insert(entity);
                     break;
                 }
             }
         }
+        console.assert(inserted, "failed to insert location");
+        return inserted;
     }
     split() {
         console.log("splitting node");
@@ -53,10 +56,26 @@ class OctNode {
                 }
             }
         }
-        for (let entity of this._entities) {
-            this.insert(entity);
+        let numInserted = 0;
+        for (let child of this._children) {
+            for (let entity of this._entities) {
+                if (child.containsBounds(entity.bounds)) {
+                    if (child.insert(entity)) {
+                        ++numInserted;
+                    }
+                    break;
+                }
+                else if (!child.containsLocation(entity.bounds.centre)) {
+                    if (child.insert(entity)) {
+                        ++numInserted;
+                    }
+                    break;
+                }
+            }
         }
+        console.assert(numInserted == this._entities.length, "failed to insert all entities into children", numInserted, "vs", this._entities.length);
         this._entities = [];
+        return true;
     }
     containsBounds(bounds) {
         return this._bounds.containsBounds(bounds);
@@ -77,23 +96,40 @@ class OctNode {
         }
         return false;
     }
+    get numEntities() {
+        if (this._entities.length != 0) {
+            return this._entities.length;
+        }
+        let total = 0;
+        for (let child of this._children) {
+            total += child.numEntities;
+        }
+        return total;
+    }
 }
 OctNode.MaxEntities = 32;
 export class Octree {
-    constructor() {
+    constructor(dimensions) {
         this._numEntities = 0;
-        let dimensions = new Dimensions(2, 2, 2);
-        let centre = new Location(1, 1, 1);
-        let bounds = new BoundingCuboid(centre, dimensions);
-        this._root = new OctNode(bounds);
+        let x = Math.floor(dimensions.width / 2);
+        let y = Math.floor(dimensions.depth / 2);
+        let z = Math.floor(dimensions.height / 2);
+        let centre = new Location(x, y, z);
+        this._worldBounds = new BoundingCuboid(centre, dimensions);
+        console.log("creating space of dimensions (WxDxH):", this._worldBounds.width, this._worldBounds.depth, this._worldBounds.height);
+        this._root = new OctNode(this._worldBounds);
     }
     get bounds() { return this._root.bounds; }
     insert(entity) {
-        this._root.insert(entity);
+        let inserted = this._root.insert(entity);
+        console.assert(inserted, "failed to insert");
+        this._numEntities++;
     }
     update(entity) {
     }
     verify(entities) {
+        console.log("spatial graph should have num entities:", this._numEntities);
+        console.log("counted: ", this._root.numEntities);
         for (let entity of entities) {
             if (!this._root.containsEntity(entity)) {
                 console.error("tree doesn't contain entity at (x,y,z):", entity.x, entity.y, entity.z);

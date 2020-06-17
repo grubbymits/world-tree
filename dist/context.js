@@ -3,12 +3,12 @@ import { IsometricRenderer } from "./graphics.js";
 import { MouseCamera } from "./camera.js";
 import { Octree } from "./tree.js";
 export class Context {
-    constructor(canvas) {
+    constructor(canvas, worldDims) {
         this._entities = new Array();
         this._controllers = new Array();
         this._camera = new MouseCamera(canvas, 0, 0, canvas.width, canvas.height);
         this._gfx = new IsometricRenderer(canvas, this._camera);
-        this._octree = new Octree();
+        this._octree = new Octree(worldDims);
     }
     get gfx() { return this._gfx; }
     get bounds() { return this._octree.bounds; }
@@ -18,7 +18,6 @@ export class Context {
     }
     verify() {
         console.log("context contains num entities:", this._entities.length);
-        this._gfx.dump();
         this._octree.verify(this._entities);
     }
     addController(controller) {

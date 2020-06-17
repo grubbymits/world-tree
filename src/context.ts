@@ -11,7 +11,8 @@ import { Point,
 import { MouseCamera } from "./camera.js"
 import { Controller } from "./controller.js"
 import { Octree } from "./tree.js"
-import { BoundingCuboid } from "./physics.js"
+import { Dimensions,
+         BoundingCuboid } from "./physics.js"
 
 export class Context {
   private _gfx: IsometricRenderer;
@@ -21,13 +22,13 @@ export class Context {
   private _octree : Octree;
   private _worldMap: SquareGrid;
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, worldDims: Dimensions) {
 
     //let terrain = _worldMap.allTerrain;
     //Array.from(terrain.values()).forEach(value => this._entities.push(value));
     this._camera = new MouseCamera(canvas, 0, 0, canvas.width, canvas.height);
     this._gfx = new IsometricRenderer(canvas, this._camera);
-    this._octree = new Octree();
+    this._octree = new Octree(worldDims);
   }
 
   get gfx(): SceneGraph { return this._gfx; }
@@ -40,7 +41,6 @@ export class Context {
 
   verify(): void {
     console.log("context contains num entities:", this._entities.length);
-    this._gfx.dump();
     this._octree.verify(this._entities);
   }
 

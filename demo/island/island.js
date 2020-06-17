@@ -29,8 +29,6 @@ for (let y = 0; y < cellsY; y++) {
 }
 
 window.onload = (event) => {
-  let canvas = document.getElementById("testCanvas");
-  let context = new WT.Context(canvas);
 
   const terraces = 4;
   const water = 3;
@@ -41,6 +39,13 @@ window.onload = (event) => {
   const spriteWidth = 256;
   const relativeDims = new WT.Dimensions(3, 3, 2);
   const physicalDims = new WT.IsometricPhysicalDimensions(spriteWidth, relativeDims);
+
+  const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
+                                       physicalDims.depth * cellsY,
+                                       physicalDims.height * terraces);
+  let canvas = document.getElementById("testCanvas");
+  let context = new WT.Context(canvas, worldDims);
+
   // Use the height map to construct a terrain.
   let builder = new WT.TerrainBuilder(cellsX, cellsY, ceiling, terraces,
                                       water, wetLimit, dryLimit,

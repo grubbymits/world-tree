@@ -20,34 +20,34 @@ class OctNode {
 
   constructor(private _bounds: BoundingCuboid) { }
 
-  insert(entity: Entity) {
-    // Ensure that this node is large enough to contain the entity.
-    if (!this._bounds.containsBounds(entity.bounds)) {
-      this._bounds.insert(entity.bounds);
-    }
-
+  insert(entity: Entity): boolean {
+    let inserted: boolean = false;
     if (this._children.length == 0) {
       // For a leaf node, insert it into the entity list and check that we're
       // within the size limit.
       this._entities.push(entity);
       if (this._entities.length > OctNode.MaxEntities) {
-        this.split();
+        inserted = this.split();
+      } else {
+        inserted = true;
       }
     } else {
       // Other wise, pass the entity down through one of the children.
       for (let child of this._children) {
         if (child.containsBounds(entity.bounds)) {
-          child.insert(entity);
+          inserted = child.insert(entity);
           break;
         } else if (child.containsLocation(entity.centre)) {
-          child.insert(entity);
+          inserted = child.insert(entity);
           break;
         }
       }
     }
+    console.assert(inserted, "failed to insert location");
+    return inserted;
   }
 
-  split() {
+  split(): boolean {
     console.log("splitting node");
     this._children = new Array<OctNode>();
     // split each dimension into 2.
@@ -74,11 +74,30 @@ class OctNode {
         }
       }
     }
+
+    let numInserted = 0;
     // Insert the entities into the children.
-    for (let entity of this._entities) {
-      this.insert(entity);
+    for (let child of this._children) {
+      for (let entity of this._entities) {
+        if (child.containsBounds(entity.bounds)) {
+          if (child.insert(entity)) {
+            ++numInserted;
+          }
+          break;
+        } else if (!child.containsLocation(entity.bounds.centre)) {
+          if (child.insert(entity)) {
+            ++numInserted;
+          }
+          break;
+        }
+      }
     }
+    console.assert(numInserted == this._entities.length,
+                   "failed to insert all entities into children",
+                   numInserted, "vs", this._entities.length);
+
     this._entities = [];
+    return true;
   }
 
   containsBounds(bounds: BoundingCuboid): boolean {
@@ -102,29 +121,51 @@ class OctNode {
     }
     return false;
   }
+
+  get numEntities(): number {
+    if (this._entities.length != 0) {
+      return this._entities.length;
+    }
+    let total = 0;
+    for (let child of this._children) {
+      total += child.numEntities;
+    }
+    return total;
+  }
 }
 
 export class Octree {
   private _root: OctNode;
   private _numEntities: number = 0;
+  private readonly _worldBounds: BoundingCuboid;
 
-  constructor() {
-    let dimensions = new Dimensions(2, 2, 2);
-    let centre = new Location(1, 1, 1);
-    let bounds = new BoundingCuboid(centre, dimensions);
-    this._root = new OctNode(bounds);
+  constructor(dimensions: Dimensions) {
+    let x = Math.floor(dimensions.width / 2);
+    let y = Math.floor(dimensions.depth / 2);
+    let z = Math.floor(dimensions.height / 2);
+    let centre = new Location(x, y, z);
+    this._worldBounds = new BoundingCuboid(centre, dimensions);
+    console.log("creating space of dimensions (WxDxH):",
+                this._worldBounds.width,
+                this._worldBounds.depth,
+                this._worldBounds.height);
+    this._root = new OctNode(this._worldBounds);
   }
 
   get bounds(): BoundingCuboid { return this._root.bounds; }
 
   insert(entity: Entity): void {
-    this._root.insert(entity);
+    let inserted = this._root.insert(entity);
+    console.assert(inserted, "failed to insert");
+    this._numEntities++;
   }
 
   update(entity: Entity): void {
   }
 
   verify(entities: Array<Entity>): boolean {
+    console.log("spatial graph should have num entities:", this._numEntities);
+    console.log("counted: ", this._root.numEntities);
     for (let entity of entities) {
       if (!this._root.containsEntity(entity)) {
         console.error("tree doesn't contain entity at (x,y,z):",
