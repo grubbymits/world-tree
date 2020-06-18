@@ -10,10 +10,10 @@ export var InputEvent;
 export class EventHandler {
     constructor() {
         this._listeners = new Map();
-        this._events = new Array();
+        this._events = new Set();
     }
     post(event) {
-        this._events.push(event);
+        this._events.add(event);
     }
     service() {
         for (let event of this._events) {
@@ -25,7 +25,7 @@ export class EventHandler {
                 callback();
             }
         }
-        this._events = [];
+        this._events.clear();
     }
     addEventListener(event, callback) {
         if (!this._listeners.has(event)) {

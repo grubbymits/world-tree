@@ -1,10 +1,13 @@
 import { Point } from "./graphics.js"
+import { EventHandler,
+         InputEvent } from "./events.js"
 
 export class Camera {
   protected _lowerX : number;
   protected _lowerY : number;
   protected _upperX : number;
   protected _upperY : number;
+  protected _handler = new EventHandler<InputEvent>();
 
   constructor(protected _x: number,
               protected _y: number,
@@ -21,6 +24,14 @@ export class Camera {
 
   getDrawCoord(coord: Point) : Point {
     return new Point(coord.x - this._x, coord.y - this._y);
+  }
+
+  addEventListener(event: InputEvent, callback: Function): void {
+    this._handler.addEventListener(event, callback);
+  }
+
+  removeEventListener(event: InputEvent, callback: Function): void {
+    this._handler.removeEventListener(event, callback);
   }
 }
 
@@ -78,6 +89,7 @@ export class MouseCamera extends Camera {
     this._x += dx;
     this._lowerX += dx;
     this._upperX += dx;
+    this._handler.post(InputEvent.CameraMove);
   }
 
   set y(y: number) {
@@ -92,5 +104,6 @@ export class MouseCamera extends Camera {
     this._y += dy;
     this._lowerY += dy;
     this._upperY += dy;
+    this._handler.post(InputEvent.CameraMove);
   }
 }

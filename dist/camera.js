@@ -1,10 +1,12 @@
 import { Point } from "./graphics.js";
+import { EventHandler, InputEvent } from "./events.js";
 export class Camera {
     constructor(_x, _y, _width, _height) {
         this._x = _x;
         this._y = _y;
         this._width = _width;
         this._height = _height;
+        this._handler = new EventHandler();
     }
     isOnScreen(coord, width, depth) {
         if (coord.x + width < this._lowerX || coord.y + depth < this._lowerY ||
@@ -15,6 +17,12 @@ export class Camera {
     }
     getDrawCoord(coord) {
         return new Point(coord.x - this._x, coord.y - this._y);
+    }
+    addEventListener(event, callback) {
+        this._handler.addEventListener(event, callback);
+    }
+    removeEventListener(event, callback) {
+        this._handler.removeEventListener(event, callback);
     }
 }
 export class MouseCamera extends Camera {
@@ -60,6 +68,7 @@ export class MouseCamera extends Camera {
         this._x += dx;
         this._lowerX += dx;
         this._upperX += dx;
+        this._handler.post(InputEvent.CameraMove);
     }
     set y(y) {
         let dy = 0;
@@ -75,6 +84,7 @@ export class MouseCamera extends Camera {
         this._y += dy;
         this._lowerY += dy;
         this._upperY += dy;
+        this._handler.post(InputEvent.CameraMove);
     }
 }
 MouseCamera.sensistivity = 10;

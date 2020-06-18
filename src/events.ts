@@ -9,12 +9,12 @@ export enum InputEvent {
 
 export class EventHandler<T> {
   protected _listeners = new Map<T, Array<Function>>();
-  protected _events = new Array<T>();
+  protected _events = new Set<T>();
 
   constructor() { }
 
   post(event: T): void {
-    this._events.push(event);
+    this._events.add(event);
   }
 
   service(): void {
@@ -27,7 +27,7 @@ export class EventHandler<T> {
         callback();
       }
     }
-    this._events = [];
+    this._events.clear();
   }
 
   addEventListener(event: T, callback: Function): void {
