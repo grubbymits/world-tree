@@ -72,6 +72,11 @@ export class Entity {
     }
     return this.z + this.height;
   }
+  updateLocation(dx: number, dy: number, dz: number): void {
+    this.location.x += dx;
+    this.location.y += dy;
+    this.location.z += dz;
+  }
 }
 
 export enum EntityEvent {
@@ -136,7 +141,7 @@ export class EventableEntity extends Entity {
 export class Actor extends EventableEntity {
   protected readonly _canSwim: boolean = false;
   protected readonly _canFly: boolean = false;
-  protected _action: Action;
+  protected _action: Action|null;
 
   constructor(context: Context,
               location: Location,
@@ -150,7 +155,9 @@ export class Actor extends EventableEntity {
   update(): void {
     this.serviceEvents();
     if (this._action != undefined && this._action.perform()) {
+      console.log("completed action");
       this.postEvent(EntityEvent.ActionComplete);
+      this._action = null;
     }
   }
 

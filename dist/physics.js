@@ -109,6 +109,9 @@ export class Location {
     get x() { return this._x; }
     get y() { return this._y; }
     get z() { return this._z; }
+    set x(x) { this._x = x; }
+    set y(y) { this._y = y; }
+    set z(z) { this._z = z; }
     isNearlySameAs(other) {
         return Math.floor(this.x) == Math.floor(other.x) &&
             Math.floor(this.y) == Math.floor(other.y) &&

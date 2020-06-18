@@ -158,6 +158,19 @@ export class Octree {
   }
 
   update(entity: Entity): void {
+    /*
+    let currentNode = function() {
+    }
+    let correctNode = function() {
+    }
+
+    let current = currentNode(entity);
+    let next = correctNode(entity);
+    if (current != next) {
+      current.remove(entity);
+      next.insert(entity);
+    }
+    */
   }
 
   verify(entities: Array<Entity>): boolean {

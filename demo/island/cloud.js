@@ -31,21 +31,23 @@ export class CloudController extends WT.Controller {
       let z = cloud.z;
 
       if (cloud.x < bounds.minX) {
-        let x = bounds.maxX;
+        x = bounds.maxX;
       } else if (cloud.x > bounds.maxX) {
-        let x = bounds.minX;
+        x = bounds.minX;
       }
       if (cloud.y < bounds.minY) {
-        let y = bounds.maxY;
+        y = bounds.maxY;
       } else if (cloud.y > bounds.maxY) {
-        let y = bounds.minY;
+        y = bounds.minY;
       }
       if (cloud.z < bounds.minZ) {
-        let z = bounds.maxZ;
+        z = bounds.maxZ;
       } else if (cloud.z > bounds.maxZ) {
-        let z = bounds.minZ;
+        z = bounds.minZ;
       }
+      console.log("resetting cloud location (x,y,z):", x, y, z);
       cloud.location = new WT.Location(x, y, z);
+      cloud.action = new WT.MoveDirection(cloud, 0, -1, 0, bounds);
     });
   }
 
@@ -57,7 +59,7 @@ export class CloudController extends WT.Controller {
                 cloudDims.width, cloudDims.depth, cloudDims.height);
     console.log("max (x,y,z):", maxX, maxY, z);
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < total; i++) {
       let x = Math.floor(Math.random() * Math.floor(maxX));
       let y = Math.floor(Math.random() * Math.floor(maxY));
       let randLocation = new WT.Location(x, y, z);

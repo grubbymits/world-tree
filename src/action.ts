@@ -21,12 +21,9 @@ export class MoveDirection extends Action {
   }
 
   perform(): boolean {
-    let x = this.actor.x + this._dx;
-    let y = this.actor.y + this._dy;
-    let z = this.actor.z + this._dz;
-    this.actor.location = new Location(x, y, z);
+    this.actor.updateLocation(this._dx, this._dy, this._dz);
     this.actor.postEvent(EntityEvent.Move);
-    return this._bounds.contains(this.actor.location)!;
+    return !this._bounds.contains(this.actor.location);
   }
 }
 

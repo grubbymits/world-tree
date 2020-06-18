@@ -50,6 +50,11 @@ export class Entity {
         }
         return this.z + this.height;
     }
+    updateLocation(dx, dy, dz) {
+        this.location.x += dx;
+        this.location.y += dy;
+        this.location.z += dz;
+    }
 }
 Entity._ids = 0;
 export var EntityEvent;
@@ -109,17 +114,17 @@ export class Actor extends EventableEntity {
         context.addActor(this);
     }
     update() {
-        console.log("update actor");
         this.serviceEvents();
         if (this._action != undefined && this._action.perform()) {
+            console.log("completed action");
             this.postEvent(EntityEvent.ActionComplete);
+            this._action = null;
         }
     }
     postEvent(event) {
         this._events.push(event);
     }
     set action(action) {
-        console.log("set action:", action);
         this._action = action;
     }
 }
