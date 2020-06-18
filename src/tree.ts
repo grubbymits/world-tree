@@ -34,10 +34,7 @@ class OctNode {
     } else {
       // Other wise, pass the entity down through one of the children.
       for (let child of this._children) {
-        if (child.containsBounds(entity.bounds)) {
-          inserted = child.insert(entity);
-          break;
-        } else if (child.containsLocation(entity.centre)) {
+        if (child.containsLocation(entity.centre)) {
           inserted = child.insert(entity);
           break;
         }
@@ -55,6 +52,7 @@ class OctNode {
     let depth = Math.floor(this._bounds.depth / 2);
     let height = Math.floor(this._bounds.height / 2);
     let dimensions = new Dimensions(width, depth, height);
+    console.log("splitting into 8x (WxDxH):", width, depth, height);
 
     // half the dimensions again to get the distances to/from the centre.
     let offset = [-0.5, 0.5];
@@ -69,32 +67,32 @@ class OctNode {
           let centre = new Location(this.centre.x + offsetX,
                                     this.centre.y + offsetY,
                                     this.centre.z + offsetZ);
+          console.log("chosen centre point (x,y,z):", centre.x, centre.y, centre.z);
           let bounds = new BoundingCuboid(centre, dimensions);
           this._children.push(new OctNode(bounds));
         }
       }
     }
 
-    let numInserted = 0;
+    let insertIntoChild = function(child: OctNode, entity: Entity) {
+      if (child.containsLocation(entity.bounds.centre)) {
+        return child.insert(entity);
+      }
+      return false;
+    }
+
     // Insert the entities into the children.
-    for (let child of this._children) {
-      for (let entity of this._entities) {
-        if (child.containsBounds(entity.bounds)) {
-          if (child.insert(entity)) {
-            ++numInserted;
-          }
-          break;
-        } else if (!child.containsLocation(entity.bounds.centre)) {
-          if (child.insert(entity)) {
-            ++numInserted;
-          }
+    for (let entity of this._entities) {
+      let inserted: boolean = false;
+      for (let child of this._children) {
+        if (insertIntoChild(child, entity)) {
+          ++numInserted;
+          inserted = true;
           break;
         }
       }
+      console.assert(inserted, "failed to insert into children:", entity);
     }
-    console.assert(numInserted == this._entities.length,
-                   "failed to insert all entities into children",
-                   numInserted, "vs", this._entities.length);
 
     this._entities = [];
     return true;

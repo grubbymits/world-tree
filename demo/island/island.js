@@ -3,8 +3,8 @@ import OpenSimplexNoise from "../../libs/open-simplex-noise/index.js";
 
 // Create a height map for the island.
 const openSimplex = new OpenSimplexNoise(Date.now());
-const cellsX = 20;
-const cellsY = 20;
+const cellsX = 40;
+const cellsY = 40;
 const freq = 0.2;
 const cx = Math.floor(cellsX / 2);
 const cy = Math.floor(cellsY / 2);
