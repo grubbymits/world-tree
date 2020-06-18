@@ -1,3 +1,4 @@
+import { EntityEvent } from "./entity.js";
 import { Location } from "./physics.js";
 export class Action {
     constructor(_actor) {
@@ -19,6 +20,7 @@ export class MoveDirection extends Action {
         let y = this.actor.y + this._dy;
         let z = this.actor.z + this._dz;
         this.actor.location = new Location(x, y, z);
+        this.actor.postEvent(EntityEvent.Move);
         return this._bounds.contains(this.actor.location);
     }
 }
@@ -92,6 +94,7 @@ export class MoveDestination extends Action {
         }
     }
     perform() {
+        console.log("perform action");
         let x = Math.abs(this.destination.x - this.actor.x) < Math.abs(this._dx) ?
             this.destination.x : this.actor.x + this._dx;
         let y = Math.abs(this.destination.y - this.actor.y) < Math.abs(this._dy) ?
@@ -99,6 +102,7 @@ export class MoveDestination extends Action {
         let z = Math.abs(this.destination.z - this.actor.z) < Math.abs(this._dz) ?
             this.destination.z : this.actor.z + this._dz;
         this.actor.location = new Location(x, y, z);
+        this.actor.postEvent(EntityEvent.Move);
         return this.actor.location.isNearlySameAs(this.destination);
     }
 }

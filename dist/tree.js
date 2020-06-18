@@ -60,19 +60,16 @@ class OctNode {
             }
             return false;
         };
-        let numInserted = 0;
         for (let entity of this._entities) {
             let inserted = false;
             for (let child of this._children) {
                 if (insertIntoChild(child, entity)) {
-                    ++numInserted;
                     inserted = true;
                     break;
                 }
             }
             console.assert(inserted, "failed to insert into children:", entity);
         }
-        console.assert(numInserted == this._entities.length, "failed to insert all entities into children", numInserted, "vs", this._entities.length);
         this._entities = [];
         return true;
     }

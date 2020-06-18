@@ -86,7 +86,6 @@ class OctNode {
       let inserted: boolean = false;
       for (let child of this._children) {
         if (insertIntoChild(child, entity)) {
-          ++numInserted;
           inserted = true;
           break;
         }

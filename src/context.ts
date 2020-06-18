@@ -56,8 +56,10 @@ export class Context {
 
   addActor(actor: Actor): void {
     let spatialGraph = this._octree;
+    let gfx = this._gfx;
     actor.addEventListener(EntityEvent.Move, function() {
       spatialGraph.update(actor);
+      gfx.setDrawCoord(actor);
     });
   }
 

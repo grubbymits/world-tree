@@ -1,27 +1,30 @@
 import * as WT from "../../dist/world-tree.js";
 
-//let sheet = new WT.SpriteSheet("../../../res/img/cloud");
-//let cloudSprite = new WT.Sprite();
-//let cloudGraphic = new WT.GraphicComponent();
+const sheet = new WT.SpriteSheet("../../../res/img/cloud");
+const cloudSprite = new WT.Sprite(sheet, 0, 0, 218, 152);
+const cloudGraphic = new WT.StaticGraphicComponent(cloudSprite.id);
+let relativeDims = new WT.Dimensions(1, 1, 1);
+let cloudDims = new WT.IsometricPhysicalDimensions(218, relativeDims);
 
 class Cloud extends WT.Actor {
-  constructor(location, dimensions) {
-    super(location, dimensions, false, cloudGraphic);
+  constructor(context, location) {
+    super(context, location, cloudDims, false, cloudGraphic);
     this._canFly = true;
   }
 }
 
-class CloudController extends WT.Controller {
-  constructor(context) {
+export class CloudController extends WT.Controller {
+  constructor(context, dims) {
     super();
     this._context = context;
+    this._worldDims = dims;
   }
 
   add(cloud) {
     this._context.addActor(cloud);
     this._actors.push(cloud);
 
-    let bounds = this.context.bounds;
+    let bounds = this._context.bounds;
     cloud.addEventListener(WT.EntityEvent.ActionComplete, function() {
       let x = cloud.x;
       let y = cloud.y;
@@ -44,6 +47,26 @@ class CloudController extends WT.Controller {
       }
       cloud.location = new WT.Location(x, y, z);
     });
+  }
+
+  addClouds(total) {
+    let maxX = this._worldDims.width - cloudDims.width;
+    let maxY = this._worldDims.depth - cloudDims.depth;
+    let z = this._worldDims.height - cloudDims.height;
+    console.log("cloud dims (WxDxH):",
+                cloudDims.width, cloudDims.depth, cloudDims.height);
+    console.log("max (x,y,z):", maxX, maxY, z);
+
+    for (let i = 0; i < 20; i++) {
+      let x = Math.floor(Math.random() * Math.floor(maxX));
+      let y = Math.floor(Math.random() * Math.floor(maxY));
+      let randLocation = new WT.Location(x, y, z);
+      console.log("adding cloud at (x,y,z):", x, y, z);
+      let cloud = new Cloud(this._context, randLocation);
+      // dy == -1 == northwards.
+      cloud.action = new WT.MoveDirection(cloud, 0, -1, 0, this._context.bounds);
+      this.add(cloud);
+    }
   }
 
   update() {

@@ -109,9 +109,17 @@ export class Actor extends EventableEntity {
         context.addActor(this);
     }
     update() {
+        console.log("update actor");
         this.serviceEvents();
         if (this._action != undefined && this._action.perform()) {
-            this._events.push(EntityEvent.ActionComplete);
+            this.postEvent(EntityEvent.ActionComplete);
         }
+    }
+    postEvent(event) {
+        this._events.push(event);
+    }
+    set action(action) {
+        console.log("set action:", action);
+        this._action = action;
     }
 }

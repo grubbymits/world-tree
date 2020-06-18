@@ -1,5 +1,6 @@
 import * as WT from "../../dist/world-tree.js";
 import OpenSimplexNoise from "../../libs/open-simplex-noise/index.js";
+import { CloudController } from "./cloud.js";
 
 // Create a height map for the island.
 const openSimplex = new OpenSimplexNoise(Date.now());
@@ -56,22 +57,11 @@ window.onload = (event) => {
 
   context.addController(new WT.MouseController(canvas, context.gfx));
   context.verify();
-  /*
-  let cloudController = new WT.CloudController(context);
+
+  let cloudController = new CloudController(context, worldDims);
+  cloudController.addClouds(20);
   context.addController(cloudController);
 
-  const cloudDims = new WT.Dimensions();
-  const z = bounds.maxZ - cloudDims.height;
-
-  for (let i = 0; i < 20; i++) {
-    let x;
-    let y;
-    let randLocation = new WT.Location(x, y, z);
-    let cloud = new Cloud(randLocation);
-    // dy == -1 == northwards.
-    cloud.addAction(new WT.MoveDirection(cloud, 0, -1, 0));
-    cloudController.add(cloud);
-  }*/
 
   console.log("done");
   var update = function update() {
@@ -81,5 +71,4 @@ window.onload = (event) => {
     window.requestAnimationFrame(update);
   }
   window.requestAnimationFrame(update);
-  //context.run();
 }

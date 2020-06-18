@@ -150,8 +150,16 @@ export class Actor extends EventableEntity {
   update(): void {
     this.serviceEvents();
     if (this._action != undefined && this._action.perform()) {
-      this._events.push(EntityEvent.ActionComplete);
+      this.postEvent(EntityEvent.ActionComplete);
     }
+  }
+
+  postEvent(event: EntityEvent): void {
+    this._events.push(event);
+  }
+
+  set action(action: Action) {
+    this._action = action;
   }
 }
 

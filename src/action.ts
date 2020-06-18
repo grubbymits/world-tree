@@ -1,4 +1,5 @@
-import { Actor } from "./entity.js"
+import { Actor,
+         EntityEvent } from "./entity.js"
 import { Location,
          BoundingCuboid } from "./physics.js"
 
@@ -24,6 +25,7 @@ export class MoveDirection extends Action {
     let y = this.actor.y + this._dy;
     let z = this.actor.z + this._dz;
     this.actor.location = new Location(x, y, z);
+    this.actor.postEvent(EntityEvent.Move);
     return this._bounds.contains(this.actor.location)!;
   }
 }
@@ -106,6 +108,7 @@ export class MoveDestination extends Action {
   }
 
   perform(): boolean {
+    console.log("perform action");
     // Make sure we don't overshoot the destination.
     let x = Math.abs(this.destination.x - this.actor.x) < Math.abs(this._dx) ?
       this.destination.x : this.actor.x + this._dx;
@@ -115,6 +118,7 @@ export class MoveDestination extends Action {
       this.destination.z : this.actor.z + this._dz;
 
     this.actor.location = new Location(x, y, z);
+    this.actor.postEvent(EntityEvent.Move);
     return this.actor.location.isNearlySameAs(this.destination);
   }
 }
