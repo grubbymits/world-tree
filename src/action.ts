@@ -1,5 +1,5 @@
-import { Actor,
-         EntityEvent } from "./entity.js"
+import { Actor } from "./entity.js"
+import { EntityEvent } from "./events.js"
 import { Location,
          BoundingCuboid } from "./physics.js"
 

@@ -1,4 +1,4 @@
-import { EntityEvent } from "./entity.js";
+import { EntityEvent } from "./events.js";
 import { IsometricRenderer } from "./graphics.js";
 import { MouseCamera } from "./camera.js";
 import { Octree } from "./tree.js";

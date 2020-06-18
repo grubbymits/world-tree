@@ -6,6 +6,8 @@ import { Point,
          IsometricRenderer } from "./graphics.js"
 import { Context } from "./context.js"
 import { Action } from "./action.js"
+import { EntityEvent,
+         EventHandler } from "./events.js"
 
 export class Entity {
   private static _ids: number = 0;
@@ -79,14 +81,8 @@ export class Entity {
   }
 }
 
-export enum EntityEvent {
-  Move = "move",
-  ActionComplete = "actionComplete",
-}
-
 export class EventableEntity extends Entity {
-  protected _listeners = new Map<EntityEvent, Array<Function>>();
-  protected _events = new Array<EntityEvent>();
+  protected _handler = new EventHandler<EntityEvent>();
 
   constructor(context: Context,
               location: Location,
@@ -96,46 +92,15 @@ export class EventableEntity extends Entity {
     super(context, location, dimensions, blocking, graphicComponent);
   }
 
-  update(): void { this.serviceEvents(); }
-
-  serviceEvents(): void {
-    for (let event of this._events) {
-      if (!this._listeners.has(event)) {
-        continue;
-      }
-      let callbacks = this._listeners.get(event)!;
-      for (let callback of callbacks) { 
-        callback();
-      }
-    }
-    this._events = [];
-  }
-
   addEventListener(event: EntityEvent, callback: Function): void {
-    if (!this._listeners.has(event)) {
-      this._listeners.set(event, new Array<Function>());
-    } else {
-      // Check that the callback doesn't already exist.
-      let callbacks = this._listeners.get(event)!;
-      for (let i in callbacks) {
-        if (callbacks[i] === callback) {
-          return;
-        }
-      }
-    }
-    this._listeners.get(event)!.push(callback);
+    this._handler.addEventListener(event, callback);
   }
 
   removeEventListener(event: EntityEvent, callback: Function): void {
-    if (!this._listeners.has(event)) {
-      return;
-    }
-    let callbacks = this._listeners.get(event)!;
-    const index = callbacks.indexOf(callback, 0);
-    if (index > -1) {
-      callbacks.splice(index, 1);
-    }
+    this._handler.removeEventListener(event, callback);
   }
+
+  update(): void { this._handler.service(); }
 }
 
 export class Actor extends EventableEntity {
@@ -153,7 +118,7 @@ export class Actor extends EventableEntity {
   }
 
   update(): void {
-    this.serviceEvents();
+    this._handler.service();
     if (this._action != undefined && this._action.perform()) {
       console.log("completed action");
       this.postEvent(EntityEvent.ActionComplete);
@@ -162,7 +127,7 @@ export class Actor extends EventableEntity {
   }
 
   postEvent(event: EntityEvent): void {
-    this._events.push(event);
+    this._handler.post(event);
   }
 
   set action(action: Action) {

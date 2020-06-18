@@ -1,4 +1,4 @@
-import { EntityEvent } from "./entity.js";
+import { EntityEvent } from "./events.js";
 import { Location } from "./physics.js";
 export class Action {
     constructor(_actor) {

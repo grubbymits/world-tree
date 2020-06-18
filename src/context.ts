@@ -1,7 +1,7 @@
 import { Entity,
          EventableEntity,
-         EntityEvent,
          Actor } from "./entity.js"
+import { EntityEvent } from "./events.js"
 import { Terrain, TerrainShape, TerrainType } from "./terrain.js"
 import { SquareGrid } from "./map.js"
 import { Point,
@@ -23,9 +23,6 @@ export class Context {
   private _worldMap: SquareGrid;
 
   constructor(canvas: HTMLCanvasElement, worldDims: Dimensions) {
-
-    //let terrain = _worldMap.allTerrain;
-    //Array.from(terrain.values()).forEach(value => this._entities.push(value));
     this._camera = new MouseCamera(canvas, 0, 0, canvas.width, canvas.height);
     this._gfx = new IsometricRenderer(canvas, this._camera);
     this._octree = new Octree(worldDims);
