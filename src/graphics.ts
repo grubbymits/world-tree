@@ -188,14 +188,13 @@ export abstract class SceneGraph {
   protected _leaf: SceneNode;
   protected _nodes: Map<Entity, SceneNode> = new Map<Entity, SceneNode>();
   
-  constructor(protected _canvas: HTMLCanvasElement,
-              protected _camera: Camera) {
-              //entities: Array<Entity>) {
+  constructor(protected _canvas: HTMLCanvasElement) {
     this._width = _canvas.width;
     this._height = _canvas.height;
     this._ctx = this._canvas.getContext("2d", { alpha: false })!;
   }
 
+  abstract getDrawCoord(location: Location): Point;
   abstract setDrawCoord(object: Entity): void;
   abstract drawOrder(a: Entity, b: Entity): number;
 
@@ -209,14 +208,14 @@ export abstract class SceneGraph {
     }
   }
 
-  render(): void {
+  render(camera: Camera): void {
     this._ctx.clearRect(0, 0, this._width, this._height);
     let node = this._root;
     while (node != undefined) {
       let entity: Entity = node.entity;
-      if (this._camera.isOnScreen(entity.drawCoord, entity.width, entity.depth) &&
+      if (camera.isOnScreen(entity.drawCoord, entity.width, entity.depth) &&
           entity.visible) {
-        let coord = this._camera.getDrawCoord(entity.drawCoord);
+        let coord = camera.getDrawCoord(entity.drawCoord);
         for (let i in entity.graphics) {
           let component = entity.graphics[i];
           let spriteId = component.update();
@@ -227,14 +226,21 @@ export abstract class SceneGraph {
     }
   }
 
-  getDrawnAt(x: number, y: number): Entity | null {
-    console.log("getDrawnAt:", x, y);
+  getLocationAt(x: number, y: number, camera: Camera): Location | null {
+    let entity: Entity|null = this.getEntityDrawnAt(x, y, camera);
+    if (entity != undefined) {
+      return entity.location;
+    }
+    return null;
+  }
+
+  getEntityDrawnAt(x: number, y: number, camera: Camera): Entity | null {
     let node = this._leaf;
     while (node != undefined) {
       let entity: Entity = node.entity;
       if (entity.visible &&
-          this._camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
-        let entityDrawCoord: Point = this._camera.getDrawCoord(entity.drawCoord);
+          camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
+        let entityDrawCoord: Point = camera.getDrawCoord(entity.drawCoord);
         let graphic: GraphicComponent = entity.graphic;
         // Check whether inbounds of the sprite.
         if (x < entityDrawCoord.x || y < entityDrawCoord.y ||
@@ -245,7 +251,6 @@ export abstract class SceneGraph {
         }
         if (!graphic.isTransparentAt(x - entityDrawCoord.x,
                                      y - entityDrawCoord.y)) {
-          console.log("found entity drawn at:", entityDrawCoord);
           return entity;
         }
       }
@@ -294,15 +299,14 @@ export abstract class SceneGraph {
 }
 
 export class IsometricRenderer extends SceneGraph {
-  constructor(canvas: HTMLCanvasElement,
-              camera: Camera) {
-    super(canvas, camera);
+  constructor(canvas: HTMLCanvasElement) {
+    super(canvas);
   }
 
   private static readonly _sqrt3 = Math.sqrt(3);
   private static readonly _halfSqrt3 = Math.sqrt(3) * 0.5;
 
-  static getDrawCoord(entity: Entity): Point {
+  static getDrawCoord(loc: Location): Point {
     // An isometric square has:
     // - sides equal length = 1,
     // - the short diagonal is length = 1,
@@ -312,13 +316,17 @@ export class IsometricRenderer extends SceneGraph {
 
     // Tiles are placed overlapping each other by half.
     // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
-    let dx = Math.floor(this._halfSqrt3 * (entity.x + entity.y));
-    let dy = Math.floor((0.5 * (entity.y - entity.x)) - entity.z);
+    let dx = Math.floor(this._halfSqrt3 * (loc.x + loc.y));
+    let dy = Math.floor((0.5 * (loc.y - loc.x)) - loc.z);
     return new Point(dx, dy);
   }
 
   setDrawCoord(entity: Entity): void {
-    entity.drawCoord = IsometricRenderer.getDrawCoord(entity);
+    entity.drawCoord = IsometricRenderer.getDrawCoord(entity.location);
+  }
+
+  getDrawCoord(location: Location): Point {
+    return IsometricRenderer.getDrawCoord(location);
   }
 
   drawOrder(first: Entity, second: Entity): number {

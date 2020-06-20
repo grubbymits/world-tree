@@ -45,7 +45,6 @@ export class CloudController extends WT.Controller {
       } else if (cloud.z > bounds.maxZ) {
         z = bounds.minZ;
       }
-      console.log("resetting cloud location (x,y,z):", x, y, z);
       cloud.location = new WT.Location(x, y, z);
       cloud.action = new WT.MoveDirection(cloud, 0, -1, 0, bounds);
     });
@@ -55,15 +54,11 @@ export class CloudController extends WT.Controller {
     let maxX = this._worldDims.width - cloudDims.width;
     let maxY = this._worldDims.depth - cloudDims.depth;
     let z = this._worldDims.height - cloudDims.height;
-    console.log("cloud dims (WxDxH):",
-                cloudDims.width, cloudDims.depth, cloudDims.height);
-    console.log("max (x,y,z):", maxX, maxY, z);
 
     for (let i = 0; i < total; i++) {
       let x = Math.floor(Math.random() * Math.floor(maxX));
       let y = Math.floor(Math.random() * Math.floor(maxY));
       let randLocation = new WT.Location(x, y, z);
-      console.log("adding cloud at (x,y,z):", x, y, z);
       let cloud = new Cloud(this._context, randLocation);
       // dy == -1 == northwards.
       cloud.action = new WT.MoveDirection(cloud, 0, -1, 0, this._context.bounds);

@@ -142,9 +142,8 @@ class SceneNode {
     set pred(p) { this._pred = p; }
 }
 export class SceneGraph {
-    constructor(_canvas, _camera) {
+    constructor(_canvas) {
         this._canvas = _canvas;
-        this._camera = _camera;
         this._nodes = new Map();
         this._width = _canvas.width;
         this._height = _canvas.height;
@@ -159,14 +158,14 @@ export class SceneGraph {
             node = node.succ;
         }
     }
-    render() {
+    render(camera) {
         this._ctx.clearRect(0, 0, this._width, this._height);
         let node = this._root;
         while (node != undefined) {
             let entity = node.entity;
-            if (this._camera.isOnScreen(entity.drawCoord, entity.width, entity.depth) &&
+            if (camera.isOnScreen(entity.drawCoord, entity.width, entity.depth) &&
                 entity.visible) {
-                let coord = this._camera.getDrawCoord(entity.drawCoord);
+                let coord = camera.getDrawCoord(entity.drawCoord);
                 for (let i in entity.graphics) {
                     let component = entity.graphics[i];
                     let spriteId = component.update();
@@ -176,14 +175,20 @@ export class SceneGraph {
             node = node.succ;
         }
     }
-    getDrawnAt(x, y) {
-        console.log("getDrawnAt:", x, y);
+    getLocationAt(x, y, camera) {
+        let entity = this.getEntityDrawnAt(x, y, camera);
+        if (entity != undefined) {
+            return entity.location;
+        }
+        return null;
+    }
+    getEntityDrawnAt(x, y, camera) {
         let node = this._leaf;
         while (node != undefined) {
             let entity = node.entity;
             if (entity.visible &&
-                this._camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
-                let entityDrawCoord = this._camera.getDrawCoord(entity.drawCoord);
+                camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
+                let entityDrawCoord = camera.getDrawCoord(entity.drawCoord);
                 let graphic = entity.graphic;
                 if (x < entityDrawCoord.x || y < entityDrawCoord.y ||
                     x > entityDrawCoord.x + graphic.width ||
@@ -192,7 +197,6 @@ export class SceneGraph {
                     continue;
                 }
                 if (!graphic.isTransparentAt(x - entityDrawCoord.x, y - entityDrawCoord.y)) {
-                    console.log("found entity drawn at:", entityDrawCoord);
                     return entity;
                 }
             }
@@ -238,16 +242,19 @@ export class SceneGraph {
     }
 }
 export class IsometricRenderer extends SceneGraph {
-    constructor(canvas, camera) {
-        super(canvas, camera);
+    constructor(canvas) {
+        super(canvas);
     }
-    static getDrawCoord(entity) {
-        let dx = Math.floor(this._halfSqrt3 * (entity.x + entity.y));
-        let dy = Math.floor((0.5 * (entity.y - entity.x)) - entity.z);
+    static getDrawCoord(loc) {
+        let dx = Math.floor(this._halfSqrt3 * (loc.x + loc.y));
+        let dy = Math.floor((0.5 * (loc.y - loc.x)) - loc.z);
         return new Point(dx, dy);
     }
     setDrawCoord(entity) {
-        entity.drawCoord = IsometricRenderer.getDrawCoord(entity);
+        entity.drawCoord = IsometricRenderer.getDrawCoord(entity.location);
+    }
+    getDrawCoord(location) {
+        return IsometricRenderer.getDrawCoord(location);
     }
     drawOrder(first, second) {
         let sameX = first.x == second.x;

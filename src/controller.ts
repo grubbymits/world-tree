@@ -1,6 +1,7 @@
 import { SceneGraph } from "./graphics.js"
 import { Entity,
          Actor } from "./entity.js"
+import { Camera } from "./camera.js"
 
 export abstract class Controller {
   protected _actors: Array<Actor> = new Array<Actor>();
@@ -15,15 +16,17 @@ export class MouseController extends Controller {
   // private _action: Action;
   // private _target: Entity;
 
-  constructor(canvas: HTMLCanvasElement,
-              scene: SceneGraph) {
+  constructor(scene: SceneGraph,
+              canvas: HTMLCanvasElement,
+              camera: Camera) {
     super();
     var controller = this;
 
     canvas.addEventListener('mousedown', e => {
       if (e.button == 0) {
       } else if (e.button == 2) {
-        let entity: Entity|null = scene.getDrawnAt(e.clientX, e.clientY);
+        let entity: Entity|null =
+          scene.getEntityDrawnAt(e.clientX, e.clientY, camera);
         if (entity != undefined) {
           controller.entity = entity;
         }

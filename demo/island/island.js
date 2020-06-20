@@ -55,18 +55,27 @@ window.onload = (event) => {
   builder.addRain(WT.Direction.North);
   context.map = builder.generateMap(context);
 
-  context.addController(new WT.MouseController(canvas, context.gfx));
+  let camera = new WT.MouseCamera(context.scene, canvas,
+                                  canvas.width, canvas.height);
+  context.addController(new WT.MouseController(context.scene, canvas, camera));
   context.verify();
 
   let cloudController = new CloudController(context, worldDims);
   cloudController.addClouds(20);
   context.addController(cloudController);
 
+  let musicDims = new WT.Dimensions(Math.floor(worldDims.width / 2),
+                                    Math.floor(worldDims.depth / 2),
+                                    Math.floor(worldDims.height / 2));
+  let musicArea = new WT.BoundingCuboid(context.bounds.centre, musicDims);
+  let islandMusic = new WT.ZonalAudioLoop("../../res/audio/purple-planet/pretty-things.mp3",
+                                          musicArea, context.scene, camera);
+
 
   console.log("done");
   var update = function update() {
     if (document.hasFocus()) {
-      context.update();
+      context.update(camera);
     }
     window.requestAnimationFrame(update);
   }

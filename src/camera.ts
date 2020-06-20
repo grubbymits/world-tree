@@ -1,18 +1,29 @@
 import { Point } from "./graphics.js"
 import { EventHandler,
          InputEvent } from "./events.js"
+import { Location } from "./physics.js"
+import { SceneGraph } from "./graphics.js"
 
 export class Camera {
-  protected _lowerX : number;
-  protected _lowerY : number;
+  protected _x: number;
+  protected _y: number;
+  protected _lowerX : number = 0;
+  protected _lowerY : number = 0;
   protected _upperX : number;
   protected _upperY : number;
   protected _handler = new EventHandler<InputEvent>();
+  protected _surfaceLocation : Location|null;
 
-  constructor(protected _x: number,
-              protected _y: number,
+  constructor(protected _scene: SceneGraph,
               protected readonly _width: number,
-              protected readonly _height: number) { }
+              protected readonly _height: number) {
+    this._x = Math.floor(_width / 2);
+    this._y = Math.floor(_height / 2);
+    this._upperX = _width;
+    this._upperY = _height;
+    console.log("initialising camera at (x,y):", this._x, this._y);
+    this._surfaceLocation = _scene.getLocationAt(this._x, this._y, this);
+  }
 
   isOnScreen(coord : Point, width: number, depth: number) : boolean {
     if (coord.x + width < this._lowerX || coord.y + depth < this._lowerY ||
@@ -22,8 +33,28 @@ export class Camera {
     return true;
   }
 
+  get x(): number { return this._x; }
+  get y(): number { return this._y; }
+  get width(): number { return this._width; }
+  get height(): number { return this._height; }
+  get location(): Location|null { return this._surfaceLocation; }
+  set x(x: number)  {
+    this._x = x;
+    this._lowerX = x - Math.floor(this.width / 2);
+    this._upperX = x + Math.floor(this.width / 2);
+  }
+  set y(y: number) {
+    this._y = y;
+    this._lowerY = y - Math.floor(this.height / 2);
+    this._upperY = y + Math.floor(this.height / 2);
+  }
+
   getDrawCoord(coord: Point) : Point {
-    return new Point(coord.x - this._x, coord.y - this._y);
+    return new Point(coord.x - this._lowerX, coord.y - this._lowerY);
+  }
+
+  update(): void {
+    this._handler.service();
   }
 
   addEventListener(event: InputEvent, callback: Function): void {
@@ -33,77 +64,37 @@ export class Camera {
   removeEventListener(event: InputEvent, callback: Function): void {
     this._handler.removeEventListener(event, callback);
   }
+
+  set location(newLocation: Location|null) {
+    if (newLocation == undefined) {
+      console.log("undefined camera surface location");
+      return;
+    }
+    console.log("updating camera to centre on (x,y,z):",
+                newLocation.x, newLocation.y, newLocation.z);
+    let newPoint: Point = this._scene.getDrawCoord(newLocation);
+    this.x = newPoint.x;
+    this.y = newPoint.y;
+    this._handler.post(InputEvent.CameraMove);
+    this._surfaceLocation = newLocation;
+  }
 }
 
 export class MouseCamera extends Camera {
-  static sensistivity: number = 10;
 
-  private _pivot: Point;
-  private _primaryClicked: boolean = false;
-
-  constructor(canvas: HTMLCanvasElement,
-              x: number,
-              y: number,
+  constructor(scene: SceneGraph,
+              canvas: HTMLCanvasElement,
               width: number,
               height: number) {
-    super(x, y, width, height);
-    this._pivot = new Point(Math.floor(width / 2), Math.floor(height / 2));
+    super(scene, width, height);
 
     var camera = this;
     canvas.addEventListener('mousedown', e => {
       if (e.button == 0) {
-        camera.primaryClicked = true;
-        camera.pivot = new Point(e.clientX, e.clientY);
-      }
-    });
-
-    canvas.addEventListener('mouseup', e => {
-      if (e.button == 0) {
-        camera.primaryClicked = false;
-      }
-    });
-
-    canvas.addEventListener('mousemove', e => {
-      if (camera.primaryClicked) {
-        camera.x = e.clientX;
-        camera.y = e.clientY;
+        camera.location = scene.getLocationAt(e.clientX, e.clientY, this);
       }
     });
   }
 
-  set primaryClicked(click: boolean) { this._primaryClicked = click; }
-  set pivot(coord: Point) { this._pivot = coord; }
-  get pivot(): Point { return this._pivot; }
   get min(): Point { return new Point(this._lowerX, this._lowerY); }
-  get primaryClicked(): boolean { return this._primaryClicked; }
-
-  set x(x: number) {
-    let dx: number = 0;
-    if (x < this._pivot.x) {
-      dx = Math.floor((this.pivot.x - x) / MouseCamera.sensistivity);
-    } else if (x > this._pivot.x) {
-      dx = -Math.floor((x - this.pivot.x) / MouseCamera.sensistivity);
-    } else {
-      return;
-    }
-    this._x += dx;
-    this._lowerX += dx;
-    this._upperX += dx;
-    this._handler.post(InputEvent.CameraMove);
-  }
-
-  set y(y: number) {
-    let dy: number = 0;
-    if (y < this._pivot.y) {
-      dy = Math.floor((this.pivot.y - y) / MouseCamera.sensistivity);
-    } else if (y > this._pivot.y) {
-      dy = -Math.floor((y - this.pivot.y) / MouseCamera.sensistivity);
-    } else {
-      return;
-    }
-    this._y += dy;
-    this._lowerY += dy;
-    this._upperY += dy;
-    this._handler.post(InputEvent.CameraMove);
-  }
 }

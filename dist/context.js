@@ -1,16 +1,14 @@
 import { EntityEvent } from "./events.js";
 import { IsometricRenderer } from "./graphics.js";
-import { MouseCamera } from "./camera.js";
 import { Octree } from "./tree.js";
 export class Context {
     constructor(canvas, worldDims) {
         this._entities = new Array();
         this._controllers = new Array();
-        this._camera = new MouseCamera(canvas, 0, 0, canvas.width, canvas.height);
-        this._gfx = new IsometricRenderer(canvas, this._camera);
+        this._scene = new IsometricRenderer(canvas);
         this._octree = new Octree(worldDims);
     }
-    get gfx() { return this._gfx; }
+    get scene() { return this._scene; }
     get bounds() { return this._octree.bounds; }
     get spatial() { return this._octree; }
     set map(map) {
@@ -26,29 +24,21 @@ export class Context {
     addEntity(entity) {
         this._entities.push(entity);
         this._octree.insert(entity);
-        this._gfx.insertEntity(entity);
+        this._scene.insertEntity(entity);
     }
     addActor(actor) {
         let spatialGraph = this._octree;
-        let gfx = this._gfx;
+        let scene = this._scene;
         actor.addEventListener(EntityEvent.Move, function () {
             spatialGraph.update(actor);
-            gfx.setDrawCoord(actor);
+            scene.setDrawCoord(actor);
         });
     }
-    update() {
+    update(camera) {
         for (let controller of this._controllers) {
+            camera.update();
             controller.update();
         }
-        this._gfx.render();
-    }
-    run() {
-        let context = this;
-        var update = function update() {
-            if (document.hasFocus()) {
-                context.update();
-            }
-        };
-        window.requestAnimationFrame(update);
+        this._scene.render(camera);
     }
 }

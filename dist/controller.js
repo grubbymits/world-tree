@@ -4,14 +4,14 @@ export class Controller {
     }
 }
 export class MouseController extends Controller {
-    constructor(canvas, scene) {
+    constructor(scene, canvas, camera) {
         super();
         var controller = this;
         canvas.addEventListener('mousedown', e => {
             if (e.button == 0) {
             }
             else if (e.button == 2) {
-                let entity = scene.getDrawnAt(e.clientX, e.clientY);
+                let entity = scene.getEntityDrawnAt(e.clientX, e.clientY, camera);
                 if (entity != undefined) {
                     controller.entity = entity;
                 }

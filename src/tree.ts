@@ -45,7 +45,7 @@ class OctNode {
   }
 
   split(): boolean {
-    console.log("splitting node");
+    //console.log("splitting node");
     this._children = new Array<OctNode>();
     // split each dimension into 2.
     let width = Math.floor(this._bounds.width / 2);
@@ -67,7 +67,7 @@ class OctNode {
           let centre = new Location(this.centre.x + offsetX,
                                     this.centre.y + offsetY,
                                     this.centre.z + offsetZ);
-          console.log("chosen centre point (x,y,z):", centre.x, centre.y, centre.z);
+          //console.log("chosen centre point (x,y,z):", centre.x, centre.y, centre.z);
           let bounds = new BoundingCuboid(centre, dimensions);
           this._children.push(new OctNode(bounds));
         }
