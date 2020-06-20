@@ -37,9 +37,6 @@ export class ZonalAudioLoop extends Sound {
             Math.pow(area.maxZ - area.minZ, 2)) / 2;
         console.log("centre of audio zone (x,y):", area.centre.x, area.centre.y);
         console.log("max distance from centre:", maxDistance);
-        window.addEventListener("blur", (event) => {
-            Sound.pause(id);
-        });
         let maybePlay = function () {
             let location = camera.location;
             if (location == undefined) {
@@ -58,7 +55,10 @@ export class ZonalAudioLoop extends Sound {
             let volume = Sound._maxVolume * Math.exp(-8 * (dx + dy));
             Sound.play(id, volume);
         };
-        window.addEventListener("focus", maybePlay);
         camera.addEventListener(InputEvent.CameraMove, maybePlay);
+        window.addEventListener("focus", maybePlay);
+        window.addEventListener("blur", (event) => {
+            Sound.pause(id);
+        });
     }
 }

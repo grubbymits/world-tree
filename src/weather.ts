@@ -1,5 +1,5 @@
 import { Direction, getDirectionName, getDirectionCoords } from "./physics.js"
-import { Surface, TerrainAttributes } from "./terrain.js"
+import { Surface } from "./builder.js"
 import { Point } from "./graphics.js"
 
 export class Rain {

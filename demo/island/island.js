@@ -9,22 +9,20 @@ const cellsY = 40;
 const freq = 0.2;
 const cx = Math.floor(cellsX / 2);
 const cy = Math.floor(cellsY / 2);
-const defaultHeight = 0.75;
-const factor = 0.05;
-const ceiling = 1;
 
 var heightMap = new Array();
+let maxDistance = Math.max(cellsX, cellsY) / 2;
+
 for (let y = 0; y < cellsY; y++) {
   heightMap[y] = new Array();
   for (let x = 0; x < cellsX; x++) {
-    let height = defaultHeight;
+    let nx = Math.abs(x - cx);
+    let ny = Math.abs(y - cy);
+    let height = 1;
     height += 0.40 * openSimplex.noise2D(freq * x, freq * y) +
               0.20 * openSimplex.noise2D(freq * 2 * x, freq * 2 * y) +
               0.10 * openSimplex.noise2D(freq * 4 * x, freq * 4 * y);
-    let nx = Math.abs(x - cx);
-    let ny = Math.abs(y - cy);
-    let distance = Math.sqrt(Math.pow(nx, 2) + Math.pow(ny, 2));
-    height -= factor * distance;
+    height *= Math.exp(-(0.1 * nx + 0.1 * ny));
     heightMap[y].push(height);
   }
 }
@@ -34,7 +32,9 @@ window.onload = (event) => {
   const terraces = 4;
   const water = 3;
   const dryLimit = 0.2;
+  const treeLimit = 0.7;
   const wetLimit = 1;
+  const hasWater = true;
 
   // width / height ratio => 2 cubes high, 3 wide and 3 deep.
   const spriteWidth = 256;
@@ -48,11 +48,14 @@ window.onload = (event) => {
   let context = new WT.Context(canvas, worldDims);
 
   // Use the height map to construct a terrain.
-  let builder = new WT.TerrainBuilder(cellsX, cellsY, ceiling, terraces,
-                                      water, wetLimit, dryLimit,
-                                      physicalDims);
-  builder.initialise(heightMap);
-  builder.addRain(WT.Direction.North);
+  let builder = new WT.OpenTerrainBuilder(cellsX, cellsY, heightMap,
+                                          terraces, hasWater,
+                                          WT.Grass, physicalDims);
+  builder.addRain(WT.Direction.North, water);
+  builder.setBiomes(wetLimit, dryLimit, treeLimit);
+  builder.setShapes();
+  builder.setEdges();
+  builder.setFeatures();
   context.map = builder.generateMap(context);
 
   let camera = new WT.MouseCamera(context.scene, canvas,
