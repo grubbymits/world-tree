@@ -50,11 +50,10 @@ window.onload = (event) => {
   // Use the height map to construct a terrain.
   let builder = new WT.OpenTerrainBuilder(cellsX, cellsY, heightMap,
                                           terraces, hasWater,
-                                          WT.Grass, physicalDims);
+                                          WT.TerrainType.DryGrass, physicalDims);
   builder.addRain(WT.Direction.North, water);
   builder.setBiomes(wetLimit, dryLimit, treeLimit);
   builder.setShapes();
-  builder.setEdges();
   builder.setFeatures();
   context.map = builder.generateMap(context);
 

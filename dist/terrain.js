@@ -4,27 +4,29 @@ import { Sprite, StaticGraphicComponent } from "./graphics.js";
 export var TerrainShape;
 (function (TerrainShape) {
     TerrainShape[TerrainShape["Flat"] = 0] = "Flat";
-    TerrainShape[TerrainShape["FlatWest"] = 1] = "FlatWest";
-    TerrainShape[TerrainShape["FlatEast"] = 2] = "FlatEast";
-    TerrainShape[TerrainShape["FlatNorthWest"] = 3] = "FlatNorthWest";
-    TerrainShape[TerrainShape["FlatNorth"] = 4] = "FlatNorth";
-    TerrainShape[TerrainShape["FlatNorthEast"] = 5] = "FlatNorthEast";
-    TerrainShape[TerrainShape["FlatSouthWest"] = 6] = "FlatSouthWest";
-    TerrainShape[TerrainShape["FlatSouth"] = 7] = "FlatSouth";
-    TerrainShape[TerrainShape["FlatSouthEast"] = 8] = "FlatSouthEast";
-    TerrainShape[TerrainShape["FlatNorthOut"] = 9] = "FlatNorthOut";
-    TerrainShape[TerrainShape["FlatEastOut"] = 10] = "FlatEastOut";
-    TerrainShape[TerrainShape["FlatWestOut"] = 11] = "FlatWestOut";
-    TerrainShape[TerrainShape["FlatSouthOut"] = 12] = "FlatSouthOut";
-    TerrainShape[TerrainShape["FlatAloneOut"] = 13] = "FlatAloneOut";
-    TerrainShape[TerrainShape["RampUpSouthEdge"] = 14] = "RampUpSouthEdge";
-    TerrainShape[TerrainShape["RampUpWestEdge"] = 15] = "RampUpWestEdge";
-    TerrainShape[TerrainShape["RampUpEastEdge"] = 16] = "RampUpEastEdge";
-    TerrainShape[TerrainShape["RampUpNorthEdge"] = 17] = "RampUpNorthEdge";
-    TerrainShape[TerrainShape["RampUpSouth"] = 18] = "RampUpSouth";
-    TerrainShape[TerrainShape["RampUpWest"] = 19] = "RampUpWest";
-    TerrainShape[TerrainShape["RampUpEast"] = 20] = "RampUpEast";
-    TerrainShape[TerrainShape["RampUpNorth"] = 21] = "RampUpNorth";
+    TerrainShape[TerrainShape["Wall"] = 1] = "Wall";
+    TerrainShape[TerrainShape["FlatWest"] = 2] = "FlatWest";
+    TerrainShape[TerrainShape["FlatEast"] = 3] = "FlatEast";
+    TerrainShape[TerrainShape["FlatNorthWest"] = 4] = "FlatNorthWest";
+    TerrainShape[TerrainShape["FlatNorth"] = 5] = "FlatNorth";
+    TerrainShape[TerrainShape["FlatNorthEast"] = 6] = "FlatNorthEast";
+    TerrainShape[TerrainShape["FlatSouthWest"] = 7] = "FlatSouthWest";
+    TerrainShape[TerrainShape["FlatSouth"] = 8] = "FlatSouth";
+    TerrainShape[TerrainShape["FlatSouthEast"] = 9] = "FlatSouthEast";
+    TerrainShape[TerrainShape["FlatNorthOut"] = 10] = "FlatNorthOut";
+    TerrainShape[TerrainShape["FlatEastOut"] = 11] = "FlatEastOut";
+    TerrainShape[TerrainShape["FlatWestOut"] = 12] = "FlatWestOut";
+    TerrainShape[TerrainShape["FlatSouthOut"] = 13] = "FlatSouthOut";
+    TerrainShape[TerrainShape["FlatAloneOut"] = 14] = "FlatAloneOut";
+    TerrainShape[TerrainShape["RampUpSouthEdge"] = 15] = "RampUpSouthEdge";
+    TerrainShape[TerrainShape["RampUpWestEdge"] = 16] = "RampUpWestEdge";
+    TerrainShape[TerrainShape["RampUpEastEdge"] = 17] = "RampUpEastEdge";
+    TerrainShape[TerrainShape["RampUpNorthEdge"] = 18] = "RampUpNorthEdge";
+    TerrainShape[TerrainShape["RampUpSouth"] = 19] = "RampUpSouth";
+    TerrainShape[TerrainShape["RampUpWest"] = 20] = "RampUpWest";
+    TerrainShape[TerrainShape["RampUpEast"] = 21] = "RampUpEast";
+    TerrainShape[TerrainShape["RampUpNorth"] = 22] = "RampUpNorth";
+    TerrainShape[TerrainShape["Max"] = 23] = "Max";
 })(TerrainShape || (TerrainShape = {}));
 export var TerrainType;
 (function (TerrainType) {
@@ -69,12 +71,14 @@ function getFeatureName(feature) {
     }
     return "None";
 }
-function getShapeName(terrain) {
+export function getShapeName(terrain) {
     switch (terrain) {
         default:
             console.error("unhandled terrain shape:", terrain);
         case TerrainShape.Flat:
             return "flat";
+        case TerrainShape.Wall:
+            return "wall";
         case TerrainShape.FlatNorth:
             return "flat north";
         case TerrainShape.FlatNorthEast:
@@ -119,7 +123,7 @@ function getShapeName(terrain) {
             return "flat alone out";
     }
 }
-function getTypeName(terrain) {
+export function getTypeName(terrain) {
     switch (terrain) {
         default:
             console.error("unhandled terrain type:", terrain);
@@ -146,6 +150,7 @@ export function isFlat(terrain) {
         case TerrainShape.FlatNorthEast:
         case TerrainShape.FlatWest:
         case TerrainShape.Flat:
+        case TerrainShape.Wall:
         case TerrainShape.FlatEast:
         case TerrainShape.FlatSouthWest:
         case TerrainShape.FlatSouth:
@@ -187,43 +192,39 @@ export class Terrain extends Entity {
             }
         }
     }
-    static init(dims) {
-        this._dimensions = dims;
-        console.log("intialised Terrain with dimensions (WxDxH):", this._dimensions.width, this._dimensions.depth, this._dimensions.height);
-    }
     static graphics(terrainType, shape) {
         console.assert(this._terrainGraphics.has(terrainType), "undefined terrain graphic for TerrainType:", getTypeName(terrainType));
-        console.assert(shape < this._terrainGraphics.get(terrainType).length, "undefined terrain graphic for:", getTypeName(terrainType), getShapeName(shape));
-        return this._terrainGraphics.get(terrainType)[shape];
+        console.assert(this._terrainGraphics.get(terrainType).has(shape), "undefined terrain graphic for:", getTypeName(terrainType), getShapeName(shape));
+        return this._terrainGraphics.get(terrainType).get(shape);
     }
     static featureGraphics(terrainFeature) {
         console.assert(this._featureGraphics.has(terrainFeature), "missing terrain feature", getFeatureName(terrainFeature));
         return this._featureGraphics.get(terrainFeature);
     }
-    static addGraphic(terrainType, sheet, width, height) {
-        console.assert(terrainType == TerrainType.Water, "water is the only type supported");
-        this._terrainGraphics.set(terrainType, new Array());
-        let graphics = this._terrainGraphics.get(terrainType);
-        let sprite = new Sprite(sheet, 0, 0, width, height);
-        graphics.push(new StaticGraphicComponent(sprite.id));
-    }
-    static addGraphics(terrainType, sheet, width, height) {
-        this._terrainGraphics.set(terrainType, new Array());
-        let graphics = this._terrainGraphics.get(terrainType);
-        let shapeType = 0;
-        let y = 0;
-        for (; y < 7; y++) {
-            for (let x = 0; x < 3; x++) {
-                let sprite = new Sprite(sheet, x * width, y * height, width, height);
-                graphics.push(new StaticGraphicComponent(sprite.id));
-                shapeType++;
-            }
+    static addGraphic(terrainType, terrainShape, sheet, x, y, width, height) {
+        let sprite = new Sprite(sheet, x, y, width, height);
+        let component = new StaticGraphicComponent(sprite.id);
+        if (!this._terrainGraphics.has(terrainType)) {
+            this._terrainGraphics.set(terrainType, new Map());
         }
-        let sprite = new Sprite(sheet, 0, y * height, width, height);
-        graphics.push(new StaticGraphicComponent(sprite.id));
+        this._terrainGraphics.get(terrainType).set(terrainShape, component);
     }
     static addFeatureGraphics(feature, graphics) {
         this._featureGraphics.set(feature, graphics);
+    }
+    static isSupportedFeature(feature) {
+        return this._featureGraphics.has(feature);
+    }
+    static isSupportedType(type) {
+        return this._terrainGraphics.has(type);
+    }
+    static isSupportedShape(type, shape) {
+        return this.isSupportedType(type) &&
+            this._terrainGraphics.get(type).has(shape);
+    }
+    static init(dims) {
+        this._dimensions = dims;
+        console.log("intialised Terrain with dimensions (WxDxH):", this.width, this.depth, this.height);
     }
     static get width() { return this._dimensions.width; }
     static get depth() { return this._dimensions.depth; }
@@ -233,9 +234,6 @@ export class Terrain extends Entity {
     }
     static create(context, x, y, z, type, shape, feature) {
         return new Terrain(context, x, y, z, this._dimensions, type, shape, feature);
-    }
-    static isSupportedFeature(feature) {
-        return this._featureGraphics.has(feature);
     }
     get gridX() { return this._gridX; }
     get gridY() { return this._gridY; }
@@ -252,5 +250,5 @@ export class Terrain extends Entity {
         return this.z + (location.y * this._tanTheta);
     }
 }
-Terrain._terrainGraphics = new Map();
 Terrain._featureGraphics = new Map();
+Terrain._terrainGraphics = new Map();

@@ -1,5 +1,5 @@
 import { SquareGrid } from "./map.js";
-import { Terrain, TerrainShape, TerrainType, TerrainFeature, isFlat } from "./terrain.js";
+import { Terrain, TerrainShape, TerrainType, TerrainFeature, isFlat, getTypeName, getShapeName } from "./terrain.js";
 import { Rain } from "./weather.js";
 import { Direction, getDirection, getDirectionName } from "./physics.js";
 import { Point } from "./graphics.js";
@@ -252,6 +252,7 @@ export class TerrainBuilder {
         }
     }
     generateMap(context) {
+        this.setEdges();
         let worldTerrain = new SquareGrid(context, this._surface.width, this._surface.depth);
         console.log("adding surface terrain entities");
         for (let y = 0; y < this._surface.depth; y++) {
@@ -353,29 +354,56 @@ export class TerrainBuilder {
                         shapeType = TerrainShape.FlatSouthEast;
                     }
                     else if (southEdge && westEdge) {
-                        shapeType = TerrainShape.FlatSouthWest;
+                        if (Terrain.isSupportedShape(centre.type, TerrainShape.FlatSouthWest)) {
+                            shapeType = TerrainShape.FlatSouthWest;
+                        }
+                        else {
+                            shapeType = TerrainShape.Wall;
+                        }
                     }
                     else if (southEdge) {
-                        shapeType = TerrainShape.FlatSouth;
+                        if (Terrain.isSupportedShape(centre.type, TerrainShape.FlatSouth)) {
+                            shapeType = TerrainShape.FlatSouth;
+                        }
+                        else {
+                            shapeType = TerrainShape.Wall;
+                        }
                     }
                     else if (eastEdge) {
                         shapeType = TerrainShape.FlatEast;
                     }
                     else if (westEdge) {
-                        shapeType = TerrainShape.FlatWest;
+                        if (Terrain.isSupportedShape(centre.type, TerrainShape.FlatWest)) {
+                            shapeType = TerrainShape.FlatWest;
+                        }
+                        else {
+                            shapeType = TerrainShape.Wall;
+                        }
                     }
                 }
                 else if (shapeType == TerrainShape.RampUpNorth && eastEdge) {
-                    shapeType = TerrainShape.RampUpNorthEdge;
+                    if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpNorthEdge)) {
+                        shapeType = TerrainShape.RampUpNorthEdge;
+                    }
                 }
                 else if (shapeType == TerrainShape.RampUpEast && northEdge) {
-                    shapeType = TerrainShape.RampUpEastEdge;
+                    if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpEastEdge)) {
+                        shapeType = TerrainShape.RampUpEastEdge;
+                    }
                 }
                 else if (shapeType == TerrainShape.RampUpSouth && eastEdge) {
-                    shapeType = TerrainShape.RampUpSouthEdge;
+                    if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpSouthEdge)) {
+                        shapeType = TerrainShape.RampUpSouthEdge;
+                    }
                 }
                 else if (shapeType == TerrainShape.RampUpWest && northEdge) {
-                    shapeType = TerrainShape.RampUpWestEdge;
+                    if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpWestEdge)) {
+                        shapeType = TerrainShape.RampUpWestEdge;
+                    }
+                }
+                if (!Terrain.isSupportedShape(centre.type, shapeType)) {
+                    console.log("unsupported shape for", getTypeName(centre.type), getShapeName(shapeType));
+                    shapeType = TerrainShape.Flat;
                 }
                 centre.shape = shapeType;
             }
@@ -486,47 +514,37 @@ export class OpenTerrainBuilder extends TerrainBuilder {
             for (let x = 0; x < this._surface.width; x++) {
                 let surface = this._surface.at(x, y);
                 let biome = Biome.Water;
+                let terrain = TerrainType.Water;
                 if (surface.height <= this._waterLine) {
                     biome = Biome.Water;
+                    terrain = TerrainType.Water;
                 }
                 else if (surface.terrace < 1) {
                     biome = Biome.Beach;
+                    terrain = TerrainType.Sand;
                 }
                 else if (surface.height > treeLimit) {
                     biome = surface.moisture > dryLimit ?
                         Biome.Grassland : Biome.Tundra;
+                    terrain = surface.moisture > dryLimit ?
+                        TerrainType.DryGrass : TerrainType.Rock;
                 }
                 else if (surface.moisture < dryLimit) {
                     biome = Biome.Desert;
+                    terrain = TerrainType.Rock;
                 }
                 else if (surface.moisture > wetLimit) {
                     biome = Biome.Marshland;
+                    terrain = TerrainType.WetGrass;
                 }
                 else {
                     biome = Biome.Woodland;
+                    terrain = TerrainType.Mud;
+                }
+                if (Terrain.isSupportedType(terrain)) {
+                    surface.type = terrain;
                 }
                 surface.biome = biome;
-                switch (surface.biome) {
-                    default:
-                        surface.type = TerrainType.Water;
-                        break;
-                    case Biome.Beach:
-                        surface.type = TerrainType.Sand;
-                        break;
-                    case Biome.Marshland:
-                        surface.type = TerrainType.WetGrass;
-                        break;
-                    case Biome.Woodland:
-                        surface.type = TerrainType.Mud;
-                        break;
-                    case Biome.Grassland:
-                        surface.type = TerrainType.DryGrass;
-                        break;
-                    case Biome.Tundra:
-                    case Biome.Desert:
-                        surface.type = TerrainType.Rock;
-                        break;
-                }
             }
         }
     }

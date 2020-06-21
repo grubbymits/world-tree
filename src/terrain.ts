@@ -10,6 +10,7 @@ import { Context } from "./context.js"
 
 export enum TerrainShape {
   Flat,
+  Wall,
   FlatWest,
   FlatEast,
   FlatNorthWest,
@@ -31,6 +32,7 @@ export enum TerrainShape {
   RampUpWest,
   RampUpEast,
   RampUpNorth,
+  Max,
 }
 
 export enum TerrainType {
@@ -78,12 +80,14 @@ function getFeatureName(feature: TerrainFeature): string {
   return "None";
 }
 
-function getShapeName(terrain: TerrainShape): string {
+export function getShapeName(terrain: TerrainShape): string {
   switch (terrain) {
   default:
     console.error("unhandled terrain shape:", terrain);
   case TerrainShape.Flat:
     return "flat";
+  case TerrainShape.Wall:
+    return "wall";
   case TerrainShape.FlatNorth:
     return "flat north";
   case TerrainShape.FlatNorthEast:
@@ -129,7 +133,7 @@ function getShapeName(terrain: TerrainShape): string {
   }
 }
 
-function getTypeName(terrain: TerrainType): string {
+export function getTypeName(terrain: TerrainType): string {
   switch (terrain) {
   default:
     console.error("unhandled terrain type:", terrain);
@@ -157,6 +161,7 @@ export function isFlat(terrain: TerrainShape): boolean {
   case TerrainShape.FlatNorthEast:
   case TerrainShape.FlatWest:
   case TerrainShape.Flat:
+  case TerrainShape.Wall:
   case TerrainShape.FlatEast:
   case TerrainShape.FlatSouthWest:
   case TerrainShape.FlatSouth:
@@ -173,26 +178,19 @@ export function isFlat(terrain: TerrainShape): boolean {
 
 export class Terrain extends Entity {
   private static _dimensions: Dimensions;
-  private static _terrainGraphics = new Map<TerrainType, Array<GraphicComponent>>();
   private static _featureGraphics = new Map<TerrainFeature, GraphicComponent>();
+  private static _terrainGraphics =
+    new Map<TerrainType, Map<TerrainShape, GraphicComponent>>();
 
-  static init(dims: Dimensions) {
-    this._dimensions = dims;
-    console.log("intialised Terrain with dimensions (WxDxH):",
-                this._dimensions.width,
-                this._dimensions.depth,
-                this._dimensions.height);
-  }
-  
   static graphics(terrainType: TerrainType,
                   shape: TerrainShape): GraphicComponent {
     console.assert(this._terrainGraphics.has(terrainType),
                    "undefined terrain graphic for TerrainType:",
                    getTypeName(terrainType));
-    console.assert(shape < this._terrainGraphics.get(terrainType)!.length,
+    console.assert(this._terrainGraphics.get(terrainType)!.has(shape),
                    "undefined terrain graphic for:", getTypeName(terrainType),
                    getShapeName(shape));
-    return this._terrainGraphics.get(terrainType)![shape];
+    return this._terrainGraphics.get(terrainType)!.get(shape)!;
   }
 
   static featureGraphics(terrainFeature: TerrainFeature): GraphicComponent {
@@ -202,39 +200,41 @@ export class Terrain extends Entity {
   }
 
   static addGraphic(terrainType: TerrainType,
+                    terrainShape: TerrainShape,
                     sheet: SpriteSheet,
-                    width: number,
-                    height: number) {
-    console.assert(terrainType == TerrainType.Water,
-                   "water is the only type supported");
-    this._terrainGraphics.set(terrainType, new Array<GraphicComponent>());
-    let graphics = this._terrainGraphics.get(terrainType)!;
-    let sprite = new Sprite(sheet, 0, 0, width, height);
-    graphics.push(new StaticGraphicComponent(sprite.id));
-  }
-
-  static addGraphics(terrainType: TerrainType,
-                     sheet: SpriteSheet,
-                     width: number,
-                     height: number) {
-    this._terrainGraphics.set(terrainType, new Array<GraphicComponent>());
-    let graphics = this._terrainGraphics.get(terrainType)!;
-    let shapeType = 0;
-    let y = 0;
-    for (; y < 7; y++) {
-      for (let x = 0; x < 3; x++) {
-        let sprite = new Sprite(sheet, x * width, y * height, width, height);
-        graphics.push(new StaticGraphicComponent(sprite.id));
-        shapeType++;
-      }
+                    x: number, y: number,
+                    width: number, height: number) {
+    let sprite = new Sprite(sheet, x, y, width, height);
+    let component = new StaticGraphicComponent(sprite.id); 
+    if (!this._terrainGraphics.has(terrainType)) {
+      this._terrainGraphics.set(terrainType, new Map<TerrainShape, GraphicComponent>());
     }
-    let sprite = new Sprite(sheet, 0, y * height, width, height);
-    graphics.push(new StaticGraphicComponent(sprite.id));
+    this._terrainGraphics.get(terrainType)!.set(terrainShape, component);
   }
 
   static addFeatureGraphics(feature: TerrainFeature,
                             graphics: GraphicComponent) {
     this._featureGraphics.set(feature, graphics);
+  }
+
+
+  static isSupportedFeature(feature: TerrainFeature): boolean {
+    return this._featureGraphics.has(feature);
+  }
+
+  static isSupportedType(type: TerrainType): boolean {
+    return this._terrainGraphics.has(type);
+  }
+
+  static isSupportedShape(type: TerrainType, shape: TerrainShape): boolean {
+    return this.isSupportedType(type) &&
+           this._terrainGraphics.get(type)!.has(shape);
+  }
+
+  static init(dims: Dimensions) {
+    this._dimensions = dims;
+    console.log("intialised Terrain with dimensions (WxDxH):",
+                this.width, this.depth, this.height);
   }
 
   static get width(): number { return this._dimensions.width; }
@@ -246,16 +246,12 @@ export class Terrain extends Entity {
                         Math.floor(loc.y / this.depth),
                         Math.floor(loc.z / this.height));
   }
-
+  
   static create(context: Context,
                 x: number, y: number, z: number,
                 type: TerrainType, shape: TerrainShape,
                 feature: TerrainFeature) : Terrain {
     return new Terrain(context, x, y, z, this._dimensions, type, shape, feature);
-  }
-
-  static isSupportedFeature(feature: TerrainFeature): boolean {
-    return this._featureGraphics.has(feature);
   }
 
   private readonly _tanTheta: number;

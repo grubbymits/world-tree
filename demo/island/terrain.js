@@ -4,23 +4,71 @@ const spriteWidth = 256;
 const spriteHeight = 246;
 
 // Create all the sprite necessary for ground tiles of the island.
-let sheet = new WT.SpriteSheet("../../../res/img/water");
-WT.Terrain.addGraphic(WT.TerrainType.Water, sheet, spriteWidth, spriteHeight);
+let waterSheet = new WT.SpriteSheet("../../../res/img/water");
+WT.Terrain.addGraphic(WT.TerrainType.Water, WT.TerrainShape.Flat,
+                      waterSheet, 0, 0, spriteWidth, spriteHeight);
 
-sheet = new WT.SpriteSheet("../../../res/img/sand");
-WT.Terrain.addGraphics(WT.TerrainType.Sand, sheet, spriteWidth, spriteHeight);
+let spriteSheetPaths = [
+  "../../../res/img/sand",
+  "../../../res/img/rock",
+  "../../../res/img/light-grass-rock",
+];
 
-sheet = new WT.SpriteSheet("../../../res/img/rock");
-WT.Terrain.addGraphics(WT.TerrainType.Rock, sheet, spriteWidth, spriteHeight);
+let terrainTypes = [
+  WT.TerrainType.Sand,
+  WT.TerrainType.Rock,
+  WT.TerrainType.DryGrass,
+];
 
-sheet = new WT.SpriteSheet("../../../res/img/light-grass-rock");
-WT.Terrain.addGraphics(WT.TerrainType.DryGrass, sheet, spriteWidth, spriteHeight);
+let terrainShapes = [
+  WT.TerrainShape.Flat,
+  WT.TerrainShape.FlatWest,
+  WT.TerrainShape.FlatEast,
+  WT.TerrainShape.FlatNorthWest,
+  WT.TerrainShape.FlatNorth,
+  WT.TerrainShape.FlatNorthEast,
+  WT.TerrainShape.FlatSouthWest,
+  WT.TerrainShape.FlatSouth,
+  WT.TerrainShape.FlatSouthEast,
+  WT.TerrainShape.FlatNorthOut,
+  WT.TerrainShape.FlatEastOut,
+  WT.TerrainShape.FlatWestOut,
+  WT.TerrainShape.FlatSouthOut,
+  WT.TerrainShape.FlatAloneOut,
+  WT.TerrainShape.RampUpSouthEdge,
+  WT.TerrainShape.RampUpWestEdge,
+  WT.TerrainShape.RampUpEastEdge,
+  WT.TerrainShape.RampUpNorthEdge,
+  WT.TerrainShape.RampUpSouth,
+  WT.TerrainShape.RampUpWest,
+  WT.TerrainShape.RampUpEast,
+  WT.TerrainShape.RampUpNorth,
+];
 
-WT.Terrain.addGraphics(WT.TerrainType.WetGrass, sheet, spriteWidth, spriteHeight);
-WT.Terrain.addGraphics(WT.TerrainType.Mud, sheet, spriteWidth, spriteHeight);
+for (let i in spriteSheetPaths) {
+  let sheet = new WT.SpriteSheet(spriteSheetPaths[i]);
+  let terrainType = terrainTypes[i];
+  let shape = 0;
+
+  // Sprite sheets are 3x7 with a single remaining sprite in the 8th row.
+  let y = 0;
+  for (; y < 7; y++) {
+    for (let x = 0; x < 3; x++) {
+      let offsetX = x * spriteWidth;
+      let offsetY = y * spriteHeight;
+      WT.Terrain.addGraphic(terrainType, terrainShapes[shape],
+                            sheet, offsetX, offsetY,
+                            spriteWidth, spriteHeight);
+      shape++;
+    }
+  }
+  WT.Terrain.addGraphic(terrainType, terrainShapes[shape],
+                        sheet, 0, y * spriteHeight,
+                        spriteWidth, spriteHeight);
+}
 
 // Add graphical features: Waves.
-sheet = new WT.SpriteSheet("../../../res/img/waves");
+let sheet = new WT.SpriteSheet("../../../res/img/waves");
 let features = [ WT.TerrainFeature.ShorelineNorth,
                  WT.TerrainFeature.ShorelineWest,
                  WT.TerrainFeature.ShorelineEast,
