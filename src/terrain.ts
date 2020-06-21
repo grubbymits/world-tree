@@ -176,6 +176,33 @@ export function isFlat(terrain: TerrainShape): boolean {
   return false;
 }
 
+export function isEdge(terrain: TerrainShape): boolean {
+  switch (terrain) {
+  default:
+    break;
+  case TerrainShape.FlatNorthWest:
+  case TerrainShape.FlatNorth:
+  case TerrainShape.FlatNorthEast:
+  case TerrainShape.FlatWest:
+  case TerrainShape.Wall:
+  case TerrainShape.FlatEast:
+  case TerrainShape.FlatSouthWest:
+  case TerrainShape.FlatSouth:
+  case TerrainShape.FlatSouthEast:
+  case TerrainShape.FlatNorthOut:
+  case TerrainShape.FlatEastOut:
+  case TerrainShape.FlatSouthOut:
+  case TerrainShape.FlatWestOut:
+  case TerrainShape.FlatAloneOut:
+  case TerrainShape.RampUpSouthEdge:
+  case TerrainShape.RampUpWestEdge:
+  case TerrainShape.RampUpEastEdge:
+  case TerrainShape.RampUpNorthEdge:
+    return true;
+  }
+  return false;
+}
+
 export class Terrain extends Entity {
   private static _dimensions: Dimensions;
   private static _featureGraphics = new Map<TerrainFeature, GraphicComponent>();

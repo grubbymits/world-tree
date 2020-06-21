@@ -5,6 +5,7 @@ import { Terrain,
          TerrainType,
          TerrainFeature,
          isFlat,
+         isEdge,
          getTypeName,
          getShapeName } from "./terrain.js"
 import { Rain } from "./weather.js"
@@ -261,14 +262,14 @@ export class Surface {
 export class TerrainBuilder {
   protected _surface: Surface;
   protected readonly _terraceSpacing: number;
-  protected readonly _waterLine: number;
 
   constructor(width: number,
               depth: number,
               heightMap: Array<Array<number>>,
               protected readonly _numTerraces: number,
               protected readonly _hasWater: boolean,
-              defaultType: TerrainType,
+              protected readonly _defaultFloor: TerrainType,
+              protected readonly _defaultWall: TerrainType,
               physicalDims: Dimensions) {
     Terrain.init(physicalDims);
 
@@ -298,11 +299,12 @@ export class TerrainBuilder {
       maxHeight += minHeight;
     }
     this._terraceSpacing = maxHeight / _numTerraces;
-    this._waterLine = 4 * this._terraceSpacing / 5;
     console.log("Terrain builder",
                 "- with a ceiling of:", maxHeight, "\n",
                 "- ", _numTerraces, "terraces\n",
                 "- ", this._terraceSpacing, "terrace spacing");
+    console.log("Using default floor", getTypeName(this._defaultFloor));
+    console.log("Using default wall", getTypeName(this._defaultWall));
 
     this._surface = new Surface(width, depth);
     this._surface.init(heightMap);
@@ -314,7 +316,7 @@ export class TerrainBuilder {
         let surface = this._surface.at(x, y);
         surface.terrace = Math.floor(surface.height / this._terraceSpacing);
         surface.shape = TerrainShape.Flat;
-        surface.type = defaultType;
+        surface.type = this._defaultFloor;
         console.assert(surface.terrace <= this._numTerraces && surface.terrace >= 0,
                        "terrace out of range:", surface.terrace);
       }
@@ -363,8 +365,10 @@ export class TerrainBuilder {
 
   setFeatures(): void { }
 
-  setBiomes(wetLimit: number, dryLimit: number, treeLimit: number): void {
+  setBiomes(waterLine: number, wetLimit: number, dryLimit: number,
+            treeLimit: number): void {
     console.log("setBiomes with\n",
+                "- waterLine:", waterLine, "\n",
                 "- wetLimit:", wetLimit, "\n",
                 "- dryLimit:", dryLimit, "\n",
                 "- treeLimit:", treeLimit, "\n");
@@ -372,7 +376,7 @@ export class TerrainBuilder {
       for (let y = 0; y < this._surface.depth; y++) {
         for (let x = 0; x < this._surface.width; x++) {
           let surface = this._surface.at(x, y);
-          if (surface.terrace == 0) {
+          if (surface.height <= waterLine) {
             surface.biome = Biome.Water;
             surface.type = TerrainType.Water;
           }
@@ -439,44 +443,43 @@ export class TerrainBuilder {
           } else if (southEdge && eastEdge) {
             shapeType = TerrainShape.FlatSouthEast;
           } else if (southEdge && westEdge) {
-            if (Terrain.isSupportedShape(centre.type, TerrainShape.FlatSouthWest)) {
-              shapeType = TerrainShape.FlatSouthWest;
-            } else {
-              shapeType = TerrainShape.Wall;
-            }
+            shapeType = TerrainShape.FlatSouthWest;
           } else if (southEdge) {
-            if (Terrain.isSupportedShape(centre.type, TerrainShape.FlatSouth)) {
-              shapeType = TerrainShape.FlatSouth;
-            } else {
-              shapeType = TerrainShape.Wall;
-            }
+            shapeType = TerrainShape.FlatSouth;
           } else if (eastEdge) {
             shapeType = TerrainShape.FlatEast;
           } else if (westEdge) {
-            if (Terrain.isSupportedShape(centre.type, TerrainShape.FlatWest)) {
-              shapeType = TerrainShape.FlatWest;
-            } else {
-              shapeType = TerrainShape.Wall;
-            }
+            shapeType = TerrainShape.FlatWest;
           }
         } else if (shapeType == TerrainShape.RampUpNorth && eastEdge) {
-          if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpNorthEdge)) {
-              shapeType = TerrainShape.RampUpNorthEdge;
-          }
+          shapeType = TerrainShape.RampUpNorthEdge;
         } else if (shapeType == TerrainShape.RampUpEast && northEdge) {
-          if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpEastEdge)) {
-              shapeType = TerrainShape.RampUpEastEdge;
-          }
+          shapeType = TerrainShape.RampUpEastEdge;
         } else if (shapeType == TerrainShape.RampUpSouth && eastEdge) {
-          if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpSouthEdge)) {
-              shapeType = TerrainShape.RampUpSouthEdge;
-          }
+          shapeType = TerrainShape.RampUpSouthEdge;
         } else if (shapeType == TerrainShape.RampUpWest && northEdge) {
-          if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpWestEdge)) {
-              shapeType = TerrainShape.RampUpWestEdge;
+          shapeType = TerrainShape.RampUpWestEdge;
+        }
+
+        // Fixup the sides of the map.
+        if (centre.terrace > 0 && shapeType == TerrainShape.Flat &&
+            neighbours.length != 8) {
+          console.log("Defaulting edge tile to Wall");
+          shapeType = TerrainShape.Wall;
+        }
+
+        // If we don't support edge, try the basic wall tile and use the
+        // default wall type.
+        if (isFlat(shapeType) && isEdge(shapeType)) {
+          if (!Terrain.isSupportedShape(centre.type, shapeType)) {
+            centre.type = this._defaultWall;
+            shapeType = TerrainShape.Wall;
+            console.log("Trying default wall shape and type",
+                        getTypeName(this._defaultWall));
           }
         }
 
+        // And if that fails, fallback to the base flat tile.
         if (!Terrain.isSupportedShape(centre.type, shapeType)) {
           console.log("unsupported shape for",
                       getTypeName(centre.type), getShapeName(shapeType));
@@ -514,9 +517,11 @@ export class OpenTerrainBuilder extends TerrainBuilder {
               heightMap: Array<Array<number>>,
               numTerraces: number,
               hasWater: boolean,
-              defaultType: TerrainType,
+              defaultFloor: TerrainType,
+              defaultWall: TerrainType,
               physicalDims: Dimensions) {
-    super(width, depth, heightMap, numTerraces, hasWater, defaultType, physicalDims);
+    super(width, depth, heightMap, numTerraces, hasWater,
+          defaultFloor, defaultWall, physicalDims);
   }
   
   setShapes(): void {
@@ -596,11 +601,11 @@ export class OpenTerrainBuilder extends TerrainBuilder {
     }
   }
 
-  addRain(towards: Direction, water: number): void {
+  addRain(towards: Direction, water: number, waterLine: number): void {
     console.log("adding rain towards", getDirectionName(towards));
     // Add moisture:
     // - clouds are added at the 'bottom' of the map and move northwards.
-    Rain.init(this._waterLine, this._surface);
+    Rain.init(waterLine, this._surface);
     for (let x = 0; x < this._surface.width; x++) {
       Rain.add(x, this._surface.depth - 1, water, towards);
     }
@@ -624,8 +629,10 @@ export class OpenTerrainBuilder extends TerrainBuilder {
     }
   }
 
-  setBiomes(wetLimit: number, dryLimit: number, treeLimit: number): void {
+  setBiomes(waterLine: number, wetLimit: number, dryLimit: number,
+            treeLimit: number): void {
     console.log("setBiomes with\n",
+                "- waterLine:", waterLine, "\n",
                 "- wetLimit:", wetLimit, "\n",
                 "- dryLimit:", dryLimit, "\n",
                 "- treeLimit:", treeLimit, "\n");
@@ -636,7 +643,7 @@ export class OpenTerrainBuilder extends TerrainBuilder {
         let biome: Biome = Biome.Water;
         let terrain: TerrainType = TerrainType.Water;
 
-        if (surface.height <= this._waterLine) {
+        if (surface.height <= waterLine) {
           biome = Biome.Water;
           terrain = TerrainType.Water;
         } else if (surface.terrace < 1) {
@@ -657,6 +664,9 @@ export class OpenTerrainBuilder extends TerrainBuilder {
           biome = Biome.Woodland;
           terrain = TerrainType.Mud;
         }
+        // Only change the type if it's supported, otherwise we'll just
+        // fallback to the default which is set in the constructor.
+        // TODO: What about default wall tiles?
         if (Terrain.isSupportedType(terrain)) {
           surface.type = terrain;
         }

@@ -35,6 +35,7 @@ window.onload = (event) => {
   const treeLimit = 0.7;
   const wetLimit = 1;
   const hasWater = true;
+  const waterLine = 0.2;
 
   // width / height ratio => 2 cubes high, 3 wide and 3 deep.
   const spriteWidth = 256;
@@ -50,9 +51,10 @@ window.onload = (event) => {
   // Use the height map to construct a terrain.
   let builder = new WT.OpenTerrainBuilder(cellsX, cellsY, heightMap,
                                           terraces, hasWater,
-                                          WT.TerrainType.DryGrass, physicalDims);
-  builder.addRain(WT.Direction.North, water);
-  builder.setBiomes(wetLimit, dryLimit, treeLimit);
+                                          WT.TerrainType.DryGrass,
+                                          WT.TerrainType.Rock, physicalDims);
+  builder.addRain(WT.Direction.North, water, waterLine);
+  builder.setBiomes(waterLine, wetLimit, dryLimit, treeLimit);
   builder.setShapes();
   builder.setFeatures();
   context.map = builder.generateMap(context);

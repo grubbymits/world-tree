@@ -164,6 +164,32 @@ export function isFlat(terrain) {
     }
     return false;
 }
+export function isEdge(terrain) {
+    switch (terrain) {
+        default:
+            break;
+        case TerrainShape.FlatNorthWest:
+        case TerrainShape.FlatNorth:
+        case TerrainShape.FlatNorthEast:
+        case TerrainShape.FlatWest:
+        case TerrainShape.Wall:
+        case TerrainShape.FlatEast:
+        case TerrainShape.FlatSouthWest:
+        case TerrainShape.FlatSouth:
+        case TerrainShape.FlatSouthEast:
+        case TerrainShape.FlatNorthOut:
+        case TerrainShape.FlatEastOut:
+        case TerrainShape.FlatSouthOut:
+        case TerrainShape.FlatWestOut:
+        case TerrainShape.FlatAloneOut:
+        case TerrainShape.RampUpSouthEdge:
+        case TerrainShape.RampUpWestEdge:
+        case TerrainShape.RampUpEastEdge:
+        case TerrainShape.RampUpNorthEdge:
+            return true;
+    }
+    return false;
+}
 export class Terrain extends Entity {
     constructor(context, _gridX, _gridY, _gridZ, dimensions, _type, _shape, features) {
         super(context, new Location(_gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height), dimensions, true, Terrain.graphics(_type, _shape));

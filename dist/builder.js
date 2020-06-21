@@ -1,5 +1,5 @@
 import { SquareGrid } from "./map.js";
-import { Terrain, TerrainShape, TerrainType, TerrainFeature, isFlat, getTypeName, getShapeName } from "./terrain.js";
+import { Terrain, TerrainShape, TerrainType, TerrainFeature, isFlat, isEdge, getTypeName, getShapeName } from "./terrain.js";
 import { Rain } from "./weather.js";
 import { Direction, getDirection, getDirectionName } from "./physics.js";
 import { Point } from "./graphics.js";
@@ -206,9 +206,11 @@ export class Surface {
     }
 }
 export class TerrainBuilder {
-    constructor(width, depth, heightMap, _numTerraces, _hasWater, defaultType, physicalDims) {
+    constructor(width, depth, heightMap, _numTerraces, _hasWater, _defaultFloor, _defaultWall, physicalDims) {
         this._numTerraces = _numTerraces;
         this._hasWater = _hasWater;
+        this._defaultFloor = _defaultFloor;
+        this._defaultWall = _defaultWall;
         Terrain.init(physicalDims);
         let minHeight = 0;
         let maxHeight = 0;
@@ -236,8 +238,9 @@ export class TerrainBuilder {
             maxHeight += minHeight;
         }
         this._terraceSpacing = maxHeight / _numTerraces;
-        this._waterLine = 4 * this._terraceSpacing / 5;
         console.log("Terrain builder", "- with a ceiling of:", maxHeight, "\n", "- ", _numTerraces, "terraces\n", "- ", this._terraceSpacing, "terrace spacing");
+        console.log("Using default floor", getTypeName(this._defaultFloor));
+        console.log("Using default wall", getTypeName(this._defaultWall));
         this._surface = new Surface(width, depth);
         this._surface.init(heightMap);
         console.log("calculating terraces");
@@ -246,7 +249,7 @@ export class TerrainBuilder {
                 let surface = this._surface.at(x, y);
                 surface.terrace = Math.floor(surface.height / this._terraceSpacing);
                 surface.shape = TerrainShape.Flat;
-                surface.type = defaultType;
+                surface.type = this._defaultFloor;
                 console.assert(surface.terrace <= this._numTerraces && surface.terrace >= 0, "terrace out of range:", surface.terrace);
             }
         }
@@ -280,13 +283,13 @@ export class TerrainBuilder {
         return worldTerrain;
     }
     setFeatures() { }
-    setBiomes(wetLimit, dryLimit, treeLimit) {
-        console.log("setBiomes with\n", "- wetLimit:", wetLimit, "\n", "- dryLimit:", dryLimit, "\n", "- treeLimit:", treeLimit, "\n");
+    setBiomes(waterLine, wetLimit, dryLimit, treeLimit) {
+        console.log("setBiomes with\n", "- waterLine:", waterLine, "\n", "- wetLimit:", wetLimit, "\n", "- dryLimit:", dryLimit, "\n", "- treeLimit:", treeLimit, "\n");
         if (this._hasWater) {
             for (let y = 0; y < this._surface.depth; y++) {
                 for (let x = 0; x < this._surface.width; x++) {
                     let surface = this._surface.at(x, y);
-                    if (surface.terrace == 0) {
+                    if (surface.height <= waterLine) {
                         surface.biome = Biome.Water;
                         surface.type = TerrainType.Water;
                     }
@@ -354,51 +357,40 @@ export class TerrainBuilder {
                         shapeType = TerrainShape.FlatSouthEast;
                     }
                     else if (southEdge && westEdge) {
-                        if (Terrain.isSupportedShape(centre.type, TerrainShape.FlatSouthWest)) {
-                            shapeType = TerrainShape.FlatSouthWest;
-                        }
-                        else {
-                            shapeType = TerrainShape.Wall;
-                        }
+                        shapeType = TerrainShape.FlatSouthWest;
                     }
                     else if (southEdge) {
-                        if (Terrain.isSupportedShape(centre.type, TerrainShape.FlatSouth)) {
-                            shapeType = TerrainShape.FlatSouth;
-                        }
-                        else {
-                            shapeType = TerrainShape.Wall;
-                        }
+                        shapeType = TerrainShape.FlatSouth;
                     }
                     else if (eastEdge) {
                         shapeType = TerrainShape.FlatEast;
                     }
                     else if (westEdge) {
-                        if (Terrain.isSupportedShape(centre.type, TerrainShape.FlatWest)) {
-                            shapeType = TerrainShape.FlatWest;
-                        }
-                        else {
-                            shapeType = TerrainShape.Wall;
-                        }
+                        shapeType = TerrainShape.FlatWest;
                     }
                 }
                 else if (shapeType == TerrainShape.RampUpNorth && eastEdge) {
-                    if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpNorthEdge)) {
-                        shapeType = TerrainShape.RampUpNorthEdge;
-                    }
+                    shapeType = TerrainShape.RampUpNorthEdge;
                 }
                 else if (shapeType == TerrainShape.RampUpEast && northEdge) {
-                    if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpEastEdge)) {
-                        shapeType = TerrainShape.RampUpEastEdge;
-                    }
+                    shapeType = TerrainShape.RampUpEastEdge;
                 }
                 else if (shapeType == TerrainShape.RampUpSouth && eastEdge) {
-                    if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpSouthEdge)) {
-                        shapeType = TerrainShape.RampUpSouthEdge;
-                    }
+                    shapeType = TerrainShape.RampUpSouthEdge;
                 }
                 else if (shapeType == TerrainShape.RampUpWest && northEdge) {
-                    if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpWestEdge)) {
-                        shapeType = TerrainShape.RampUpWestEdge;
+                    shapeType = TerrainShape.RampUpWestEdge;
+                }
+                if (centre.terrace > 0 && shapeType == TerrainShape.Flat &&
+                    neighbours.length != 8) {
+                    console.log("Defaulting edge tile to Wall");
+                    shapeType = TerrainShape.Wall;
+                }
+                if (isFlat(shapeType) && isEdge(shapeType)) {
+                    if (!Terrain.isSupportedShape(centre.type, shapeType)) {
+                        centre.type = this._defaultWall;
+                        shapeType = TerrainShape.Wall;
+                        console.log("Trying default wall shape and type", getTypeName(this._defaultWall));
                     }
                 }
                 if (!Terrain.isSupportedShape(centre.type, shapeType)) {
@@ -426,8 +418,8 @@ export class TerrainBuilder {
     }
 }
 export class OpenTerrainBuilder extends TerrainBuilder {
-    constructor(width, depth, heightMap, numTerraces, hasWater, defaultType, physicalDims) {
-        super(width, depth, heightMap, numTerraces, hasWater, defaultType, physicalDims);
+    constructor(width, depth, heightMap, numTerraces, hasWater, defaultFloor, defaultWall, physicalDims) {
+        super(width, depth, heightMap, numTerraces, hasWater, defaultFloor, defaultWall, physicalDims);
     }
     setShapes() {
         console.log("adding ramps");
@@ -488,9 +480,9 @@ export class OpenTerrainBuilder extends TerrainBuilder {
             }
         }
     }
-    addRain(towards, water) {
+    addRain(towards, water, waterLine) {
         console.log("adding rain towards", getDirectionName(towards));
-        Rain.init(this._waterLine, this._surface);
+        Rain.init(waterLine, this._surface);
         for (let x = 0; x < this._surface.width; x++) {
             Rain.add(x, this._surface.depth - 1, water, towards);
         }
@@ -508,14 +500,14 @@ export class OpenTerrainBuilder extends TerrainBuilder {
             }
         }
     }
-    setBiomes(wetLimit, dryLimit, treeLimit) {
-        console.log("setBiomes with\n", "- wetLimit:", wetLimit, "\n", "- dryLimit:", dryLimit, "\n", "- treeLimit:", treeLimit, "\n");
+    setBiomes(waterLine, wetLimit, dryLimit, treeLimit) {
+        console.log("setBiomes with\n", "- waterLine:", waterLine, "\n", "- wetLimit:", wetLimit, "\n", "- dryLimit:", dryLimit, "\n", "- treeLimit:", treeLimit, "\n");
         for (let y = 0; y < this._surface.depth; y++) {
             for (let x = 0; x < this._surface.width; x++) {
                 let surface = this._surface.at(x, y);
                 let biome = Biome.Water;
                 let terrain = TerrainType.Water;
-                if (surface.height <= this._waterLine) {
+                if (surface.height <= waterLine) {
                     biome = Biome.Water;
                     terrain = TerrainType.Water;
                 }
