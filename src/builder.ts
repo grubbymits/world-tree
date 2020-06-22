@@ -273,6 +273,7 @@ export class TerrainBuilder {
               physicalDims: Dimensions) {
     Terrain.init(physicalDims);
 
+    // Normalise heights, minimum = 0;
     let minHeight: number = 0;
     let maxHeight: number = 0;
     for (let y = 0; y < depth; y++) {
@@ -365,6 +366,41 @@ export class TerrainBuilder {
 
   setFeatures(): void { }
 
+  setShapes(): void {
+    const coordOffsets: Array<Point> = [ new Point(0, -1),
+                                         new Point(1, 0),
+                                         new Point(0, 1),
+                                         new Point(-1, 0) ];
+
+    const ramps: Array<TerrainShape> = [ TerrainShape.RampUpNorth,
+                                         TerrainShape.RampUpEast,
+                                         TerrainShape.RampUpSouth,
+                                         TerrainShape.RampUpWest ];
+
+    // Find locations that have heights that sit exactly between two terraces
+    // and then find their adjacent locations that are higher terraces. Set
+    // those locations to be ramps.
+    for (let y = 1; y < this._surface.depth - 1; y++) {
+      for (let x = 1; x < this._surface.width - 1; x++) {
+        let centre: TerrainAttributes = this._surface.at(x, y);
+
+        let roundUpHeight = centre.height + (this._terraceSpacing / 2);
+        if (roundUpHeight != (centre.terrace + 1) * this._terraceSpacing) {
+          continue;
+        }
+
+        for (let i in coordOffsets) {
+          let offset: Point = coordOffsets[i];
+          let neighbour: TerrainAttributes =
+              this._surface.at(centre.x + offset.x, centre.y + offset.y);
+          if (neighbour.terrace == centre.terrace + 1) {
+            neighbour.shape = ramps[i];
+          }
+        }
+      }
+    }
+  }
+
   setBiomes(waterLine: number, wetLimit: number, dryLimit: number,
             treeLimit: number): void {
     console.log("setBiomes with\n",
@@ -452,13 +488,21 @@ export class TerrainBuilder {
             shapeType = TerrainShape.FlatWest;
           }
         } else if (shapeType == TerrainShape.RampUpNorth && eastEdge) {
-          shapeType = TerrainShape.RampUpNorthEdge;
+          if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpNorthEdge)) {
+            shapeType = TerrainShape.RampUpNorthEdge;
+          }
         } else if (shapeType == TerrainShape.RampUpEast && northEdge) {
-          shapeType = TerrainShape.RampUpEastEdge;
+          if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpEastEdge)) {
+            shapeType = TerrainShape.RampUpEastEdge;
+          }
         } else if (shapeType == TerrainShape.RampUpSouth && eastEdge) {
-          shapeType = TerrainShape.RampUpSouthEdge;
+          if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpSouthEdge)) {
+            shapeType = TerrainShape.RampUpSouthEdge;
+          }
         } else if (shapeType == TerrainShape.RampUpWest && northEdge) {
-          shapeType = TerrainShape.RampUpWestEdge;
+          if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpWestEdge)) {
+            shapeType = TerrainShape.RampUpWestEdge;
+          }
         }
 
         // Fixup the sides of the map.
@@ -533,10 +577,10 @@ export class OpenTerrainBuilder extends TerrainBuilder {
                                          new Point(-1, 0) ];
 
     const diagOffsets: Array<Array<Point>> =
-      [ [ new Point(-1, -1), new Point (1, -1) ],
-      [ new Point(1, -1), new Point(1, 1) ],
-      [ new Point(-1, 1), new Point(1, 1) ],
-      [ new Point(-1, -1), new Point(-1, 1) ]];
+      [ [ new Point(-1, -1),  new Point(1, -1)],
+        [ new Point(1, -1),   new Point(1, 1) ],
+        [ new Point(-1, 1),   new Point(1, 1) ],
+        [ new Point(-1, -1),  new Point(-1, 1)]];
 
     const ramps: Array<TerrainShape> = [ TerrainShape.RampUpNorth,
                                          TerrainShape.RampUpEast,

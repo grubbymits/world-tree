@@ -283,6 +283,43 @@ export class TerrainBuilder {
         return worldTerrain;
     }
     setFeatures() { }
+    setShapes() {
+        const rampUpFilters = [[-1, 0, 1],
+            [1, 0, -1]];
+        const rampsAxisY = [TerrainShape.RampUpNorth,
+            TerrainShape.RampUpSouth];
+        const rampsAxisX = [TerrainShape.RampUpEast,
+            TerrainShape.RampUpWest];
+        const coordOffsets = [new Point(0, -1),
+            new Point(1, 0),
+            new Point(0, 1),
+            new Point(-1, 0)];
+        const ramps = [TerrainShape.RampUpNorth,
+            TerrainShape.RampUpEast,
+            TerrainShape.RampUpSouth,
+            TerrainShape.RampUpWest];
+        for (let y = 1; y < this._surface.depth - 1; y++) {
+            for (let x = 1; x < this._surface.width - 1; x++) {
+                let centre = this._surface.at(x, y);
+                console.log("centre terrace:", centre.terrace);
+                console.log("centre height:", centre.height);
+                let roundUpHeight = centre.height + (this._terraceSpacing / 2);
+                console.log("rounded up height:", roundUpHeight);
+                if (roundUpHeight != (centre.terrace + 1) * this._terraceSpacing) {
+                    continue;
+                }
+                for (let i in coordOffsets) {
+                    let offset = coordOffsets[i];
+                    let neighbour = this._surface.at(centre.x + offset.x, centre.y + offset.y);
+                    console.log("neighbour terrace:", neighbour.terrace);
+                    if (neighbour.terrace == centre.terrace + 1) {
+                        neighbour.shape = ramps[i];
+                        console.log("adding", getShapeName(neighbour.shape), "at", centre.x + offset.x, centre.y + offset.y);
+                    }
+                }
+            }
+        }
+    }
     setBiomes(waterLine, wetLimit, dryLimit, treeLimit) {
         console.log("setBiomes with\n", "- waterLine:", waterLine, "\n", "- wetLimit:", wetLimit, "\n", "- dryLimit:", dryLimit, "\n", "- treeLimit:", treeLimit, "\n");
         if (this._hasWater) {
@@ -370,16 +407,24 @@ export class TerrainBuilder {
                     }
                 }
                 else if (shapeType == TerrainShape.RampUpNorth && eastEdge) {
-                    shapeType = TerrainShape.RampUpNorthEdge;
+                    if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpNorthEdge)) {
+                        shapeType = TerrainShape.RampUpNorthEdge;
+                    }
                 }
                 else if (shapeType == TerrainShape.RampUpEast && northEdge) {
-                    shapeType = TerrainShape.RampUpEastEdge;
+                    if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpEastEdge)) {
+                        shapeType = TerrainShape.RampUpEastEdge;
+                    }
                 }
                 else if (shapeType == TerrainShape.RampUpSouth && eastEdge) {
-                    shapeType = TerrainShape.RampUpSouthEdge;
+                    if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpSouthEdge)) {
+                        shapeType = TerrainShape.RampUpSouthEdge;
+                    }
                 }
                 else if (shapeType == TerrainShape.RampUpWest && northEdge) {
-                    shapeType = TerrainShape.RampUpWestEdge;
+                    if (Terrain.isSupportedShape(centre.type, TerrainShape.RampUpWestEdge)) {
+                        shapeType = TerrainShape.RampUpWestEdge;
+                    }
                 }
                 if (centre.terrace > 0 && shapeType == TerrainShape.Flat &&
                     neighbours.length != 8) {
