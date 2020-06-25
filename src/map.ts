@@ -6,6 +6,7 @@ import { Terrain,
          TerrainShape,
          TerrainType,
          TerrainFeature,
+         isFlat,
          isRampUp } from "./terrain.js"
 import { Point,
          GraphicComponent } from "./graphics.js"
@@ -85,10 +86,11 @@ export class SquareGrid {
   getNeighbourCost(centre: Terrain, to: Terrain): number {
     // If a horizontal, or vertical, move cost 1 then a diagonal move would be
     // 1.444... So scale by 2 and round. Double the cost of changing height.
-    if ((centre.x == to.x) || (centre.y == to.y)) {
-      return centre.z == to.z ? 2 : 4;
+    let cost: number = centre.x == to.x || centre.y == to.y ? 2 : 3;
+    if (isFlat(centre.shape) && isFlat(to.shape)) {
+      return cost;
     }
-    return centre.z == to.z ? 3 : 6;
+    return centre.z == to.z ? cost : cost * 2;
   }
   
   getNeighbours(centre: Terrain): Array<Terrain> {

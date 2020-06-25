@@ -1,5 +1,5 @@
 import { getDirection, getOppositeDirection } from "./physics.js";
-import { Terrain, isRampUp } from "./terrain.js";
+import { Terrain, isFlat, isRampUp } from "./terrain.js";
 import { Point } from "./graphics.js";
 class MovementCost {
     constructor(_terrain, _cost) {
@@ -64,10 +64,11 @@ export class SquareGrid {
         return this._allTerrain.get(id);
     }
     getNeighbourCost(centre, to) {
-        if ((centre.x == to.x) || (centre.y == to.y)) {
-            return centre.z == to.z ? 2 : 4;
+        let cost = centre.x == to.x || centre.y == to.y ? 2 : 3;
+        if (isFlat(centre.shape) && isFlat(to.shape)) {
+            return cost;
         }
-        return centre.z == to.z ? 3 : 6;
+        return centre.z == to.z ? cost : cost * 2;
     }
     getNeighbours(centre) {
         let neighbours = new Array();
