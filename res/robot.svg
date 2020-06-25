@@ -15,7 +15,7 @@
    viewBox="0 0 297 210"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
    sodipodi:docname="robot.svg"
    inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-rock.png"
    inkscape:export-xdpi="96.071075"
@@ -38,19 +38,19 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.5600001"
-     inkscape:cx="221.30416"
-     inkscape:cy="375.52147"
+     inkscape:zoom="2.1491893"
+     inkscape:cx="154.73124"
+     inkscape:cy="460.42061"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      objecttolerance="10000"
      guidetolerance="10000"
-     inkscape:window-width="1920"
-     inkscape:window-height="1040"
+     inkscape:window-width="3840"
+     inkscape:window-height="2136"
      inkscape:window-x="0"
-     inkscape:window-y="20"
-     inkscape:window-maximized="1">
+     inkscape:window-y="0"
+     inkscape:window-maximized="0">
     <inkscape:grid
        type="axonomgrid"
        id="grid10"
@@ -75,9 +75,160 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-87)">
+    <path
+       inkscape:connector-curvature="0"
+       id="path4916-6-7"
+       d="m 38.953103,213.65624 11.456789,-6.61458 -13.748147,-7.9375 -11.456795,6.61458 z"
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5121-3"
+       d="M 13.748156,199.10416 5.6118729e-6,207.04166 11.456796,213.65625 l 13.74816,-7.9375 z"
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 13.748156,156.77083 5.6118729e-6,164.70833 11.456796,171.32292 l 13.74816,-7.9375 z"
+       id="path5123-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 64.15805,156.77083 -13.74815,7.9375 11.45679,6.61459 13.74816,-7.9375 z"
+       id="path5123"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4916-3-6-8"
+       d="m 38.953103,171.32291 11.456789,-6.61458 -13.748147,-7.9375 -11.456795,6.61458 z"
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5125-1"
+       d="M 13.748157,117.08332 6.8118729e-6,125.02082 11.456797,131.63541 l 13.74816,-7.9375 z"
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4916-3-6"
+       d="m 38.953103,131.63541 11.456789,-6.61458 -13.748147,-7.9375 -11.456795,6.61458 z"
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 64.158042,241.4375 -13.74815,7.9375 11.45679,6.61459 13.74816,-7.9375 z"
+       id="path5144"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5125"
+       d="m 64.158051,117.08332 -13.74815,7.9375 11.45679,6.61459 13.74816,-7.9375 z"
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5121"
+       d="m 64.158051,199.10415 -13.74815,7.9375 11.45679,6.61459 13.74816,-7.9375 z"
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4916-6"
+       d="m 89.362998,213.65624 11.456792,-6.61458 -13.74815,-7.9375 -11.456795,6.61458 z"
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4916-3"
+       d="m 89.362998,131.63541 11.456792,-6.61458 -13.74815,-7.9375 -11.456795,6.61458 z"
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4916"
+       d="m 89.362998,171.32291 11.456792,-6.61458 -13.74815,-7.9375 -11.456795,6.61458 z"
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       transform="translate(-9.1654317,-47.625017)"
+       id="g4914"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 96.237069,154.125 v 13.22917 l -6.874075,3.96875 v -5.29167 l 2.291359,-1.32291 v -7.9375 z"
+         id="path4908"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 89.362993,166.03126 v 5.29167 l -2.291358,-1.32292 v -5.29167 z"
+         id="path4910"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 87.071635,164.70834 2.291358,-1.32291 10e-7,-5.29167 2.291359,-1.32292 v 7.9375 l -2.291359,1.32292 z"
+         id="path4912"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       transform="translate(-9.1654333,29.104159)"
+       id="g4894"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4888"
+         d="m 38.953103,118.40625 v 13.22917 l 6.87408,-3.96875 V 122.375 l -2.29136,1.32292 v -7.9375 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path4890"
+         d="m 38.953103,131.63542 -2.291361,-1.32292 3e-6,-10.58333 2.291359,-1.32292 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path4892"
+         d="m 45.827183,122.375 -2.29136,-1.32292 v 2.64584 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
     <g
        id="g207"
-       transform="translate(-2.2031779e-7,-1.198989e-6)">
+       transform="translate(-9.1654331,-7.9375111)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          inkscape:connector-curvature="0"
          id="path1777"
@@ -97,21 +248,33 @@
     <path
        inkscape:connector-curvature="0"
        id="path1789"
-       d="m 18.330873,162.06251 v 13.22917 l -6.87408,-3.96875 v -5.29167 l 2.29136,1.32292 v -7.9375 z"
-       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 9.1654401,154.125 v 13.22917 l -6.87408,-3.96875 v -5.29167 l 2.29136,1.32292 v -7.9375 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path1791"
-       d="m 18.330873,175.29168 2.29135,-1.32292 10e-6,-10.58333 -2.29136,-1.32292 z"
-       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="M 9.1654401,167.35417 11.45679,166.03125 11.4568,155.44792 9.1654401,154.125 Z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path1793"
-       d="m 11.456793,166.03126 2.29136,-1.32292 v 2.64584 z"
-       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 2.2913601,158.09375 2.29136,-1.32292 v 2.64584 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <g
        id="g197"
-       transform="translate(-1.6609534e-6,-2.6458378)">
+       transform="translate(-9.1654345,-7.9375144)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 107.69386,158.09375 v 13.22917 l -6.87407,3.96875 V 170 l 2.29136,-1.32291 v -7.9375 z"
@@ -130,7 +293,10 @@
     </g>
     <g
        id="g1413"
-       transform="translate(-77.906199,-158.75)">
+       transform="translate(-87.071632,-166.68751)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          inkscape:connector-curvature="0"
          id="path564"
@@ -150,51 +316,81 @@
     <path
        inkscape:connector-curvature="0"
        id="path580"
-       d="m 61.866688,121.05207 v 13.22917 l 6.87408,3.96875 v -5.29167 l -2.29136,-1.32291 v -7.9375 z"
-       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 52.701255,113.11456 v 13.22917 l 6.87408,3.96875 v -5.29167 l -2.29136,-1.32291 v -7.9375 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path582"
-       d="m 68.740768,132.95832 2.29136,-1.32292 v 5.29167 l -2.29136,1.32292 z"
-       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 59.575335,125.02081 2.29136,-1.32292 v 5.29167 l -2.29136,1.32292 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path584"
-       d="m 71.032128,131.6354 -2.29136,-1.32291 v -5.29167 l -2.29136,-1.32291 v 7.9375 l 2.29136,1.32291 z"
-       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 61.866695,123.69789 -2.29136,-1.32291 v -5.29167 l -2.29136,-1.32291 v 7.9375 l 2.29136,1.32291 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 73.323488,98.562493 -13.74815,7.937497 11.45679,6.61459 13.74816,-7.9375 z"
+       d="m 64.158055,90.624983 -13.74815,7.937497 11.45679,6.61459 13.74816,-7.9375 z"
        id="path1431"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 59.575338,106.49999 v 13.22917 l 11.45679,6.61458 v -13.22916 z"
+       d="m 50.409905,98.56248 v 13.22917 l 11.45679,6.61458 v -13.22916 z"
        id="path1433"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 84.780288,105.17708 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
+       d="m 75.614855,97.23957 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
        id="path1435"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 73.323478,114.4375 9.16544,-5.29167"
+       d="m 64.158045,106.49999 9.16544,-5.29167"
        id="path1437"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 77.906198,111.79166 v 5.29167"
+       d="m 68.740765,103.85415 v 5.29167"
        id="path1439"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 75.614838,121.05208 4.58272,-2.64583"
+       d="m 66.449405,113.11457 4.58272,-2.64583"
        id="path1441"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <g
        id="g1664"
-       transform="translate(-105.40251,-18.520837)">
+       transform="translate(-114.56794,-26.458347)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 135.19018,136.92709 v 13.22917 l -6.87408,-3.96875 v -5.29167 l 2.29136,1.32292 v -7.9375 z"
@@ -246,127 +442,160 @@
          d="m 137.48153,127.66667 -9.16544,5.29167 1e-5,7.9375 9.16543,-5.29167 v -5.29167 l -6.87408,3.96875 v 2.64584 l 4.58272,-2.64584"
          style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     </g>
+    <path
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 89.362985,105.17706 -13.748154,-7.9375 1e-6,13.22917 13.748154,7.9375 z"
+       id="path1585"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 89.362985,105.17706 100.81978,98.56248 87.071627,90.62498 75.614832,97.23956 Z"
+       id="path1587"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 100.81978,98.56248 v 13.22916 l -11.456795,6.61459 v -13.22917 z"
+       id="path1589"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 77.906191,101.20831 9.165433,5.29167"
+       id="path1591"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 82.488909,103.85414 v 5.29167"
+       id="path1593"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 80.197548,110.46873 4.582719,2.64583"
+       id="path1595"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 98.528417,113.11455 v 13.22917 l -6.87407,3.96875 v -5.29167 l 2.29136,-1.32291 v -7.9375 z"
+       id="path1597"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 91.654347,125.02081 v 5.29167 l -2.291362,-1.32292 v -5.29167 z"
+       id="path1599"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 89.362985,123.69789 2.291362,-1.32291 v -5.29167 l 2.29136,-1.32292 v 7.9375 l -2.29136,1.32292 z"
+       id="path1601"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <g
-       id="g1652"
-       transform="translate(52.701241,1.3228972)">
+       id="g4886"
+       transform="translate(-9.1654377,-7.9375099)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 43.535816,113.11458 v 13.22917 l -6.874075,3.96875 v -5.29167 l 2.291359,-1.32291 v -7.9375 z"
-         id="path1603"
-         inkscape:connector-curvature="0" />
-      <path
-         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 36.66174,125.02084 v 5.29167 l -2.291358,-1.32292 v -5.29167 z"
-         id="path1605"
-         inkscape:connector-curvature="0" />
-      <path
-         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 34.370382,123.69792 2.291358,-1.32291 10e-7,-5.29167 2.291359,-1.32292 v 7.9375 l -2.291359,1.32292 z"
-         id="path1607"
-         inkscape:connector-curvature="0" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path1585"
-         d="m 45.827177,111.79167 -13.748154,-7.9375 10e-7,13.22917 13.748154,7.9375 z"
-         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path1587"
-         d="M 45.827177,111.79167 57.283971,105.17709 43.535819,97.239593 32.079024,103.85417 Z"
-         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path1589"
-         d="m 57.283971,105.17709 v 13.22916 l -11.456794,6.61459 v -13.22917 z"
-         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path1591"
-         d="m 34.370383,107.82292 9.165433,5.29167"
-         style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path1593"
-         d="m 38.953101,110.46875 v 5.29167"
-         style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path1595"
-         d="m 36.66174,117.08334 4.582719,2.64583"
-         style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path1597"
-         d="m 54.992611,119.72916 v 13.22917 l -6.874075,3.96875 v -5.29167 l 2.291359,-1.32291 v -7.9375 z"
-         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path1599"
-         d="m 48.118535,131.63542 v 5.29167 l -2.291358,-1.32292 v -5.29167 z"
-         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path1601"
-         d="m 45.827177,130.3125 2.291358,-1.32291 10e-7,-5.29167 2.291359,-1.32292 v 7.9375 l -2.291359,1.32292 z"
-         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-    </g>
-    <g
-       id="g1688"
-       transform="translate(-48.118543,1.3229105)">
-      <path
-         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 87.071634,117.08333 v 13.22917 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
+         d="m 38.953103,118.40625 v 13.22917 l 6.87408,-3.96875 V 122.375 l -2.29136,1.32292 v -7.9375 z"
          id="path1672"
          inkscape:connector-curvature="0" />
       <path
          style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 87.071634,130.3125 -2.291361,-1.32292 3e-6,-10.58333 2.291359,-1.32292 z"
+         d="m 38.953103,131.63542 -2.291361,-1.32292 3e-6,-10.58333 2.291359,-1.32292 z"
          id="path1674"
          inkscape:connector-curvature="0" />
       <path
          style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 93.945714,121.05208 -2.29136,-1.32292 v 2.64584 z"
+         d="m 45.827183,122.375 -2.29136,-1.32292 v 2.64584 z"
          id="path1676"
          inkscape:connector-curvature="0" />
-      <path
-         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 96.237071,111.79166 -13.748154,-7.9375 10e-7,13.22917 13.748154,7.9375 z"
-         id="path1611"
-         inkscape:connector-curvature="0" />
-      <path
-         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="M 96.237071,111.79166 107.69386,105.17708 93.945713,97.239586 82.488918,103.85416 Z"
-         id="path1613"
-         inkscape:connector-curvature="0" />
-      <path
-         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 107.69386,105.17708 v 13.22916 l -11.456789,6.61459 v -13.22917 z"
-         id="path1615"
-         inkscape:connector-curvature="0" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path1623"
-         d="m 93.945712,113.11458 -9.165436,-5.29167 v 7.9375 l 9.165436,5.29167 v -5.29167 l -6.874077,-3.96875 v 2.64584 l 4.582718,2.64583"
-         style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path1611"
+       d="m 38.953107,105.17707 -13.748154,-7.9375 1e-6,13.22917 13.748154,7.9375 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path1613"
+       d="M 38.953107,105.17707 50.409896,98.56249 36.661749,90.624999 25.204954,97.23957 Z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path1615"
+       d="m 50.409896,98.56249 v 13.22916 l -11.456789,6.61459 v -13.22917 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 36.661748,106.49999 -9.165436,-5.29167 v 7.9375 l 9.165436,5.29167 v -5.29167 l -6.874077,-3.96875 v 2.64584 l 4.582718,2.64583"
+       id="path1623"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       id="g4881"
+       transform="translate(-9.1654336,-7.9375073)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          inkscape:connector-curvature="0"
          id="path1666"
-         d="m 98.52843,123.69792 v 13.22917 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
+         d="M 50.409892,125.02083 V 138.25 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
          style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
       <path
          inkscape:connector-curvature="0"
          id="path1668"
-         d="m 98.52843,136.92709 -2.291361,-1.32292 3e-6,-10.58333 2.291359,-1.32292 z"
+         d="m 50.409899,138.25001 -2.291361,-1.32292 3e-6,-10.58333 2.291359,-1.32292 z"
          style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
       <path
          inkscape:connector-curvature="0"
          id="path1670"
-         d="m 105.40251,127.66667 -2.29136,-1.32292 v 2.64584 z"
+         d="m 57.283979,128.98959 -2.29136,-1.32292 v 2.64584 z"
          style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     </g>
     <g
-       transform="translate(-77.9062,-121.70833)"
-       id="g1755">
+       transform="translate(-87.071633,-129.64584)"
+       id="g1755"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 151.22968,273.1875 v 13.22917 l 6.87408,3.96875 v -5.29167 l -2.29136,-1.32291 v -7.9375 z"
@@ -385,7 +614,10 @@
     </g>
     <g
        id="g212"
-       transform="translate(-2.144596e-6,-7.7489866e-6)">
+       transform="translate(-9.165435,-7.9375177)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          inkscape:connector-curvature="0"
          id="path1757"
@@ -405,56 +637,89 @@
     <path
        inkscape:connector-curvature="0"
        id="path1763"
-       d="m 73.323488,138.25001 -13.74815,7.9375 11.45679,6.61459 13.74816,-7.9375 z"
-       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 64.158055,130.3125 -13.74815,7.9375 11.45679,6.61459 13.74816,-7.9375 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path1765"
-       d="m 59.575338,146.18751 v 13.22917 l 11.45679,6.61458 V 152.8021 Z"
-       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 50.409905,138.25 v 13.22917 l 11.45679,6.61458 v -13.22916 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path1767"
-       d="m 84.780288,144.8646 v 13.22916 l -13.74816,7.9375 V 152.8021 Z"
-       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 75.614855,136.92709 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path1769"
-       d="m 73.323478,154.12502 9.16544,-5.29167"
-       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 64.158045,146.18751 9.16544,-5.29167"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path1771"
-       d="m 77.906198,151.47918 v 5.29167"
-       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 68.740765,143.54167 v 5.29167"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path1773"
-       d="m 75.614838,160.7396 4.58272,-2.64583"
-       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 66.449405,152.80209 4.58272,-2.64583"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 22.9136,138.25002 -13.74815,7.9375 11.45679,6.61459 13.74816,-7.9375 z"
+       d="M 13.748167,130.31251 1.7111873e-5,138.25001 11.456807,144.8646 l 13.74816,-7.9375 z"
        id="path1783"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 9.16545,146.18752 v 13.22917 l 11.45679,6.61458 v -13.22916 z"
+       d="m 1.7111873e-5,138.25001 v 13.22917 L 11.456807,158.09376 V 144.8646 Z"
        id="path1785"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 34.3704,144.86461 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
+       d="m 25.204967,136.9271 v 13.22916 l -13.74816,7.9375 V 144.8646 Z"
        id="path1787"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path1795"
-       d="m 32.07903,148.83335 -9.16544,5.29167 10e-6,7.9375 9.16543,-5.29167 v -5.29167 l -6.87408,3.96875 v 2.64584 l 4.58272,-2.64584"
-       style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 22.913597,140.89584 -9.16544,5.29167 10e-6,7.9375 9.16543,-5.29167 v -5.29167 l -6.87408,3.96875 v 2.64584 l 4.58272,-2.64584"
+       style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <g
        id="g202"
-       transform="translate(2.2913601,-1.3229244)">
+       transform="translate(-6.8740728,-9.2604343)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          inkscape:connector-curvature="0"
          id="path1799"
@@ -474,86 +739,130 @@
     <path
        inkscape:connector-curvature="0"
        id="path1805"
-       d="m 98.52843,152.80209 -13.748154,-7.9375 10e-7,13.22917 13.748154,7.9375 z"
-       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 89.362997,144.86458 -13.748154,-7.9375 1e-6,13.22917 13.748154,7.9375 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path1807"
-       d="m 98.52843,152.80209 11.45679,-6.61458 -13.748148,-7.9375 -11.456795,6.61458 z"
-       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="M 89.362997,144.86458 100.81979,138.25 87.071639,130.3125 75.614844,136.92708 Z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path1809"
-       d="m 109.98522,146.18751 v 13.22916 l -11.45679,6.61459 v -13.22917 z"
-       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 100.81979,138.25 v 13.22916 l -11.456793,6.61459 v -13.22917 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path1811"
-       d="m 87.071636,148.83334 9.165433,5.29167"
-       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 77.906203,140.89583 9.165433,5.29167"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path1813"
-       d="m 91.654354,151.47917 v 5.29167"
-       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 82.488921,143.54166 v 5.29167"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path1815"
-       d="m 89.362995,158.09375 4.58272,2.64583"
-       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-    <path
-       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 38.953098,155.44792 v 13.22917 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
-       id="path1825"
-       inkscape:connector-curvature="0" />
-    <path
-       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 38.953098,168.67709 -2.291361,-1.32292 3e-6,-10.58333 2.291359,-1.32292 z"
-       id="path1827"
-       inkscape:connector-curvature="0" />
+       d="m 80.197562,150.15624 4.58272,2.64583"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 45.827178,159.41667 -2.29136,-1.32292 v 2.64584 z"
+       d="m 36.661745,151.47916 -2.29136,-1.32292 v 2.64584 z"
        id="path1829"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 48.118535,152.8021 -13.748154,-7.9375 10e-7,13.22917 13.748154,7.9375 z"
+       d="m 38.953102,144.86459 -13.748154,-7.9375 10e-7,13.22917 13.748154,7.9375 z"
        id="path1831"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 48.118535,152.8021 11.456789,-6.61458 -13.748147,-7.9375 -11.456795,6.61458 z"
+       d="m 38.953102,144.86459 11.456789,-6.61458 -13.748147,-7.9375 -11.456795,6.61458 z"
        id="path1833"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 59.575324,146.18752 v 13.22916 l -11.456789,6.61459 V 152.8021 Z"
+       d="m 50.409891,138.25001 v 13.22916 l -11.456789,6.61459 v -13.22917 z"
        id="path1835"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path1837"
-       d="m 45.827176,154.12502 -9.165436,-5.29167 v 7.9375 l 9.165436,5.29167 v -5.29167 l -6.874077,-3.96875 v 2.64584 l 4.582718,2.64583"
-       style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 36.661743,146.18751 -9.165436,-5.29167 v 7.9375 l 9.165436,5.29167 v -5.29167 l -6.874077,-3.96875 v 2.64584 l 4.582718,2.64583"
+       style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path1839"
-       d="m 48.118535,166.03125 v 13.22917 l 6.87408,-3.96875 V 170 l -2.29136,1.32292 v -7.9375 z"
-       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 38.953102,158.09374 v 13.22917 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path1843"
-       d="m 54.992615,170 -2.29136,-1.32292 v 2.64584 z"
-       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 45.827182,162.06249 -2.29136,-1.32292 v 2.64584 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
-       style="fill:#586e75;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
-       d="m 48.118535,166.03125 -2.291358,-1.32291 v 13.22916 l 2.291359,1.32292 z"
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 29.787667,163.38541 6.87408,-3.96875 -2.29136,-1.32291 -6.874079,3.96875 z"
+       id="path4918-79"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 38.953102,158.09374 -2.291358,-1.32291 v 13.22916 l 2.291359,1.32292 z"
        id="path1892"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <g
-       transform="translate(6.712373e-7,42.333317)"
-       id="g220">
+       transform="translate(-9.1654322,34.395807)"
+       id="g220"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 32.079023,159.41667 v 13.22917 l -6.87408,-3.96875 v -5.29167 l 2.29136,1.32292 v -7.9375 z"
@@ -572,7 +881,10 @@
     </g>
     <g
        id="g315"
-       transform="translate(-8.8812712e-7,2.645835)">
+       transform="translate(-11.456786,-9.2604216)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          inkscape:connector-curvature="0"
          id="path222"
@@ -590,8 +902,11 @@
          style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     </g>
     <g
-       transform="translate(3.7862291e-7,42.333311)"
-       id="g234">
+       transform="translate(-11.456793,35.718735)"
+       id="g234"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          inkscape:connector-curvature="0"
          id="path228"
@@ -610,7 +925,10 @@
     </g>
     <g
        id="g242"
-       transform="translate(-77.906199,-76.729176)">
+       transform="translate(-84.780274,-85.989592)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          inkscape:connector-curvature="0"
          id="path236"
@@ -628,8 +946,11 @@
          style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     </g>
     <g
-       transform="translate(-1.2530409e-6,42.333311)"
-       id="g250">
+       transform="translate(-9.1654341,34.395801)"
+       id="g250"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 59.57533,159.41667 v 13.22917 l 6.87408,3.96875 v -5.29167 l -2.29136,-1.32291 v -7.9375 z"
@@ -648,57 +969,90 @@
     </g>
     <path
        style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 73.323489,180.58333 -13.74815,7.9375 11.45679,6.61459 13.74816,-7.9375 z"
+       d="m 64.158056,172.64582 -13.74815,7.9375 11.45679,6.61459 13.74816,-7.9375 z"
        id="path252"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 59.575339,188.52083 V 201.75 l 11.45679,6.61458 v -13.22916 z"
+       d="m 50.409906,180.58332 v 13.22917 l 11.45679,6.61458 v -13.22916 z"
        id="path254"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 84.780289,187.19792 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
+       d="m 75.614856,179.26041 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
        id="path256"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 73.323479,196.45834 9.16544,-5.29167"
+       d="m 64.158046,188.52083 9.16544,-5.29167"
        id="path258"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 77.906199,193.8125 v 5.29167"
+       d="m 68.740766,185.87499 v 5.29167"
        id="path260"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 75.614839,203.07292 4.58272,-2.64583"
+       d="m 66.449406,195.13541 4.58272,-2.64583"
        id="path262"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path264"
-       d="m 22.913601,180.58334 -13.7481501,7.9375 11.4567901,6.61459 13.74816,-7.9375 z"
-       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="M 13.748168,172.64583 1.8011873e-5,180.58333 11.456808,187.19792 l 13.74816,-7.9375 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path266"
-       d="m 9.1654509,188.52084 v 13.22917 l 11.4567901,6.61458 v -13.22916 z"
-       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="M 1.8011873e-5,180.58333 V 193.8125 L 11.456808,200.42708 v -13.22916 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path268"
-       d="m 34.370401,187.19793 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
-       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 25.204968,179.26042 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 32.079031,191.16667 -9.16544,5.29167 10e-6,7.9375 9.16543,-5.29167 v -5.29167 l -6.87408,3.96875 v 2.64584 l 4.58272,-2.64584"
+       d="m 22.913598,183.22916 -9.16544,5.29167 10e-6,7.9375 9.16543,-5.29167 v -5.29167 l -6.87408,3.96875 v 2.64584 l 4.58272,-2.64584"
        id="path270"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <g
-       transform="translate(2.2913601,41.010408)"
-       id="g278">
+       transform="translate(-6.8740728,33.072898)"
+       id="g278"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 96.237069,154.125 v 13.22917 l -6.874075,3.96875 v -5.29167 l 2.291359,-1.32291 v -7.9375 z"
@@ -717,37 +1071,58 @@
     </g>
     <path
        style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 98.528431,195.13541 -13.748154,-7.9375 10e-7,13.22917 13.748154,7.9375 z"
+       d="m 89.362998,187.1979 -13.748154,-7.9375 10e-7,13.22917 13.748154,7.9375 z"
        id="path280"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 98.528431,195.13541 11.456789,-6.61458 -13.748147,-7.9375 -11.456795,6.61458 z"
+       d="m 89.362998,187.1979 11.456792,-6.61458 -13.74815,-7.9375 -11.456795,6.61458 z"
        id="path282"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 109.98522,188.52083 v 13.22916 l -11.456789,6.61459 v -13.22917 z"
+       d="m 100.81979,180.58332 v 13.22916 l -11.456792,6.61459 V 187.1979 Z"
        id="path284"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 87.071637,191.16666 9.165433,5.29167"
+       d="m 77.906204,183.22915 9.165433,5.29167"
        id="path286"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 91.654355,193.81249 v 5.29167"
+       d="m 82.488922,185.87498 v 5.29167"
        id="path288"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 89.362996,200.42707 4.58272,2.64583"
+       d="m 80.197563,192.48956 4.58272,2.64583"
        id="path290"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <g
        id="g320"
-       transform="translate(0,2.6458334)">
+       transform="translate(-6.8740704,-9.2604149)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
       <path
          style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 38.953099,197.78124 v 13.22917 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
@@ -767,37 +1142,2037 @@
     <path
        inkscape:connector-curvature="0"
        id="path298"
-       d="m 48.118536,195.13542 -13.748154,-7.9375 10e-7,13.22917 13.748154,7.9375 z"
-       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 38.953103,187.19791 -13.748154,-7.9375 1e-6,13.22917 13.748154,7.9375 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path300"
-       d="m 48.118536,195.13542 11.456789,-6.61458 -13.748147,-7.9375 -11.456795,6.61458 z"
-       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 38.953103,187.19791 11.456789,-6.61458 -13.748147,-7.9375 -11.456795,6.61458 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path302"
-       d="M 59.575325,188.52084 V 201.75 l -11.456789,6.61459 v -13.22917 z"
-       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 50.409892,180.58333 v 13.22916 l -11.456789,6.61459 v -13.22917 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 45.827177,196.45834 -9.165436,-5.29167 v 7.9375 l 9.165436,5.29167 v -5.29167 L 38.9531,195.13542 v 2.64584 l 4.582718,2.64583"
+       d="m 36.661744,188.52083 -9.165436,-5.29167 v 7.9375 l 9.165436,5.29167 v -5.29167 l -6.874077,-3.96875 v 2.64584 l 4.582718,2.64583"
        id="path304"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 32.079026,204.39582 6.874082,-3.96875 -2.29136,-1.32291 -6.874082,3.96875 z"
+       id="path4918-7-5"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 48.118536,208.36457 v 13.22917 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
+       d="m 38.953103,200.42706 v 13.22917 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
        id="path306"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 54.992616,212.33332 -2.29136,-1.32292 v 2.64584 z"
+       d="m 45.827183,204.39581 -2.29136,-1.32292 v 2.64584 z"
        id="path308"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
     <path
        inkscape:connector-curvature="0"
        id="path310"
-       d="m 48.118536,208.36457 -2.291358,-1.32291 v 13.22916 l 2.291359,1.32292 z"
-       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 38.953103,200.42706 -2.291358,-1.32291 v 13.22916 l 2.291359,1.32292 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 91.654357,169.99999 6.87408,-3.96875 -2.29136,-1.32291 -6.874079,3.96875 z"
+       id="path4918"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 89.362991,213.65625 6.874082,-3.96875 -2.29136,-1.32291 -6.874082,3.96875 z"
+       id="path4918-7"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 89.362995,255.9896 11.456785,-6.61458 -13.748142,-7.9375 -11.456795,6.61458 z"
+       id="path4965"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       id="g4973"
+       transform="translate(-11.456797,80.697912)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 107.69386,158.09375 v 13.22917 l -6.87407,3.96875 V 170 l 2.29136,-1.32291 v -7.9375 z"
+         id="path4967"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 100.81979,170.00001 v 5.29167 l -2.291362,-1.32292 v -5.29167 z"
+         id="path4969"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 98.528428,168.67709 2.291362,-1.32291 v -5.29167 l 2.29136,-1.32292 v 7.9375 l -2.29136,1.32292 z"
+         id="path4971"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       id="g4981"
+       transform="translate(-6.8740761,75.406243)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4975"
+         d="m 96.237069,154.125 v 13.22917 l -6.874075,3.96875 v -5.29167 l 2.291359,-1.32291 v -7.9375 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path4977"
+         d="m 89.362993,166.03126 v 5.29167 l -2.291358,-1.32292 v -5.29167 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path4979"
+         d="m 87.071635,164.70834 2.291358,-1.32291 10e-7,-5.29167 2.291359,-1.32292 v 7.9375 l -2.291359,1.32292 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path4983"
+       d="m 89.362995,229.53126 -13.748153,-7.9375 10e-7,13.22917 13.748152,7.9375 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4985"
+       d="m 89.362995,229.53126 11.456785,-6.61458 -13.748142,-7.9375 -11.456795,6.61458 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4987"
+       d="m 100.81978,222.91668 v 13.22916 l -11.456785,6.61459 v -13.22917 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4989"
+       d="m 77.906202,225.56251 9.165433,5.29167"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4991"
+       d="m 82.48892,228.20834 v 5.29167"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4993"
+       d="m 80.197561,234.82292 4.58272,2.64583"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4997"
+       d="m 89.362994,340.65625 11.456796,-6.61458 -13.748154,-7.9375 -11.456791,6.61458 z"
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       transform="translate(-6.8740753,162.71874)"
+       id="g5005"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4999"
+         d="m 107.69386,158.09375 v 13.22917 l -6.87407,3.96875 V 170 l 2.29136,-1.32291 v -7.9375 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5001"
+         d="m 100.81979,170.00001 v 5.29167 l -2.291362,-1.32292 v -5.29167 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5003"
+         d="m 98.528428,168.67709 2.291362,-1.32291 v -5.29167 l 2.29136,-1.32292 v 7.9375 l -2.29136,1.32292 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <g
+       transform="translate(-9.1654316,158.74999)"
+       id="g5013"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 96.237069,154.125 v 13.22917 l -6.874075,3.96875 v -5.29167 l 2.291359,-1.32291 v -7.9375 z"
+         id="path5007"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 89.362993,166.03126 v 5.29167 l -2.291358,-1.32292 v -5.29167 z"
+         id="path5009"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 87.071635,164.70834 2.291358,-1.32291 10e-7,-5.29167 2.291359,-1.32292 v 7.9375 l -2.291359,1.32292 z"
+         id="path5011"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 89.362994,314.19791 -13.74815,-7.9375 10e-7,13.22917 13.748149,7.9375 z"
+       id="path5015"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 89.362994,314.19791 11.456796,-6.61458 -13.748154,-7.9375 -11.456791,6.61458 z"
+       id="path5017"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 100.81979,307.58333 v 13.22916 l -11.456796,6.61459 v -13.22917 z"
+       id="path5019"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 77.906204,310.22916 9.165432,5.29167"
+       id="path5021"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 82.488924,312.87499 v 5.29167"
+       id="path5023"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 80.197564,319.48957 4.582722,2.64583"
+       id="path5025"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 80.197564,332.71874 6.874072,-3.96875 -2.29135,-1.32291 -6.874082,3.96875 z"
+       id="path5027"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 89.362997,382.98958 11.456793,-6.61458 -13.748153,-7.9375 -11.45679,6.61458 z"
+       id="path5029"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       id="g5037"
+       transform="translate(-6.8740748,205.05207)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 107.69386,158.09375 v 13.22917 l -6.87407,3.96875 V 170 l 2.29136,-1.32291 v -7.9375 z"
+         id="path5031"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 100.81979,170.00001 v 5.29167 l -2.291362,-1.32292 v -5.29167 z"
+         id="path5033"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 98.528428,168.67709 2.291362,-1.32291 v -5.29167 l 2.29136,-1.32292 v 7.9375 l -2.29136,1.32292 z"
+         id="path5035"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       id="g5045"
+       transform="translate(-11.456788,202.40624)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5039"
+         d="m 96.237069,154.125 v 13.22917 l -6.874075,3.96875 v -5.29167 l 2.291359,-1.32291 v -7.9375 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5041"
+         d="m 89.362993,166.03126 v 5.29167 l -2.291358,-1.32292 v -5.29167 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5043"
+         d="m 87.071635,164.70834 2.291358,-1.32291 10e-7,-5.29167 2.291359,-1.32292 v 7.9375 l -2.291359,1.32292 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path5047"
+       d="m 89.362997,356.53124 -13.74815,-7.9375 v 13.22917 l 13.74815,7.9375 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5049"
+       d="m 89.362997,356.53124 11.456793,-6.61458 -13.748153,-7.9375 -11.45679,6.61458 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5051"
+       d="m 100.81979,349.91666 v 13.22916 l -11.456793,6.61459 v -13.22917 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5053"
+       d="m 77.906207,352.56249 9.16543,5.29167"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5055"
+       d="m 82.488929,355.20832 v 5.29167"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5057"
+       d="m 80.197567,361.8229 4.582712,2.64583"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       sodipodi:nodetypes="ccccc"
+       inkscape:connector-curvature="0"
+       id="path5059"
+       d="m 77.906207,376.375 6.874072,-3.96875 -2.29135,-1.32291 -6.874082,3.96875 z"
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5061"
+       d="m 89.363008,425.32291 11.456792,-6.61458 -13.748154,-7.9375 -11.45679,6.61458 z"
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       transform="translate(-6.8740683,247.3854)"
+       id="g5069"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5063"
+         d="m 107.69386,158.09375 v 13.22917 l -6.87407,3.96875 V 170 l 2.29136,-1.32291 v -7.9375 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5065"
+         d="m 100.81979,170.00001 v 5.29167 l -2.291362,-1.32292 v -5.29167 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5067"
+         d="m 98.528428,168.67709 2.291362,-1.32291 v -5.29167 l 2.29136,-1.32292 v 7.9375 l -2.29136,1.32292 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 77.906206,418.70832 6.87408,-3.96875 -2.291358,-1.32291 -6.874082,3.96875 z"
+       id="path5091"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       transform="translate(-11.45678,247.3854)"
+       id="g5077"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 96.237069,154.125 v 13.22917 l -6.874075,3.96875 v -5.29167 l 2.291359,-1.32291 v -7.9375 z"
+         id="path5071"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 89.362993,166.03126 v 5.29167 l -2.291358,-1.32292 v -5.29167 z"
+         id="path5073"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 87.071635,164.70834 2.291358,-1.32291 10e-7,-5.29167 2.291359,-1.32292 v 7.9375 l -2.291359,1.32292 z"
+         id="path5075"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 89.363008,398.86457 -13.748162,-7.9375 1e-5,13.22917 13.748152,7.9375 z"
+       id="path5079"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 89.363008,398.86457 11.456792,-6.61458 -13.748154,-7.9375 -11.45679,6.61458 z"
+       id="path5081"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 100.8198,392.24999 v 13.22916 l -11.456792,6.61459 v -13.22917 z"
+       id="path5083"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 77.906206,394.89582 9.16544,5.29167"
+       id="path5085"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 82.488928,397.54165 v 5.29167"
+       id="path5087"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 80.197568,404.15623 4.582718,2.64583"
+       id="path5089"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 89.363001,298.32293 11.456789,-6.61458 -13.748149,-7.9375 -11.456801,6.61458 z"
+       id="path5093"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       id="g5101"
+       transform="translate(-9.1654292,119.0625)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5095"
+         d="m 96.237069,154.125 v 13.22917 l -6.874075,3.96875 v -5.29167 l 2.291359,-1.32291 v -7.9375 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5097"
+         d="m 89.362993,166.03126 v 5.29167 l -2.291358,-1.32292 v -5.29167 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5099"
+         d="m 87.071635,164.70834 2.291358,-1.32291 10e-7,-5.29167 2.291359,-1.32292 v 7.9375 l -2.291359,1.32292 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path5103"
+       d="m 89.362981,271.86458 -13.748151,-7.9375 v 13.22917 l 13.748161,7.9375 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5105"
+       d="M 89.362981,271.86458 100.81978,265.25 87.071631,257.3125 75.61483,263.92708 Z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5107"
+       d="m 100.81978,265.25 v 13.22916 l -11.456799,6.61459 v -13.22917 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5109"
+       d="m 77.90619,267.89583 9.165431,5.29167"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5111"
+       d="m 82.48891,270.54166 v 5.29167"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5113"
+       d="m 80.19755,277.15625 4.58272,2.64583"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5115"
+       d="m 98.528423,279.80207 v 13.22917 l -6.874074,3.96875 v -5.29167 l 2.29136,-1.32291 v -7.9375 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5117"
+       d="M 91.654349,291.70833 V 297 l -2.291368,-1.32292 v -5.29167 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5119"
+       d="m 89.362981,290.38541 2.291368,-1.32291 v -5.29167 l 2.29136,-1.32292 v 7.9375 l -2.29136,1.32292 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 73.323484,162.06249 -6.874076,-3.96875 -2.291358,1.32292 6.874077,3.96875 z"
+       id="path5127"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 75.614842,205.71874 -6.874076,-3.96875 -2.291358,1.32292 6.874077,3.96875 z"
+       id="path5127-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       transform="translate(-84.780276,-41.010422)"
+       id="g5152"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 151.22968,273.1875 v 13.22917 l 6.87408,3.96875 v -5.29167 l -2.29136,-1.32291 v -7.9375 z"
+         id="path5146"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 158.10376,285.09375 2.29136,-1.32292 v 5.29167 l -2.29136,1.32292 z"
+         id="path5148"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 160.39512,283.77083 -2.29136,-1.32291 v -5.29167 l -2.29136,-1.32291 v 7.9375 l 2.29136,1.32291 z"
+         id="path5150"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       id="g5160"
+       transform="translate(-9.1654429,76.729149)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5154"
+         d="m 59.57533,159.41667 v 13.22917 l 6.87408,3.96875 v -5.29167 l -2.29136,-1.32291 v -7.9375 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5156"
+         d="M 66.44941,171.32292 68.74077,170 v 5.29167 l -2.29136,1.32292 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5158"
+         d="m 68.740768,169.99999 -2.29136,-1.32291 v -5.29167 l -2.29136,-1.32291 V 170 l 2.29136,1.32291 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path5162"
+       d="m 64.158047,214.97917 -13.74815,7.9375 11.45679,6.61459 13.74816,-7.9375 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5164"
+       d="m 50.409897,222.91667 v 13.22917 l 11.45679,6.61458 v -13.22916 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5166"
+       d="m 75.614847,221.59376 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5168"
+       d="m 64.158037,230.85418 9.16544,-5.29167"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5170"
+       d="m 68.740757,228.20834 v 5.29167"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5172"
+       d="m 66.449397,237.46876 4.58272,-2.64583"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5125-3"
+       d="m 64.158038,283.77083 -13.748149,7.9375 11.456789,6.61459 13.74816,-7.9375 z"
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       id="g1413-5"
+       transform="translate(-87.071641,9.0510117e-6)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path564-6"
+         d="m 151.22968,273.1875 v 13.22917 l 6.87408,3.96875 v -5.29167 l -2.29136,-1.32291 v -7.9375 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path566-2"
+         d="m 158.10376,285.09375 2.29136,-1.32292 v 5.29167 l -2.29136,1.32292 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path568-9"
+         d="m 160.39512,283.77083 -2.29136,-1.32291 v -5.29167 l -2.29136,-1.32291 v 7.9375 l 2.29136,1.32291 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path580-1"
+       d="m 52.701243,279.80207 v 13.22917 l 6.874079,3.96875 v -5.29167 l -2.291359,-1.32291 v -7.9375 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path582-2"
+       d="m 59.575322,291.70832 2.29136,-1.32292 v 5.29167 l -2.29136,1.32292 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path584-7"
+       d="m 61.866682,290.3854 -2.29136,-1.32291 v -5.29167 l -2.291359,-1.32291 v 7.9375 l 2.291359,1.32291 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 64.158042,257.3125 -13.748149,7.93749 11.456789,6.61459 13.74816,-7.9375 z"
+       id="path1431-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 50.409893,265.24999 v 13.22917 l 11.456789,6.61458 v -13.22916 z"
+       id="path1433-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 75.614842,263.92708 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
+       id="path1435-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 64.158032,273.1875 9.16544,-5.29167"
+       id="path1437-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 68.740752,270.54166 v 5.29167"
+       id="path1439-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 66.449392,279.80208 4.58272,-2.64583"
+       id="path1441-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 64.158042,326.10416 -13.748149,7.9375 11.456789,6.61459 13.74816,-7.9375 z"
+       id="path5230"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       transform="translate(-89.362995,41.010418)"
+       id="g5238"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 151.22968,273.1875 v 13.22917 l 6.87408,3.96875 v -5.29167 l -2.29136,-1.32291 v -7.9375 z"
+         id="path5232"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 158.10376,285.09375 2.29136,-1.32292 v 5.29167 l -2.29136,1.32292 z"
+         id="path5234"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 160.39512,283.77083 -2.29136,-1.32291 v -5.29167 l -2.29136,-1.32291 v 7.9375 l 2.29136,1.32291 z"
+         id="path5236"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       id="g5261"
+       transform="translate(-9.1654336,-10.583316)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5240"
+         d="m 61.866684,330.0729 v 13.22917 l 6.874079,3.96875 v -5.29167 l -2.291359,-1.32291 v -7.9375 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5242"
+         d="m 68.740763,341.97915 2.29136,-1.32292 v 5.29167 l -2.29136,1.32292 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5244"
+         d="m 71.032126,340.65624 -2.29136,-1.32291 v -5.29167 l -2.291359,-1.32291 v 7.9375 l 2.291359,1.32291 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path5246"
+       d="m 64.158046,299.64583 -13.748149,7.93749 11.456789,6.61459 13.74816,-7.9375 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5248"
+       d="m 50.409897,307.58332 v 13.22917 l 11.456789,6.61458 v -13.22916 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5250"
+       d="m 75.614846,306.26041 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5252"
+       d="m 64.158036,315.52083 9.16544,-5.29167"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5254"
+       d="m 68.740756,312.87499 v 5.29167"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5256"
+       d="m 66.449396,322.13541 4.58272,-2.64583"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 61.866684,338.01042 -6.874076,-3.96875 -2.291358,1.32292 6.874077,3.96875 z"
+       id="path5127-5-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5278"
+       d="m 64.158044,368.4375 -13.748149,7.9375 11.456789,6.61459 13.74816,-7.9375 z"
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       id="g5286"
+       transform="translate(-89.362993,83.343747)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5280"
+         d="m 151.22968,273.1875 v 13.22917 l 6.87408,3.96875 v -5.29167 l -2.29136,-1.32291 v -7.9375 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5282"
+         d="m 158.10376,285.09375 2.29136,-1.32292 v 5.29167 l -2.29136,1.32292 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5284"
+         d="m 160.39512,283.77083 -2.29136,-1.32291 v -5.29167 l -2.29136,-1.32291 v 7.9375 l 2.29136,1.32291 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <g
+       transform="translate(-6.8740768,33.07292)"
+       id="g5294"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 61.866684,330.0729 v 13.22917 l 6.874079,3.96875 v -5.29167 l -2.291359,-1.32291 v -7.9375 z"
+         id="path5288"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 68.740763,341.97915 2.29136,-1.32292 v 5.29167 l -2.29136,1.32292 z"
+         id="path5290"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 71.032126,340.65624 -2.29136,-1.32291 v -5.29167 l -2.291359,-1.32291 v 7.9375 l 2.291359,1.32291 z"
+         id="path5292"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 64.158048,341.97917 -13.748149,7.93749 11.456789,6.61459 13.74816,-7.9375 z"
+       id="path5296"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 50.409899,349.91666 v 13.22917 l 11.456789,6.61458 v -13.22916 z"
+       id="path5298"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 75.614848,348.59375 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
+       id="path5300"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 64.158038,357.85417 9.16544,-5.29167"
+       id="path5302"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 68.740758,355.20833 V 360.5"
+       id="path5304"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 66.449398,364.46875 4.58272,-2.64583"
+       id="path5306"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5308"
+       d="m 64.158048,381.66667 -6.874076,-3.96875 -2.291358,1.32292 6.874077,3.96875 z"
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 64.158052,410.77083 -13.748149,7.9375 11.456789,6.61459 13.74816,-7.9375 z"
+       id="path5310"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       transform="translate(-89.362985,125.67708)"
+       id="g5318"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 151.22968,273.1875 v 13.22917 l 6.87408,3.96875 v -5.29167 l -2.29136,-1.32291 v -7.9375 z"
+         id="path5312"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 158.10376,285.09375 2.29136,-1.32292 v 5.29167 l -2.29136,1.32292 z"
+         id="path5314"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 160.39512,283.77083 -2.29136,-1.32291 v -5.29167 l -2.29136,-1.32291 v 7.9375 l 2.29136,1.32291 z"
+         id="path5316"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       id="g5326"
+       transform="translate(-6.8740683,78.05209)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5320"
+         d="m 61.866684,330.0729 v 13.22917 l 6.874079,3.96875 v -5.29167 l -2.291359,-1.32291 v -7.9375 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5322"
+         d="m 68.740763,341.97915 2.29136,-1.32292 v 5.29167 l -2.29136,1.32292 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5324"
+         d="m 71.032126,340.65624 -2.29136,-1.32291 v -5.29167 l -2.291359,-1.32291 v 7.9375 l 2.291359,1.32291 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path5328"
+       d="m 64.158056,384.3125 -13.748149,7.93749 11.456789,6.61459 13.74816,-7.9375 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5330"
+       d="m 50.409907,392.24999 v 13.22917 l 11.456789,6.61458 v -13.22916 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5332"
+       d="m 75.614856,390.92708 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5334"
+       d="m 64.158046,400.1875 9.16544,-5.29167"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5336"
+       d="m 68.740766,397.54166 v 5.29167"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5338"
+       d="m 66.449406,406.80208 4.58272,-2.64583"
+       style="fill:none;stroke:#2aa198;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 11.456795,168.67707 -6.8740759,-3.96875 -2.291358,1.32292 6.874077,3.96875 z"
+       id="path5127-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 9.1654361,209.68749 2.2913601,205.71874 2.3118729e-6,207.04166 6.8740791,211.01041 Z"
+       id="path5127-5-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 38.953088,255.98958 50.409877,249.375 36.66173,241.4375 25.204935,248.05208 Z"
+       id="path5507"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 13.748141,241.4375 -1.0088127e-5,249.375 11.456781,255.98959 l 13.74816,-7.9375 z"
+       id="path5509"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       id="g5517"
+       transform="translate(-9.1654479,76.729145)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5511"
+         d="m 32.079023,159.41667 v 13.22917 l -6.87408,-3.96875 v -5.29167 l 2.29136,1.32292 v -7.9375 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5513"
+         d="m 25.204943,163.38542 2.29136,-1.32292 v 2.64584 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5515"
+         d="m 34.370383,158.09375 v 13.22917 l -2.291359,1.32292 v -13.22917 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <g
+       transform="translate(-11.456796,35.718751)"
+       id="g5525"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="M 18.330874,204.39583 V 217.625 l -6.87408,-3.96875 v -5.29167 l 2.29136,1.32292 V 201.75 Z"
+         id="path5519"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 18.330874,217.625 2.29135,-1.32292 10e-6,-10.58333 -2.29136,-1.32292 z"
+         id="path5521"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 11.456794,208.36458 2.29136,-1.32292 v 2.64584 z"
+         id="path5523"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 13.748153,214.97917 2.9118729e-6,222.91667 11.456793,229.53126 l 13.74816,-7.9375 z"
+       id="path5527"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 2.9118729e-6,222.91667 v 13.22917 L 11.456793,242.76042 v -13.22916 z"
+       id="path5529"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 25.204953,221.59376 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
+       id="path5531"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5533"
+       d="m 22.913583,225.5625 -9.16544,5.29167 10e-6,7.9375 9.16543,-5.29167 v -5.29167 l -6.87408,3.96875 v 2.64584 l 4.58272,-2.64584"
+       style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       transform="translate(-6.8740779,35.718758)"
+       id="g5541"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5535"
+         d="m 38.953099,197.78124 v 13.22917 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5537"
+         d="m 38.953099,211.01041 -2.291361,-1.32292 3e-6,-10.58333 2.291359,-1.32292 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5539"
+         d="m 45.827179,201.74999 -2.29136,-1.32292 v 2.64584 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 38.953088,229.53125 -13.748154,-7.9375 10e-7,13.22917 13.748154,7.9375 z"
+       id="path5543"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 38.953088,229.53125 11.456789,-6.61458 -13.748147,-7.9375 -11.456795,6.61458 z"
+       id="path5545"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 50.409877,222.91667 v 13.22916 l -11.456789,6.61459 v -13.22917 z"
+       id="path5547"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5549"
+       d="M 36.661729,230.85417 27.496293,225.5625 V 233.5 l 9.165436,5.29167 V 233.5 l -6.874077,-3.96875 v 2.64584 l 4.582718,2.64583"
+       style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5551"
+       d="m 38.953088,242.7604 v 13.22917 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5553"
+       d="m 45.827168,246.72915 -2.29136,-1.32292 v 2.64584 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 38.953088,242.7604 -2.291358,-1.32291 v 13.22916 l 2.291359,1.32292 z"
+       id="path5555"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5125-1-2"
+       d="M 13.748154,283.77082 4.2118729e-6,291.70832 11.456794,298.32291 l 13.74816,-7.9375 z"
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4916-3-6-2"
+       d="m 38.953099,298.32291 11.45679,-6.61458 -13.748147,-7.9375 -11.456795,6.61458 z"
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       id="g1664-8"
+       transform="translate(-114.56795,140.22916)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 135.19018,136.92709 v 13.22917 l -6.87408,-3.96875 v -5.29167 l 2.29136,1.32292 v -7.9375 z"
+         id="path1577-9"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 135.19018,150.15626 2.29135,-1.32292 1e-5,-10.58333 -2.29136,-1.32292 z"
+         id="path1579-7"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 128.3161,140.89584 2.29136,-1.32292 v 2.64584 z"
+         id="path1581-3"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 128.3161,117.08334 -13.74815,7.9375 11.45679,6.61459 13.74816,-7.9375 z"
+         id="path1544-6"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 114.56795,125.02084 v 13.22917 l 11.45679,6.61458 v -13.22916 z"
+         id="path1546-1"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 139.7729,123.69793 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
+         id="path1548-2"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path1560-9"
+         d="m 123.73338,143.54167 v 13.22917 l -6.87408,-3.96875 v -5.29167 l 2.29136,1.32292 v -7.9375 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path1562-3"
+         d="m 123.73338,156.77084 2.29135,-1.32292 10e-6,-10.58333 -2.29136,-1.32292 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path1564-1"
+         d="m 116.8593,147.51042 2.29136,-1.32292 v 2.64584 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path1583-9"
+         d="m 137.48153,127.66667 -9.16544,5.29167 1e-5,7.9375 9.16543,-5.29167 v -5.29167 l -6.87408,3.96875 v 2.64584 l 4.58272,-2.64584"
+         style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <g
+       id="g4886-4"
+       transform="translate(-9.1654402,158.75)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 38.953103,118.40625 v 13.22917 l 6.87408,-3.96875 V 122.375 l -2.29136,1.32292 v -7.9375 z"
+         id="path1672-7"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 38.953103,131.63542 -2.291361,-1.32292 3e-6,-10.58333 2.291359,-1.32292 z"
+         id="path1674-8"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 45.827183,122.375 -2.29136,-1.32292 v 2.64584 z"
+         id="path1676-4"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path1611-5"
+       d="m 38.953105,271.86457 -13.748155,-7.9375 1e-6,13.22917 13.748154,7.9375 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path1613-0"
+       d="m 38.953105,271.86457 11.456789,-6.61458 -13.748147,-7.93749 -11.456796,6.61457 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path1615-3"
+       d="m 50.409894,265.24999 v 13.22916 l -11.456789,6.61459 v -13.22917 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 36.661744,273.18749 -9.165434,-5.29167 v 7.9375 l 9.165434,5.29167 v -5.29167 l -6.874076,-3.96875 v 2.64584 l 4.582718,2.64583"
+       id="path1623-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       id="g4881-1"
+       transform="translate(-9.1654359,158.75)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path1666-0"
+         d="M 50.409892,125.02083 V 138.25 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path1668-6"
+         d="m 50.409899,138.25001 -2.291361,-1.32292 3e-6,-10.58333 2.291359,-1.32292 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path1670-3"
+         d="m 57.283979,128.98959 -2.29136,-1.32292 v 2.64584 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 13.748157,326.10415 6.7118729e-6,334.04165 11.456797,340.65624 l 13.74816,-7.9375 z"
+       id="path5648"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 38.953102,340.65624 11.45679,-6.61458 -13.748147,-7.9375 -11.456795,6.61458 z"
+       id="path5650"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 13.748153,299.64583 3.7118729e-6,307.58333 11.456793,314.19792 l 13.74816,-7.9375 z"
+       id="path5658"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 3.7118729e-6,307.58333 V 320.8125 L 11.456793,327.42708 v -13.22916 z"
+       id="path5660"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       id="g5824-6"
+       transform="translate(-9.1654296,-52.916665)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 29.787667,369.76041 v 13.22917 l -6.87408,-3.96875 v -5.29167 l 2.29136,1.32292 v -7.9375 z"
+         id="path5769-1"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 29.78766,382.98959 2.29135,-1.32292 1e-5,-10.58333 -2.29136,-1.32292 z"
+         id="path5771-5"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 22.91358,373.72917 2.29136,-1.32292 v 2.64584 z"
+         id="path5773-5"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 25.204953,306.26042 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
+       id="path5662"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5670"
+       d="m 22.913583,310.22916 -9.16544,5.29167 10e-6,7.9375 9.16543,-5.29167 v -5.29167 l -6.87408,3.96875 v 2.64584 l 4.58272,-2.64584"
+       style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       id="g5723"
+       transform="translate(-11.456798,-27.781245)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5674"
+         d="m 38.9531,348.59375 v 13.22917 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5678"
+         d="m 45.82718,352.5625 -2.29136,-1.32292 v 2.64584 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5715"
+         d="m 38.953099,361.82291 v -13.22916 l -2.291357,-1.32292 V 360.5 Z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 38.953108,314.1979 -13.748155,-7.9375 1e-6,13.22917 13.748154,7.9375 z"
+       id="path5682"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 38.953108,314.1979 50.409897,307.58332 36.66175,299.64583 25.204954,306.2604 Z"
+       id="path5684"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       transform="translate(-9.1654366,198.4375)"
+       id="g5696"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="M 50.409892,125.02083 V 138.25 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
+         id="path5690"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 50.409899,138.25001 -2.291361,-1.32292 3e-6,-10.58333 2.291359,-1.32292 z"
+         id="path5692"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 57.283979,128.98959 -2.29136,-1.32292 v 2.64584 z"
+         id="path5694"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 50.409897,307.58332 v 13.22916 l -11.456789,6.61459 V 314.1979 Z"
+       id="path5686"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5688"
+       d="m 36.661747,315.52082 -9.165434,-5.29167 v 7.9375 l 9.165434,5.29167 v -5.29167 l -6.874076,-3.96875 v 2.64584 l 4.582718,2.64583"
+       style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 41.244458,339.33333 6.874072,-3.96875 -2.29135,-1.32291 -6.874082,3.96875 z"
+       id="path5027-2"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 25.204946,319.48958 2.291357,1.32292"
+       id="path5713"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       id="g5748"
+       transform="translate(-9.1654366,-7.9374921)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 20.622233,335.36458 v 13.22917 l -6.87408,-3.96875 v -5.29167 l 2.29136,1.32292 v -7.9375 z"
+         id="path5664"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 13.74815,339.33333 2.29136,-1.32292 v 2.64584 z"
+         id="path5668"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5743"
+         d="m 20.622229,348.59374 2.291359,-1.32291 1e-6,-13.22916 -2.291359,1.32291 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 22.913585,331.39583 -6.874076,-3.96875 -2.291358,1.32292 6.874077,3.96875 z"
+       id="path5127-5-2-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5765"
+       d="M 13.748149,368.43749 -1.5445932e-6,376.37499 11.456789,382.98958 l 13.74816,-7.9375 z"
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5767"
+       d="m 38.953094,382.98958 11.45679,-6.61458 -13.748147,-7.9375 -11.456795,6.61458 z"
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       id="g5824"
+       transform="translate(-11.456787,-11.906261)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 29.787667,369.76041 v 13.22917 l -6.87408,-3.96875 v -5.29167 l 2.29136,1.32292 v -7.9375 z"
+         id="path5769"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 29.78766,382.98959 2.29135,-1.32292 1e-5,-10.58333 -2.29136,-1.32292 z"
+         id="path5771"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 22.91358,373.72917 2.29136,-1.32292 v 2.64584 z"
+         id="path5773"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path5775"
+       d="M 13.748145,341.97917 -4.5445932e-6,349.91667 11.456785,356.53126 l 13.74816,-7.9375 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5777"
+       d="m -4.5445932e-6,349.91667 v 13.22917 L 11.456785,369.76042 v -13.22916 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5779"
+       d="m 25.204945,348.59376 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 22.913575,352.5625 -9.16544,5.29167 10e-6,7.9375 9.16543,-5.29167 v -5.29167 l -6.87408,3.96875 v 2.64584 l 4.58272,-2.64584"
+       id="path5781"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       transform="translate(-11.456806,14.552081)"
+       id="g5789"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 38.9531,348.59375 v 13.22917 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
+         id="path5783"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 45.82718,352.5625 -2.29136,-1.32292 v 2.64584 z"
+         id="path5785"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 38.953099,361.82291 v -13.22916 l -2.291357,-1.32292 V 360.5 Z"
+         id="path5787"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path5791"
+       d="m 38.9531,356.53124 -13.748155,-7.9375 1e-6,13.22917 13.748154,7.9375 z"
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5793"
+       d="m 38.9531,356.53124 11.456789,-6.61458 -13.748147,-7.93749 -11.456796,6.61457 z"
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       id="g5801"
+       transform="translate(-6.8740758,239.44792)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5795"
+         d="M 50.409892,125.02083 V 138.25 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5797"
+         d="m 50.409899,138.25001 -2.291361,-1.32292 3e-6,-10.58333 2.291359,-1.32292 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5799"
+         d="m 57.283979,128.98959 -2.29136,-1.32292 v 2.64584 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path5803"
+       d="m 50.409889,349.91666 v 13.22916 L 38.9531,369.76041 v -13.22917 z"
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 36.661739,357.85416 -9.165434,-5.29167 v 7.9375 l 9.165434,5.29167 v -5.29167 l -6.874076,-3.96875 v 2.64584 l 4.582718,2.64583"
+       id="path5805"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       sodipodi:nodetypes="ccccc"
+       inkscape:connector-curvature="0"
+       id="path5807"
+       d="m 43.535819,380.34375 6.874072,-3.96875 -2.29135,-1.32291 -6.874082,3.96875 z"
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5809"
+       d="m 25.204938,361.82292 2.291357,1.32292"
+       style="fill:none;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5819"
+       d="m 20.622228,372.40625 -6.874076,-3.96875 -2.291358,1.32292 6.874077,3.96875 z"
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       id="g5817"
+       transform="translate(-9.1654451,34.395834)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5811"
+         d="m 20.622233,335.36458 v 13.22917 l -6.87408,-3.96875 v -5.29167 l 2.29136,1.32292 v -7.9375 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5813"
+         d="m 13.74815,339.33333 2.29136,-1.32292 v 2.64584 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 20.622229,348.59374 2.291359,-1.32291 1e-6,-13.22916 -2.291359,1.32291 z"
+         id="path5815"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       style="fill:#647b82;fill-opacity:0.4;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 13.748157,410.77082 6.8118723e-6,418.70832 11.456797,425.32291 l 13.74816,-7.9375 z"
+       id="path5886"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:0.4017094;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 38.953102,425.32291 11.45679,-6.61458 -13.748147,-7.9375 -11.456795,6.61458 z"
+       id="path5888"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       transform="translate(-11.456772,33.072914)"
+       id="g5896"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5890"
+         d="m 29.787667,369.76041 v 13.22917 l -6.87408,-3.96875 v -5.29167 l 2.29136,1.32292 v -7.9375 z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5892"
+         d="m 29.78766,382.98959 2.29135,-1.32292 1e-5,-10.58333 -2.29136,-1.32292 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5894"
+         d="m 22.91358,373.72917 2.29136,-1.32292 v 2.64584 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 13.748153,384.3125 3.8118723e-6,392.25 11.456793,398.86459 l 13.74816,-7.9375 z"
+       id="path5898"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 3.8118723e-6,392.25 v 13.22917 L 11.456793,412.09375 v -13.22916 z"
+       id="path5900"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 25.204953,390.92709 v 13.22916 l -13.74816,7.9375 v -13.22916 z"
+       id="path5902"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5904"
+       d="m 22.913583,394.89583 -9.16544,5.29167 10e-6,7.9375 9.16543,-5.29167 v -5.29167 l -6.87408,3.96875 v 2.64584 l 4.58272,-2.64584"
+       style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       id="g5912"
+       transform="translate(-11.456798,56.885415)"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5906"
+         d="m 38.9531,348.59375 v 13.22917 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5908"
+         d="m 45.82718,352.5625 -2.29136,-1.32292 v 2.64584 z"
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5910"
+         d="m 38.953099,361.82291 v -13.22916 l -2.291357,-1.32292 V 360.5 Z"
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 38.953108,398.86457 -13.748155,-7.9375 1e-6,13.22917 13.748154,7.9375 z"
+       id="path5914"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 38.953108,398.86457 50.409897,392.24999 36.66175,384.3125 25.204954,390.92707 Z"
+       id="path5916"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       transform="translate(-6.8740743,284.42708)"
+       id="g5924"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="M 50.409892,125.02083 V 138.25 l 6.87408,-3.96875 v -5.29167 l -2.29136,1.32292 v -7.9375 z"
+         id="path5918"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 50.409899,138.25001 -2.291361,-1.32292 3e-6,-10.58333 2.291359,-1.32292 z"
+         id="path5920"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 57.283979,128.98959 -2.29136,-1.32292 v 2.64584 z"
+         id="path5922"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 50.409897,392.24999 v 13.22916 l -11.456789,6.61459 v -13.22917 z"
+       id="path5926"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path5928"
+       d="m 36.661747,400.18749 -9.165434,-5.29167 v 7.9375 l 9.165434,5.29167 v -5.29167 l -6.874076,-3.96875 v 2.64584 l 4.582718,2.64583"
+       style="fill:none;stroke:#859900;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 25.204946,404.15625 2.291357,1.32292"
+       id="path5932"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       transform="translate(-9.1654369,76.729168)"
+       id="g5942"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/robot.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         style="fill:#586e75;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 20.622233,335.36458 v 13.22917 l -6.87408,-3.96875 v -5.29167 l 2.29136,1.32292 v -7.9375 z"
+         id="path5936"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#657b83;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 13.74815,339.33333 2.29136,-1.32292 v 2.64584 z"
+         id="path5938"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5940"
+         d="m 20.622229,348.59374 2.291359,-1.32291 1e-6,-13.22916 -2.291359,1.32291 z"
+         style="fill:#073642;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
   </g>
 </svg>

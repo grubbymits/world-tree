@@ -1,8 +1,12 @@
-import { Location } from "./physics.js"
+import { Location,
+         Direction,
+         getDirection,
+         getOppositeDirection } from "./physics.js"
 import { Terrain,
          TerrainShape,
          TerrainType,
-         TerrainFeature } from "./terrain.js"
+         TerrainFeature,
+         isRampUp } from "./terrain.js"
 import { Point,
          GraphicComponent } from "./graphics.js"
 import { Context } from "./context.js"
@@ -14,35 +18,6 @@ class MovementCost {
   get location(): Location { return this._terrain.location; }
   get cost(): number { return this._cost; }
 }
-
-/*
-class PathFinder {
-  constructor(private _map: SquareGrid,
-              private _objects: Array<Entity>) { }
-
-  static isBlocked(toTerrain: Terrain, fromTerrain: Terrain): boolean {
-    let toLoc = Terrain.scaleLocation(toTerrain.location);
-    let fromLoc = Terrain.scaleLocation(fromTerrain.location);
-
-    if ((toTerrain.shape == fromTerrain.shape) &&
-        (toTerrain.shape == TerrainShape.Flat)) {
-      return fromLoc.z == toLoc.z;
-    } else if (fromLoc.z == toLoc.z || Math.abs(fromLoc.z - toLoc.z) > 1) {
-      return false;
-    }
-
-    switch (toTerrain.shape) {
-    case TerrainShape.RampUpNorth:
-    case TerrainShape.RampUpSouth:
-      return fromLoc.x == toLoc.x && Math.abs(fromLoc.y - toLoc.y) == 1;
-    case TerrainShape.RampUpEast:
-    case TerrainShape.RampUpWest:
-      return fromLoc.y == toLoc.y && Math.abs(fromLoc.x - toLoc.x) == 1;
-    }
-    return false;
-  }
-}
-*/
 
 export class SquareGrid {
   private readonly _neighbourOffsets: Array<Point> =
@@ -133,6 +108,42 @@ export class SquareGrid {
     return neighbours;
   }
 
+  getAccessibleNeighbours(centre: Terrain): Array<Terrain> {
+
+    // Blocked by different Z values, other than when:
+    // direction, entering non-blocking tile
+    // north,     RampUpNorth
+    // east,      RampUEast
+    // south,     RampUpSouth
+    // west,      RampUpWest
+
+    // Blocked by different Z values, other than when:
+    // direction, leaving non-blocking tile
+    // north,     RampUpSouth
+    // east,      RampUpWest
+    // south,     RampUpNorth
+    // west,      RampUpEast
+
+    let neighbours = this.getNeighbours(centre);
+    let centrePoint: Point = new Point(centre.x, centre.y);
+    return neighbours.filter(function(to: Terrain) {
+      console.assert(Math.abs(centre.z - to.z) <= 1,
+                     "can only handle neighbours separated by 1 terrace max");
+
+      let toPoint: Point = new Point(to.x, to.y);
+      let direction: Direction = getDirection(centrePoint, toPoint);
+      let oppositeDir: Direction = getOppositeDirection(direction);
+      if (to.z == centre.z) {
+        return true;
+      } else if (to.z > centre.z) {
+        return !isRampUp(centre.shape, direction) && isRampUp(to.shape, direction);
+      } else if (to.z < centre.z) {
+        return !isRampUp(centre.shape, oppositeDir) && isRampUp(to.shape, oppositeDir);
+      }
+      return false;
+    });
+  }
+
   findPath(begin: Terrain, end: Terrain) : Array<Terrain> {
     let path = new Array<Terrain>();
   
@@ -157,7 +168,7 @@ export class SquareGrid {
         break;
       }
 
-      let neighbours: Array<Terrain> = this.getNeighbours(current.terrain);
+      let neighbours: Array<Terrain> = this.getAccessibleNeighbours(current.terrain);
       for (let next of neighbours) {
         let newCost = costSoFar.get(current.terrain.id)! +
           this.getNeighbourCost(current.terrain, next);

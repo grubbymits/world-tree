@@ -1,4 +1,5 @@
-import { Terrain } from "./terrain.js";
+import { getDirection, getOppositeDirection } from "./physics.js";
+import { Terrain, isRampUp } from "./terrain.js";
 import { Point } from "./graphics.js";
 class MovementCost {
     constructor(_terrain, _cost) {
@@ -81,6 +82,26 @@ export class SquareGrid {
         }
         return neighbours;
     }
+    getAccessibleNeighbours(centre) {
+        let neighbours = this.getNeighbours(centre);
+        let centrePoint = new Point(centre.x, centre.y);
+        return neighbours.filter(function (to) {
+            console.assert(Math.abs(centre.z - to.z) <= 1, "can only handle neighbours separated by 1 terrace max");
+            let toPoint = new Point(to.x, to.y);
+            let direction = getDirection(centrePoint, toPoint);
+            let oppositeDir = getOppositeDirection(direction);
+            if (to.z == centre.z) {
+                return true;
+            }
+            else if (to.z > centre.z) {
+                return !isRampUp(centre.shape, direction) && isRampUp(to.shape, direction);
+            }
+            else if (to.z < centre.z) {
+                return !isRampUp(centre.shape, oppositeDir) && isRampUp(to.shape, oppositeDir);
+            }
+            return false;
+        });
+    }
     findPath(begin, end) {
         let path = new Array();
         let frontier = new Array();
@@ -95,7 +116,7 @@ export class SquareGrid {
             if (current.terrain.id == end.id) {
                 break;
             }
-            let neighbours = this.getNeighbours(current.terrain);
+            let neighbours = this.getAccessibleNeighbours(current.terrain);
             for (let next of neighbours) {
                 let newCost = costSoFar.get(current.terrain.id) +
                     this.getNeighbourCost(current.terrain, next);

@@ -103,6 +103,30 @@ export function getDirection(from: Point, to: Point): Direction {
   return Direction.SouthEast;
 }
 
+export function getOppositeDirection(direction: Direction): Direction {
+  switch (direction) {
+  default:
+    break;
+  case Direction.NorthEast:
+    return Direction.SouthWest;
+  case Direction.East:
+    return Direction.West;
+  case Direction.SouthEast:
+    return Direction.NorthWest;
+  case Direction.South:
+    return Direction.North;
+  case Direction.SouthWest:
+    return Direction.NorthEast;
+  case Direction.West:
+    return Direction.East;
+  case Direction.NorthWest:
+    return Direction.SouthEast;
+  }
+  console.assert(direction == Direction.North,
+                 "unhandled direction");
+  return Direction.North;
+}
+
 export class Location {
   constructor(private _x: number,
               private _y: number,

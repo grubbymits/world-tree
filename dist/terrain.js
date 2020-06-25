@@ -1,4 +1,4 @@
-import { Location } from "./physics.js";
+import { Location, Direction } from "./physics.js";
 import { Entity } from "./entity.js";
 import { Sprite, StaticGraphicComponent } from "./graphics.js";
 export var TerrainShape;
@@ -187,6 +187,25 @@ export function isEdge(terrain) {
         case TerrainShape.RampUpEastEdge:
         case TerrainShape.RampUpNorthEdge:
             return true;
+    }
+    return false;
+}
+export function isRampUp(shape, direction) {
+    switch (direction) {
+        default:
+            break;
+        case Direction.North:
+            return shape == TerrainShape.RampUpNorthEdge ||
+                shape == TerrainShape.RampUpNorth;
+        case Direction.East:
+            return shape == TerrainShape.RampUpEastEdge ||
+                shape == TerrainShape.RampUpEast;
+        case Direction.South:
+            return shape == TerrainShape.RampUpSouthEdge ||
+                shape == TerrainShape.RampUpSouth;
+        case Direction.West:
+            return shape == TerrainShape.RampUpWestEdge ||
+                shape == TerrainShape.RampUpWest;
     }
     return false;
 }

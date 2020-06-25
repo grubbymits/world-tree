@@ -284,12 +284,6 @@ export class TerrainBuilder {
     }
     setFeatures() { }
     setShapes() {
-        const rampUpFilters = [[-1, 0, 1],
-            [1, 0, -1]];
-        const rampsAxisY = [TerrainShape.RampUpNorth,
-            TerrainShape.RampUpSouth];
-        const rampsAxisX = [TerrainShape.RampUpEast,
-            TerrainShape.RampUpWest];
         const coordOffsets = [new Point(0, -1),
             new Point(1, 0),
             new Point(0, 1),
@@ -301,20 +295,15 @@ export class TerrainBuilder {
         for (let y = 1; y < this._surface.depth - 1; y++) {
             for (let x = 1; x < this._surface.width - 1; x++) {
                 let centre = this._surface.at(x, y);
-                console.log("centre terrace:", centre.terrace);
-                console.log("centre height:", centre.height);
                 let roundUpHeight = centre.height + (this._terraceSpacing / 2);
-                console.log("rounded up height:", roundUpHeight);
                 if (roundUpHeight != (centre.terrace + 1) * this._terraceSpacing) {
                     continue;
                 }
                 for (let i in coordOffsets) {
                     let offset = coordOffsets[i];
                     let neighbour = this._surface.at(centre.x + offset.x, centre.y + offset.y);
-                    console.log("neighbour terrace:", neighbour.terrace);
                     if (neighbour.terrace == centre.terrace + 1) {
                         neighbour.shape = ramps[i];
-                        console.log("adding", getShapeName(neighbour.shape), "at", centre.x + offset.x, centre.y + offset.y);
                     }
                 }
             }
