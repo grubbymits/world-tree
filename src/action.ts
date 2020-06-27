@@ -119,3 +119,14 @@ export class MoveDestination extends Action {
     return this.actor.location.isNearlySameAs(this.destination);
   }
 }
+
+// get a path from the map, then for each point (from A to B):
+// - query the physics whether there's anything in the way of point A and B.
+// - ignore any objects that are terrain, because the map has already decided
+//   that they're accessible.
+// - generate a series of waypoints to get from A to B.
+// Then, each update we need to check whether the next move is still possible.
+export class Navigate extends Action {
+  constructor(actor: Actor, from: Location, to: Location) {
+  }
+}
