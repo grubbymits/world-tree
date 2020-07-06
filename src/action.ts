@@ -120,13 +120,44 @@ export class MoveDestination extends Action {
   }
 }
 
-// get a path from the map, then for each point (from A to B):
-// - query the physics whether there's anything in the way of point A and B.
-// - ignore any objects that are terrain, because the map has already decided
-//   that they're accessible.
-// - generate a series of waypoints to get from A to B.
-// Then, each update we need to check whether the next move is still possible.
 export class Navigate extends Action {
-  constructor(actor: Actor, from: Location, to: Location) {
+  private readonly _currentStep: MoveDestination;
+  private _waypoints: Array<Location>;
+  private _index: number = 0;
+
+  constructor(actor: Actor,
+              private readonly _step: number,
+              private readonly _destination,
+              private readonly _map: SquareGrid,
+              private readonly _boundsInfo: Octree) {
+    super(actor);
+    this._waypoints = _map.findPath(actor.location, _destination, _boundsInfo);
+    if (this._waypoints.length != 0) {
+      this._currentStep = new MoveDestination(actor, _step, this._waypoints[0]);
+    }
+  }
+
+  perform(): boolean {
+    // Maybe there's no path to the destination.
+    if (this._waypoints.length == 0) {
+      return true;
+    }
+
+    let finishedStep: boolean = currentMove.perform();
+    if (!finishedStep) {
+      return false;
+    }
+
+    this._index++;
+    if (this._index == this._waypoints.length) {
+      return true;
+    }
+
+    let nextLocation = this._waypoints[this._index];
+    // Check that nextLocation is still free, otherwise recompute the path.
+
+    this._currentStep = new MoveDestination(this._actor, this._step,
+                                            nextLocation);
+    return false;
   }
 }

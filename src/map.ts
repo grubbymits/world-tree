@@ -210,3 +210,4 @@ export class SquareGrid {
     return path.splice(1);
   }
 }
+

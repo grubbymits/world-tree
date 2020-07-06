@@ -303,6 +303,7 @@ export class Terrain extends Entity {
   }
 
   private readonly _tanTheta: number;
+  private readonly _surfaceLocation: Location;
 
   constructor(context: Context,
               private readonly _gridX: number,
@@ -326,6 +327,11 @@ export class Terrain extends Entity {
       this._tanTheta = 0;
     }
 
+    let x = this._bounds.centre.x;
+    let y = this._bounds.centre.y;
+    let z = this.heightAt(this._bounds.centre)!;
+    this._surfaceLocation = new Location(x, y, z);
+
     if (features == TerrainFeature.None) {
       return;
     }
@@ -346,6 +352,7 @@ export class Terrain extends Entity {
   get gridZ(): number { return this._gridZ; }
   get shape(): TerrainShape { return this._shape; }
   get type(): TerrainType { return this._type; }
+  get surfaceLocation(): Location { return this._surfaceLocation; }
 
   heightAt(location: Location): number|null {
     // Given a world location, does this terrain define what the minimum z
