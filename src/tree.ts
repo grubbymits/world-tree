@@ -17,6 +17,16 @@ class OctNode {
   get width(): number { return this._bounds.width; }
   get height(): number { return this._bounds.height; }
   get depth(): number { return this._bounds.depth; }
+  get numEntities(): number {
+    if (this._entities.length != 0) {
+      return this._entities.length;
+    }
+    let total = 0;
+    for (let child of this._children) {
+      total += child.numEntities;
+    }
+    return total;
+  }
 
   constructor(private _bounds: BoundingCuboid) { }
 
@@ -119,15 +129,21 @@ class OctNode {
     return false;
   }
 
-  get numEntities(): number {
-    if (this._entities.length != 0) {
-      return this._entities.length;
+  obstructSegment(begin: Location, end: Location): boolean {
+    if (!this.bounds.obstructSegment(begin, end)) {
+      return false;
     }
-    let total = 0;
     for (let child of this._children) {
-      total += child.numEntities;
+      if (child.obstructSegment(begin, end)) {
+        return true;
+      }
     }
-    return total;
+    for (let entity of this._entities) {
+      if (entity.bounds.obstructSegment(begin, end)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
@@ -155,6 +171,10 @@ export class Octree {
     let inserted = this._root.insert(entity);
     console.assert(inserted, "failed to insert");
     this._numEntities++;
+  }
+
+  obstructSegment(begin: Location, end: Location): boolean {
+    return this._root.obstructSegment(begin, end);
   }
 
   update(entity: Entity): void {

@@ -153,11 +153,21 @@ export class Navigate extends Action {
       return true;
     }
 
+    // Check that nextLocation is still free.
     let nextLocation = this._waypoints[this._index];
-    // Check that nextLocation is still free, otherwise recompute the path.
-
-    this._currentStep = new MoveDestination(this._actor, this._step,
-                                            nextLocation);
-    return false;
+    if (!this._boundsInfo.obstructSegment(nextLocation, this._actor.location)) {
+      this._currentStep = new MoveDestination(this._actor, this._step,
+                                              nextLocation);
+      return false;
+    }
+    // Otherwise, recompute the path.
+    this.waypoints =
+      this._map.findPath(actor.location, this._destination, this._boundsInfo);
+    if (this._waypoints.length != 0) {
+      this._index = 0;
+      this._currentStep = new MoveDestination(actor, _step, this._waypoints[0]);
+      return false;
+    }
+    return true; // can't perform the move anymore.
   }
 }

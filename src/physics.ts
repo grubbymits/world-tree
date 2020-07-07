@@ -146,7 +146,7 @@ export class Location {
   }
 
   isSameAs(other: Location): boolean {
-    return this.x == other.x && this.y == other.y && this.z == other.z;
+    return this.x === other.x && this.y === other.y && this.z === other.z;
   }
 }
 
@@ -229,6 +229,19 @@ export class BoundingCuboid {
     y = centre.y + depth;
     z = centre.z + height;
     this._maxLocation  = new Location(x, y, z);
+
+    this._planes = new Array<Plane>();
+    let v0 = new Location(this.minX + width, this.minY, this.minZ);
+    let v1 = new Location(this.minX, this.minY + depth, this.minZ);
+    let v2 = new Location(this.minX, this.minY, this.minZ + height);
+    let v3 = new Location(this.minX + width, this.minY, this.minZ + height);
+    let v4 = new Location(this.minX, this.minY + depth, this.minZ + height);
+    this._planes.push(new Plane(minLocation, v0, v1));
+    this._planes.push(new Plane(minLocation, v0, v2));
+    this._planes.push(new Plane(minLocation, v1, v2));
+    this._planes.push(new Plane(maxLocation, v0, v3));
+    this._planes.push(new Plane(maxLocation, v1, v4));
+    this._planes.push(new Plane(maxLocation, v2, v3));
   }
 
   contains(location: Location): boolean {
@@ -248,6 +261,16 @@ export class BoundingCuboid {
   containsBounds(other: BoundingCuboid) {
     return this.contains(other.minLocation) &&
            this.contains(other.maxLocation);
+  }
+
+  obstructSegment(begin: Location, end: Location): boolean {
+    let vector: Vector3D = end.subtract(begin);
+    for (let plane of this.planes) {
+      if (vector.intersects(begin, end, plane)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   intersects(other: BoundingCuboid): boolean {
