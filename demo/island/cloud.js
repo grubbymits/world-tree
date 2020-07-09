@@ -18,7 +18,7 @@ export class CloudController extends WT.Controller {
     super();
     this._context = context;
     this._worldDims = dims;
-    this.moveVector = new WT.Vector3D(0, -1, 0);
+    this._moveVector = new WT.Vector3D(0, -1, 0);
   }
 
   add(cloud) {
@@ -26,7 +26,8 @@ export class CloudController extends WT.Controller {
     this._actors.push(cloud);
 
     let bounds = this._context.bounds;
-    let moveVector = this.moveVector;
+    let moveVector = this._moveVector;
+    let spatialInfo = this._context.spatial;
     cloud.addEventListener(WT.EntityEvent.ActionComplete, function() {
       let x = cloud.x;
       let y = cloud.y;
@@ -48,7 +49,7 @@ export class CloudController extends WT.Controller {
         z = bounds.minZ;
       }
       cloud.bounds.centre = new WT.Point3D(x, y, z);
-      cloud.action = new WT.MoveDirection(cloud, moveVector, bounds);
+      cloud.action = new WT.MoveDirection(cloud, moveVector, bounds, spatialInfo);
     });
   }
 
@@ -63,7 +64,8 @@ export class CloudController extends WT.Controller {
       let randLocation = new WT.Point3D(x, y, z);
       let cloud = new Cloud(this._context, randLocation);
       // dy == -1 == northwards.
-      cloud.action = new WT.MoveDirection(cloud, this.moveVector, this._context.bounds);
+      cloud.action = new WT.MoveDirection(cloud, this._moveVector, this._context.bounds,
+                                          this._context.spatial);
       this.add(cloud);
     }
   }

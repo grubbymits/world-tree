@@ -16,27 +16,67 @@ export abstract class Action {
   abstract perform(): boolean;
 }
 
-export class MoveDirection extends Action {
+class MoveAction extends Action {
   constructor(actor: Actor,
-              private readonly _d: Vector3D,
-              private _bounds: BoundingCuboid) {
+              protected readonly _spatialInfo: Octree) {
     super(actor);
   }
 
+  canMove(from: Point3D, to: Point3D): boolean {
+    let bounds = this._actor.bounds;
+    // Create a bounds to contain the current location and the destination.
+    let area = new BoundingCuboid(to, bounds.dimensions);
+    area.insert(bounds);
+
+    let entities: Array<Entity> = this._spatialInfo.getEntities(area);
+    let path: Vector3D = to.subtract(bounds.bottomCentre);
+    let beginMinLocation: Point3D = bounds.minLocation;
+    let beginMaxLocation: Point3D = bounds.maxLocation;
+    let endMinLocation: Point3D = beginMinLocation.add(path);
+    let endMaxLocation: Point3D = beginMaxLocation.add(path);
+
+    for (let entity of entities) {
+      let geometry: Geometry = entity.geometry;
+      if (geometry.obstructs(beginMinLocation, endMinLocation) ||
+          geometry.obstructs(beginMaxLocation, endMaxLocation)) {
+        console.log("obstructed by entity at", entity.bounds.centre);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  perform(): boolean { return true; }
+}
+
+export class MoveDirection extends MoveAction {
+  constructor(actor: Actor,
+              private readonly _d: Vector3D,
+              private _bounds: BoundingCuboid,
+              spatialInfo: Octree) {
+    super(actor, spatialInfo);
+  }
+
   perform(): boolean {
-    this.actor.bounds.updatePosition(this._d);
-    this.actor.postEvent(EntityEvent.Move);
-    return !this._bounds.contains(this.actor.bounds.centre);
+    let currentPos = this.actor.bounds.minLocation;
+    let nextPos = currentPos.add(this._d);
+    if (this.canMove(currentPos, nextPos)) {
+      this.actor.bounds.updatePosition(this._d);
+      this.actor.postEvent(EntityEvent.Move);
+      return !this._bounds.contains(this.actor.bounds.centre);
+    }
+    return true;
   }
 }
 
-export class MoveDestination extends Action {
+export class MoveDestination extends MoveAction {
   private _d: Vector3D;
 
   constructor(actor: Actor,
               private _step: number,
-              private _destination: Point3D) {
-    super(actor);
+              private _destination: Point3D,
+              spatialInfo: Octree) {
+    super(actor, spatialInfo);
     this.destination = _destination;
   }
 
@@ -117,6 +157,15 @@ export class MoveDestination extends Action {
     return bounds.minLocation.isNearlySameAs(this.destination);
   }
 }
+/*
+class MovementCost {
+  constructor(private readonly _terrain: Terrain,
+              private readonly _cost: number) { }
+  get terrain(): Terrain { return this._terrain; }
+  get location(): Point3D { return this._terrain.bounds.minLocation; }
+  get cost(): number { return this._cost; }
+}
+*/
 
 export class Navigate extends Action {
   private _currentStep: MoveDestination;
@@ -127,18 +176,59 @@ export class Navigate extends Action {
               private readonly _step: number,
               private readonly _destination: Point3D,
               private readonly _map: SquareGrid,
-              private readonly _boundsInfo: Octree) {
+              private readonly _spatialInfo: Octree) {
     super(actor);
     this._waypoints = this.findPath();
     if (this._waypoints.length != 0) {
-      this._currentStep = new MoveDestination(actor, _step, this._waypoints[0]);
+      this._currentStep =
+        new MoveDestination(actor, _step, this._waypoints[0], _spatialInfo);
     }
   }
 
+  perform(): boolean {
+    // Maybe there's no path to the destination.
+    if (this._waypoints.length == 0) {
+      return true;
+    }
+
+    // Perform the current movement until we reach the waypoint, or fail to get
+    // there.
+    let finishedStep: boolean = this._currentStep.perform();
+    if (!finishedStep) {
+      return false;
+    }
+
+    // If the step is reporting that it's done, check whether it completed or
+    // failed. If it failed, try to recompute the path.
+    if (!this._currentStep.destination.isNearlySameAs(
+        this._actor.bounds.minLocation)) {
+      this._waypoints = this.findPath();
+      if (this._waypoints.length != 0) {
+        this._index = 0;
+        this._currentStep =
+          new MoveDestination(this._actor, this._step, this._waypoints[0],
+                              this._spatialInfo);
+        return false;
+      }
+      return true; // can no longer reach the destination.
+    }
+
+    this._index++;
+    if (this._index == this._waypoints.length) {
+      return true;
+    }
+
+    let nextLocation = this._waypoints[this._index];
+    this._currentStep =
+      new MoveDestination(this._actor, this._step, nextLocation,
+                          this._spatialInfo);
+    return false;
+  }
+
   findPath(): Array<Point3D> {
-    return new Array<Point3D>();
+    let path = new Array<Point3D>();
+    return path;
     /*
-    let path = new Array<Terrain>();
   
     // Adapted from:
     // http://www.redblobgames.com/pathfinding/a-star/introduction.html
@@ -207,62 +297,5 @@ export class Navigate extends Action {
     path.reverse();
     return path.splice(1);
     */
-  }
-
-  canMove(from: Point3D, to: Point3D): boolean {
-    let bounds = this._actor.bounds;
-    // Create a bounds to contain the current location and the destination.
-    let area = new BoundingCuboid(to, bounds.dimensions);
-    area.insert(bounds);
-
-    let entities: Array<Entity> = this._boundsInfo.getEntities(area);
-    let path: Vector3D = to.subtract(bounds.bottomCentre);
-    let beginMinLocation: Point3D = bounds.minLocation;
-    let beginMaxLocation: Point3D = bounds.maxLocation;
-    let endMinLocation: Point3D = beginMinLocation.add(path);
-    let endMaxLocation: Point3D = beginMaxLocation.add(path);
-
-    for (let entity of entities) {
-      let geometry: Geometry = entity.geometry;
-      if (geometry.obstructs(beginMinLocation, endMinLocation) ||
-          geometry.obstructs(beginMaxLocation, endMaxLocation)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  perform(): boolean {
-    // Maybe there's no path to the destination.
-    if (this._waypoints.length == 0) {
-      return true;
-    }
-
-    let finishedStep: boolean = this._currentStep.perform();
-    if (!finishedStep) {
-      return false;
-    }
-
-    this._index++;
-    if (this._index == this._waypoints.length) {
-      return true;
-    }
-
-    // Check that nextLocation is still free.
-    let nextLocation = this._waypoints[this._index];
-    if (this.canMove(this._actor.bounds.minLocation, nextLocation)) {
-      this._currentStep =
-        new MoveDestination(this._actor, this._step, nextLocation);
-      return false;
-    }
-    // Otherwise, recompute the path.
-    this._waypoints = this.findPath();
-    if (this._waypoints.length != 0) {
-      this._index = 0;
-      this._currentStep =
-        new MoveDestination(this._actor, this._step, this._waypoints[0]);
-      return false;
-    }
-    return true; // can't perform the move anymore.
   }
 }

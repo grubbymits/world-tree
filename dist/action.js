@@ -8,21 +8,53 @@ export class Action {
     get actor() { return this._actor; }
     set actor(actor) { this._actor = actor; }
 }
-export class MoveDirection extends Action {
-    constructor(actor, _d, _bounds) {
+class MoveAction extends Action {
+    constructor(actor, _spatialInfo) {
         super(actor);
+        this._spatialInfo = _spatialInfo;
+    }
+    canMove(from, to) {
+        let bounds = this._actor.bounds;
+        let area = new BoundingCuboid(to, bounds.dimensions);
+        area.insert(bounds);
+        let entities = this._spatialInfo.getEntities(area);
+        let path = to.subtract(bounds.bottomCentre);
+        let beginMinLocation = bounds.minLocation;
+        let beginMaxLocation = bounds.maxLocation;
+        let endMinLocation = beginMinLocation.add(path);
+        let endMaxLocation = beginMaxLocation.add(path);
+        for (let entity of entities) {
+            let geometry = entity.geometry;
+            if (geometry.obstructs(beginMinLocation, endMinLocation) ||
+                geometry.obstructs(beginMaxLocation, endMaxLocation)) {
+                console.log("obstructed by entity at", entity.bounds.centre);
+                return false;
+            }
+        }
+        return true;
+    }
+    perform() { return true; }
+}
+export class MoveDirection extends MoveAction {
+    constructor(actor, _d, _bounds, spatialInfo) {
+        super(actor, spatialInfo);
         this._d = _d;
         this._bounds = _bounds;
     }
     perform() {
-        this.actor.bounds.updatePosition(this._d);
-        this.actor.postEvent(EntityEvent.Move);
-        return !this._bounds.contains(this.actor.bounds.centre);
+        let currentPos = this.actor.bounds.minLocation;
+        let nextPos = currentPos.add(this._d);
+        if (this.canMove(currentPos, nextPos)) {
+            this.actor.bounds.updatePosition(this._d);
+            this.actor.postEvent(EntityEvent.Move);
+            return !this._bounds.contains(this.actor.bounds.centre);
+        }
+        return true;
     }
 }
-export class MoveDestination extends Action {
-    constructor(actor, _step, _destination) {
-        super(actor);
+export class MoveDestination extends MoveAction {
+    constructor(actor, _step, _destination, spatialInfo) {
+        super(actor, spatialInfo);
         this._step = _step;
         this._destination = _destination;
         this.destination = _destination;
@@ -100,39 +132,18 @@ export class MoveDestination extends Action {
     }
 }
 export class Navigate extends Action {
-    constructor(actor, _step, _destination, _map, _boundsInfo) {
+    constructor(actor, _step, _destination, _map, _spatialInfo) {
         super(actor);
         this._step = _step;
         this._destination = _destination;
         this._map = _map;
-        this._boundsInfo = _boundsInfo;
+        this._spatialInfo = _spatialInfo;
         this._index = 0;
         this._waypoints = this.findPath();
         if (this._waypoints.length != 0) {
-            this._currentStep = new MoveDestination(actor, _step, this._waypoints[0]);
+            this._currentStep =
+                new MoveDestination(actor, _step, this._waypoints[0], _spatialInfo);
         }
-    }
-    findPath() {
-        return new Array();
-    }
-    canMove(from, to) {
-        let bounds = this._actor.bounds;
-        let area = new BoundingCuboid(to, bounds.dimensions);
-        area.insert(bounds);
-        let entities = this._boundsInfo.getEntities(area);
-        let path = to.subtract(bounds.bottomCentre);
-        let beginMinLocation = bounds.minLocation;
-        let beginMaxLocation = bounds.maxLocation;
-        let endMinLocation = beginMinLocation.add(path);
-        let endMaxLocation = beginMaxLocation.add(path);
-        for (let entity of entities) {
-            let geometry = entity.geometry;
-            if (geometry.obstructs(beginMinLocation, endMinLocation) ||
-                geometry.obstructs(beginMaxLocation, endMaxLocation)) {
-                return false;
-            }
-        }
-        return true;
     }
     perform() {
         if (this._waypoints.length == 0) {
@@ -142,23 +153,27 @@ export class Navigate extends Action {
         if (!finishedStep) {
             return false;
         }
+        if (!this._currentStep.destination.isNearlySameAs(this._actor.bounds.minLocation)) {
+            this._waypoints = this.findPath();
+            if (this._waypoints.length != 0) {
+                this._index = 0;
+                this._currentStep =
+                    new MoveDestination(this._actor, this._step, this._waypoints[0], this._spatialInfo);
+                return false;
+            }
+            return true;
+        }
         this._index++;
         if (this._index == this._waypoints.length) {
             return true;
         }
         let nextLocation = this._waypoints[this._index];
-        if (this.canMove(this._actor.bounds.minLocation, nextLocation)) {
-            this._currentStep =
-                new MoveDestination(this._actor, this._step, nextLocation);
-            return false;
-        }
-        this._waypoints = this.findPath();
-        if (this._waypoints.length != 0) {
-            this._index = 0;
-            this._currentStep =
-                new MoveDestination(this._actor, this._step, this._waypoints[0]);
-            return false;
-        }
-        return true;
+        this._currentStep =
+            new MoveDestination(this._actor, this._step, nextLocation, this._spatialInfo);
+        return false;
+    }
+    findPath() {
+        let path = new Array();
+        return path;
     }
 }

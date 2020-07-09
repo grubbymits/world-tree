@@ -12,14 +12,6 @@ import { Point,
          GraphicComponent } from "./graphics.js"
 import { Context } from "./context.js"
 
-class MovementCost {
-  constructor(private readonly _terrain: Terrain,
-              private readonly _cost: number) { }
-  get terrain(): Terrain { return this._terrain; }
-  get location(): Point3D { return this._terrain.bounds.minLocation; }
-  get cost(): number { return this._cost; }
-}
-
 export class SquareGrid {
   private readonly _neighbourOffsets: Array<Point> =
     [ new Point(-1, -1), new Point(0, -1), new Point(1, -1),

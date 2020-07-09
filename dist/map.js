@@ -1,15 +1,6 @@
 import { getDirection, getOppositeDirection } from "./physics.js";
 import { Terrain, isFlat, isRampUp } from "./terrain.js";
 import { Point } from "./graphics.js";
-class MovementCost {
-    constructor(_terrain, _cost) {
-        this._terrain = _terrain;
-        this._cost = _cost;
-    }
-    get terrain() { return this._terrain; }
-    get location() { return this._terrain.bounds.minLocation; }
-    get cost() { return this._cost; }
-}
 export class SquareGrid {
     constructor(_context, _width, _height) {
         this._context = _context;
