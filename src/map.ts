@@ -16,7 +16,7 @@ class MovementCost {
   constructor(private readonly _terrain: Terrain,
               private readonly _cost: number) { }
   get terrain(): Terrain { return this._terrain; }
-  get location(): Point3D { return this._terrain.location; }
+  get location(): Point3D { return this._terrain.bounds.minLocation; }
   get cost(): number { return this._cost; }
 }
 

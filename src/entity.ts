@@ -45,7 +45,6 @@ export class Entity {
   get width(): number { return this._bounds.width; }
   get depth(): number { return this._bounds.depth; }
   get height(): number { return this._bounds.height; }
-  get location(): Point3D { return this._bounds.minLocation; }
   get geometry(): Geometry { return this._geometry; }
   get dimensions(): Dimensions { return this._bounds.dimensions; }
   get bounds(): BoundingCuboid { return this._bounds; }
@@ -63,7 +62,6 @@ export class Entity {
 
   set drawCoord(coord: Point) { this._drawCoord = coord; }
   set visible(visible: boolean) { this._visible = visible; }
-  set location(location: Point3D) { this._bounds.centre = location; }
 
   addGraphic(graphic: GraphicComponent): void {
     this._graphicComponents.push(graphic);

@@ -7,7 +7,7 @@ class MovementCost {
         this._cost = _cost;
     }
     get terrain() { return this._terrain; }
-    get location() { return this._terrain.location; }
+    get location() { return this._terrain.bounds.minLocation; }
     get cost() { return this._cost; }
 }
 export class SquareGrid {

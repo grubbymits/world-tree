@@ -17,20 +17,16 @@ export abstract class Action {
 }
 
 export class MoveDirection extends Action {
-  private _d: Vector3D;
   constructor(actor: Actor,
-              dx: number,
-              dy: number,
-              dz: number,
+              private readonly _d: Vector3D,
               private _bounds: BoundingCuboid) {
     super(actor);
-    this._d = new Vector3D(dx, dy, dz);
   }
 
   perform(): boolean {
     this.actor.bounds.updatePosition(this._d);
     this.actor.postEvent(EntityEvent.Move);
-    return !this._bounds.contains(this.actor.location);
+    return !this._bounds.contains(this.actor.bounds.centre);
   }
 }
 
@@ -50,7 +46,8 @@ export class MoveDestination extends Action {
 
   set destination(destination: Point3D) {
     this._destination = destination;
-    let maxD = destination.subtract(this.actor.location);
+    let currentPos = this.actor.bounds.minLocation;
+    let maxD = destination.subtract(currentPos);
 
     console.assert(maxD.x == 0 || maxD.y == 0 || maxD.z == 0,
                    "can only change distance along two axes simultaneously");
@@ -253,7 +250,7 @@ export class Navigate extends Action {
 
     // Check that nextLocation is still free.
     let nextLocation = this._waypoints[this._index];
-    if (this.canMove(this._actor.location, nextLocation)) {
+    if (this.canMove(this._actor.bounds.minLocation, nextLocation)) {
       this._currentStep =
         new MoveDestination(this._actor, this._step, nextLocation);
       return false;

@@ -8,7 +8,7 @@ let cloudDims = new WT.IsometricPhysicalDimensions(218, relativeDims);
 
 class Cloud extends WT.Actor {
   constructor(context, location) {
-    super(context, location, cloudDims, false, cloudGraphic);
+    super(context, location, cloudDims, cloudGraphic);
     this._canFly = true;
   }
 }
@@ -18,6 +18,7 @@ export class CloudController extends WT.Controller {
     super();
     this._context = context;
     this._worldDims = dims;
+    this.moveVector = new WT.Vector3D(0, -1, 0);
   }
 
   add(cloud) {
@@ -25,6 +26,7 @@ export class CloudController extends WT.Controller {
     this._actors.push(cloud);
 
     let bounds = this._context.bounds;
+    let moveVector = this.moveVector;
     cloud.addEventListener(WT.EntityEvent.ActionComplete, function() {
       let x = cloud.x;
       let y = cloud.y;
@@ -45,8 +47,8 @@ export class CloudController extends WT.Controller {
       } else if (cloud.z > bounds.maxZ) {
         z = bounds.minZ;
       }
-      cloud.location = new WT.Location(x, y, z);
-      cloud.action = new WT.MoveDirection(cloud, 0, -1, 0, bounds);
+      cloud.bounds.centre = new WT.Point3D(x, y, z);
+      cloud.action = new WT.MoveDirection(cloud, moveVector, bounds);
     });
   }
 
@@ -58,10 +60,10 @@ export class CloudController extends WT.Controller {
     for (let i = 0; i < total; i++) {
       let x = Math.floor(Math.random() * Math.floor(maxX));
       let y = Math.floor(Math.random() * Math.floor(maxY));
-      let randLocation = new WT.Location(x, y, z);
+      let randLocation = new WT.Point3D(x, y, z);
       let cloud = new Cloud(this._context, randLocation);
       // dy == -1 == northwards.
-      cloud.action = new WT.MoveDirection(cloud, 0, -1, 0, this._context.bounds);
+      cloud.action = new WT.MoveDirection(cloud, this.moveVector, this._context.bounds);
       this.add(cloud);
     }
   }

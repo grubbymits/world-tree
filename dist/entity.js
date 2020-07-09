@@ -23,7 +23,6 @@ export class Entity {
     get width() { return this._bounds.width; }
     get depth() { return this._bounds.depth; }
     get height() { return this._bounds.height; }
-    get location() { return this._bounds.minLocation; }
     get geometry() { return this._geometry; }
     get dimensions() { return this._bounds.dimensions; }
     get bounds() { return this._bounds; }
@@ -40,7 +39,6 @@ export class Entity {
     }
     set drawCoord(coord) { this._drawCoord = coord; }
     set visible(visible) { this._visible = visible; }
-    set location(location) { this._bounds.centre = location; }
     addGraphic(graphic) {
         this._graphicComponents.push(graphic);
     }

@@ -229,7 +229,7 @@ export abstract class SceneGraph {
   getLocationAt(x: number, y: number, camera: Camera): Point3D | null {
     let entity: Entity|null = this.getEntityDrawnAt(x, y, camera);
     if (entity != undefined) {
-      return entity.location;
+      return entity.bounds.minLocation;
     }
     return null;
   }
@@ -322,7 +322,8 @@ export class IsometricRenderer extends SceneGraph {
   }
 
   setDrawCoord(entity: Entity): void {
-    entity.drawCoord = IsometricRenderer.getDrawCoord(entity.location);
+    entity.drawCoord =
+      IsometricRenderer.getDrawCoord(entity.bounds.minLocation);
   }
 
   getDrawCoord(location: Point3D): Point {
