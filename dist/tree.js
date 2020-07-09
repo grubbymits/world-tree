@@ -58,6 +58,7 @@ class OctNode {
                     let offsetY = Math.floor(offset[y] * dimensions.depth);
                     let offsetZ = Math.floor(offset[z] * dimensions.height);
                     let centre = new Point3D(this.centre.x + offsetX, this.centre.y + offsetY, this.centre.z + offsetZ);
+                    console.log("chosen centre point (x,y,z):", centre.x, centre.y, centre.z);
                     let bounds = new BoundingCuboid(centre, dimensions);
                     this._children.push(new OctNode(bounds));
                 }
@@ -77,7 +78,7 @@ class OctNode {
                     break;
                 }
             }
-            console.assert(inserted, "failed to insert into children:", entity);
+            console.assert(inserted, "failed to insert into children, entity centred at:", entity.bounds.centre);
         }
         this._entities = [];
         return true;

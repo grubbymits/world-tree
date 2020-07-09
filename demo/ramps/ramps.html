@@ -44,7 +44,7 @@
 
     const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
                                         physicalDims.depth * cellsY,
-                                        physicalDims.height * terraces);
+                                        physicalDims.height * (1 + terraces));
     
     window.onload = (event) => {
       console.log("window loaded");

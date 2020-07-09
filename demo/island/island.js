@@ -44,7 +44,7 @@ window.onload = (event) => {
 
   const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
                                        physicalDims.depth * cellsY,
-                                       physicalDims.height * terraces);
+                                       physicalDims.height * (1 + terraces));
   let canvas = document.getElementById("testCanvas");
   let context = new WT.Context(canvas, worldDims);
 
