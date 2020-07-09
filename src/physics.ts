@@ -173,10 +173,11 @@ export class IsometricPhysicalDimensions extends Dimensions {
 export class BoundingCuboid {
   private _minLocation: Point3D;
   private _maxLocation: Point3D;
+  private _bottomCentre: Point3D;
 
   constructor(private _centre: Point3D,
               private _dimensions: Dimensions) {
-    this.updateLocation(_centre);
+    this.location = _centre;
   }
 
   get minLocation(): Point3D { return this._minLocation; }
@@ -188,11 +189,13 @@ export class BoundingCuboid {
   get maxY(): number { return this.maxLocation.y; }
   get maxZ(): number { return this.maxLocation.z; }
   get centre(): Point3D { return this._centre; }
+  get bottomCentre(): Point3D { return this._bottomCentre; }
   get width(): number { return this._dimensions.width; }
   get depth(): number { return this._dimensions.depth; }
   get height(): number { return this._dimensions.height; }
+  get dimensions(): Dimensions { return this._dimensions; }
 
-  updateLocation(centre: Point3D): void {
+  set location(centre: Point3D) {
     this._centre = centre;
     let width = Math.floor(this.width / 2);
     let depth = Math.floor(this.depth / 2);
@@ -201,6 +204,7 @@ export class BoundingCuboid {
     let x = centre.x - width;
     let y = centre.y - depth;
     let z = centre.z - height;
+    this._bottomCentre = new Point3D(centre.x, centre.y, z);
     this._minLocation = new Point3D(x, y, z);
 
     x = centre.x + width;

@@ -1,6 +1,8 @@
 import { Dimensions,
          BoundingCuboid } from "./physics.js"
-import { Point3D } from "./geometry.js"
+import { Point3D,
+         Geometry,
+         NoGeometry } from "./geometry.js"
 import { Point,
          GraphicComponent,
          IsometricRenderer } from "./graphics.js"
@@ -37,13 +39,14 @@ export class Entity {
     this._context.addEntity(this);
   }
   
-  get x(): number { return this._bounds.x; }
-  get y(): number { return this._bounds.y; }
-  get z(): number { return this._bounds.z; }
+  get x(): number { return this._bounds.minX; }
+  get y(): number { return this._bounds.minY; }
+  get z(): number { return this._bounds.minZ; }
   get width(): number { return this._bounds.width; }
   get depth(): number { return this._bounds.depth; }
   get height(): number { return this._bounds.height; }
   get location(): Point3D { return this._bounds.minLocation; }
+  get geometry(): Geometry { return this._geometry; }
   get dimensions(): Dimensions { return this._bounds.dimensions; }
   get bounds(): BoundingCuboid { return this._bounds; }
   get centre(): Point3D { return this._bounds.centre; }
@@ -60,7 +63,7 @@ export class Entity {
 
   set drawCoord(coord: Point) { this._drawCoord = coord; }
   set visible(visible: boolean) { this._visible = visible; }
-  set location(location: Point3D) { this._location = location; }
+  set location(location: Point3D) { this._bounds.location = location; }
 
   addGraphic(graphic: GraphicComponent): void {
     this._graphicComponents.push(graphic);
@@ -87,9 +90,8 @@ export class EventableEntity extends Entity {
   constructor(context: Context,
               location: Point3D,
               dimensions: Dimensions,
-              blocking: boolean,
               graphicComponent: GraphicComponent) {
-    super(context, location, dimensions, blocking, graphicComponent);
+    super(context, location, dimensions, graphicComponent);
   }
 
   addEventListener(event: EntityEvent, callback: Function): void {
@@ -111,9 +113,8 @@ export class Actor extends EventableEntity {
   constructor(context: Context,
               location: Point3D,
               dimensions: Dimensions,
-              blocking: boolean,
               graphicComponent: GraphicComponent) {
-    super(context, location, dimensions, blocking, graphicComponent);
+    super(context, location, dimensions, graphicComponent);
     context.addActor(this);
   }
 

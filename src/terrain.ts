@@ -7,7 +7,9 @@ import { Point,
          GraphicComponent,
          StaticGraphicComponent } from "./graphics.js"
 import { Context } from "./context.js"
-import { Point3D } from "./geometry.js"
+import { Point3D,
+         Geometry,
+         CuboidGeometry } from "./geometry.js"
 
 export enum TerrainShape {
   Flat,
@@ -317,7 +319,7 @@ export class Terrain extends Entity {
           new Point3D(_gridX * dimensions.width,
                        _gridY * dimensions.depth,
                        _gridZ * dimensions.height),
-          dimensions, true, Terrain.graphics(_type, _shape));
+          dimensions, Terrain.graphics(_type, _shape));
 
     if (isFlat(_shape)) {
       this._geometry = new CuboidGeometry(this.bounds);

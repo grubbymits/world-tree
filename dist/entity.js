@@ -1,12 +1,10 @@
-import { Location, BoundingCuboid } from "./physics.js";
+import { BoundingCuboid } from "./physics.js";
+import { Point3D, NoGeometry } from "./geometry.js";
 import { Point } from "./graphics.js";
 import { EntityEvent, EventHandler } from "./events.js";
 export class Entity {
-    constructor(_context, _location, _dimensions, _blocking, graphicComponent) {
+    constructor(_context, location, dimensions, graphicComponent) {
         this._context = _context;
-        this._location = _location;
-        this._dimensions = _dimensions;
-        this._blocking = _blocking;
         this._hasMoved = false;
         this._drawCoord = new Point(0, 0);
         this._visible = true;
@@ -14,21 +12,22 @@ export class Entity {
         Entity._ids++;
         this._graphicComponents = new Array();
         this._graphicComponents.push(graphicComponent);
-        let centre = new Location(this.x + Math.floor(this.width / 2), this.y + Math.floor(this.depth / 2), this.z + Math.floor(this.height / 2));
-        this._bounds = new BoundingCuboid(centre, _dimensions);
+        let centre = new Point3D(location.x + Math.floor(dimensions.width / 2), location.y + Math.floor(dimensions.depth / 2), location.z + Math.floor(dimensions.height / 2));
+        this._bounds = new BoundingCuboid(centre, dimensions);
+        this._geometry = new NoGeometry(this._bounds);
         this._context.addEntity(this);
     }
-    get x() { return this._location.x; }
-    get y() { return this._location.y; }
-    get z() { return this._location.z; }
-    get width() { return this._dimensions.width; }
-    get depth() { return this._dimensions.depth; }
-    get height() { return this._dimensions.height; }
-    get location() { return this._location; }
-    get dimensions() { return this._dimensions; }
+    get x() { return this._bounds.minX; }
+    get y() { return this._bounds.minY; }
+    get z() { return this._bounds.minZ; }
+    get width() { return this._bounds.width; }
+    get depth() { return this._bounds.depth; }
+    get height() { return this._bounds.height; }
+    get location() { return this._bounds.minLocation; }
+    get geometry() { return this._geometry; }
+    get dimensions() { return this._bounds.dimensions; }
     get bounds() { return this._bounds; }
     get centre() { return this._bounds.centre; }
-    get blocking() { return this._blocking; }
     get id() { return this._id; }
     get hasMoved() { return this._hasMoved; }
     get drawCoord() { return this._drawCoord; }
@@ -41,7 +40,7 @@ export class Entity {
     }
     set drawCoord(coord) { this._drawCoord = coord; }
     set visible(visible) { this._visible = visible; }
-    set location(location) { this._location = location; }
+    set location(location) { this._bounds.location = location; }
     addGraphic(graphic) {
         this._graphicComponents.push(graphic);
     }
@@ -59,8 +58,8 @@ export class Entity {
 }
 Entity._ids = 0;
 export class EventableEntity extends Entity {
-    constructor(context, location, dimensions, blocking, graphicComponent) {
-        super(context, location, dimensions, blocking, graphicComponent);
+    constructor(context, location, dimensions, graphicComponent) {
+        super(context, location, dimensions, graphicComponent);
         this._handler = new EventHandler();
     }
     addEventListener(event, callback) {
@@ -72,8 +71,8 @@ export class EventableEntity extends Entity {
     update() { this._handler.service(); }
 }
 export class Actor extends EventableEntity {
-    constructor(context, location, dimensions, blocking, graphicComponent) {
-        super(context, location, dimensions, blocking, graphicComponent);
+    constructor(context, location, dimensions, graphicComponent) {
+        super(context, location, dimensions, graphicComponent);
         this._canSwim = false;
         this._canFly = false;
         context.addActor(this);

@@ -1,4 +1,5 @@
-import { Location, Dimensions, BoundingCuboid } from "./physics.js";
+import { Dimensions, BoundingCuboid } from "./physics.js";
+import { Point3D } from "./geometry.js";
 class OctNode {
     constructor(_bounds) {
         this._bounds = _bounds;
@@ -10,6 +11,16 @@ class OctNode {
     get width() { return this._bounds.width; }
     get height() { return this._bounds.height; }
     get depth() { return this._bounds.depth; }
+    get numEntities() {
+        if (this._entities.length != 0) {
+            return this._entities.length;
+        }
+        let total = 0;
+        for (let child of this._children) {
+            total += child.numEntities;
+        }
+        return total;
+    }
     insert(entity) {
         let inserted = false;
         if (this._children.length == 0) {
@@ -46,7 +57,7 @@ class OctNode {
                     let offsetX = Math.floor(offset[x] * dimensions.width);
                     let offsetY = Math.floor(offset[y] * dimensions.depth);
                     let offsetZ = Math.floor(offset[z] * dimensions.height);
-                    let centre = new Location(this.centre.x + offsetX, this.centre.y + offsetY, this.centre.z + offsetZ);
+                    let centre = new Point3D(this.centre.x + offsetX, this.centre.y + offsetY, this.centre.z + offsetZ);
                     let bounds = new BoundingCuboid(centre, dimensions);
                     this._children.push(new OctNode(bounds));
                 }
@@ -90,15 +101,18 @@ class OctNode {
         }
         return false;
     }
-    get numEntities() {
-        if (this._entities.length != 0) {
-            return this._entities.length;
+    getEntities(area) {
+        let entities = new Array();
+        if (!this._bounds.containsBounds(area) && !this._bounds.intersects(area)) {
+            return entities;
         }
-        let total = 0;
         for (let child of this._children) {
-            total += child.numEntities;
+            child.getEntities(area).forEach(entity => entities.push(entity));
         }
-        return total;
+        for (let entity of this._entities) {
+            entities.push(entity);
+        }
+        return entities;
     }
 }
 OctNode.MaxEntities = 32;
@@ -108,7 +122,7 @@ export class Octree {
         let x = Math.floor(dimensions.width / 2);
         let y = Math.floor(dimensions.depth / 2);
         let z = Math.floor(dimensions.height / 2);
-        let centre = new Location(x, y, z);
+        let centre = new Point3D(x, y, z);
         this._worldBounds = new BoundingCuboid(centre, dimensions);
         console.log("creating space of dimensions (WxDxH):", this._worldBounds.width, this._worldBounds.depth, this._worldBounds.height);
         this._root = new OctNode(this._worldBounds);
@@ -118,6 +132,9 @@ export class Octree {
         let inserted = this._root.insert(entity);
         console.assert(inserted, "failed to insert");
         this._numEntities++;
+    }
+    getEntities(bounds) {
+        return this._root.getEntities(bounds);
     }
     update(entity) {
     }

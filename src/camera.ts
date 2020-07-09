@@ -1,7 +1,7 @@
 import { Point } from "./graphics.js"
 import { EventHandler,
          InputEvent } from "./events.js"
-import { Location } from "./physics.js"
+import { Point3D } from "./geometry.js"
 import { SceneGraph } from "./graphics.js"
 
 export class Camera {
@@ -12,7 +12,7 @@ export class Camera {
   protected _upperX : number;
   protected _upperY : number;
   protected _handler = new EventHandler<InputEvent>();
-  protected _surfaceLocation : Location|null;
+  protected _surfaceLocation : Point3D|null;
 
   constructor(protected _scene: SceneGraph,
               protected readonly _width: number,
@@ -37,7 +37,7 @@ export class Camera {
   get y(): number { return this._y; }
   get width(): number { return this._width; }
   get height(): number { return this._height; }
-  get location(): Location|null { return this._surfaceLocation; }
+  get location(): Point3D|null { return this._surfaceLocation; }
   set x(x: number)  {
     this._x = x;
     this._lowerX = x - Math.floor(this.width / 2);
@@ -65,7 +65,7 @@ export class Camera {
     this._handler.removeEventListener(event, callback);
   }
 
-  set location(newLocation: Location|null) {
+  set location(newLocation: Point3D|null) {
     if (newLocation == undefined) {
       console.log("undefined camera surface location");
       return;

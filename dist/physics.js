@@ -1,4 +1,5 @@
 import { Point } from "./graphics.js";
+import { Point3D } from "./geometry.js";
 export var Direction;
 (function (Direction) {
     Direction[Direction["North"] = 0] = "North";
@@ -122,27 +123,6 @@ export function getOppositeDirection(direction) {
     console.assert(direction == Direction.North, "unhandled direction");
     return Direction.North;
 }
-export class Location {
-    constructor(_x, _y, _z) {
-        this._x = _x;
-        this._y = _y;
-        this._z = _z;
-    }
-    get x() { return this._x; }
-    get y() { return this._y; }
-    get z() { return this._z; }
-    set x(x) { this._x = x; }
-    set y(y) { this._y = y; }
-    set z(z) { this._z = z; }
-    isNearlySameAs(other) {
-        return Math.floor(this.x) == Math.floor(other.x) &&
-            Math.floor(this.y) == Math.floor(other.y) &&
-            Math.floor(this.z) == Math.floor(other.z);
-    }
-    isSameAs(other) {
-        return this.x == other.x && this.y == other.y && this.z == other.z;
-    }
-}
 export class Dimensions {
     constructor(_width, _depth, _height) {
         this._width = _width;
@@ -177,7 +157,7 @@ export class BoundingCuboid {
     constructor(_centre, _dimensions) {
         this._centre = _centre;
         this._dimensions = _dimensions;
-        this.updateLocation(_centre);
+        this.location = _centre;
     }
     get minLocation() { return this._minLocation; }
     get minX() { return this.minLocation.x; }
@@ -188,10 +168,12 @@ export class BoundingCuboid {
     get maxY() { return this.maxLocation.y; }
     get maxZ() { return this.maxLocation.z; }
     get centre() { return this._centre; }
+    get bottomCentre() { return this._bottomCentre; }
     get width() { return this._dimensions.width; }
     get depth() { return this._dimensions.depth; }
     get height() { return this._dimensions.height; }
-    updateLocation(centre) {
+    get dimensions() { return this._dimensions; }
+    set location(centre) {
         this._centre = centre;
         let width = Math.floor(this.width / 2);
         let depth = Math.floor(this.depth / 2);
@@ -199,11 +181,12 @@ export class BoundingCuboid {
         let x = centre.x - width;
         let y = centre.y - depth;
         let z = centre.z - height;
-        this._minLocation = new Location(x, y, z);
+        this._bottomCentre = new Point3D(centre.x, centre.y, z);
+        this._minLocation = new Point3D(x, y, z);
         x = centre.x + width;
         y = centre.y + depth;
         z = centre.z + height;
-        this._maxLocation = new Location(x, y, z);
+        this._maxLocation = new Point3D(x, y, z);
     }
     contains(location) {
         if (location.x < this._minLocation.x ||
@@ -250,12 +233,12 @@ export class BoundingCuboid {
             other.maxLocation.z : this.maxLocation.z;
         this._dimensions =
             new Dimensions(maxX - minX, maxY - minY, maxZ - minZ);
-        let min = new Location(minX, minY, minZ);
-        let max = new Location(maxX, maxY, maxZ);
+        let min = new Point3D(minX, minY, minZ);
+        let max = new Point3D(maxX, maxY, maxZ);
         let width = Math.floor((max.x - min.x) / 2);
         let depth = Math.floor((max.y - min.y) / 2);
         let height = Math.floor((max.z - min.z) / 2);
-        this._centre = new Location(min.x + width, min.y + depth, min.z + height);
+        this._centre = new Point3D(min.x + width, min.y + depth, min.z + height);
         this._minLocation = min;
         this._maxLocation = max;
     }

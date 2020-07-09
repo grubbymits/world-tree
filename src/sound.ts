@@ -1,5 +1,5 @@
-import { Location,
-         BoundingCuboid } from "./physics.js"
+import { BoundingCuboid } from "./physics.js"
+import { Point3D } from "./geometry.js"
 import { Camera } from "./camera.js"
 import { SceneGraph } from "./graphics.js"
 import { InputEvent } from "./events.js"
@@ -55,7 +55,7 @@ export class ZonalAudioLoop extends Sound {
     console.log("max distance from centre:", maxDistance);
 
     let maybePlay = function() {
-      let location: Location|null = camera.location;
+      let location: Point3D|null = camera.location;
       if (location == undefined) {
         console.log("couldn't get camera location");
         return;

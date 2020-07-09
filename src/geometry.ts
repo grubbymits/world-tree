@@ -1,4 +1,6 @@
-class Point3D {
+import { BoundingCuboid } from "./physics.js"
+
+export class Point3D {
   constructor(private _x: number,
               private _y: number,
               private _z: number) { }
@@ -9,6 +11,12 @@ class Point3D {
   set x(x: number) { this._x = x; }
   set y(y: number) { this._y = y; }
   set z(z: number) { this._z = z; }
+
+  add(vector: Vector3D): Point3D {
+    return new Point3D(this.x + vector.x,
+                       this.y + vector.y,
+                       this.z + vector.z);
+  }
 
   subtract(other: Point3D): Vector3D {
     return new Vector3D(this.x - other.x,
@@ -27,7 +35,7 @@ class Point3D {
   }
 }
 
-class Vector3D {
+export class Vector3D {
   constructor(private readonly _x: number,
               private readonly _y: number,
               private readonly _z: number) { }
@@ -62,7 +70,7 @@ class Vertex3D {
   constructor(private readonly _point: Point3D,
               v1: Point3D,
               v2: Point3D) {
-    this._u = = v1.subtract(_point);
+    this._u = v1.subtract(_point);
     this._v = v2.subtract(_point);
     this._normal = this.u.cross(this.v);
   }
@@ -83,9 +91,7 @@ class Vertex3D {
     let w = begin.subtract(this.point);
     let N = -this.normal.dot(w);
     let intersection = N / D;
-    if (intersection < 0 || intersection > 1) {
-      return false;
-    }
+    return intersection >= 0 && intersection <= 1;
   }
 }
 
@@ -119,8 +125,8 @@ class TriangleFace3D extends Face3D {
     let vDotv = v.dot(v);
     let wDotu = w.dot(u);
     let dominator = (Math.pow(uDotv, 2) - uDotu * vDotv);
-    let s1 = (uDotv * wDotV - vDotv * wDotu) / dominator;
-    let t1 = (uDotv * wDotU - uDotU * wDotv) / dominator;
+    let s1 = (uDotv * wDotv - vDotv * wDotu) / dominator;
+    let t1 = (uDotv * wDotu - uDotu * wDotv) / dominator;
     return s1 >= 0 && t1 >= 0 && s1 + t1 <= 1;
   }
 }
@@ -128,27 +134,27 @@ class TriangleFace3D extends Face3D {
 // Two vertices, which can be connected to create a diagonal edge across a
 // quad-edge polygon (two triangles). Both vertices are on the same plane.
 class QuadFace3D extends Face3D {
-  private readonly triangleA: TriangleFace3D;
-  private readonly triangleB: TriangleFace3D;
+  private readonly _triangleA: TriangleFace3D;
+  private readonly _triangleB: TriangleFace3D;
 
   constructor(vertexA: Vertex3D,
               vertexB: Vertex3D) {
     super(vertexA);
-    this.triangleA = new TriangleFace(vertexA);
-    this.triangleB = new TriangleFace(vertexB);
+    this._triangleA = new TriangleFace3D(vertexA);
+    this._triangleB = new TriangleFace3D(vertexB);
   }
 
   intersects(end: Point3D): boolean {
-    return triangleA.intersects(end) || triangleB.intersects(end);
+    return this._triangleA.intersects(end) || this._triangleB.intersects(end);
   }
 }
 
-class Geometry {
+export class Geometry {
   protected _faces: Array<Face3D> = new Array<Face3D>();
 
   constructor(protected _bounds: BoundingCuboid) { }
 
-  get bounds(): BoundCuboid { return this._bounds; }
+  get bounds(): BoundingCuboid { return this._bounds; }
 
   obstructs(begin: Point3D, end: Point3D): boolean {
     for (let face of this._faces) {
@@ -160,14 +166,14 @@ class Geometry {
   }
 }
 
-class NoGeometry extends Geometry {
+export class NoGeometry extends Geometry {
   constructor(bounds: BoundingCuboid) {
     super(bounds);
   }
   obstructs(begin: Point3D, end: Point3D): boolean { return false; }
 }
 
-class CuboidGeometry extends Geometry {
+export class CuboidGeometry extends Geometry {
   constructor(bounds: BoundingCuboid) {
     super(bounds);
     let p0 = this.bounds.minLocation;

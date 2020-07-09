@@ -1,6 +1,7 @@
-import { Location, Direction } from "./physics.js";
+import { Direction } from "./physics.js";
 import { Entity } from "./entity.js";
 import { Sprite, StaticGraphicComponent } from "./graphics.js";
+import { Point3D, CuboidGeometry } from "./geometry.js";
 export var TerrainShape;
 (function (TerrainShape) {
     TerrainShape[TerrainShape["Flat"] = 0] = "Flat";
@@ -211,12 +212,15 @@ export function isRampUp(shape, direction) {
 }
 export class Terrain extends Entity {
     constructor(context, _gridX, _gridY, _gridZ, dimensions, _type, _shape, features) {
-        super(context, new Location(_gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height), dimensions, true, Terrain.graphics(_type, _shape));
+        super(context, new Point3D(_gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height), dimensions, Terrain.graphics(_type, _shape));
         this._gridX = _gridX;
         this._gridY = _gridY;
         this._gridZ = _gridZ;
         this._type = _type;
         this._shape = _shape;
+        if (isFlat(_shape)) {
+            this._geometry = new CuboidGeometry(this.bounds);
+        }
         if (!isFlat(_shape)) {
             let theta = Math.atan(this.height / this.depth) * 180 / Math.PI;
             this._tanTheta = Math.tan(theta);
@@ -224,6 +228,10 @@ export class Terrain extends Entity {
         else {
             this._tanTheta = 0;
         }
+        let x = this._bounds.centre.x;
+        let y = this._bounds.centre.y;
+        let z = this.heightAt(this._bounds.centre);
+        this._surfaceLocation = new Point3D(x, y, z);
         if (features == TerrainFeature.None) {
             return;
         }
@@ -275,7 +283,7 @@ export class Terrain extends Entity {
     static get depth() { return this._dimensions.depth; }
     static get height() { return this._dimensions.height; }
     static scaleLocation(loc) {
-        return new Location(Math.floor(loc.x / this.width), Math.floor(loc.y / this.depth), Math.floor(loc.z / this.height));
+        return new Point3D(Math.floor(loc.x / this.width), Math.floor(loc.y / this.depth), Math.floor(loc.z / this.height));
     }
     static create(context, x, y, z, type, shape, feature) {
         return new Terrain(context, x, y, z, this._dimensions, type, shape, feature);
@@ -285,6 +293,7 @@ export class Terrain extends Entity {
     get gridZ() { return this._gridZ; }
     get shape() { return this._shape; }
     get type() { return this._type; }
+    get surfaceLocation() { return this._surfaceLocation; }
     heightAt(location) {
         if (!this._bounds.contains(location)) {
             return null;

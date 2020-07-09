@@ -1,7 +1,12 @@
-import { Actor } from "./entity.js"
+import { Entity,
+         Actor } from "./entity.js"
 import { EntityEvent } from "./events.js"
 import { BoundingCuboid } from "./physics.js"
-import { Point3D } from "./geometry.js"
+import { Point3D,
+         Vector3D,
+         Geometry } from "./geometry.js"
+import { Octree } from "./tree.js"
+import { SquareGrid  } from "./map.js"
 
 export abstract class Action {
   constructor(protected _actor: Actor) { }
@@ -121,13 +126,13 @@ export class MoveDestination extends Action {
 }
 
 export class Navigate extends Action {
-  private readonly _currentStep: MoveDestination;
-  private _waypoints: Array<Location>;
+  private _currentStep: MoveDestination;
+  private _waypoints: Array<Point3D>;
   private _index: number = 0;
 
   constructor(actor: Actor,
               private readonly _step: number,
-              private readonly _destination,
+              private readonly _destination: Point3D,
               private readonly _map: SquareGrid,
               private readonly _boundsInfo: Octree) {
     super(actor);
@@ -137,7 +142,9 @@ export class Navigate extends Action {
     }
   }
 
-  findPath(): Array<Location> {
+  findPath(): Array<Point3D> {
+    return new Array<Point3D>();
+    /*
     let path = new Array<Terrain>();
   
     // Adapted from:
@@ -201,20 +208,21 @@ export class Navigate extends Action {
     let step = end;
     path.push(step);
     while (step.id != begin.id) {
-      step = this.map.getTerrainFromId(cameFrom.get(step.id)!);
+      step = this._map.getTerrainFromId(cameFrom.get(step.id)!);
       path.push(step);
     }
     path.reverse();
     return path.splice(1);
+    */
   }
 
   canMove(from: Point3D, to: Point3D): boolean {
-    let bounds: this._actor.bounds;
+    let bounds = this._actor.bounds;
     // Create a bounds to contain the current location and the destination.
     let area = new BoundingCuboid(to, bounds.dimensions);
     area.insert(bounds);
 
-    let entities: Array<Entity> = this._spatialInfo.getEntitites(area);
+    let entities: Array<Entity> = this._boundsInfo.getEntities(area);
     let path: Vector3D = to.subtract(bounds.bottomCentre);
     let beginMinLocation: Point3D = bounds.minLocation;
     let beginMaxLocation: Point3D = bounds.maxLocation;
@@ -222,8 +230,9 @@ export class Navigate extends Action {
     let endMaxLocation: Point3D = beginMaxLocation.add(path);
 
     for (let entity of entities) {
-      if (entity.obstructs(beginMinLocation, endMinLocation) ||
-          entity.obstructs(beginMaxLocation, endMaxLocation)) {
+      let geometry: Geometry = entity.geometry;
+      if (geometry.obstructs(beginMinLocation, endMinLocation) ||
+          geometry.obstructs(beginMaxLocation, endMaxLocation)) {
         return false;
       }
     }
@@ -236,7 +245,7 @@ export class Navigate extends Action {
       return true;
     }
 
-    let finishedStep: boolean = currentMove.perform();
+    let finishedStep: boolean = this._currentStep.perform();
     if (!finishedStep) {
       return false;
     }
@@ -248,16 +257,17 @@ export class Navigate extends Action {
 
     // Check that nextLocation is still free.
     let nextLocation = this._waypoints[this._index];
-    if (this.canMove(nextLocation)) {
-      this._currentStep = new MoveDestination(this._actor, this._step,
-                                              nextLocation);
+    if (this.canMove(this._actor.location, nextLocation)) {
+      this._currentStep =
+        new MoveDestination(this._actor, this._step, nextLocation);
       return false;
     }
     // Otherwise, recompute the path.
-    this.waypoints = this.findPath();
+    this._waypoints = this.findPath();
     if (this._waypoints.length != 0) {
       this._index = 0;
-      this._currentStep = new MoveDestination(actor, _step, this._waypoints[0]);
+      this._currentStep =
+        new MoveDestination(this._actor, this._step, this._waypoints[0]);
       return false;
     }
     return true; // can't perform the move anymore.

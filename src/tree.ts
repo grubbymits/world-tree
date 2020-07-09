@@ -131,11 +131,11 @@ class OctNode {
 
   getEntities(area: BoundingCuboid): Array<Entity> {
     let entities = new Array<Entity>();
-    if (!this._bounds.contains(area) && !this._bounds.intersects(area)) {
+    if (!this._bounds.containsBounds(area) && !this._bounds.intersects(area)) {
       return entities;
     }
     for (let child of this._children) {
-      child.getEntities().forEach(entity => entities.push(entity));
+      child.getEntities(area).forEach(entity => entities.push(entity));
     }
     for (let entity of this._entities) {
       entities.push(entity);
@@ -170,7 +170,7 @@ export class Octree {
     this._numEntities++;
   }
 
-  getEntities(bounds: BoundingCuboid): Array<Entities> {
+  getEntities(bounds: BoundingCuboid): Array<Entity> {
     return this._root.getEntities(bounds);
   }
 

@@ -1,5 +1,6 @@
 import { EntityEvent } from "./events.js";
-import { Location } from "./physics.js";
+import { BoundingCuboid } from "./physics.js";
+import { Point3D } from "./geometry.js";
 export class Action {
     constructor(_actor) {
         this._actor = _actor;
@@ -98,8 +99,71 @@ export class MoveDestination extends Action {
             this.destination.y : this.actor.y + this._dy;
         let z = Math.abs(this.destination.z - this.actor.z) < Math.abs(this._dz) ?
             this.destination.z : this.actor.z + this._dz;
-        this.actor.location = new Location(x, y, z);
+        this.actor.location = new Point3D(x, y, z);
         this.actor.postEvent(EntityEvent.Move);
         return this.actor.location.isNearlySameAs(this.destination);
+    }
+}
+export class Navigate extends Action {
+    constructor(actor, _step, _destination, _map, _boundsInfo) {
+        super(actor);
+        this._step = _step;
+        this._destination = _destination;
+        this._map = _map;
+        this._boundsInfo = _boundsInfo;
+        this._index = 0;
+        this._waypoints = this.findPath();
+        if (this._waypoints.length != 0) {
+            this._currentStep = new MoveDestination(actor, _step, this._waypoints[0]);
+        }
+    }
+    findPath() {
+        return new Array();
+    }
+    canMove(from, to) {
+        let bounds = this._actor.bounds;
+        let area = new BoundingCuboid(to, bounds.dimensions);
+        area.insert(bounds);
+        let entities = this._boundsInfo.getEntities(area);
+        let path = to.subtract(bounds.bottomCentre);
+        let beginMinLocation = bounds.minLocation;
+        let beginMaxLocation = bounds.maxLocation;
+        let endMinLocation = beginMinLocation.add(path);
+        let endMaxLocation = beginMaxLocation.add(path);
+        for (let entity of entities) {
+            let geometry = entity.geometry;
+            if (geometry.obstructs(beginMinLocation, endMinLocation) ||
+                geometry.obstructs(beginMaxLocation, endMaxLocation)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    perform() {
+        if (this._waypoints.length == 0) {
+            return true;
+        }
+        let finishedStep = this._currentStep.perform();
+        if (!finishedStep) {
+            return false;
+        }
+        this._index++;
+        if (this._index == this._waypoints.length) {
+            return true;
+        }
+        let nextLocation = this._waypoints[this._index];
+        if (this.canMove(this._actor.location, nextLocation)) {
+            this._currentStep =
+                new MoveDestination(this._actor, this._step, nextLocation);
+            return false;
+        }
+        this._waypoints = this.findPath();
+        if (this._waypoints.length != 0) {
+            this._index = 0;
+            this._currentStep =
+                new MoveDestination(this._actor, this._step, this._waypoints[0]);
+            return false;
+        }
+        return true;
     }
 }

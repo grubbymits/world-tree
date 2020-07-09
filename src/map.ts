@@ -1,7 +1,7 @@
-import { Location,
-         Direction,
+import { Direction,
          getDirection,
          getOppositeDirection } from "./physics.js"
+import { Point3D } from "./geometry.js"
 import { Terrain,
          TerrainShape,
          TerrainType,
@@ -16,7 +16,7 @@ class MovementCost {
   constructor(private readonly _terrain: Terrain,
               private readonly _cost: number) { }
   get terrain(): Terrain { return this._terrain; }
-  get location(): Location { return this._terrain.location; }
+  get location(): Point3D { return this._terrain.location; }
   get cost(): number { return this._cost; }
 }
 

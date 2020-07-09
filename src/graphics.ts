@@ -1,6 +1,6 @@
 import { SquareGrid } from "./map.js"
 import { Entity } from "./entity.js"
-import { Location } from "./physics.js"
+import { Point3D } from "./geometry.js"
 import { Terrain } from "./terrain.js"
 import { Camera } from "./camera.js"
 
@@ -194,7 +194,7 @@ export abstract class SceneGraph {
     this._ctx = this._canvas.getContext("2d", { alpha: false })!;
   }
 
-  abstract getDrawCoord(location: Location): Point;
+  abstract getDrawCoord(location: Point3D): Point;
   abstract setDrawCoord(object: Entity): void;
   abstract drawOrder(a: Entity, b: Entity): number;
 
@@ -226,7 +226,7 @@ export abstract class SceneGraph {
     }
   }
 
-  getLocationAt(x: number, y: number, camera: Camera): Location | null {
+  getLocationAt(x: number, y: number, camera: Camera): Point3D | null {
     let entity: Entity|null = this.getEntityDrawnAt(x, y, camera);
     if (entity != undefined) {
       return entity.location;
@@ -306,7 +306,7 @@ export class IsometricRenderer extends SceneGraph {
   private static readonly _sqrt3 = Math.sqrt(3);
   private static readonly _halfSqrt3 = Math.sqrt(3) * 0.5;
 
-  static getDrawCoord(loc: Location): Point {
+  static getDrawCoord(loc: Point3D): Point {
     // An isometric square has:
     // - sides equal length = 1,
     // - the short diagonal is length = 1,
@@ -325,7 +325,7 @@ export class IsometricRenderer extends SceneGraph {
     entity.drawCoord = IsometricRenderer.getDrawCoord(entity.location);
   }
 
-  getDrawCoord(location: Location): Point {
+  getDrawCoord(location: Point3D): Point {
     return IsometricRenderer.getDrawCoord(location);
   }
 
