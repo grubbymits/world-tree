@@ -40,7 +40,7 @@ export class Entity {
     }
     set drawCoord(coord) { this._drawCoord = coord; }
     set visible(visible) { this._visible = visible; }
-    set location(location) { this._bounds.location = location; }
+    set location(location) { this._bounds.centre = location; }
     addGraphic(graphic) {
         this._graphicComponents.push(graphic);
     }
@@ -49,11 +49,6 @@ export class Entity {
             return null;
         }
         return this.z + this.height;
-    }
-    updateLocation(dx, dy, dz) {
-        this.location.x += dx;
-        this.location.y += dy;
-        this.location.z += dz;
     }
 }
 Entity._ids = 0;

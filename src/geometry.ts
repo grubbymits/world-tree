@@ -60,6 +60,13 @@ export class Vector3D {
     let z = this.x * other.y - this.y * other.x;
     return new Vector3D(x, y, z);
   }
+
+  absMin(other: Vector3D): Vector3D {
+    let x = Math.abs(this.x) < Math.abs(other.x) ? this.x : other.x;
+    let y = Math.abs(this.y) < Math.abs(other.y) ? this.y : other.y;
+    let z = Math.abs(this.z) < Math.abs(other.z) ? this.z : other.z;
+    return new Vector3D(x, y, z);
+  }
 }
 
 class Vertex3D {

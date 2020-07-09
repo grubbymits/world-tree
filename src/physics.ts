@@ -2,7 +2,8 @@ import { Entity } from "./entity.js"
 import { TerrainType, TerrainShape, Terrain } from "./terrain.js"
 import { SquareGrid } from "./map.js"
 import { Point } from "./graphics.js"
-import { Point3D } from "./geometry.js"
+import { Point3D,
+         Vector3D } from "./geometry.js"
 
 export enum Direction {
   North,
@@ -177,7 +178,7 @@ export class BoundingCuboid {
 
   constructor(private _centre: Point3D,
               private _dimensions: Dimensions) {
-    this.location = _centre;
+    this.centre = _centre;
   }
 
   get minLocation(): Point3D { return this._minLocation; }
@@ -195,7 +196,7 @@ export class BoundingCuboid {
   get height(): number { return this._dimensions.height; }
   get dimensions(): Dimensions { return this._dimensions; }
 
-  set location(centre: Point3D) {
+  set centre(centre: Point3D) {
     this._centre = centre;
     let width = Math.floor(this.width / 2);
     let depth = Math.floor(this.depth / 2);
@@ -211,6 +212,12 @@ export class BoundingCuboid {
     y = centre.y + depth;
     z = centre.z + height;
     this._maxLocation  = new Point3D(x, y, z);
+  }
+
+  updatePosition(d: Vector3D): void {
+    this._centre = this._centre.add(d);
+    this._minLocation = this._minLocation.add(d);
+    this._maxLocation = this._maxLocation.add(d);
   }
 
   contains(location: Point3D): boolean {

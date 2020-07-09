@@ -157,7 +157,7 @@ export class BoundingCuboid {
     constructor(_centre, _dimensions) {
         this._centre = _centre;
         this._dimensions = _dimensions;
-        this.location = _centre;
+        this.centre = _centre;
     }
     get minLocation() { return this._minLocation; }
     get minX() { return this.minLocation.x; }
@@ -173,7 +173,7 @@ export class BoundingCuboid {
     get depth() { return this._dimensions.depth; }
     get height() { return this._dimensions.height; }
     get dimensions() { return this._dimensions; }
-    set location(centre) {
+    set centre(centre) {
         this._centre = centre;
         let width = Math.floor(this.width / 2);
         let depth = Math.floor(this.depth / 2);
@@ -187,6 +187,11 @@ export class BoundingCuboid {
         y = centre.y + depth;
         z = centre.z + height;
         this._maxLocation = new Point3D(x, y, z);
+    }
+    updatePosition(d) {
+        this._centre = this._centre.add(d);
+        this._minLocation = this._minLocation.add(d);
+        this._maxLocation = this._maxLocation.add(d);
     }
     contains(location) {
         if (location.x < this._minLocation.x ||

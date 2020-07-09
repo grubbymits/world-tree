@@ -63,7 +63,7 @@ export class Entity {
 
   set drawCoord(coord: Point) { this._drawCoord = coord; }
   set visible(visible: boolean) { this._visible = visible; }
-  set location(location: Point3D) { this._bounds.location = location; }
+  set location(location: Point3D) { this._bounds.centre = location; }
 
   addGraphic(graphic: GraphicComponent): void {
     this._graphicComponents.push(graphic);
@@ -76,11 +76,6 @@ export class Entity {
       return null;
     }
     return this.z + this.height;
-  }
-  updateLocation(dx: number, dy: number, dz: number): void {
-    this.location.x += dx;
-    this.location.y += dy;
-    this.location.z += dz;
   }
 }
 
