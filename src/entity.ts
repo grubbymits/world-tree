@@ -1,6 +1,6 @@
-import { Location,
-         Dimensions,
+import { Dimensions,
          BoundingCuboid } from "./physics.js"
+import { Point3D } from "./geometry.js"
 import { Point,
          GraphicComponent,
          IsometricRenderer } from "./graphics.js"
@@ -19,34 +19,34 @@ export class Entity {
   protected _graphicComponents: Array<GraphicComponent>;
   protected _visible: boolean = true;
   protected _bounds: BoundingCuboid;
+  protected _geometry: Geometry;
 
   constructor(protected _context: Context,
-              protected _location: Location,
-              protected readonly _dimensions: Dimensions,
-              protected readonly _blocking: boolean,
+              location: Point3D,
+              dimensions: Dimensions,
               graphicComponent: GraphicComponent) {
     this._id = Entity._ids;
     Entity._ids++;
     this._graphicComponents = new Array<GraphicComponent>();
     this._graphicComponents.push(graphicComponent);
-    let centre = new Location(this.x + Math.floor(this.width / 2),
-                              this.y + Math.floor(this.depth / 2),
-                              this.z + Math.floor(this.height / 2));
-    this._bounds = new BoundingCuboid(centre, _dimensions);
+    let centre = new Point3D(location.x + Math.floor(dimensions.width / 2),
+                             location.y + Math.floor(dimensions.depth / 2),
+                             location.z + Math.floor(dimensions.height / 2));
+    this._bounds = new BoundingCuboid(centre, dimensions);
+    this._geometry = new NoGeometry(this._bounds);
     this._context.addEntity(this);
   }
   
-  get x(): number { return this._location.x; }
-  get y(): number { return this._location.y; }
-  get z(): number { return this._location.z; }
-  get width(): number { return this._dimensions.width; }
-  get depth(): number { return this._dimensions.depth; }
-  get height(): number { return this._dimensions.height; }
-  get location(): Location { return this._location; }
-  get dimensions(): Dimensions { return this._dimensions; }
+  get x(): number { return this._bounds.x; }
+  get y(): number { return this._bounds.y; }
+  get z(): number { return this._bounds.z; }
+  get width(): number { return this._bounds.width; }
+  get depth(): number { return this._bounds.depth; }
+  get height(): number { return this._bounds.height; }
+  get location(): Point3D { return this._bounds.minLocation; }
+  get dimensions(): Dimensions { return this._bounds.dimensions; }
   get bounds(): BoundingCuboid { return this._bounds; }
-  get centre(): Location { return this._bounds.centre; }
-  get blocking(): boolean { return this._blocking; }
+  get centre(): Point3D { return this._bounds.centre; }
   get id(): number { return this._id; }
   get hasMoved(): boolean { return this._hasMoved; }
   get drawCoord(): Point { return this._drawCoord; }
@@ -60,12 +60,12 @@ export class Entity {
 
   set drawCoord(coord: Point) { this._drawCoord = coord; }
   set visible(visible: boolean) { this._visible = visible; }
-  set location(location: Location) { this._location = location; }
+  set location(location: Point3D) { this._location = location; }
 
   addGraphic(graphic: GraphicComponent): void {
     this._graphicComponents.push(graphic);
   }
-  heightAt(location: Location): number|null {
+  heightAt(location: Point3D): number|null {
     // Given a world location, does this terrain define what the minimum z
     // coordinate?
     // If the locations is outside of the bounding cuboid, just return null.
@@ -85,7 +85,7 @@ export class EventableEntity extends Entity {
   protected _handler = new EventHandler<EntityEvent>();
 
   constructor(context: Context,
-              location: Location,
+              location: Point3D,
               dimensions: Dimensions,
               blocking: boolean,
               graphicComponent: GraphicComponent) {
@@ -109,7 +109,7 @@ export class Actor extends EventableEntity {
   protected _action: Action|null;
 
   constructor(context: Context,
-              location: Location,
+              location: Point3D,
               dimensions: Dimensions,
               blocking: boolean,
               graphicComponent: GraphicComponent) {

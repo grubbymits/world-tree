@@ -2,6 +2,7 @@ import { Entity } from "./entity.js"
 import { TerrainType, TerrainShape, Terrain } from "./terrain.js"
 import { SquareGrid } from "./map.js"
 import { Point } from "./graphics.js"
+import { Point3D } from "./geometry.js"
 
 export enum Direction {
   North,
@@ -127,29 +128,6 @@ export function getOppositeDirection(direction: Direction): Direction {
   return Direction.North;
 }
 
-export class Location {
-  constructor(private _x: number,
-              private _y: number,
-              private _z: number) { }
-
-  get x(): number { return this._x; }
-  get y(): number { return this._y; }
-  get z(): number { return this._z; }
-  set x(x: number) { this._x = x; }
-  set y(y: number) { this._y = y; }
-  set z(z: number) { this._z = z; }
-
-  isNearlySameAs(other: Location): boolean {
-    return Math.floor(this.x) == Math.floor(other.x) &&
-           Math.floor(this.y) == Math.floor(other.y) &&
-           Math.floor(this.z) == Math.floor(other.z);
-  }
-
-  isSameAs(other: Location): boolean {
-    return this.x === other.x && this.y === other.y && this.z === other.z;
-  }
-}
-
 export class Dimensions {
   constructor(protected readonly _width: number,
               protected readonly _depth: number,
@@ -193,28 +171,28 @@ export class IsometricPhysicalDimensions extends Dimensions {
 }
 
 export class BoundingCuboid {
-  private _minLocation: Location;
-  private _maxLocation: Location;
+  private _minLocation: Point3D;
+  private _maxLocation: Point3D;
 
-  constructor(private _centre: Location,
+  constructor(private _centre: Point3D,
               private _dimensions: Dimensions) {
     this.updateLocation(_centre);
   }
 
-  get minLocation(): Location { return this._minLocation; }
+  get minLocation(): Point3D { return this._minLocation; }
   get minX(): number { return this.minLocation.x; }
   get minY(): number { return this.minLocation.y; }
   get minZ(): number { return this.minLocation.z; }
-  get maxLocation(): Location { return this._maxLocation; }
+  get maxLocation(): Point3D { return this._maxLocation; }
   get maxX(): number { return this.maxLocation.x; }
   get maxY(): number { return this.maxLocation.y; }
   get maxZ(): number { return this.maxLocation.z; }
-  get centre(): Location { return this._centre; }
+  get centre(): Point3D { return this._centre; }
   get width(): number { return this._dimensions.width; }
   get depth(): number { return this._dimensions.depth; }
   get height(): number { return this._dimensions.height; }
 
-  updateLocation(centre: Location): void {
+  updateLocation(centre: Point3D): void {
     this._centre = centre;
     let width = Math.floor(this.width / 2);
     let depth = Math.floor(this.depth / 2);
@@ -223,28 +201,15 @@ export class BoundingCuboid {
     let x = centre.x - width;
     let y = centre.y - depth;
     let z = centre.z - height;
-    this._minLocation = new Location(x, y, z);
+    this._minLocation = new Point3D(x, y, z);
 
     x = centre.x + width;
     y = centre.y + depth;
     z = centre.z + height;
-    this._maxLocation  = new Location(x, y, z);
-
-    this._planes = new Array<Plane>();
-    let v0 = new Location(this.minX + width, this.minY, this.minZ);
-    let v1 = new Location(this.minX, this.minY + depth, this.minZ);
-    let v2 = new Location(this.minX, this.minY, this.minZ + height);
-    let v3 = new Location(this.minX + width, this.minY, this.minZ + height);
-    let v4 = new Location(this.minX, this.minY + depth, this.minZ + height);
-    this._planes.push(new Plane(minLocation, v0, v1));
-    this._planes.push(new Plane(minLocation, v0, v2));
-    this._planes.push(new Plane(minLocation, v1, v2));
-    this._planes.push(new Plane(maxLocation, v0, v3));
-    this._planes.push(new Plane(maxLocation, v1, v4));
-    this._planes.push(new Plane(maxLocation, v2, v3));
+    this._maxLocation  = new Point3D(x, y, z);
   }
 
-  contains(location: Location): boolean {
+  contains(location: Point3D): boolean {
     if (location.x < this._minLocation.x ||
         location.y < this._minLocation.y ||
         location.z < this._minLocation.z)
@@ -261,16 +226,6 @@ export class BoundingCuboid {
   containsBounds(other: BoundingCuboid) {
     return this.contains(other.minLocation) &&
            this.contains(other.maxLocation);
-  }
-
-  obstructSegment(begin: Location, end: Location): boolean {
-    let vector: Vector3D = end.subtract(begin);
-    for (let plane of this.planes) {
-      if (vector.intersects(begin, end, plane)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   intersects(other: BoundingCuboid): boolean {
@@ -309,12 +264,12 @@ export class BoundingCuboid {
 
     this._dimensions =
       new Dimensions(maxX - minX, maxY - minY, maxZ - minZ);
-    let min = new Location(minX, minY, minZ);
-    let max = new Location(maxX, maxY, maxZ);
+    let min = new Point3D(minX, minY, minZ);
+    let max = new Point3D(maxX, maxY, maxZ);
     let width = Math.floor((max.x - min.x) / 2);
     let depth = Math.floor((max.y - min.y) / 2);
     let height = Math.floor((max.z - min.z) / 2);
-    this._centre = new Location(min.x + width,
+    this._centre = new Point3D(min.x + width,
                                 min.y + depth,
                                 min.z + height);
     this._minLocation = min;

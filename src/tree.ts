@@ -1,7 +1,7 @@
-import { Location,
-         Dimensions,
+import { Dimensions,
          BoundingCuboid } from "./physics.js"
 import { Entity } from "./entity.js"
+import { Point3D } from "./geometry.js"
 
 // TODO Templates/Generics..?
 
@@ -13,7 +13,7 @@ class OctNode {
   private _entities: Array<Entity> = new Array<Entity>();
 
   get bounds(): BoundingCuboid { return this._bounds; }
-  get centre(): Location { return this._bounds.centre; }
+  get centre(): Point3D { return this._bounds.centre; }
   get width(): number { return this._bounds.width; }
   get height(): number { return this._bounds.height; }
   get depth(): number { return this._bounds.depth; }
@@ -74,7 +74,7 @@ class OctNode {
           let offsetX = Math.floor(offset[x] * dimensions.width);
           let offsetY = Math.floor(offset[y] * dimensions.depth);
           let offsetZ = Math.floor(offset[z] * dimensions.height);
-          let centre = new Location(this.centre.x + offsetX,
+          let centre = new Point3D(this.centre.x + offsetX,
                                     this.centre.y + offsetY,
                                     this.centre.z + offsetZ);
           //console.log("chosen centre point (x,y,z):", centre.x, centre.y, centre.z);
@@ -111,7 +111,7 @@ class OctNode {
     return this._bounds.containsBounds(bounds);
   }
 
-  containsLocation(location: Location): boolean {
+  containsLocation(location: Point3D): boolean {
     return this._bounds.contains(location);
   }
 
@@ -129,21 +129,18 @@ class OctNode {
     return false;
   }
 
-  obstructSegment(begin: Location, end: Location): boolean {
-    if (!this.bounds.obstructSegment(begin, end)) {
-      return false;
+  getEntities(area: BoundingCuboid): Array<Entity> {
+    let entities = new Array<Entity>();
+    if (!this._bounds.contains(area) && !this._bounds.intersects(area)) {
+      return entities;
     }
     for (let child of this._children) {
-      if (child.obstructSegment(begin, end)) {
-        return true;
-      }
+      child.getEntities().forEach(entity => entities.push(entity));
     }
     for (let entity of this._entities) {
-      if (entity.bounds.obstructSegment(begin, end)) {
-        return true;
-      }
+      entities.push(entity);
     }
-    return false;
+    return entities;
   }
 }
 
@@ -156,7 +153,7 @@ export class Octree {
     let x = Math.floor(dimensions.width / 2);
     let y = Math.floor(dimensions.depth / 2);
     let z = Math.floor(dimensions.height / 2);
-    let centre = new Location(x, y, z);
+    let centre = new Point3D(x, y, z);
     this._worldBounds = new BoundingCuboid(centre, dimensions);
     console.log("creating space of dimensions (WxDxH):",
                 this._worldBounds.width,
@@ -173,8 +170,8 @@ export class Octree {
     this._numEntities++;
   }
 
-  obstructSegment(begin: Location, end: Location): boolean {
-    return this._root.obstructSegment(begin, end);
+  getEntities(bounds: BoundingCuboid): Array<Entities> {
+    return this._root.getEntities(bounds);
   }
 
   update(entity: Entity): void {

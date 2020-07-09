@@ -1,5 +1,4 @@
-import { Location,
-         Direction,
+import { Direction,
          Dimensions } from "./physics.js"
 import { Entity } from "./entity.js"
 import { Point,
@@ -8,6 +7,7 @@ import { Point,
          GraphicComponent,
          StaticGraphicComponent } from "./graphics.js"
 import { Context } from "./context.js"
+import { Point3D } from "./geometry.js"
 
 export enum TerrainShape {
   Flat,
@@ -289,8 +289,8 @@ export class Terrain extends Entity {
   static get depth(): number { return this._dimensions.depth; }
   static get height(): number { return this._dimensions.height; }
 
-  static scaleLocation(loc: Location): Location {
-    return new Location(Math.floor(loc.x / this.width),
+  static scaleLocation(loc: Point3D): Point3D {
+    return new Point3D(Math.floor(loc.x / this.width),
                         Math.floor(loc.y / this.depth),
                         Math.floor(loc.z / this.height));
   }
@@ -303,7 +303,7 @@ export class Terrain extends Entity {
   }
 
   private readonly _tanTheta: number;
-  private readonly _surfaceLocation: Location;
+  private readonly _surfaceLocation: Point3D;
 
   constructor(context: Context,
               private readonly _gridX: number,
@@ -314,11 +314,14 @@ export class Terrain extends Entity {
               private readonly _shape: TerrainShape,
               features: number) {
     super(context,
-          new Location(_gridX * dimensions.width,
+          new Point3D(_gridX * dimensions.width,
                        _gridY * dimensions.depth,
                        _gridZ * dimensions.height),
           dimensions, true, Terrain.graphics(_type, _shape));
 
+    if (isFlat(_shape)) {
+      this._geometry = new CuboidGeometry(this.bounds);
+    }
     // Pre-calculate the angle of the ramp.
     if (!isFlat(_shape)) {
       let theta = Math.atan(this.height / this.depth) * 180 / Math.PI;
@@ -330,7 +333,7 @@ export class Terrain extends Entity {
     let x = this._bounds.centre.x;
     let y = this._bounds.centre.y;
     let z = this.heightAt(this._bounds.centre)!;
-    this._surfaceLocation = new Location(x, y, z);
+    this._surfaceLocation = new Point3D(x, y, z);
 
     if (features == TerrainFeature.None) {
       return;
@@ -352,9 +355,9 @@ export class Terrain extends Entity {
   get gridZ(): number { return this._gridZ; }
   get shape(): TerrainShape { return this._shape; }
   get type(): TerrainType { return this._type; }
-  get surfaceLocation(): Location { return this._surfaceLocation; }
+  get surfaceLocation(): Point3D { return this._surfaceLocation; }
 
-  heightAt(location: Location): number|null {
+  heightAt(location: Point3D): number|null {
     // Given a world location, does this terrain define what the minimum z
     // coordinate?
     // If the locations is outside of the bounding cuboid, just return null.
