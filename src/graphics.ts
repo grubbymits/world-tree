@@ -196,7 +196,7 @@ export abstract class SceneGraph {
 
   abstract getDrawCoord(location: Point3D): Point;
   abstract setDrawCoord(object: Entity): void;
-  abstract drawOrder(a: Entity, b: Entity): number;
+  abstract drawBefore(a: Entity, b: Entity): boolean;
 
   dump(): void {
     console.log("scene graph contains number node:", this._nodes.size);
@@ -272,7 +272,7 @@ export abstract class SceneGraph {
 
     let existing = this._root;
     while (existing != undefined) {
-      if (this.drawOrder(existing.entity, node.entity) == -1) {
+      if (!this.drawBefore(existing.entity, node.entity)) {
         if (existing == this._root) {
           this._root = node;
           this._root.succ = existing;
@@ -295,6 +295,10 @@ export abstract class SceneGraph {
     this._leaf = node;
     last.succ = this._leaf;
     this._leaf.pred = last;
+  }
+
+  updateEntity(entity: Entity): void {
+    this.setDrawCoord(entity);
   }
 }
 
@@ -330,7 +334,7 @@ export class IsometricRenderer extends SceneGraph {
     return IsometricRenderer.getDrawCoord(location);
   }
 
-  drawOrder(first: Entity, second: Entity): number {
+  drawBefore(first: Entity, second: Entity): boolean {
     let sameX: boolean = first.x == second.x;
     let sameY: boolean = first.y == second.y;
     let sameZ: boolean = first.z == second.z;
@@ -341,11 +345,11 @@ export class IsometricRenderer extends SceneGraph {
 
     if (sameX) {
       if (sameY) {
-        return first.z < second.z ? 1 : -1;
+        return first.z < second.z ? true : false;
       } else {
-        return first.y < second.y ? 1 : -1;
+        return first.y < second.y ? true : false;
       }
     }
-    return first.x > second.x ? 1 : -1;
+    return first.x > second.x ? true : false;
   }
 }

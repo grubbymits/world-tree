@@ -31,7 +31,7 @@ export class Context {
         let scene = this._scene;
         actor.addEventListener(EntityEvent.Move, function () {
             spatialGraph.update(actor);
-            scene.setDrawCoord(actor);
+            scene.updateEntity(actor);
         });
     }
     update(camera) {

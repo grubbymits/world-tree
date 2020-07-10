@@ -2,7 +2,7 @@ import { Dimensions,
          BoundingCuboid } from "./physics.js"
 import { Point3D,
          Geometry,
-         NoGeometry } from "./geometry.js"
+         CuboidGeometry } from "./geometry.js"
 import { Point,
          GraphicComponent,
          IsometricRenderer } from "./graphics.js"
@@ -35,7 +35,7 @@ export class Entity {
                              location.y + Math.floor(dimensions.depth / 2),
                              location.z + Math.floor(dimensions.height / 2));
     this._bounds = new BoundingCuboid(centre, dimensions);
-    this._geometry = new NoGeometry(this._bounds);
+    this._geometry = new CuboidGeometry(this._bounds);
     this._context.addEntity(this);
   }
   

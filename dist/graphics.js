@@ -216,7 +216,7 @@ export class SceneGraph {
         }
         let existing = this._root;
         while (existing != undefined) {
-            if (this.drawOrder(existing.entity, node.entity) == -1) {
+            if (!this.drawBefore(existing.entity, node.entity)) {
                 if (existing == this._root) {
                     this._root = node;
                     this._root.succ = existing;
@@ -240,6 +240,9 @@ export class SceneGraph {
         last.succ = this._leaf;
         this._leaf.pred = last;
     }
+    updateEntity(entity) {
+        this.setDrawCoord(entity);
+    }
 }
 export class IsometricRenderer extends SceneGraph {
     constructor(canvas) {
@@ -257,19 +260,19 @@ export class IsometricRenderer extends SceneGraph {
     getDrawCoord(location) {
         return IsometricRenderer.getDrawCoord(location);
     }
-    drawOrder(first, second) {
+    drawBefore(first, second) {
         let sameX = first.x == second.x;
         let sameY = first.y == second.y;
         let sameZ = first.z == second.z;
         if (sameX) {
             if (sameY) {
-                return first.z < second.z ? 1 : -1;
+                return first.z < second.z ? true : false;
             }
             else {
-                return first.y < second.y ? 1 : -1;
+                return first.y < second.y ? true : false;
             }
         }
-        return first.x > second.x ? 1 : -1;
+        return first.x > second.x ? true : false;
     }
 }
 IsometricRenderer._sqrt3 = Math.sqrt(3);

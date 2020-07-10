@@ -3,10 +3,14 @@ import { Entity,
          Actor } from "./entity.js"
 import { Camera } from "./camera.js"
 
-export abstract class Controller {
+export class Controller {
   protected _actors: Array<Actor> = new Array<Actor>();
 
-  abstract update(): void;
+  update(): void {
+    for (let actor of this._actors) {
+      actor.update();
+    }
+  }
 }
 
 export class MouseController extends Controller {

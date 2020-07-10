@@ -1,5 +1,5 @@
 import { BoundingCuboid } from "./physics.js";
-import { Point3D, NoGeometry } from "./geometry.js";
+import { Point3D, CuboidGeometry } from "./geometry.js";
 import { Point } from "./graphics.js";
 import { EntityEvent, EventHandler } from "./events.js";
 export class Entity {
@@ -14,7 +14,7 @@ export class Entity {
         this._graphicComponents.push(graphicComponent);
         let centre = new Point3D(location.x + Math.floor(dimensions.width / 2), location.y + Math.floor(dimensions.depth / 2), location.z + Math.floor(dimensions.height / 2));
         this._bounds = new BoundingCuboid(centre, dimensions);
-        this._geometry = new NoGeometry(this._bounds);
+        this._geometry = new CuboidGeometry(this._bounds);
         this._context.addEntity(this);
     }
     get x() { return this._bounds.minX; }

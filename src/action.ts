@@ -24,22 +24,29 @@ class MoveAction extends Action {
 
   canMove(from: Point3D, to: Point3D): boolean {
     let bounds = this._actor.bounds;
-    // Create a bounds to contain the current location and the destination.
-    let area = new BoundingCuboid(to, bounds.dimensions);
-    area.insert(bounds);
-
-    let entities: Array<Entity> = this._spatialInfo.getEntities(area);
     let path: Vector3D = to.subtract(bounds.bottomCentre);
     let beginMinLocation: Point3D = bounds.minLocation;
     let beginMaxLocation: Point3D = bounds.maxLocation;
     let endMinLocation: Point3D = beginMinLocation.add(path);
     let endMaxLocation: Point3D = beginMaxLocation.add(path);
+    if (!this._spatialInfo.bounds.contains(endMinLocation) ||
+        !this._spatialInfo.bounds.contains(endMaxLocation)) {
+      console.log("cannot move to:", to.x, to.y, to.z);
+      return false;
+    }
 
+    // Create a bounds to contain the current location and the destination.
+    let area = new BoundingCuboid(to, bounds.dimensions);
+    area.insert(bounds);
+    let entities: Array<Entity> = this._spatialInfo.getEntities(area);
     for (let entity of entities) {
+      if (entity.id == this._actor.id) {
+        continue;
+      }
       let geometry: Geometry = entity.geometry;
       if (geometry.obstructs(beginMinLocation, endMinLocation) ||
           geometry.obstructs(beginMaxLocation, endMaxLocation)) {
-        console.log("obstructed by entity at", entity.bounds.centre);
+        console.log("obstructed by entity at", entity.bounds.minLocation);
         return false;
       }
     }
@@ -63,7 +70,7 @@ export class MoveDirection extends MoveAction {
     if (this.canMove(currentPos, nextPos)) {
       this.actor.bounds.updatePosition(this._d);
       this.actor.postEvent(EntityEvent.Move);
-      return !this._bounds.contains(this.actor.bounds.centre);
+      return false;
     }
     return true;
   }

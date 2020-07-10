@@ -22,7 +22,6 @@ export class CloudController extends WT.Controller {
   }
 
   add(cloud) {
-    this._context.addActor(cloud);
     this._actors.push(cloud);
 
     let bounds = this._context.bounds;
@@ -67,12 +66,6 @@ export class CloudController extends WT.Controller {
       cloud.action = new WT.MoveDirection(cloud, this._moveVector, this._context.bounds,
                                           this._context.spatial);
       this.add(cloud);
-    }
-  }
-
-  update() {
-    for (let cloud of this._actors) {
-      cloud.update();
     }
   }
 }
