@@ -33,11 +33,11 @@
     const terraces = 1;
     let heightMap = [ [ 2, 2, 2, 2, 2, 2, 2, 2, 2 ],
                       [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 1, 2, 2, 1, 2 ],
-                      [ 2, 1, 2, 1, 1, 1, 1, 1, 2 ],
-                      [ 2, 1, 2, 2, 1, 1, 1, 2, 2 ],
-                      [ 2, 1, 1, 1, 1, 2, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 1, 2, 1, 1, 2 ],
+                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
+                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
+                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
+                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
+                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
                       [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
                       [ 2, 2, 2, 2, 2, 2, 2, 2, 2] ];
 
@@ -69,7 +69,7 @@
       // place a robot in the middle of the map.
       robotController.add(new WT.Point3D(Math.floor(worldDims.width / 2),
                                          Math.floor(worldDims.depth / 2),
-                                         Math.floor(worldDims.height / 2) + 1));
+                                         physicalDims.height + 30));
 
       var update = function update() {
         if (document.hasFocus()) {

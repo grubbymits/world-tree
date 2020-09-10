@@ -208,6 +208,22 @@ export abstract class SceneGraph {
     }
   }
 
+  renderGeometry(entity: Entity, camera: Camera): void {
+    // draw red lines from which vertex of the bounding cuboid to draw a
+    // red outline of it.
+    let vertices: Array<Point3D> = entity.geometry.vertices;
+    let first = vertices[0];
+    let coord = camera.getDrawCoord(this.getDrawCoord(first));
+    this._ctx.strokeStyle = "#FF0000";
+    this._ctx.beginPath();
+    this._ctx.moveTo(coord.x, coord.y);
+    for (let i = 1; i < vertices.length; i++) {
+      coord = camera.getDrawCoord(this.getDrawCoord(vertices[i]));
+      this._ctx.lineTo(coord.x, coord.y);
+    }
+    this._ctx.stroke();
+  }
+
   render(camera: Camera): void {
     this._ctx.clearRect(0, 0, this._width, this._height);
     let node = this._root;
@@ -221,6 +237,7 @@ export abstract class SceneGraph {
           let spriteId = component.update();
           Sprite.sprites[spriteId].draw(coord, this._ctx);
         }
+        this.renderGeometry(entity, camera);
       }
       node = node.succ;
     }
@@ -343,13 +360,26 @@ export class IsometricRenderer extends SceneGraph {
     // First would have a smaller y.
     // First would have a smaller z.
 
-    if (sameX) {
-      if (sameY) {
-        return first.z < second.z ? true : false;
-      } else {
-        return first.y < second.y ? true : false;
-      }
+    if (first.bounds.minZ < second.bounds.minZ) {
+      return true;
     }
-    return first.x > second.x ? true : false;
+    if (first.bounds.minY < second.bounds.minY) {
+      return true;
+    }
+    return first.bounds.minX > second.bounds.maxX;
+    if (sameX && sameY) {
+      return first.z < second.z;
+    } else if (sameX && sameZ) {
+      return first.y < second.y;
+    } else if (sameY && sameZ) {
+      return first.x > second.x;
+    }
+    if (sameX) {
+      return first.z < second.z || first.y < second.y;
+    } else if (sameY) {
+      return first.z < second.z || first.x > second.x;
+    } else {
+      return first.x > second.x;
+    }
   }
 }

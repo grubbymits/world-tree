@@ -212,7 +212,7 @@ export function isRampUp(shape, direction) {
 }
 export class Terrain extends Entity {
     constructor(context, _gridX, _gridY, _gridZ, dimensions, _type, _shape, features) {
-        super(context, new Point3D(_gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height), dimensions, Terrain.graphics(_type, _shape));
+        super(context, new Point3D(_gridX * dimensions.width + Math.floor(dimensions.width / 2), _gridY * dimensions.depth + Math.floor(dimensions.depth / 2), _gridZ * dimensions.height + Math.floor(dimensions.height / 2)), dimensions, Terrain.graphics(_type, _shape));
         this._gridX = _gridX;
         this._gridY = _gridY;
         this._gridZ = _gridZ;

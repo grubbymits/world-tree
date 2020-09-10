@@ -53,7 +53,7 @@ export class MoveDirection extends MoveAction {
         let currentPos = this.actor.bounds.minLocation;
         let nextPos = currentPos.add(this._d);
         if (this.canMove(currentPos, nextPos)) {
-            this.actor.bounds.updatePosition(this._d);
+            this.actor.updatePosition(this._d);
             this.actor.postEvent(EntityEvent.Move);
             return false;
         }
@@ -134,7 +134,7 @@ export class MoveDestination extends MoveAction {
         let location = bounds.minLocation;
         let maxD = this.destination.subtract(location);
         let minD = maxD.absMin(this._d);
-        bounds.updatePosition(minD);
+        this.actor.updatePosition(minD);
         this.actor.postEvent(EntityEvent.Move);
         return bounds.minLocation.isNearlySameAs(this.destination);
     }

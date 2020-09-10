@@ -74,7 +74,7 @@ class Vertex3D {
   private readonly _v: Vector3D;
   private readonly _u: Vector3D;
 
-  constructor(private readonly _point: Point3D,
+  constructor(private _point: Point3D,
               v1: Point3D,
               v2: Point3D) {
     this._u = v1.subtract(_point);
@@ -85,6 +85,10 @@ class Vertex3D {
   get normal(): Vector3D { return this._normal; }
   get u(): Vector3D { return this._u; }
   get v(): Vector3D { return this._v; }
+
+  transform(d: Vector3D): void {
+    this._point = this.point.add(d);
+  }
 
   // https://www.geomalgorithms.com/a05-_intersect-1.html 
   intersects(begin: Point3D, end: Point3D): boolean {
@@ -109,14 +113,30 @@ abstract class Face3D {
   intersectsPlane(begin: Point3D, end: Point3D): boolean {
     return this.plane.intersects(begin, end);
   }
+  abstract transform(d: Vector3D): void;
   // Given that the segment 'begin' -> 'end' intersects the plane, test
   // whether it intersects this face.
   abstract intersects(end: Point3D): boolean;
 }
 
 class TriangleFace3D extends Face3D {
+  private readonly _uDotv: number;
+  private readonly _uDotu: number;
+  private readonly _vDotv: number;
+  private readonly _denominator: number;
+
   constructor(vertex: Vertex3D) {
     super(vertex);
+    let u = this.vertex.u;
+    let v = this.vertex.v;
+    this._uDotv = u.dot(v);
+    this._uDotu = u.dot(u);
+    this._vDotv = v.dot(v);
+    this._denominator = (Math.pow(this._uDotv, 2) - this._uDotu * this._vDotv);
+  }
+
+  transform(d: Vector3D): void {
+    this.vertex.transform(d);
   }
 
   // https://www.geomalgorithms.com/a06-_intersect-2.html 
@@ -126,14 +146,10 @@ class TriangleFace3D extends Face3D {
     let w = end.subtract(this.vertex.point);
     let u = this.vertex.u;
     let v = this.vertex.v;
-    let uDotv = u.dot(v);
-    let uDotu = u.dot(u);
     let wDotv = w.dot(v);
-    let vDotv = v.dot(v);
     let wDotu = w.dot(u);
-    let dominator = (Math.pow(uDotv, 2) - uDotu * vDotv);
-    let s1 = (uDotv * wDotv - vDotv * wDotu) / dominator;
-    let t1 = (uDotv * wDotu - uDotu * wDotv) / dominator;
+    let s1 = (this._uDotv * wDotv - this._vDotv * wDotu) / this._denominator;
+    let t1 = (this._uDotv * wDotu - this._uDotu * wDotv) / this._denominator;
     return s1 >= 0 && t1 >= 0 && s1 + t1 <= 1;
   }
 }
@@ -151,6 +167,11 @@ class QuadFace3D extends Face3D {
     this._triangleB = new TriangleFace3D(vertexB);
   }
 
+  transform(d: Vector3D): void {
+    this._triangleA.transform(d);
+    this._triangleB.transform(d);
+  }
+
   intersects(end: Point3D): boolean {
     return this._triangleA.intersects(end) || this._triangleB.intersects(end);
   }
@@ -162,6 +183,20 @@ export class Geometry {
   constructor(protected _bounds: BoundingCuboid) { }
 
   get bounds(): BoundingCuboid { return this._bounds; }
+
+  transform(d: Vector3D): void {
+    for (let face of this._faces) {
+      face.transform(d);
+    }
+  }
+
+  get vertices(): Array<Point3D> {
+    let vertices = new Array<Point3D>();
+    for (let face of this._faces) {
+      vertices.push(face.vertex.point);
+    }
+    return vertices;
+  }
 
   obstructs(begin: Point3D, end: Point3D): boolean {
     for (let face of this._faces) {

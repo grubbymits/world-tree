@@ -1,6 +1,7 @@
 import { Dimensions,
          BoundingCuboid } from "./physics.js"
 import { Point3D,
+         Vector3D,
          Geometry,
          CuboidGeometry } from "./geometry.js"
 import { Point,
@@ -24,16 +25,13 @@ export class Entity {
   protected _geometry: Geometry;
 
   constructor(protected _context: Context,
-              location: Point3D,
+              centre: Point3D,
               dimensions: Dimensions,
               graphicComponent: GraphicComponent) {
     this._id = Entity._ids;
     Entity._ids++;
     this._graphicComponents = new Array<GraphicComponent>();
     this._graphicComponents.push(graphicComponent);
-    let centre = new Point3D(location.x + Math.floor(dimensions.width / 2),
-                             location.y + Math.floor(dimensions.depth / 2),
-                             location.z + Math.floor(dimensions.height / 2));
     this._bounds = new BoundingCuboid(centre, dimensions);
     this._geometry = new CuboidGeometry(this._bounds);
     this._context.addEntity(this);
@@ -66,6 +64,7 @@ export class Entity {
   addGraphic(graphic: GraphicComponent): void {
     this._graphicComponents.push(graphic);
   }
+
   heightAt(location: Point3D): number|null {
     // Given a world location, does this terrain define what the minimum z
     // coordinate?
@@ -74,6 +73,11 @@ export class Entity {
       return null;
     }
     return this.z + this.height;
+  }
+
+  updatePosition(d: Vector3D): void {
+    this.bounds.update(d);
+    this.geometry.transform(d);
   }
 }
 

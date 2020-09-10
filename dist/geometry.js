@@ -67,6 +67,9 @@ class Vertex3D {
     get normal() { return this._normal; }
     get u() { return this._u; }
     get v() { return this._v; }
+    transform(d) {
+        this._point = this.point.add(d);
+    }
     intersects(begin, end) {
         let u = end.subtract(begin);
         let D = this.normal.dot(u);
@@ -92,19 +95,24 @@ class Face3D {
 class TriangleFace3D extends Face3D {
     constructor(vertex) {
         super(vertex);
+        let u = this.vertex.u;
+        let v = this.vertex.v;
+        this._uDotv = u.dot(v);
+        this._uDotu = u.dot(u);
+        this._vDotv = v.dot(v);
+        this._denominator = (Math.pow(this._uDotv, 2) - this._uDotu * this._vDotv);
+    }
+    transform(d) {
+        this.vertex.transform(d);
     }
     intersects(end) {
         let w = end.subtract(this.vertex.point);
         let u = this.vertex.u;
         let v = this.vertex.v;
-        let uDotv = u.dot(v);
-        let uDotu = u.dot(u);
         let wDotv = w.dot(v);
-        let vDotv = v.dot(v);
         let wDotu = w.dot(u);
-        let dominator = (Math.pow(uDotv, 2) - uDotu * vDotv);
-        let s1 = (uDotv * wDotv - vDotv * wDotu) / dominator;
-        let t1 = (uDotv * wDotu - uDotu * wDotv) / dominator;
+        let s1 = (this._uDotv * wDotv - this._vDotv * wDotu) / this._denominator;
+        let t1 = (this._uDotv * wDotu - this._uDotu * wDotv) / this._denominator;
         return s1 >= 0 && t1 >= 0 && s1 + t1 <= 1;
     }
 }
@@ -113,6 +121,10 @@ class QuadFace3D extends Face3D {
         super(vertexA);
         this._triangleA = new TriangleFace3D(vertexA);
         this._triangleB = new TriangleFace3D(vertexB);
+    }
+    transform(d) {
+        this._triangleA.transform(d);
+        this._triangleB.transform(d);
     }
     intersects(end) {
         return this._triangleA.intersects(end) || this._triangleB.intersects(end);
@@ -124,6 +136,18 @@ export class Geometry {
         this._faces = new Array();
     }
     get bounds() { return this._bounds; }
+    transform(d) {
+        for (let face of this._faces) {
+            face.transform(d);
+        }
+    }
+    get vertices() {
+        let vertices = new Array();
+        for (let face of this._faces) {
+            vertices.push(face.vertex.point);
+        }
+        return vertices;
+    }
     obstructs(begin, end) {
         for (let face of this._faces) {
             if (face.intersectsPlane(begin, end) && face.intersects(end)) {

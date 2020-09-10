@@ -1,9 +1,9 @@
 import { BoundingCuboid } from "./physics.js";
-import { Point3D, CuboidGeometry } from "./geometry.js";
+import { CuboidGeometry } from "./geometry.js";
 import { Point } from "./graphics.js";
 import { EntityEvent, EventHandler } from "./events.js";
 export class Entity {
-    constructor(_context, location, dimensions, graphicComponent) {
+    constructor(_context, centre, dimensions, graphicComponent) {
         this._context = _context;
         this._hasMoved = false;
         this._drawCoord = new Point(0, 0);
@@ -12,7 +12,6 @@ export class Entity {
         Entity._ids++;
         this._graphicComponents = new Array();
         this._graphicComponents.push(graphicComponent);
-        let centre = new Point3D(location.x + Math.floor(dimensions.width / 2), location.y + Math.floor(dimensions.depth / 2), location.z + Math.floor(dimensions.height / 2));
         this._bounds = new BoundingCuboid(centre, dimensions);
         this._geometry = new CuboidGeometry(this._bounds);
         this._context.addEntity(this);
@@ -47,6 +46,10 @@ export class Entity {
             return null;
         }
         return this.z + this.height;
+    }
+    updatePosition(d) {
+        this.bounds.update(d);
+        this.geometry.transform(d);
     }
 }
 Entity._ids = 0;

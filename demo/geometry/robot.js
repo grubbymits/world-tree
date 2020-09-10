@@ -26,10 +26,17 @@ export class RobotController extends WT.Controller {
     let spatialInfo = this._context.spatial;
 
     let moveRandomDirection = function() {
-      // Choose values between: -1, 0, 1
       let dx = Math.round(Math.random() * 2) - 1;
-      let dy = Math.round(Math.random() * 2) - 1;
+      let dy = 0;
       let dz = 0;
+      // Move along either the x or y axis.
+      // Choose values between: -1, 0, 1
+      if (dx == 0) {
+        dy = Math.round(Math.random() * 2) - 1;
+      }
+      if (dx == 0 && dy == 0) {
+        dy = 1;
+      }
       let moveVector = new WT.Vector3D(dx, dy, dz);
       robot.action = new WT.MoveDirection(robot, moveVector, bounds, spatialInfo);
     };

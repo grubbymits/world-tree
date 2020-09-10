@@ -316,9 +316,9 @@ export class Terrain extends Entity {
               private readonly _shape: TerrainShape,
               features: number) {
     super(context,
-          new Point3D(_gridX * dimensions.width,
-                       _gridY * dimensions.depth,
-                       _gridZ * dimensions.height),
+          new Point3D(_gridX * dimensions.width + Math.floor(dimensions.width / 2),
+                      _gridY * dimensions.depth + Math.floor(dimensions.depth / 2),
+                      _gridZ * dimensions.height + Math.floor(dimensions.height / 2)),
           dimensions, Terrain.graphics(_type, _shape));
 
     if (isFlat(_shape)) {

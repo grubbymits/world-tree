@@ -188,7 +188,7 @@ export class BoundingCuboid {
         z = centre.z + height;
         this._maxLocation = new Point3D(x, y, z);
     }
-    updatePosition(d) {
+    update(d) {
         this._centre = this._centre.add(d);
         this._minLocation = this._minLocation.add(d);
         this._maxLocation = this._maxLocation.add(d);
