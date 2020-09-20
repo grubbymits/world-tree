@@ -5,6 +5,12 @@ export class Point {
     }
     get x() { return this._x; }
     get y() { return this._y; }
+    add(other) {
+        return new Point(this.x + other.x, this.y + other.y);
+    }
+    sub(other) {
+        return new Point(this.x - other.x, this.y - other.y);
+    }
 }
 export class SpriteSheet {
     constructor(name) {
@@ -42,14 +48,27 @@ export class SpriteSheet {
 }
 SpriteSheet._sheets = new Array();
 export class Sprite {
-    constructor(_sheet, _offsetX, _offsetY, _width, _height) {
+    constructor(_sheet, offsetX, offsetY, _width, _height) {
         this._sheet = _sheet;
-        this._offsetX = _offsetX;
-        this._offsetY = _offsetY;
         this._width = _width;
         this._height = _height;
         this._id = Sprite.sprites.length;
+        this._spriteOffset = new Point(offsetX, offsetY);
+        this._sheet = _sheet;
         Sprite.add(this);
+        this._drawOffset = new Point(0, _height - 1);
+        let sprite = this;
+        this._sheet.image.addEventListener('load', function () {
+            for (let x = 0; x < _width; x++) {
+                for (let y = _height - 1; y >= 0; y--) {
+                    if (!sprite.isTransparentAt(x, y)) {
+                        sprite._drawOffset = new Point(x, y - _height);
+                        console.log("set draw offset:", sprite._drawOffset);
+                        return;
+                    }
+                }
+            }
+        });
     }
     static add(sprite) {
         this._sprites.push(sprite);
@@ -58,16 +77,18 @@ export class Sprite {
         return this._sprites;
     }
     draw(coord, ctx) {
-        ctx.drawImage(this._sheet.image, this._offsetX, this._offsetY, this._width, this._height, coord.x, coord.y, this._width, this._height);
+        ctx.drawImage(this._sheet.image, this._spriteOffset.x, this._spriteOffset.y, this._width, this._height, coord.x + this.drawOffset.x, coord.y + this.drawOffset.y, this._width, this._height);
     }
     isTransparentAt(x, y) {
-        x += this._offsetX;
-        y += this._offsetY;
+        x += this._spriteOffset.x;
+        y += this._spriteOffset.y;
         return this._sheet.isTransparentAt(x, y);
     }
     get id() { return this._id; }
     get width() { return this._width; }
     get height() { return this._height; }
+    get drawOffset() { return this._drawOffset; }
+    set drawOffset(offset) { this._drawOffset = offset; }
 }
 Sprite._sprites = new Array();
 export class GraphicComponent {
@@ -82,6 +103,9 @@ export class GraphicComponent {
     }
     get height() {
         return Sprite.sprites[this._currentSpriteId].height;
+    }
+    get offset() {
+        return Sprite.sprites[this._currentSpriteId].drawOffset;
     }
 }
 export class StaticGraphicComponent extends GraphicComponent {
@@ -159,14 +183,14 @@ export class SceneGraph {
         }
     }
     renderGeometry(entity, camera) {
-        let vertices = entity.geometry.vertices;
-        let first = vertices[0];
+        let points = entity.geometry.points;
+        let first = points[0];
         let coord = camera.getDrawCoord(this.getDrawCoord(first));
         this._ctx.strokeStyle = "#FF0000";
         this._ctx.beginPath();
         this._ctx.moveTo(coord.x, coord.y);
-        for (let i = 1; i < vertices.length; i++) {
-            coord = camera.getDrawCoord(this.getDrawCoord(vertices[i]));
+        for (let i = 1; i < points.length; i++) {
+            coord = camera.getDrawCoord(this.getDrawCoord(points[i]));
             this._ctx.lineTo(coord.x, coord.y);
         }
         this._ctx.stroke();
@@ -184,10 +208,10 @@ export class SceneGraph {
                     let spriteId = component.update();
                     Sprite.sprites[spriteId].draw(coord, this._ctx);
                 }
-                this.renderGeometry(entity, camera);
             }
             node = node.succ;
         }
+        this.renderGeometry(this._root.entity, camera);
     }
     getLocationAt(x, y, camera) {
         let entity = this.getEntityDrawnAt(x, y, camera);
@@ -268,8 +292,8 @@ export class IsometricRenderer extends SceneGraph {
         return new Point(dx, dy);
     }
     setDrawCoord(entity) {
-        entity.drawCoord =
-            IsometricRenderer.getDrawCoord(entity.bounds.minLocation);
+        let coord = IsometricRenderer.getDrawCoord(entity.bounds.minLocation);
+        entity.drawCoord = new Point(coord.x, coord.y - entity.depth);
     }
     getDrawCoord(location) {
         return IsometricRenderer.getDrawCoord(location);

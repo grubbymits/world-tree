@@ -9,6 +9,12 @@ export class Point {
               private readonly _y: number) { }
   get x() { return this._x; }
   get y() { return this._y; }
+  add(other: Point): Point {
+    return new Point(this.x + other.x, this.y + other.y);
+  }
+  sub(other: Point): Point {
+    return new Point(this.x - other.x, this.y - other.y);
+  }
 }
 
 export class SpriteSheet {
@@ -67,33 +73,55 @@ export class Sprite {
   }
 
   private readonly _id: number;
+  private readonly _spriteOffset: Point;
+  private _drawOffset: Point;
 
   constructor(private readonly _sheet: SpriteSheet,
-              private readonly _offsetX: number,
-              private readonly _offsetY: number,
+              offsetX: number,
+              offsetY: number,
               private readonly _width: number,
               private readonly _height: number) {
     this._id = Sprite.sprites.length;
+    this._spriteOffset = new Point(offsetX, offsetY);
+    this._sheet = _sheet;
     Sprite.add(this);
+    this._drawOffset = new Point(0, _height - 1);
+
+    let sprite: Sprite = this;
+    this._sheet.image.addEventListener('load', function() {
+      // Find the bottom left-most point.
+      for (let x = 0; x < _width; x++) {
+        for (let y = _height - 1; y >= 0; y--) {
+          if (!sprite.isTransparentAt(x, y)) {
+            sprite._drawOffset = new Point(x, y-_height);
+            console.log("set draw offset:", sprite._drawOffset);
+            return;
+          }
+        }
+      }
+    });
   }
 
   draw(coord: Point, ctx: CanvasRenderingContext2D): void {
     ctx.drawImage(this._sheet.image,
-                  this._offsetX, this._offsetY,
+                  this._spriteOffset.x, this._spriteOffset.y,
                   this._width, this._height,
-                  coord.x, coord.y,
+                  coord.x + this.drawOffset.x,
+                  coord.y + this.drawOffset.y,
                   this._width, this._height);
   }
 
   isTransparentAt(x: number, y: number): boolean {
-    x += this._offsetX;
-    y += this._offsetY;
+    x += this._spriteOffset.x;
+    y += this._spriteOffset.y;
     return this._sheet.isTransparentAt(x, y);
   }
 
   get id(): number { return this._id; }
   get width(): number { return this._width; }
   get height(): number { return this._height; }
+  get drawOffset(): Point { return this._drawOffset; }
+  set drawOffset(offset: Point) { this._drawOffset = offset; }
 }
 
 // Computer graphics have their origin in the top left corner.
@@ -113,6 +141,9 @@ export abstract class GraphicComponent {
   }
   get height(): number { 
     return Sprite.sprites[this._currentSpriteId].height;
+  }
+  get offset(): Point {
+    return Sprite.sprites[this._currentSpriteId].drawOffset;
   }
 }
 
@@ -211,14 +242,14 @@ export abstract class SceneGraph {
   renderGeometry(entity: Entity, camera: Camera): void {
     // draw red lines from which vertex of the bounding cuboid to draw a
     // red outline of it.
-    let vertices: Array<Point3D> = entity.geometry.vertices;
-    let first = vertices[0];
+    let points: Array<Point3D> = entity.geometry.points;
+    let first = points[0];
     let coord = camera.getDrawCoord(this.getDrawCoord(first));
     this._ctx.strokeStyle = "#FF0000";
     this._ctx.beginPath();
     this._ctx.moveTo(coord.x, coord.y);
-    for (let i = 1; i < vertices.length; i++) {
-      coord = camera.getDrawCoord(this.getDrawCoord(vertices[i]));
+    for (let i = 1; i < points.length; i++) {
+      coord = camera.getDrawCoord(this.getDrawCoord(points[i]));
       this._ctx.lineTo(coord.x, coord.y);
     }
     this._ctx.stroke();
@@ -237,10 +268,10 @@ export abstract class SceneGraph {
           let spriteId = component.update();
           Sprite.sprites[spriteId].draw(coord, this._ctx);
         }
-        this.renderGeometry(entity, camera);
       }
       node = node.succ;
     }
+    this.renderGeometry(this._root.entity, camera);
   }
 
   getLocationAt(x: number, y: number, camera: Camera): Point3D | null {
@@ -343,8 +374,9 @@ export class IsometricRenderer extends SceneGraph {
   }
 
   setDrawCoord(entity: Entity): void {
-    entity.drawCoord =
+    let coord =
       IsometricRenderer.getDrawCoord(entity.bounds.minLocation);
+    entity.drawCoord = new Point(coord.x, coord.y - entity.depth);
   }
 
   getDrawCoord(location: Point3D): Point {

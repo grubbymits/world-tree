@@ -321,9 +321,6 @@ export class Terrain extends Entity {
                       _gridZ * dimensions.height + Math.floor(dimensions.height / 2)),
           dimensions, Terrain.graphics(_type, _shape));
 
-    if (isFlat(_shape)) {
-      this._geometry = new CuboidGeometry(this.bounds);
-    }
     // Pre-calculate the angle of the ramp.
     if (!isFlat(_shape)) {
       let theta = Math.atan(this.height / this.depth) * 180 / Math.PI;

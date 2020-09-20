@@ -85,8 +85,10 @@ class Vertex3D {
 class Face3D {
     constructor(_vertex) {
         this._vertex = _vertex;
+        this._points = new Array();
     }
     get vertex() { return this._vertex; }
+    get points() { return this._points; }
     get plane() { return this._vertex; }
     intersectsPlane(begin, end) {
         return this.plane.intersects(begin, end);
@@ -101,6 +103,9 @@ class TriangleFace3D extends Face3D {
         this._uDotu = u.dot(u);
         this._vDotv = v.dot(v);
         this._denominator = (Math.pow(this._uDotv, 2) - this._uDotu * this._vDotv);
+        this._points.push(this.vertex.point);
+        this._points.push(this.vertex.point.add(u));
+        this._points.push(this.vertex.point.add(v));
     }
     transform(d) {
         this.vertex.transform(d);
@@ -122,6 +127,9 @@ class QuadFace3D extends Face3D {
         this._triangleA = new TriangleFace3D(vertexA);
         this._triangleB = new TriangleFace3D(vertexB);
     }
+    get points() {
+        return this._triangleA.points.concat(this._triangleB.points);
+    }
     transform(d) {
         this._triangleA.transform(d);
         this._triangleB.transform(d);
@@ -141,12 +149,14 @@ export class Geometry {
             face.transform(d);
         }
     }
-    get vertices() {
-        let vertices = new Array();
+    get points() {
+        let points = new Array();
         for (let face of this._faces) {
-            vertices.push(face.vertex.point);
+            for (let point of face.points) {
+                points.push(point);
+            }
         }
-        return vertices;
+        return points;
     }
     obstructs(begin, end) {
         for (let face of this._faces) {

@@ -1,7 +1,7 @@
 import { Direction } from "./physics.js";
 import { Entity } from "./entity.js";
 import { Sprite, StaticGraphicComponent } from "./graphics.js";
-import { Point3D, CuboidGeometry } from "./geometry.js";
+import { Point3D } from "./geometry.js";
 export var TerrainShape;
 (function (TerrainShape) {
     TerrainShape[TerrainShape["Flat"] = 0] = "Flat";
@@ -218,9 +218,6 @@ export class Terrain extends Entity {
         this._gridZ = _gridZ;
         this._type = _type;
         this._shape = _shape;
-        if (isFlat(_shape)) {
-            this._geometry = new CuboidGeometry(this.bounds);
-        }
         if (!isFlat(_shape)) {
             let theta = Math.atan(this.height / this.depth) * 180 / Math.PI;
             this._tanTheta = Math.tan(theta);
