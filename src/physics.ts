@@ -1,9 +1,12 @@
-import { Entity } from "./entity.js"
+import { Entity,
+         Actor } from "./entity.js"
 import { TerrainType, TerrainShape, Terrain } from "./terrain.js"
 import { SquareGrid } from "./map.js"
 import { Point } from "./graphics.js"
 import { Point3D,
-         Vector3D } from "./geometry.js"
+         Vector3D,
+         Geometry } from "./geometry.js"
+import { Octree } from "./tree.js"
 
 export enum Direction {
   North,
@@ -303,5 +306,32 @@ export class BoundingCuboid {
                 this.centre.z);
     console.log(" - dimensions (WxDxH):",
                 this.width, this.depth, this.height);
+  }
+}
+
+export class CollisionDetector {
+  constructor(private readonly _spatialInfo : Octree) { }
+
+  detectInArea(actor: Actor, path: Vector3D, area: BoundingCuboid): boolean {
+    let bounds = actor.bounds;
+    const endMinLocation: Point3D = bounds.minLocation.add(path);
+    const endMaxLocation: Point3D = bounds.maxLocation.add(path);
+
+    let entities: Array<Entity> = this._spatialInfo.getEntities(area);
+    for (let entity of entities) {
+      if (entity.id == actor.id) {
+        continue;
+      }
+      const geometry: Geometry = entity.geometry;
+      if (geometry.obstructs(actor.bounds.minLocation, endMinLocation) ||
+          geometry.obstructs(actor.bounds.minLocation, endMaxLocation) ||
+          geometry.obstructs(actor.bounds.maxLocation, endMaxLocation) ||
+          geometry.obstructs(actor.bounds.maxLocation, endMinLocation)) {
+        console.log("actor at", actor.bounds.minLocation);
+        console.log("obstructed by entity at", entity.bounds.minLocation);
+        return true;
+      }
+    }
+    return false;
   }
 }

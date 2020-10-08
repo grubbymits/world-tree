@@ -134,7 +134,7 @@ class TriangleFace3D extends Face3D {
     this._uDotv = u.dot(v);
     this._uDotu = u.dot(u);
     this._vDotv = v.dot(v);
-    this._denominator = (Math.pow(this._uDotv, 2) - this._uDotu * this._vDotv);
+    this._denominator = 1 / (Math.pow(this._uDotv, 2) - this._uDotu * this._vDotv);
     this._points.push(this.vertex.point);
     this._points.push(this.vertex.point.add(u));
     this._points.push(this.vertex.point.add(v));
@@ -153,8 +153,8 @@ class TriangleFace3D extends Face3D {
     let v = this.vertex.v;
     let wDotv = w.dot(v);
     let wDotu = w.dot(u);
-    let s1 = (this._uDotv * wDotv - this._vDotv * wDotu) / this._denominator;
-    let t1 = (this._uDotv * wDotu - this._uDotu * wDotv) / this._denominator;
+    let s1 = (this._uDotv * wDotv - this._vDotv * wDotu) * this._denominator;
+    let t1 = (this._uDotv * wDotu - this._uDotu * wDotv) * this._denominator;
     return s1 >= 0 && t1 >= 0 && s1 + t1 <= 1;
   }
 }

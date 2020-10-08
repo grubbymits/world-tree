@@ -15,8 +15,6 @@
 
     const spriteWidth = 256;
     const spriteHeight = 248;
-    const relativeDims = new WT.Dimensions(3, 3, 2);
-    const physicalDims = new WT.IsometricPhysicalDimensions(spriteWidth, relativeDims);
 
     let sheet = new WT.SpriteSheet("../../../res/img/basic-dungeon");
     WT.Terrain.addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Flat,
@@ -41,6 +39,8 @@
                       [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
                       [ 2, 2, 2, 2, 2, 2, 2, 2, 2] ];
 
+    const relativeDims = new WT.Dimensions(3, 3, 2);
+    const physicalDims = new WT.IsometricPhysicalDimensions(spriteWidth, relativeDims);
     const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
                                         physicalDims.depth * cellsY,
                                         physicalDims.height * (1 + terraces));
@@ -69,7 +69,8 @@
       // place a robot in the middle of the map.
       robotController.add(new WT.Point3D(Math.floor(worldDims.width / 2),
                                          Math.floor(worldDims.depth / 2),
-                                         physicalDims.height + 30));
+                                         2 + Math.floor(worldDims.height / 2 +
+                                                        physicalDims.height / 2)));
 
       var update = function update() {
         if (document.hasFocus()) {

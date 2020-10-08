@@ -1,7 +1,8 @@
 import { Entity,
          Actor } from "./entity.js"
 import { EntityEvent } from "./events.js"
-import { BoundingCuboid } from "./physics.js"
+import { BoundingCuboid,
+         CollisionDetector } from "./physics.js"
 import { Point3D,
          Vector3D,
          Geometry } from "./geometry.js"
@@ -17,40 +18,20 @@ export abstract class Action {
 }
 
 class MoveAction extends Action {
+  protected readonly _collisionDetector : CollisionDetector;
   constructor(actor: Actor,
-              protected readonly _spatialInfo: Octree) {
+              spatialInfo: Octree) {
     super(actor);
+    this._collisionDetector = new CollisionDetector(spatialInfo);
   }
 
   canMove(from: Point3D, to: Point3D): boolean {
     let bounds = this._actor.bounds;
-    let path: Vector3D = to.subtract(bounds.bottomCentre);
-    let beginMinLocation: Point3D = bounds.minLocation;
-    let beginMaxLocation: Point3D = bounds.maxLocation;
-    let endMinLocation: Point3D = beginMinLocation.add(path);
-    let endMaxLocation: Point3D = beginMaxLocation.add(path);
-    if (!this._spatialInfo.bounds.contains(endMinLocation) ||
-        !this._spatialInfo.bounds.contains(endMaxLocation)) {
-      console.log("cannot move to:", to.x, to.y, to.z);
-      return false;
-    }
-
     // Create a bounds to contain the current location and the destination.
+    let path: Vector3D = to.subtract(from);
     let area = new BoundingCuboid(to, bounds.dimensions);
     area.insert(bounds);
-    let entities: Array<Entity> = this._spatialInfo.getEntities(area);
-    for (let entity of entities) {
-      if (entity.id == this._actor.id) {
-        continue;
-      }
-      let geometry: Geometry = entity.geometry;
-      if (geometry.obstructs(beginMinLocation, endMinLocation) ||
-          geometry.obstructs(beginMaxLocation, endMaxLocation)) {
-        console.log("obstructed by entity at", entity.bounds.minLocation);
-        return false;
-      }
-    }
-    return true;
+    return !this._collisionDetector.detectInArea(this._actor, path, area);
   }
 
   perform(): boolean { return true; }
@@ -65,8 +46,8 @@ export class MoveDirection extends MoveAction {
   }
 
   perform(): boolean {
-    let currentPos = this.actor.bounds.minLocation;
-    let nextPos = currentPos.add(this._d);
+    const currentPos = this.actor.bounds.bottomCentre;
+    const nextPos = currentPos.add(this._d);
     if (this.canMove(currentPos, nextPos)) {
       this.actor.updatePosition(this._d);
       this.actor.postEvent(EntityEvent.Move);

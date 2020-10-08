@@ -5,10 +5,11 @@ class Robot extends WT.Actor {
   static sprite = new WT.Sprite(Robot.sheet, 0, 0, 256, 248);
   static graphic = new WT.StaticGraphicComponent(Robot.sprite.id);
   static relativeDims = new WT.Dimensions(3, 3, 2);
-  static dims = new WT.IsometricPhysicalDimensions(128, Robot.relativeDims);
+  static dims = new WT.IsometricPhysicalDimensions(256, Robot.relativeDims);
 
   constructor(context, position) {
     super(context, position, Robot.dims, Robot.graphic);
+    //this._drawGeometry = true;
   }
 }
 
@@ -19,8 +20,10 @@ export class RobotController extends WT.Controller {
   }
 
   add(position) {
-    console.log("adding robot at (x,y,z):", position.x, position.y, position.z);
+    console.log("adding robot at:", position);
     let robot = new Robot(this._context, position);
+    console.log("min location:", robot.bounds.minLocation);
+
     this._actors.push(robot);
     let bounds = this._context.bounds;
     let spatialInfo = this._context.spatial;

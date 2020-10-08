@@ -1,5 +1,5 @@
 import { EntityEvent } from "./events.js";
-import { BoundingCuboid } from "./physics.js";
+import { BoundingCuboid, CollisionDetector } from "./physics.js";
 import { Vector3D } from "./geometry.js";
 export class Action {
     constructor(_actor) {
@@ -9,37 +9,16 @@ export class Action {
     set actor(actor) { this._actor = actor; }
 }
 class MoveAction extends Action {
-    constructor(actor, _spatialInfo) {
+    constructor(actor, spatialInfo) {
         super(actor);
-        this._spatialInfo = _spatialInfo;
+        this._collisionDetector = new CollisionDetector(spatialInfo);
     }
     canMove(from, to) {
         let bounds = this._actor.bounds;
-        let path = to.subtract(bounds.bottomCentre);
-        let beginMinLocation = bounds.minLocation;
-        let beginMaxLocation = bounds.maxLocation;
-        let endMinLocation = beginMinLocation.add(path);
-        let endMaxLocation = beginMaxLocation.add(path);
-        if (!this._spatialInfo.bounds.contains(endMinLocation) ||
-            !this._spatialInfo.bounds.contains(endMaxLocation)) {
-            console.log("cannot move to:", to.x, to.y, to.z);
-            return false;
-        }
+        let path = to.subtract(from);
         let area = new BoundingCuboid(to, bounds.dimensions);
         area.insert(bounds);
-        let entities = this._spatialInfo.getEntities(area);
-        for (let entity of entities) {
-            if (entity.id == this._actor.id) {
-                continue;
-            }
-            let geometry = entity.geometry;
-            if (geometry.obstructs(beginMinLocation, endMinLocation) ||
-                geometry.obstructs(beginMaxLocation, endMaxLocation)) {
-                console.log("obstructed by entity at", entity.bounds.minLocation);
-                return false;
-            }
-        }
-        return true;
+        return !this._collisionDetector.detectInArea(this._actor, path, area);
     }
     perform() { return true; }
 }
@@ -50,8 +29,8 @@ export class MoveDirection extends MoveAction {
         this._bounds = _bounds;
     }
     perform() {
-        let currentPos = this.actor.bounds.minLocation;
-        let nextPos = currentPos.add(this._d);
+        const currentPos = this.actor.bounds.bottomCentre;
+        const nextPos = currentPos.add(this._d);
         if (this.canMove(currentPos, nextPos)) {
             this.actor.updatePosition(this._d);
             this.actor.postEvent(EntityEvent.Move);

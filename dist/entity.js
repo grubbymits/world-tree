@@ -8,6 +8,7 @@ export class Entity {
         this._hasMoved = false;
         this._drawCoord = new Point(0, 0);
         this._visible = true;
+        this._drawGeometry = false;
         this._id = Entity._ids;
         Entity._ids++;
         this._graphicComponents = new Array();
@@ -36,6 +37,7 @@ export class Entity {
     get graphic() {
         return this._graphicComponents[0];
     }
+    get drawGeometry() { return this._drawGeometry; }
     set drawCoord(coord) { this._drawCoord = coord; }
     set visible(visible) { this._visible = visible; }
     addGraphic(graphic) {

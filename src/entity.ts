@@ -23,6 +23,7 @@ export class Entity {
   protected _visible: boolean = true;
   protected _bounds: BoundingCuboid;
   protected _geometry: Geometry;
+  protected _drawGeometry: boolean = false;
 
   constructor(protected _context: Context,
               centre: Point3D,
@@ -57,6 +58,7 @@ export class Entity {
   get graphic(): GraphicComponent {
     return this._graphicComponents[0];
   }
+  get drawGeometry(): boolean { return this._drawGeometry; }
 
   set drawCoord(coord: Point) { this._drawCoord = coord; }
   set visible(visible: boolean) { this._visible = visible; }

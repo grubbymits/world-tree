@@ -155,6 +155,8 @@ export class OssilateGraphicComponent extends GraphicComponent {
 class SceneNode {
     constructor(_entity) {
         this._entity = _entity;
+        this._succ = null;
+        this._pred = null;
     }
     get x() { return this._entity.x; }
     get y() { return this._entity.y; }
@@ -177,7 +179,7 @@ export class SceneGraph {
         console.log("scene graph contains number node:", this._nodes.size);
         console.log("draw order:");
         let node = this._root;
-        while (node != undefined) {
+        while (node != null) {
             console.log(node.x, node.y, node.z);
             node = node.succ;
         }
@@ -198,7 +200,7 @@ export class SceneGraph {
     render(camera) {
         this._ctx.clearRect(0, 0, this._width, this._height);
         let node = this._root;
-        while (node != undefined) {
+        while (node != null) {
             let entity = node.entity;
             if (camera.isOnScreen(entity.drawCoord, entity.width, entity.depth) &&
                 entity.visible) {
@@ -208,21 +210,23 @@ export class SceneGraph {
                     let spriteId = component.update();
                     Sprite.sprites[spriteId].draw(coord, this._ctx);
                 }
+                if (entity.drawGeometry) {
+                    this.renderGeometry(entity, camera);
+                }
             }
             node = node.succ;
         }
-        this.renderGeometry(this._root.entity, camera);
     }
     getLocationAt(x, y, camera) {
         let entity = this.getEntityDrawnAt(x, y, camera);
-        if (entity != undefined) {
+        if (entity != null) {
             return entity.bounds.minLocation;
         }
         return null;
     }
     getEntityDrawnAt(x, y, camera) {
         let node = this._leaf;
-        while (node != undefined) {
+        while (node != null && node != undefined) {
             let entity = node.entity;
             if (entity.visible &&
                 camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
@@ -250,36 +254,137 @@ export class SceneGraph {
             console.log("set initial root of the scene");
             this._root = node;
             this._leaf = node;
+            this._root.pred = null;
+            this._root.succ = null;
             return;
         }
-        let existing = this._root;
-        while (existing != undefined) {
-            if (!this.drawBefore(existing.entity, node.entity)) {
-                if (existing == this._root) {
-                    this._root = node;
-                    this._root.succ = existing;
-                    existing.pred = this._root;
-                }
-                else {
-                    let first = existing.pred;
-                    let second = node;
-                    let third = existing;
-                    first.succ = second;
-                    second.pred = first;
-                    second.succ = third;
-                    third.pred = second;
-                }
+        return this.insertNode(node);
+    }
+    insertNode(node) {
+        if (this.drawBefore(node.entity, this._root.entity)) {
+            return this.insertBefore(node, this._root);
+        }
+        if (this.drawBefore(this._leaf.entity, node.entity)) {
+            return this.insertAfter(node, this._leaf);
+        }
+        let existing = this._root.succ;
+        while (existing != null) {
+            if (this.drawBefore(node.entity, existing.entity)) {
+                this.insertBefore(node, existing);
+                console.assert(this._root.pred == null, "expected root to have no predecessor");
+                console.assert(this._leaf.succ == null, "expected leaf to have no successor", this._leaf.entity.id);
                 return;
             }
             existing = existing.succ;
         }
-        let last = this._leaf;
-        this._leaf = node;
-        last.succ = this._leaf;
-        this._leaf.pred = last;
+        console.error("unable to insert entity into scene graph");
+        console.log("entity at", node.entity.x, node.entity.y, node.entity.z);
+        console.log("current leaf at:", this._leaf.entity.x, this._leaf.entity.y, this._leaf.entity.z);
+    }
+    insert(first, second, third) {
+        first.succ = second;
+        second.pred = first;
+        second.succ = third;
+        third.pred = second;
+        let verifyChainMap = new Map();
+        let node = this._root;
+        let numFound = 0;
+        while (node != null) {
+            console.assert(!verifyChainMap.has(node.entity.id), "node accessible more than once!");
+            verifyChainMap.set(node, true);
+            node = node.succ;
+            numFound++;
+        }
+        if (numFound == this._nodes.size) {
+        }
+        else {
+            console.error("unsuccessful insertion, only found", numFound, "out of a total", this._nodes.size);
+        }
+    }
+    insertBefore(node, succ) {
+        let first = succ.pred;
+        let second = node;
+        let third = succ;
+        if (first == null) {
+            console.assert(succ.entity.id == this._root.entity.id, "expected root node");
+            console.log("updating root scene node:", node.entity.id);
+            this._root = node;
+            this._root.pred = null;
+            this._root.succ = succ;
+            succ.pred = this._root;
+        }
+        else {
+            this.insert(first, second, third);
+        }
+    }
+    insertAfter(node, pred) {
+        let first = pred;
+        let second = node;
+        let third = pred.succ;
+        if (third == null) {
+            console.assert(pred.entity.id == this._leaf.entity.id, "expected leaf node");
+            console.log("updating leaf scene node:", node.entity.id);
+            this._leaf = node;
+            this._leaf.succ = null;
+            this._leaf.pred = pred;
+            pred.succ = this._leaf;
+        }
+        else {
+            this.insert(first, second, third);
+        }
+    }
+    remove(node) {
+        if (node.pred == null) {
+            this._root = node.succ;
+            this._root.pred = null;
+        }
+        else if (node.succ == null) {
+            this._leaf = node.pred;
+            this._leaf.succ = null;
+        }
+        else {
+            let first = node.pred;
+            let second = node.succ;
+            first.succ = second;
+            second.pred = first;
+        }
     }
     updateEntity(entity) {
+        console.assert(this._nodes.has(entity), "entity not in node map");
         this.setDrawCoord(entity);
+        let node = this._nodes.get(entity);
+        this.remove(node);
+        this.insertNode(node);
+        return;
+        let pred = node.pred;
+        let succ = node.succ;
+        let drawBeforeSucc = succ != null && this.drawBefore(entity, succ.entity);
+        let drawAfterPred = pred != null && this.drawBefore(pred.entity, entity);
+        if (drawAfterPred && drawBeforeSucc ||
+            pred == null && drawBeforeSucc ||
+            succ == null && drawAfterPred) {
+            console.log("no update needed");
+            return;
+        }
+        if (pred != null && !drawAfterPred) {
+            while (pred != null) {
+                if (this.drawBefore(entity, pred.entity)) {
+                    return this.insertBefore(node, pred);
+                }
+                pred = pred.pred;
+            }
+            return this.insertBefore(node, this._root);
+        }
+        else if (succ != null && !drawBeforeSucc) {
+            while (succ != null) {
+                if (this.drawBefore(entity, succ.entity)) {
+                    return this.insertBefore(node, succ);
+                }
+                succ = succ.succ;
+            }
+            return this.insertAfter(node, this._leaf);
+        }
+        console.error("didn't update scene graph");
     }
 }
 export class IsometricRenderer extends SceneGraph {
@@ -302,31 +407,23 @@ export class IsometricRenderer extends SceneGraph {
         let sameX = first.x == second.x;
         let sameY = first.y == second.y;
         let sameZ = first.z == second.z;
-        if (first.bounds.minZ < second.bounds.minZ) {
+        if (first.bounds.maxY < second.bounds.minY) {
             return true;
         }
-        if (first.bounds.minY < second.bounds.minY) {
+        if (first.bounds.minX > second.bounds.minX) {
             return true;
         }
-        return first.bounds.minX > second.bounds.maxX;
+        if (first.bounds.maxZ < second.bounds.minZ) {
+            return true;
+        }
         if (sameX && sameY) {
-            return first.z < second.z;
+            return first.bounds.minZ < second.bounds.minZ;
         }
-        else if (sameX && sameZ) {
-            return first.y < second.y;
-        }
-        else if (sameY && sameZ) {
-            return first.x > second.x;
-        }
-        if (sameX) {
-            return first.z < second.z || first.y < second.y;
-        }
-        else if (sameY) {
-            return first.z < second.z || first.x > second.x;
-        }
-        else {
-            return first.x > second.x;
-        }
+        return false;
+        return first.bounds.minY < second.bounds.minY &&
+            first.bounds.minX > second.bounds.minX &&
+            first.bounds.minZ < second.bounds.minZ;
+        return false;
     }
 }
 IsometricRenderer._sqrt3 = Math.sqrt(3);

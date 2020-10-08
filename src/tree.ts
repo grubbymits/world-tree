@@ -36,7 +36,9 @@ class OctNode {
       // For a leaf node, insert it into the entity list and check that we're
       // within the size limit.
       this._entities.push(entity);
+      //console.log("inserted entity into octree node");
       if (this._entities.length > OctNode.MaxEntities) {
+        //console.log("entity insertion has crossed entity limit");
         inserted = this.split();
       } else {
         inserted = true;
@@ -55,14 +57,13 @@ class OctNode {
   }
 
   split(): boolean {
-    //console.log("splitting node");
     this._children = new Array<OctNode>();
     // split each dimension into 2.
     let width = Math.floor(this._bounds.width / 2);
     let depth = Math.floor(this._bounds.depth / 2);
     let height = Math.floor(this._bounds.height / 2);
     let dimensions = new Dimensions(width, depth, height);
-    console.log("splitting into 8x (WxDxH):", width, depth, height);
+    //console.log("splitting into 8x (WxDxH):", width, depth, height);
 
     // half the dimensions again to get the distances to/from the centre.
     let offset = [-0.5, 0.5];
@@ -78,7 +79,7 @@ class OctNode {
                                     this.centre.y + offsetY,
                                     this.centre.z + offsetZ);
 
-          console.log("chosen centre point (x,y,z):", centre.x, centre.y, centre.z);
+          //console.log("chosen centre point (x,y,z):", centre.x, centre.y, centre.z);
           let bounds = new BoundingCuboid(centre, dimensions);
           this._children.push(new OctNode(bounds));
         }

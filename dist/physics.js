@@ -255,3 +255,29 @@ export class BoundingCuboid {
         console.log(" - dimensions (WxDxH):", this.width, this.depth, this.height);
     }
 }
+export class CollisionDetector {
+    constructor(_spatialInfo) {
+        this._spatialInfo = _spatialInfo;
+    }
+    detectInArea(actor, path, area) {
+        let bounds = actor.bounds;
+        const endMinLocation = bounds.minLocation.add(path);
+        const endMaxLocation = bounds.maxLocation.add(path);
+        let entities = this._spatialInfo.getEntities(area);
+        for (let entity of entities) {
+            if (entity.id == actor.id) {
+                continue;
+            }
+            const geometry = entity.geometry;
+            if (geometry.obstructs(actor.bounds.minLocation, endMinLocation) ||
+                geometry.obstructs(actor.bounds.minLocation, endMaxLocation) ||
+                geometry.obstructs(actor.bounds.maxLocation, endMaxLocation) ||
+                geometry.obstructs(actor.bounds.maxLocation, endMinLocation)) {
+                console.log("actor at", actor.bounds.minLocation);
+                console.log("obstructed by entity at", entity.bounds.minLocation);
+                return true;
+            }
+        }
+        return false;
+    }
+}
