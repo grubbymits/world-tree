@@ -1,5 +1,4 @@
-import { Point } from "./graphics.js";
-import { Point3D } from "./geometry.js";
+import { Point2D, Point3D } from "./geometry.js";
 export var Direction;
 (function (Direction) {
     Direction[Direction["North"] = 0] = "North";
@@ -72,7 +71,7 @@ export function getDirectionCoords(x, y, direction) {
             yDiff = -1;
             break;
     }
-    return new Point(x + xDiff, y + yDiff);
+    return new Point2D(x + xDiff, y + yDiff);
 }
 export function getDirection(from, to) {
     let xDiff = from.x - to.x;

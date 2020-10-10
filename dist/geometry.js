@@ -1,3 +1,74 @@
+var Orientation;
+(function (Orientation) {
+    Orientation[Orientation["Colinear"] = 0] = "Colinear";
+    Orientation[Orientation["Clockwise"] = 1] = "Clockwise";
+    Orientation[Orientation["CounterClockwise"] = 2] = "CounterClockwise";
+})(Orientation || (Orientation = {}));
+export class Point2D {
+    constructor(_x, _y) {
+        this._x = _x;
+        this._y = _y;
+    }
+    get x() { return this._x; }
+    get y() { return this._y; }
+    add(other) {
+        return new Point2D(this.x + other.x, this.y + other.y);
+    }
+    sub(other) {
+        return new Point2D(this.x - other.x, this.y - other.y);
+    }
+    static orientation(p, q, r) {
+        const res = (q.y - p.y) * (r.x - q.x) -
+            (q.x - p.x) * (r.y - q.y);
+        if (res == 0) {
+            return Orientation.Colinear;
+        }
+        return res > 0 ? Orientation.Clockwise : Orientation.CounterClockwise;
+    }
+}
+export class Segment2D {
+    constructor(_p0, _p1) {
+        this._p0 = _p0;
+        this._p1 = _p1;
+    }
+    get p0() { return this._p0; }
+    get p1() { return this._p1; }
+    contains(p) {
+        return p.x <= Math.max(this.p0.x, this.p1.x) &&
+            p.x >= Math.min(this.p0.x, this.p1.x) &&
+            p.y <= Math.max(this.p0.y, this.p1.y) &&
+            p.y >= Math.max(this.p0.y, this.p1.y);
+    }
+    intersects(other) {
+        const o1 = Point2D.orientation(this.p0, this.p1, other.p0);
+        const o2 = Point2D.orientation(this.p0, this.p1, other.p1);
+        const o3 = Point2D.orientation(other.p0, other.p1, this.p0);
+        const o4 = Point2D.orientation(other.p0, other.p1, this.p1);
+        if (o1 != o2 && o3 != o4) {
+            return true;
+        }
+        if (o1 == Orientation.Colinear && this.contains(other.p0)) {
+            return true;
+        }
+        if (o2 == Orientation.Colinear && this.contains(other.p1)) {
+            return true;
+        }
+        if (o3 == Orientation.Colinear && other.contains(this.p0)) {
+            return true;
+        }
+        if (o4 == Orientation.Colinear && other.contains(this.p1)) {
+            return true;
+        }
+        return false;
+    }
+    distance(p) {
+        const vl = this.p0.x * this.p1.y - this.p1.x * this.p0.y;
+        const w = this.p0.x * p.y - p.x * this.p0.y;
+        const u = 1 / Math.sqrt(Math.pow(this.p1.x - this.p0.x, 2) +
+            Math.pow(this.p1.y - this.p0.y, 2));
+        return vl * w * u;
+    }
+}
 export class Point3D {
     constructor(_x, _y, _z) {
         this._x = _x;

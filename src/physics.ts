@@ -2,8 +2,8 @@ import { Entity,
          Actor } from "./entity.js"
 import { TerrainType, TerrainShape, Terrain } from "./terrain.js"
 import { SquareGrid } from "./map.js"
-import { Point } from "./graphics.js"
-import { Point3D,
+import { Point2D,
+         Point3D,
          Vector3D,
          Geometry } from "./geometry.js"
 import { Octree } from "./tree.js"
@@ -46,7 +46,7 @@ export function getDirectionName(direction: Direction): string {
 }
 
 export function getDirectionCoords(x: number, y: number,
-                                   direction: Direction): Point {
+                                   direction: Direction): Point2D{
   let xDiff: number = 0;
   let yDiff: number = 0;
   switch(direction) {
@@ -82,10 +82,10 @@ export function getDirectionCoords(x: number, y: number,
     yDiff = -1;
     break;
   }
-  return new Point(x + xDiff, y + yDiff);
+  return new Point2D(x + xDiff, y + yDiff);
 }
 
-export function getDirection(from: Point, to: Point): Direction {
+export function getDirection(from: Point2D, to: Point2D): Direction {
   let xDiff = from.x - to.x;
   let yDiff = from.y - to.y;
 

@@ -2,7 +2,7 @@ import { SquareGrid } from "./map.js";
 import { Terrain, TerrainShape, TerrainType, TerrainFeature, isFlat, isEdge, getTypeName, getShapeName } from "./terrain.js";
 import { Rain } from "./weather.js";
 import { Direction, getDirection, getDirectionName } from "./physics.js";
-import { Point } from "./graphics.js";
+import { Point2D } from "./geometry.js";
 export var Biome;
 (function (Biome) {
     Biome[Biome["Water"] = 0] = "Water";
@@ -142,7 +142,7 @@ export class TerrainAttributes {
     }
     get x() { return this._x; }
     get y() { return this._y; }
-    get pos() { return new Point(this._x, this._y); }
+    get pos() { return new Point2D(this._x, this._y); }
     get height() { return this._height; }
     get terrace() { return this._terrace; }
     get type() { return this._type; }
@@ -284,10 +284,10 @@ export class TerrainBuilder {
     }
     setFeatures() { }
     setShapes() {
-        const coordOffsets = [new Point(0, -1),
-            new Point(1, 0),
-            new Point(0, 1),
-            new Point(-1, 0)];
+        const coordOffsets = [new Point2D(0, -1),
+            new Point2D(1, 0),
+            new Point2D(0, 1),
+            new Point2D(-1, 0)];
         const ramps = [TerrainShape.RampUpNorth,
             TerrainShape.RampUpEast,
             TerrainShape.RampUpSouth,
@@ -458,14 +458,14 @@ export class OpenTerrainBuilder extends TerrainBuilder {
     setShapes() {
         console.log("adding ramps");
         const filterDepth = 3;
-        const coordOffsets = [new Point(0, -1),
-            new Point(1, 0),
-            new Point(0, 1),
-            new Point(-1, 0)];
-        const diagOffsets = [[new Point(-1, -1), new Point(1, -1)],
-            [new Point(1, -1), new Point(1, 1)],
-            [new Point(-1, 1), new Point(1, 1)],
-            [new Point(-1, -1), new Point(-1, 1)]];
+        const coordOffsets = [new Point2D(0, -1),
+            new Point2D(1, 0),
+            new Point2D(0, 1),
+            new Point2D(-1, 0)];
+        const diagOffsets = [[new Point2D(-1, -1), new Point2D(1, -1)],
+            [new Point2D(1, -1), new Point2D(1, 1)],
+            [new Point2D(-1, 1), new Point2D(1, 1)],
+            [new Point2D(-1, -1), new Point2D(-1, 1)]];
         const ramps = [TerrainShape.RampUpNorth,
             TerrainShape.RampUpEast,
             TerrainShape.RampUpSouth,

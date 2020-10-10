@@ -1,6 +1,6 @@
 import { Direction, getDirectionName, getDirectionCoords } from "./physics.js"
 import { Surface } from "./builder.js"
-import { Point } from "./graphics.js"
+import { Point2D } from "./geometry.js"
 
 export class Rain {
   private static readonly rain: number = 0.5;
@@ -78,8 +78,8 @@ export class Rain {
     if (next.terrace > current.terrace) {
       let dirA: Direction = (this._direction + 1) % Direction.Max;
       let dirB: Direction = (this._direction + Direction.NorthWest) % Direction.Max;
-      let pointA: Point = getDirectionCoords(this._x, this._y, dirA);
-      let pointB: Point = getDirectionCoords(this._x, this._y, dirB);
+      let pointA: Point2D= getDirectionCoords(this._x, this._y, dirA);
+      let pointB: Point2D= getDirectionCoords(this._x, this._y, dirB);
       let numClouds: number = 2;
       if (Rain._surface.inbounds(pointA) && Rain._surface.inbounds(pointB)) {
         Rain.add(pointA.x, pointA.y, this._moisture / 3, dirA);

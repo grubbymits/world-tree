@@ -1,8 +1,7 @@
 import { Direction,
          Dimensions } from "./physics.js"
 import { Entity } from "./entity.js"
-import { Point,
-         SpriteSheet,
+import { SpriteSheet,
          Sprite,
          GraphicComponent,
          StaticGraphicComponent } from "./graphics.js"

@@ -1,21 +1,10 @@
 import { SquareGrid } from "./map.js"
 import { Entity } from "./entity.js"
-import { Point3D } from "./geometry.js"
+import { Point2D,
+         Segment2D,
+         Point3D } from "./geometry.js"
 import { Terrain } from "./terrain.js"
 import { Camera } from "./camera.js"
-
-export class Point {
-  constructor(private readonly _x: number,
-              private readonly _y: number) { }
-  get x() { return this._x; }
-  get y() { return this._y; }
-  add(other: Point): Point {
-    return new Point(this.x + other.x, this.y + other.y);
-  }
-  sub(other: Point): Point {
-    return new Point(this.x - other.x, this.y - other.y);
-  }
-}
 
 export class SpriteSheet {
   private static _sheets = new Array<SpriteSheet>();
@@ -73,8 +62,8 @@ export class Sprite {
   }
 
   private readonly _id: number;
-  private readonly _spriteOffset: Point;
-  private _drawOffset: Point;
+  private readonly _spriteOffset: Point2D;
+  private _drawOffset: Point2D;
 
   constructor(private readonly _sheet: SpriteSheet,
               offsetX: number,
@@ -82,10 +71,10 @@ export class Sprite {
               private readonly _width: number,
               private readonly _height: number) {
     this._id = Sprite.sprites.length;
-    this._spriteOffset = new Point(offsetX, offsetY);
+    this._spriteOffset = new Point2D(offsetX, offsetY);
     this._sheet = _sheet;
     Sprite.add(this);
-    this._drawOffset = new Point(0, _height - 1);
+    this._drawOffset = new Point2D(0, _height - 1);
 
     let sprite: Sprite = this;
     this._sheet.image.addEventListener('load', function() {
@@ -93,7 +82,7 @@ export class Sprite {
       for (let x = 0; x < _width; x++) {
         for (let y = _height - 1; y >= 0; y--) {
           if (!sprite.isTransparentAt(x, y)) {
-            sprite._drawOffset = new Point(x, y-_height);
+            sprite._drawOffset = new Point2D(x, y-_height);
             console.log("set draw offset:", sprite._drawOffset);
             return;
           }
@@ -102,7 +91,7 @@ export class Sprite {
     });
   }
 
-  draw(coord: Point, ctx: CanvasRenderingContext2D): void {
+  draw(coord: Point2D, ctx: CanvasRenderingContext2D): void {
     ctx.drawImage(this._sheet.image,
                   this._spriteOffset.x, this._spriteOffset.y,
                   this._width, this._height,
@@ -120,8 +109,8 @@ export class Sprite {
   get id(): number { return this._id; }
   get width(): number { return this._width; }
   get height(): number { return this._height; }
-  get drawOffset(): Point { return this._drawOffset; }
-  set drawOffset(offset: Point) { this._drawOffset = offset; }
+  get drawOffset(): Point2D { return this._drawOffset; }
+  set drawOffset(offset: Point2D) { this._drawOffset = offset; }
 }
 
 // Computer graphics have their origin in the top left corner.
@@ -142,7 +131,7 @@ export abstract class GraphicComponent {
   get height(): number { 
     return Sprite.sprites[this._currentSpriteId].height;
   }
-  get offset(): Point {
+  get offset(): Point2D {
     return Sprite.sprites[this._currentSpriteId].drawOffset;
   }
 }
@@ -225,7 +214,7 @@ export abstract class SceneGraph {
     this._ctx = this._canvas.getContext("2d", { alpha: false })!;
   }
 
-  abstract getDrawCoord(location: Point3D): Point;
+  abstract getDrawCoord(location: Point3D): Point2D;
   abstract setDrawCoord(object: Entity): void;
   abstract drawBefore(a: Entity, b: Entity): boolean;
 
@@ -290,7 +279,7 @@ export abstract class SceneGraph {
       let entity: Entity = node.entity;
       if (entity.visible &&
           camera.isOnScreen(entity.drawCoord, entity.width, entity.depth)) {
-        let entityDrawCoord: Point = camera.getDrawCoord(entity.drawCoord);
+        let entityDrawCoord: Point2D = camera.getDrawCoord(entity.drawCoord);
         let graphic: GraphicComponent = entity.graphic;
         // Check whether inbounds of the sprite.
         if (x < entityDrawCoord.x || y < entityDrawCoord.y ||
@@ -311,6 +300,7 @@ export abstract class SceneGraph {
 
   insertEntity(entity: Entity): void {
     this.setDrawCoord(entity);
+
     let node = new SceneNode(entity);
     this._nodes.set(entity, node);
 
@@ -438,9 +428,6 @@ export abstract class SceneGraph {
     console.assert(this._nodes.has(entity), "entity not in node map");
     this.setDrawCoord(entity);
     let node = this._nodes.get(entity)!;
-    this.remove(node);
-    this.insertNode(node);
-    return;
 
     let pred = node.pred!;
     let succ = node.succ!;
@@ -455,6 +442,11 @@ export abstract class SceneGraph {
       return;
     }
 
+    this.remove(node);
+    this.insertNode(node);
+    return;
+
+    /*
     if (pred != null && !drawAfterPred) {
       while (pred != null) {
         if (this.drawBefore(entity, pred.entity)) {
@@ -473,6 +465,7 @@ export abstract class SceneGraph {
       return this.insertAfter(node, this._leaf);
     }
     console.error("didn't update scene graph");
+    */
   }
 }
 
@@ -484,7 +477,7 @@ export class IsometricRenderer extends SceneGraph {
   private static readonly _sqrt3 = Math.sqrt(3);
   private static readonly _halfSqrt3 = Math.sqrt(3) * 0.5;
 
-  static getDrawCoord(loc: Point3D): Point {
+  static getDrawCoord(loc: Point3D): Point2D {
     // An isometric square has:
     // - sides equal length = 1,
     // - the short diagonal is length = 1,
@@ -496,60 +489,93 @@ export class IsometricRenderer extends SceneGraph {
     // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
     let dx = Math.floor(this._halfSqrt3 * (loc.x + loc.y));
     let dy = Math.floor((0.5 * (loc.y - loc.x)) - loc.z);
-    return new Point(dx, dy);
+    return new Point2D(dx, dy);
   }
 
   setDrawCoord(entity: Entity): void {
     let coord =
       IsometricRenderer.getDrawCoord(entity.bounds.minLocation);
-    entity.drawCoord = new Point(coord.x, coord.y - entity.depth);
+    entity.drawCoord = new Point2D(coord.x, coord.y - entity.depth);
+
+    // Create six lines that represent the drawing boundary.
+    const min: Point3D = entity.bounds.minLocation;
+    const max: Point3D = entity.bounds.maxLocation;
+
+    const p0: Point2D = entity.drawCoord;
+    const p1: Point2D =
+      IsometricRenderer.getDrawCoord(new Point3D(min.x, min.y, max.z));
+    const p2: Point2D =
+      IsometricRenderer.getDrawCoord(new Point3D(max.x, min.y, max.z));
+    const p3: Point2D = IsometricRenderer.getDrawCoord(max);
+    const p4: Point2D =
+      IsometricRenderer.getDrawCoord(new Point3D(max.x, max.y, min.z));
+    const p5: Point2D =
+      IsometricRenderer.getDrawCoord(new Point3D(min.x, max.y, min.z));
+
+    entity.topOutline.length = 0;
+    entity.sideOutline.length = 0;
+    entity.baseOutline.length = 0;
+
+    entity.sideOutline.push(new Segment2D(p0, p1));
+    entity.topOutline.push(new Segment2D(p1, p2));
+    entity.topOutline.push(new Segment2D(p2, p3));
+    entity.sideOutline.push(new Segment2D(p3, p4));
+    entity.baseOutline.push(new Segment2D(p4, p5));
+    entity.baseOutline.push(new Segment2D(p5, p0));
   }
 
-  getDrawCoord(location: Point3D): Point {
+  getDrawCoord(location: Point3D): Point2D {
     return IsometricRenderer.getDrawCoord(location);
   }
 
   drawBefore(first: Entity, second: Entity): boolean {
-    let sameX: boolean = first.x == second.x;
-    let sameY: boolean = first.y == second.y;
-    let sameZ: boolean = first.z == second.z;
+    // priority ordering:
+    // - smaller z
+    // - smaller y
+    // - greater x
 
-    // First should have a larger x.
-    // First would have a smaller y.
-    // First would have a smaller z.
-    if (first.bounds.maxY < second.bounds.minY) {
-      return true;
-    }
-    if (first.bounds.minX > second.bounds.minX) {
-      return true;
-    }
-    if (first.bounds.maxZ < second.bounds.minZ) {
-      return true;
-    }
-    if (sameX && sameY) {
-      return first.bounds.minZ < second.bounds.minZ;
-    }
-    return false;
-
-    /*
-    if (first.bounds.minX > second.bounds.minX &&
-        first.bounds.minX < second.bounds.maxX) {
-      return true;
+    // renders a 3D grid fine
+    const sameX = first.x == second.x;
+    const sameY = first.y == second.y;
+    const sameZ = first.z == second.z;
+    if (sameX) {
+      if (sameY) {
+        return first.z < second.z;
+      }
+      return first.y < second.y;
     }
 
-    if (first.bounds.maxY > second.bounds.minY &&
-        first.bounds.maxY < second.bounds.maxX) {
-      return true;
+    const overlapX = (first.bounds.minX > second.bounds.minX &&
+                      first.bounds.minX < second.bounds.maxX) ||
+                     (first.bounds.maxX > second.bounds.minX &&
+                      first.bounds.maxX < second.bounds.maxX);
+    const overlapY = (first.bounds.minY > second.bounds.minY &&
+                      first.bounds.minY < second.bounds.maxY) ||
+                     (first.bounds.maxY > second.bounds.minY &&
+                      first.bounds.maxY < second.bounds.maxY);
+    const overlapZ = (first.bounds.minZ > second.bounds.minZ &&
+                      first.bounds.minZ < second.bounds.maxZ) ||
+                     (first.bounds.maxZ > second.bounds.minZ &&
+                      first.bounds.maxZ < second.bounds.maxZ);
+
+    if (!overlapX && !overlapY && !overlapZ) {
+      return first.x > second.x;
     }
 
-    if (first.bounds.maxZ > second.bounds.minZ &&
-        first.bounds.maxZ < second.bounds.maxZ) {
-      return true;
+    // If the entities aren't nicely aligned on the grid, then we need to
+    // check for intersections.
+    for (let sideSegment of second.sideOutline) {
+      for (let baseSegment of first.baseOutline) {
+        if (baseSegment.intersects(sideSegment)) {
+          return true;
+        }
+      }
+      for (let topSegment of first.topOutline) {
+        if (topSegment.intersects(sideSegment)) {
+          return true;
+        }
+      }
     }
-    */
-    return first.bounds.minY < second.bounds.minY &&
-           first.bounds.minX > second.bounds.minX &&
-           first.bounds.minZ < second.bounds.minZ;
-    return false;
+    return first.x > second.x;
   }
 }

@@ -1,17 +1,4 @@
-export class Point {
-    constructor(_x, _y) {
-        this._x = _x;
-        this._y = _y;
-    }
-    get x() { return this._x; }
-    get y() { return this._y; }
-    add(other) {
-        return new Point(this.x + other.x, this.y + other.y);
-    }
-    sub(other) {
-        return new Point(this.x - other.x, this.y - other.y);
-    }
-}
+import { Point2D, Segment2D, Point3D } from "./geometry.js";
 export class SpriteSheet {
     constructor(name) {
         this._image = new Image();
@@ -53,16 +40,16 @@ export class Sprite {
         this._width = _width;
         this._height = _height;
         this._id = Sprite.sprites.length;
-        this._spriteOffset = new Point(offsetX, offsetY);
+        this._spriteOffset = new Point2D(offsetX, offsetY);
         this._sheet = _sheet;
         Sprite.add(this);
-        this._drawOffset = new Point(0, _height - 1);
+        this._drawOffset = new Point2D(0, _height - 1);
         let sprite = this;
         this._sheet.image.addEventListener('load', function () {
             for (let x = 0; x < _width; x++) {
                 for (let y = _height - 1; y >= 0; y--) {
                     if (!sprite.isTransparentAt(x, y)) {
-                        sprite._drawOffset = new Point(x, y - _height);
+                        sprite._drawOffset = new Point2D(x, y - _height);
                         console.log("set draw offset:", sprite._drawOffset);
                         return;
                     }
@@ -353,9 +340,6 @@ export class SceneGraph {
         console.assert(this._nodes.has(entity), "entity not in node map");
         this.setDrawCoord(entity);
         let node = this._nodes.get(entity);
-        this.remove(node);
-        this.insertNode(node);
-        return;
         let pred = node.pred;
         let succ = node.succ;
         let drawBeforeSucc = succ != null && this.drawBefore(entity, succ.entity);
@@ -366,25 +350,9 @@ export class SceneGraph {
             console.log("no update needed");
             return;
         }
-        if (pred != null && !drawAfterPred) {
-            while (pred != null) {
-                if (this.drawBefore(entity, pred.entity)) {
-                    return this.insertBefore(node, pred);
-                }
-                pred = pred.pred;
-            }
-            return this.insertBefore(node, this._root);
-        }
-        else if (succ != null && !drawBeforeSucc) {
-            while (succ != null) {
-                if (this.drawBefore(entity, succ.entity)) {
-                    return this.insertBefore(node, succ);
-                }
-                succ = succ.succ;
-            }
-            return this.insertAfter(node, this._leaf);
-        }
-        console.error("didn't update scene graph");
+        this.remove(node);
+        this.insertNode(node);
+        return;
     }
 }
 export class IsometricRenderer extends SceneGraph {
@@ -394,36 +362,71 @@ export class IsometricRenderer extends SceneGraph {
     static getDrawCoord(loc) {
         let dx = Math.floor(this._halfSqrt3 * (loc.x + loc.y));
         let dy = Math.floor((0.5 * (loc.y - loc.x)) - loc.z);
-        return new Point(dx, dy);
+        return new Point2D(dx, dy);
     }
     setDrawCoord(entity) {
         let coord = IsometricRenderer.getDrawCoord(entity.bounds.minLocation);
-        entity.drawCoord = new Point(coord.x, coord.y - entity.depth);
+        entity.drawCoord = new Point2D(coord.x, coord.y - entity.depth);
+        const min = entity.bounds.minLocation;
+        const max = entity.bounds.maxLocation;
+        const p0 = entity.drawCoord;
+        const p1 = IsometricRenderer.getDrawCoord(new Point3D(min.x, min.y, max.z));
+        const p2 = IsometricRenderer.getDrawCoord(new Point3D(max.x, min.y, max.z));
+        const p3 = IsometricRenderer.getDrawCoord(max);
+        const p4 = IsometricRenderer.getDrawCoord(new Point3D(max.x, max.y, min.z));
+        const p5 = IsometricRenderer.getDrawCoord(new Point3D(min.x, max.y, min.z));
+        entity.topOutline.length = 0;
+        entity.sideOutline.length = 0;
+        entity.baseOutline.length = 0;
+        entity.sideOutline.push(new Segment2D(p0, p1));
+        entity.topOutline.push(new Segment2D(p1, p2));
+        entity.topOutline.push(new Segment2D(p2, p3));
+        entity.sideOutline.push(new Segment2D(p3, p4));
+        entity.baseOutline.push(new Segment2D(p4, p5));
+        entity.baseOutline.push(new Segment2D(p5, p0));
     }
     getDrawCoord(location) {
         return IsometricRenderer.getDrawCoord(location);
     }
     drawBefore(first, second) {
-        let sameX = first.x == second.x;
-        let sameY = first.y == second.y;
-        let sameZ = first.z == second.z;
-        if (first.bounds.maxY < second.bounds.minY) {
-            return true;
+        const sameX = first.x == second.x;
+        const sameY = first.y == second.y;
+        const sameZ = first.z == second.z;
+        if (sameX) {
+            if (sameY) {
+                return first.z < second.z;
+            }
+            return first.y < second.y;
         }
-        if (first.bounds.minX > second.bounds.minX) {
-            return true;
+        const overlapX = (first.bounds.minX > second.bounds.minX &&
+            first.bounds.minX < second.bounds.maxX) ||
+            (first.bounds.maxX > second.bounds.minX &&
+                first.bounds.maxX < second.bounds.maxX);
+        const overlapY = (first.bounds.minY > second.bounds.minY &&
+            first.bounds.minY < second.bounds.maxY) ||
+            (first.bounds.maxY > second.bounds.minY &&
+                first.bounds.maxY < second.bounds.maxY);
+        const overlapZ = (first.bounds.minZ > second.bounds.minZ &&
+            first.bounds.minZ < second.bounds.maxZ) ||
+            (first.bounds.maxZ > second.bounds.minZ &&
+                first.bounds.maxZ < second.bounds.maxZ);
+        if (!overlapX && !overlapY && !overlapZ) {
+            return first.x > second.x;
         }
-        if (first.bounds.maxZ < second.bounds.minZ) {
-            return true;
-        }
-        if (sameX && sameY) {
-            return first.bounds.minZ < second.bounds.minZ;
+        for (let sideSegment of second.sideOutline) {
+            for (let baseSegment of first.baseOutline) {
+                if (baseSegment.intersects(sideSegment)) {
+                    return true;
+                }
+            }
+            for (let topSegment of first.topOutline) {
+                if (topSegment.intersects(sideSegment)) {
+                    return true;
+                }
+            }
         }
         return false;
-        return first.bounds.minY < second.bounds.minY &&
-            first.bounds.minX > second.bounds.minX &&
-            first.bounds.minZ < second.bounds.minZ;
-        return false;
+        return first.x > second.x;
     }
 }
 IsometricRenderer._sqrt3 = Math.sqrt(3);

@@ -13,7 +13,7 @@ import { Dimensions,
          Direction,
          getDirection,
          getDirectionName } from "./physics.js"
-import { Point } from "./graphics.js"
+import { Point2D } from "./geometry.js"
 import { Context } from "./context.js"
 
 export enum Biome {
@@ -186,7 +186,7 @@ export class TerrainAttributes {
   
   get x(): number { return this._x; }
   get y(): number { return this._y; }
-  get pos(): Point { return new Point(this._x, this._y); }
+  get pos(): Point2D { return new Point2D(this._x, this._y); }
   get height(): number { return this._height; }
   get terrace(): number { return this._terrace; }
   get type(): TerrainType { return this._type; }
@@ -225,7 +225,7 @@ export class Surface {
     }
   }
 
-  inbounds(coord: Point): boolean {
+  inbounds(coord: Point2D): boolean {
     if (coord.x < 0 || coord.x >= this._width ||
         coord.y < 0 || coord.y >= this._depth)
       return false;
@@ -367,10 +367,10 @@ export class TerrainBuilder {
   setFeatures(): void { }
 
   setShapes(): void {
-    const coordOffsets: Array<Point> = [ new Point(0, -1),
-                                         new Point(1, 0),
-                                         new Point(0, 1),
-                                         new Point(-1, 0) ];
+    const coordOffsets: Array<Point2D> = [ new Point2D(0, -1),
+                                           new Point2D(1, 0),
+                                           new Point2D(0, 1),
+                                           new Point2D(-1, 0) ];
 
     const ramps: Array<TerrainShape> = [ TerrainShape.RampUpNorth,
                                          TerrainShape.RampUpEast,
@@ -390,7 +390,7 @@ export class TerrainBuilder {
         }
 
         for (let i in coordOffsets) {
-          let offset: Point = coordOffsets[i];
+          let offset: Point2D = coordOffsets[i];
           let neighbour: TerrainAttributes =
               this._surface.at(centre.x + offset.x, centre.y + offset.y);
           if (neighbour.terrace == centre.terrace + 1) {
@@ -571,16 +571,16 @@ export class OpenTerrainBuilder extends TerrainBuilder {
   setShapes(): void {
     console.log("adding ramps");
     const filterDepth: number = 3;
-    const coordOffsets: Array<Point> = [ new Point(0, -1),
-                                         new Point(1, 0),
-                                         new Point(0, 1),
-                                         new Point(-1, 0) ];
+    const coordOffsets: Array<Point2D> = [ new Point2D(0, -1),
+                                           new Point2D(1, 0),
+                                           new Point2D(0, 1),
+                                           new Point2D(-1, 0) ];
 
-    const diagOffsets: Array<Array<Point>> =
-      [ [ new Point(-1, -1),  new Point(1, -1)],
-        [ new Point(1, -1),   new Point(1, 1) ],
-        [ new Point(-1, 1),   new Point(1, 1) ],
-        [ new Point(-1, -1),  new Point(-1, 1)]];
+    const diagOffsets: Array<Array<Point2D>> =
+      [ [ new Point2D(-1, -1),  new Point2D(1, -1)],
+        [ new Point2D(1, -1),   new Point2D(1, 1) ],
+        [ new Point2D(-1, 1),   new Point2D(1, 1) ],
+        [ new Point2D(-1, -1),  new Point2D(-1, 1)]];
 
     const ramps: Array<TerrainShape> = [ TerrainShape.RampUpNorth,
                                          TerrainShape.RampUpEast,
@@ -598,7 +598,7 @@ export class OpenTerrainBuilder extends TerrainBuilder {
         }
 
         for (let i in coordOffsets) {
-          let offset: Point = coordOffsets[i];
+          let offset: Point2D = coordOffsets[i];
           let neighbour: TerrainAttributes =
             this._surface.at(x + offset.x, y + offset.y);
 

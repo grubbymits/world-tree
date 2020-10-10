@@ -1,22 +1,22 @@
 import { Direction,
          getDirection,
          getOppositeDirection } from "./physics.js"
-import { Point3D } from "./geometry.js"
+import { Point2D,
+         Point3D } from "./geometry.js"
 import { Terrain,
          TerrainShape,
          TerrainType,
          TerrainFeature,
          isFlat,
          isRampUp } from "./terrain.js"
-import { Point,
-         GraphicComponent } from "./graphics.js"
+import { GraphicComponent } from "./graphics.js"
 import { Context } from "./context.js"
 
 export class SquareGrid {
-  private readonly _neighbourOffsets: Array<Point> =
-    [ new Point(-1, -1), new Point(0, -1), new Point(1, -1),
-      new Point(-1, 0),                    new Point(1, 0),
-      new Point(-1, 1),  new Point(0, 1),  new Point(1, 1), ];
+  private readonly _neighbourOffsets: Array<Point2D> =
+    [ new Point2D(-1, -1), new Point2D(0, -1), new Point2D(1, -1),
+      new Point2D(-1, 0),                    new Point2D(1, 0),
+      new Point2D(-1, 1),  new Point2D(0, 1),  new Point2D(1, 1), ];
 
   private _raisedTerrain: Map<number, Map<number, Array<Terrain>>>;
   private _allTerrain: Map<number, Terrain>;
@@ -119,12 +119,12 @@ export class SquareGrid {
     // west,      RampUpEast
 
     let neighbours = this.getNeighbours(centre);
-    let centrePoint: Point = new Point(centre.x, centre.y);
+    let centrePoint: Point2D = new Point2D(centre.x, centre.y);
     return neighbours.filter(function(to: Terrain) {
       console.assert(Math.abs(centre.z - to.z) <= 1,
                      "can only handle neighbours separated by 1 terrace max");
 
-      let toPoint: Point = new Point(to.x, to.y);
+      let toPoint: Point2D = new Point2D(to.x, to.y);
       let direction: Direction = getDirection(centrePoint, toPoint);
       let oppositeDir: Direction = getOppositeDirection(direction);
       if (to.z == centre.z) {

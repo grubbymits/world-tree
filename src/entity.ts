@@ -1,11 +1,12 @@
 import { Dimensions,
          BoundingCuboid } from "./physics.js"
-import { Point3D,
+import { Point2D,
+         Segment2D,
+         Point3D,
          Vector3D,
          Geometry,
          CuboidGeometry } from "./geometry.js"
-import { Point,
-         GraphicComponent,
+import { GraphicComponent,
          IsometricRenderer } from "./graphics.js"
 import { Context } from "./context.js"
 import { Action } from "./action.js"
@@ -18,12 +19,15 @@ export class Entity {
   private readonly _id: number;
 
   protected _hasMoved: boolean = false;
-  protected _drawCoord: Point = new Point(0, 0);
+  protected _drawCoord: Point2D = new Point2D(0, 0);
   protected _graphicComponents: Array<GraphicComponent>;
   protected _visible: boolean = true;
   protected _bounds: BoundingCuboid;
   protected _geometry: Geometry;
   protected _drawGeometry: boolean = false;
+  protected _topOutlineSegments: Array<Segment2D>;
+  protected _sideOutlineSegments: Array<Segment2D>;
+  protected _baseOutlineSegments: Array<Segment2D>;
 
   constructor(protected _context: Context,
               centre: Point3D,
@@ -35,6 +39,9 @@ export class Entity {
     this._graphicComponents.push(graphicComponent);
     this._bounds = new BoundingCuboid(centre, dimensions);
     this._geometry = new CuboidGeometry(this._bounds);
+    this._topOutlineSegments = new Array<Segment2D>();
+    this._sideOutlineSegments = new Array<Segment2D>();
+    this._baseOutlineSegments = new Array<Segment2D>();
     this._context.addEntity(this);
   }
   
@@ -47,10 +54,13 @@ export class Entity {
   get geometry(): Geometry { return this._geometry; }
   get dimensions(): Dimensions { return this._bounds.dimensions; }
   get bounds(): BoundingCuboid { return this._bounds; }
+  get topOutline(): Array<Segment2D> { return this._topOutlineSegments; }
+  get sideOutline(): Array<Segment2D> { return this._sideOutlineSegments; }
+  get baseOutline(): Array<Segment2D> { return this._baseOutlineSegments; }
   get centre(): Point3D { return this._bounds.centre; }
   get id(): number { return this._id; }
   get hasMoved(): boolean { return this._hasMoved; }
-  get drawCoord(): Point { return this._drawCoord; }
+  get drawCoord(): Point2D { return this._drawCoord; }
   get visible(): boolean { return this._visible; }
   get graphics(): Array<GraphicComponent> {
     return this._graphicComponents;
@@ -60,7 +70,7 @@ export class Entity {
   }
   get drawGeometry(): boolean { return this._drawGeometry; }
 
-  set drawCoord(coord: Point) { this._drawCoord = coord; }
+  set drawCoord(coord: Point2D) { this._drawCoord = coord; }
   set visible(visible: boolean) { this._visible = visible; }
 
   addGraphic(graphic: GraphicComponent): void {

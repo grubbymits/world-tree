@@ -1,7 +1,6 @@
-import { Point } from "./graphics.js"
 import { EventHandler,
          InputEvent } from "./events.js"
-import { Point3D } from "./geometry.js"
+import { Point2D, Point3D } from "./geometry.js"
 import { SceneGraph } from "./graphics.js"
 
 export class Camera {
@@ -25,7 +24,7 @@ export class Camera {
     this._surfaceLocation = _scene.getLocationAt(this._x, this._y, this);
   }
 
-  isOnScreen(coord : Point, width: number, depth: number) : boolean {
+  isOnScreen(coord : Point2D, width: number, depth: number) : boolean {
     if (coord.x + width < this._lowerX || coord.y + depth < this._lowerY ||
         coord.x - width > this._upperX || coord.y - depth > this._upperY) {
       return false;
@@ -49,8 +48,8 @@ export class Camera {
     this._upperY = y + Math.floor(this.height / 2);
   }
 
-  getDrawCoord(coord: Point) : Point {
-    return new Point(coord.x - this._lowerX, coord.y - this._lowerY);
+  getDrawCoord(coord: Point2D) : Point2D {
+    return new Point2D(coord.x - this._lowerX, coord.y - this._lowerY);
   }
 
   update(): void {
@@ -72,7 +71,7 @@ export class Camera {
     }
     console.log("updating camera to centre on (x,y,z):",
                 newLocation.x, newLocation.y, newLocation.z);
-    let newPoint: Point = this._scene.getDrawCoord(newLocation);
+    let newPoint: Point2D = this._scene.getDrawCoord(newLocation);
     this.x = newPoint.x;
     this.y = newPoint.y;
     this._handler.post(InputEvent.CameraMove);
@@ -96,5 +95,5 @@ export class MouseCamera extends Camera {
     });
   }
 
-  get min(): Point { return new Point(this._lowerX, this._lowerY); }
+  get min(): Point2D { return new Point2D(this._lowerX, this._lowerY); }
 }

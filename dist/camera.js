@@ -1,5 +1,5 @@
-import { Point } from "./graphics.js";
 import { EventHandler, InputEvent } from "./events.js";
+import { Point2D } from "./geometry.js";
 export class Camera {
     constructor(_scene, _width, _height) {
         this._scene = _scene;
@@ -38,7 +38,7 @@ export class Camera {
         this._upperY = y + Math.floor(this.height / 2);
     }
     getDrawCoord(coord) {
-        return new Point(coord.x - this._lowerX, coord.y - this._lowerY);
+        return new Point2D(coord.x - this._lowerX, coord.y - this._lowerY);
     }
     update() {
         this._handler.service();
@@ -72,5 +72,5 @@ export class MouseCamera extends Camera {
             }
         });
     }
-    get min() { return new Point(this._lowerX, this._lowerY); }
+    get min() { return new Point2D(this._lowerX, this._lowerY); }
 }

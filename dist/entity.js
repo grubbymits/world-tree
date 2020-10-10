@@ -1,12 +1,11 @@
 import { BoundingCuboid } from "./physics.js";
-import { CuboidGeometry } from "./geometry.js";
-import { Point } from "./graphics.js";
+import { Point2D, CuboidGeometry } from "./geometry.js";
 import { EntityEvent, EventHandler } from "./events.js";
 export class Entity {
     constructor(_context, centre, dimensions, graphicComponent) {
         this._context = _context;
         this._hasMoved = false;
-        this._drawCoord = new Point(0, 0);
+        this._drawCoord = new Point2D(0, 0);
         this._visible = true;
         this._drawGeometry = false;
         this._id = Entity._ids;
@@ -15,6 +14,9 @@ export class Entity {
         this._graphicComponents.push(graphicComponent);
         this._bounds = new BoundingCuboid(centre, dimensions);
         this._geometry = new CuboidGeometry(this._bounds);
+        this._topOutlineSegments = new Array();
+        this._sideOutlineSegments = new Array();
+        this._baseOutlineSegments = new Array();
         this._context.addEntity(this);
     }
     get x() { return this._bounds.minX; }
@@ -26,6 +28,9 @@ export class Entity {
     get geometry() { return this._geometry; }
     get dimensions() { return this._bounds.dimensions; }
     get bounds() { return this._bounds; }
+    get topOutline() { return this._topOutlineSegments; }
+    get sideOutline() { return this._sideOutlineSegments; }
+    get baseOutline() { return this._baseOutlineSegments; }
     get centre() { return this._bounds.centre; }
     get id() { return this._id; }
     get hasMoved() { return this._hasMoved; }
