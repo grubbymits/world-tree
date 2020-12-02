@@ -4,9 +4,8 @@ import { Entity,
 import { EntityEvent } from "./events.js"
 import { Terrain, TerrainShape, TerrainType } from "./terrain.js"
 import { SquareGrid } from "./map.js"
-import { Sprite,
-         SceneGraph,
-         IsometricRenderer } from "./graphics.js"
+import { SceneGraph,
+         IsometricRenderer } from "./scene.js"
 import { Camera } from "./camera.js"
 import { Controller } from "./controller.js"
 import { Octree } from "./tree.js"

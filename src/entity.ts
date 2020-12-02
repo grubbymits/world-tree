@@ -6,8 +6,7 @@ import { Point2D,
          Vector3D,
          Geometry,
          CuboidGeometry } from "./geometry.js"
-import { GraphicComponent,
-         IsometricRenderer } from "./graphics.js"
+import { GraphicComponent } from "./graphics.js"
 import { Context } from "./context.js"
 import { Action } from "./action.js"
 import { EntityEvent,

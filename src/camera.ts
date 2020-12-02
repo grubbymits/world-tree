@@ -1,7 +1,7 @@
 import { EventHandler,
          InputEvent } from "./events.js"
 import { Point2D, Point3D } from "./geometry.js"
-import { SceneGraph } from "./graphics.js"
+import { SceneGraph } from "./scene.js"
 
 export class Camera {
   protected _x: number;
@@ -16,8 +16,8 @@ export class Camera {
   constructor(protected _scene: SceneGraph,
               protected readonly _width: number,
               protected readonly _height: number) {
-    this._x = Math.floor(_width / 2);
-    this._y = Math.floor(_height / 2);
+    this._x = 0;//Math.floor(_width / 2);
+    this._y = 0;//Math.floor(_height / 2);
     this._upperX = _width;
     this._upperY = _height;
     console.log("initialising camera at (x,y):", this._x, this._y);

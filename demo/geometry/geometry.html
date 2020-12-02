@@ -6,7 +6,7 @@
 </head>
 <body>
   <div>
-    <canvas id="demoCanvas" oncontextmenu="return false;" width="1920" height="1200">
+    <canvas id="demoCanvas" oncontextmenu="return false;" width="1600" height="900">
   </div>
   <script type="module" src"robot.js"></script>
   <script type="module">
@@ -38,6 +38,17 @@
                       [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
                       [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
                       [ 2, 2, 2, 2, 2, 2, 2, 2, 2] ];
+    /*
+    let heightMap = [ [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1] ];
+    */
 
     const relativeDims = new WT.Dimensions(3, 3, 2);
     const physicalDims = new WT.IsometricPhysicalDimensions(spriteWidth, relativeDims);
@@ -67,7 +78,10 @@
       let robotController = new RobotController(context);
       context.addController(robotController);
       // place a robot in the middle of the map.
-      robotController.add(new WT.Point3D(Math.floor(worldDims.width / 2),
+      robotController.add(new WT.Point3D(//255, 588,
+                                         //2 + Math.floor(worldDims.height / 2 +
+                                           //             physicalDims.height / 2)));
+                                         Math.floor(worldDims.width / 2),
                                          Math.floor(worldDims.depth / 2),
                                          2 + Math.floor(worldDims.height / 2 +
                                                         physicalDims.height / 2)));
@@ -78,6 +92,7 @@
         }
         window.requestAnimationFrame(update);
       }
+      context.update(camera);
       window.requestAnimationFrame(update);
     }
   </script>

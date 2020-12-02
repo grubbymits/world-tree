@@ -8,8 +8,7 @@ class Robot extends WT.Actor {
   static dims = new WT.IsometricPhysicalDimensions(256, Robot.relativeDims);
 
   constructor(context, position) {
-    super(context, position, Robot.dims, Robot.graphic);
-    //this._drawGeometry = true;
+    super(context, position, Robot.dims, Robot.graphic, /*debug*/ true);
   }
 }
 

@@ -1,7 +1,7 @@
 import { BoundingCuboid } from "./physics.js"
 import { Point3D } from "./geometry.js"
 import { Camera } from "./camera.js"
-import { SceneGraph } from "./graphics.js"
+import { SceneGraph } from "./scene.js"
 import { InputEvent } from "./events.js"
 
 export class Sound {

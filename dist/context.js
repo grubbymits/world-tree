@@ -1,5 +1,5 @@
 import { EntityEvent } from "./events.js";
-import { IsometricRenderer } from "./graphics.js";
+import { IsometricRenderer } from "./scene.js";
 import { Octree } from "./tree.js";
 export class Context {
     constructor(canvas, worldDims) {
