@@ -23,11 +23,18 @@
     const cellsX = 5;
     const cellsY = 5;
     const terraces = 1;
+    /*
     let heightMap = [ [ 1, 1, 1, 1, 1 ],
                       [ 1, 0, 0, 0, 1 ],
                       [ 1, 0, 0, 0, 1 ],
                       [ 1, 0, 0, 0, 1 ],
                       [ 1, 1, 1, 1, 1 ] ];
+    */
+    let heightMap = [ [ 1, 1, 0, 0, 1 ],
+                      [ 1, 0, 0, 0, 1 ],
+                      [ 1, 0, 1, 0, 1 ],
+                      [ 1, 0, 0, 0, 1 ],
+                      [ 1, 0, 0, 0, 1 ] ];
 
     const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
                                         physicalDims.depth * cellsY,

@@ -31,15 +31,15 @@ class SceneNode {
 
   overlapX(other: SceneNode): boolean {
     return (this.entity.bounds.minX >= other.entity.bounds.minX &&
-            this.entity.bounds.minX < other.entity.bounds.maxX) ||
-           (this.entity.bounds.maxX > other.entity.bounds.minX &&
+            this.entity.bounds.minX <= other.entity.bounds.maxX) ||
+           (this.entity.bounds.maxX >= other.entity.bounds.minX &&
             this.entity.bounds.maxX <= other.entity.bounds.maxX);
   }
 
   overlapY(other: SceneNode): boolean {
     return (this.entity.bounds.minY >= other.entity.bounds.minY &&
-            this.entity.bounds.minY < other.entity.bounds.maxY) ||
-           (this.entity.bounds.maxY > other.entity.bounds.minY &&
+            this.entity.bounds.minY <= other.entity.bounds.maxY) ||
+           (this.entity.bounds.maxY >= other.entity.bounds.minY &&
             this.entity.bounds.maxY <= other.entity.bounds.maxY);
   }
 
@@ -108,6 +108,8 @@ type NodeCompare = (firstId: number, secondId: number) => RenderOrder;
 class SceneLevel {
   private _nodes: Array<SceneNode> = new Array<SceneNode>();
   private _roots: Array<number> = new Array<number>();
+  private _discovered: Set<number> = new Set<number>();
+  private _topologicalOrder: Array<SceneNode> = new Array<SceneNode>();
   private readonly _minZ: number;
   private readonly _maxZ: number;
 
@@ -120,6 +122,7 @@ class SceneLevel {
 
   get nodes(): Array<SceneNode> { return this._nodes; }
   get roots(): Array<number> { return this._roots; }
+  get order(): Array<SceneNode> { return this._topologicalOrder; }
 
   inrange(entity: Entity): boolean {
     return entity.bounds.minZ >= this._minZ && entity.bounds.minZ < this._maxZ;
@@ -143,7 +146,6 @@ class SceneLevel {
   }
 
   update(node: SceneNode, graph: SceneGraph): void {
-    this._nodes.sort((a, b) => graph.drawOrder(a.id, b.id));
 
     node.preds.forEach((predId) => {
       if (graph.drawOrder(predId, node.id) != RenderOrder.Before) {
@@ -159,29 +161,18 @@ class SceneLevel {
       }
     });
 
-    let idx = this._nodes.indexOf(node);
-    console.assert(idx != -1);
-    if (idx > 0) {
-      for (let i = idx - 1; i >= 0; i--) {
-        let pred: SceneNode = this._nodes[i];
-        if (graph.drawOrder(pred.id, node.id) == RenderOrder.Before) {
-          pred.addSucc(node.id);
-          node.addPred(pred.id);
-        } else {
-          break;
-        }
+    for (let i = 0; i < this._nodes.length; i++) {
+      let existing = this._nodes[i];
+      if (existing.id == node.id) {
+        continue;
       }
-    }
-
-    if (idx < this._nodes.length - 1) {
-      for (let i = idx + 1; i < this._nodes.length; i++) {
-        let succ: SceneNode = this._nodes[i];
-        if (graph.drawOrder(succ.id, node.id) == RenderOrder.After) {
-          node.addSucc(succ.id);
-          succ.addPred(node.id);
-        } else {
-          break;
-        }
+      const order = graph.drawOrder(node.id, existing.id);
+      if (RenderOrder.Before == order) {
+        node.addSucc(existing.id);
+        existing.addPred(node.id);
+      } else if (RenderOrder.After == order) {
+        existing.addSucc(node.id);
+        node.addPred(existing.id);
       }
     }
 
@@ -189,41 +180,69 @@ class SceneLevel {
       this._roots.push(node.id);
       console.log("num roots:", this._roots.length);
     }
+    this._discovered.clear();
+    this._topologicalOrder.length = 0;
+    for (let i in this._roots) {
+      if (this._discovered.has(this._roots[i])) {
+        continue;
+      }
+      this.topologicalSort(graph, graph.getNode(this._roots[i]));
+    }
   }
 
   buildGraph(graph: SceneGraph): void {
     console.log("buildGraph of size:", this._nodes.length);
-    this._nodes.sort((a, b) => graph.drawOrder(a.id, b.id));
 
-    if (this._nodes.length < 2) {
-      return;
-    }
-
+    // TODO: Should be able to form a transistive reduction using ordered
+    // pairs...
+    // this._nodes.sort((a, b) => graph.drawOrder(a.id, b.id));
+    // transistive closure
     for (let i = 0; i < this._nodes.length; i++) {
-      let parentNode: SceneNode = this._nodes[i];
-
+      let nodeI = this._nodes[i];
       for (let j = 0; j < this._nodes.length; j++) {
         if (i == j) continue;
-
-        let childNode: SceneNode = this._nodes[j];
-
-        if (graph.drawOrder(parentNode.id, childNode.id) == RenderOrder.Before) {
-          parentNode.addSucc(childNode.id);
-          childNode.addPred(parentNode.id);
-        } else {
-          break;
+        let nodeJ = this._nodes[j];
+        const order = graph.drawOrder(nodeI.id, nodeJ.id);
+        if (RenderOrder.Before == order) {
+          nodeI.addSucc(nodeJ.id);
+          nodeJ.addPred(nodeI.id);
+        } else if (RenderOrder.After == order) {
+          nodeJ.addSucc(nodeI.id);
+          nodeI.addPred(nodeJ.id);
         }
       }
     }
 
-    this._roots.length = 0;
-    for (let i = 0; i < this._nodes.length; i++) {
-      const node: SceneNode = this._nodes[i];
-      if (node.isRoot) {
+    for (let i in this._nodes) {
+      const node = this._nodes[i];
+      if (node.preds.length == 0) {
         this._roots.push(node.id);
+        console.log("root id:", node.id);
       }
     }
+
     console.log("num scene roots:", this._roots.length);
+    this._discovered.clear();
+    this._topologicalOrder.length = 0;
+    for (let i in this._roots) {
+      if (this._discovered.has(this._roots[i])) {
+        continue;
+      }
+      this.topologicalSort(graph, graph.getNode(this._roots[i]));
+    }
+    for (let i = this.order.length - 1; i >= 0; i--) {
+      console.log("-", this.order[i].id);
+    }
+  }
+
+  topologicalSort(graph: SceneGraph, node: SceneNode): void {
+    this._discovered.add(node.id);
+    for (let succId of node.succs) {
+      if (this._discovered.has(succId))
+        continue;
+      this.topologicalSort(graph, graph.getNode(succId));
+    }
+    this._topologicalOrder.push(node);
   }
 }
 
@@ -246,6 +265,11 @@ export abstract class SceneGraph {
   abstract drawOrder(firstId: number, secondId: number): RenderOrder;
 
   get nodes(): Map<number, SceneNode> { return this._nodes; }
+
+  getNode(id: number): SceneNode {
+    console.assert(this._nodes.has(id));
+    return this._nodes.get(id)!;
+  }
 
   render(camera: Camera): void {
     // Is this the first run? If so, organise the nodes into a level structure.
@@ -282,13 +306,10 @@ export abstract class SceneGraph {
     let ctx = this._ctx;
     ctx.clearRect(0, 0, this._width, this._height);
     this._levels.forEach((level) => {
-      level.roots.forEach((rootId) => {
-        const root: SceneNode = this._nodes.get(rootId)!;
-        renderNode(root);
-        root.succs.forEach((nodeId) =>
-          renderNode(this._nodes.get(nodeId)!)
-        );
-      });
+      for (let i = level.order.length - 1; i >= 0; i--) {
+        const node: SceneNode = level.order[i];
+        renderNode(node);
+      }
     });
   }
 
@@ -443,11 +464,9 @@ export class IsometricRenderer extends SceneGraph {
       return RenderOrder.Any;
     }
     if (first.intersectsTop(second)) {
-      console.log("first intersects");
       return RenderOrder.Before;
     }
     if (second.intersectsTop(first)) {
-      console.log("second intersects");
       return RenderOrder.After;
     }
     return RenderOrder.Any;
