@@ -1,6 +1,10 @@
 export var EntityEvent;
 (function (EntityEvent) {
     EntityEvent["Move"] = "move";
+    EntityEvent["FaceNorth"] = "faceNorth";
+    EntityEvent["FaceEast"] = "faceEast";
+    EntityEvent["FaceSouth"] = "faceSouth";
+    EntityEvent["FaceWest"] = "faceWest";
     EntityEvent["ActionComplete"] = "actionComplete";
 })(EntityEvent || (EntityEvent = {}));
 export var InputEvent;

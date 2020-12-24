@@ -1,4 +1,5 @@
-import { Dimensions,
+import { Direction,
+         Dimensions,
          BoundingCuboid } from "./physics.js"
 import { Point2D,
          Segment2D,
@@ -104,7 +105,10 @@ export class EventableEntity extends Entity {
 export class Actor extends EventableEntity {
   protected readonly _canSwim: boolean = false;
   protected readonly _canFly: boolean = false;
+  protected _direction: Direction;
   protected _action: Action|null;
+  protected _directionalGraphics =
+    new Map<Direction, GraphicComponent>();
 
   constructor(context: Context,
               location: Point3D,
@@ -123,10 +127,33 @@ export class Actor extends EventableEntity {
     }
   }
 
+  addDirectionalGraphic(direction: Direction, graphic: GraphicComponent): void {
+    this._directionalGraphics.set(direction, graphic);
+  }
+
   postEvent(event: EntityEvent): void {
     this._handler.post(event);
   }
 
+  get direction(): Direction { return this._direction; }
+
+  get graphic(): GraphicComponent {
+    if (this._directionalGraphics.has(this.direction)) {
+      return this._directionalGraphics.get(this.direction)!;
+    }
+    return super.graphic;
+  }
+
+  get graphics(): Array<GraphicComponent> {
+    if (this._directionalGraphics.has(this.direction)) {
+      return [ this._directionalGraphics.get(this.direction)! ];
+    }
+    return super.graphics;
+  }
+
+  set direction(direction: Direction) {
+    this._direction = direction;
+  }
   set action(action: Action) {
     this._action = action;
   }

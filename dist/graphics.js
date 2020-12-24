@@ -103,39 +103,69 @@ export class StaticGraphicComponent extends GraphicComponent {
         return this._currentSpriteId;
     }
 }
-export class OssilateGraphicComponent extends GraphicComponent {
+export class AnimatedGraphicComponent extends GraphicComponent {
     constructor(sprites, _interval) {
         super(sprites[0].id);
         this._interval = _interval;
-        this._increase = true;
-        this._startId = 0;
-        this._endId = 0;
         this._nextUpdate = 0;
-        this._startId = sprites[0].id;
-        this._endId = sprites[sprites.length - 1].id;
-        this._currentSpriteId =
-            Math.floor(Math.random() * (this._endId - this._startId) + this._startId);
+        this._currentSpriteIdx = 0;
+        this._spriteIds = new Array();
+        for (let i in sprites) {
+            this._spriteIds.push(sprites[i].id);
+        }
         this._nextUpdate = Date.now() + _interval;
     }
     update() {
+        return this._spriteIds[this._currentSpriteIdx];
+    }
+    get firstId() { return this._spriteIds[0]; }
+    get lastId() {
+        return this._spriteIds[this._spriteIds.length - 1];
+    }
+    get currentSpriteId() {
+        return this._spriteIds[this._currentSpriteIdx];
+    }
+}
+export class OssilateGraphicComponent extends AnimatedGraphicComponent {
+    constructor(sprites, interval) {
+        super(sprites, interval);
+        this._increase = true;
+        this._currentSpriteId =
+            Math.floor(Math.random() * (this.lastId - this.firstId) + this.firstId);
+    }
+    update() {
         if (this._nextUpdate > Date.now()) {
-            return this._currentSpriteId;
+            return this.currentSpriteId;
         }
         if (this._increase) {
-            if (this._currentSpriteId != this._endId) {
-                this._currentSpriteId++;
+            if (this._currentSpriteId != this.lastId) {
+                this._currentSpriteIdx++;
             }
             else {
                 this._increase = false;
             }
         }
-        else if (this._currentSpriteId != this._startId) {
-            this._currentSpriteId--;
+        else if (this._currentSpriteIdx != this.firstId) {
+            this._currentSpriteIdx--;
         }
         else {
             this._increase = true;
         }
         this._nextUpdate = Date.now() + this._interval;
-        return this._currentSpriteId;
+        return this.currentSpriteId;
+    }
+}
+export class LoopGraphicComponent extends AnimatedGraphicComponent {
+    constructor(sprites, interval) {
+        super(sprites, interval);
+        this._currentSpriteId = 0;
+    }
+    update() {
+        if (this._nextUpdate > Date.now()) {
+            return this.currentSpriteId;
+        }
+        this._currentSpriteIdx = (this._currentSpriteIdx + 1) % this._spriteIds.length;
+        this._nextUpdate = Date.now() + this._interval;
+        return this.currentSpriteId;
     }
 }

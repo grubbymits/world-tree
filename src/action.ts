@@ -1,7 +1,9 @@
 import { Entity,
          Actor } from "./entity.js"
 import { EntityEvent } from "./events.js"
-import { BoundingCuboid,
+import { Direction,
+         getDirectionName,
+         BoundingCuboid,
          CollisionDetector } from "./physics.js"
 import { Point3D,
          Vector3D,
@@ -54,6 +56,42 @@ export class MoveDirection extends MoveAction {
       return false;
     }
     return true;
+  }
+}
+
+export class MoveForwardsDirection extends MoveDirection {
+  private _direction: Direction;
+  private _event: EntityEvent;
+
+  constructor(actor: Actor,
+              d: Vector3D,
+              bounds: BoundingCuboid,
+              spatialInfo: Octree) {
+    super(actor, d, bounds, spatialInfo);
+
+    if (d.y < 0 && d.y < d.x) {
+      this._direction = Direction.North;
+      this._event = EntityEvent.FaceNorth;
+    } else if (d.x > d.y && d.x > 0) {
+      this._direction = Direction.East;
+      this._event = EntityEvent.FaceEast;
+    } else if (d.y > 0 && d.y > d.x) {
+      this._direction = Direction.South;
+      this._event = EntityEvent.FaceSouth;
+    } else if (d.x < 0 && d.x < d.y) {
+      this._direction = Direction.West;
+      this._event = EntityEvent.FaceWest;
+    } else {
+      console.log("Unhandled direction to face");
+      console.log("dx:", d.x, "dy:", d.y);
+    }
+  }
+
+  perform(): boolean {
+    // TODO: Geometry updates as the actor is spinning on its axis.
+    this.actor.postEvent(this._event);
+    this.actor.direction = this._direction;
+    return super.perform();
   }
 }
 

@@ -69,6 +69,7 @@ export class Actor extends EventableEntity {
         super(context, location, dimensions, graphicComponent);
         this._canSwim = false;
         this._canFly = false;
+        this._directionalGraphics = new Map();
         context.addActor(this);
     }
     update() {
@@ -79,8 +80,27 @@ export class Actor extends EventableEntity {
             this._action = null;
         }
     }
+    addDirectionalGraphic(direction, graphic) {
+        this._directionalGraphics.set(direction, graphic);
+    }
     postEvent(event) {
         this._handler.post(event);
+    }
+    get direction() { return this._direction; }
+    get graphic() {
+        if (this._directionalGraphics.has(this.direction)) {
+            return this._directionalGraphics.get(this.direction);
+        }
+        return super.graphic;
+    }
+    get graphics() {
+        if (this._directionalGraphics.has(this.direction)) {
+            return [this._directionalGraphics.get(this.direction)];
+        }
+        return super.graphics;
+    }
+    set direction(direction) {
+        this._direction = direction;
     }
     set action(action) {
         this._action = action;

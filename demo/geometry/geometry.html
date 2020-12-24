@@ -11,7 +11,7 @@
   <script type="module" src"robot.js"></script>
   <script type="module">
     import * as WT from "../../dist/world-tree.js";
-    import { RobotController } from "./robot.js"
+    import { Robot, RobotController } from "./robot.js"
 
     const spriteWidth = 256;
     const spriteHeight = 248;
@@ -75,6 +75,7 @@
                                       canvas.width, canvas.height);
       context.addController(new WT.MouseController(context.scene, canvas, camera));
 
+      Robot.initGraphics();
       let robotController = new RobotController(context);
       context.addController(robotController);
       // place a robot in the middle of the map.

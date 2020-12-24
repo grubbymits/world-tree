@@ -1,5 +1,9 @@
 export enum EntityEvent {
   Move = "move",
+  FaceNorth = "faceNorth",
+  FaceEast = "faceEast",
+  FaceSouth = "faceSouth",
+  FaceWest = "faceWest",
   ActionComplete = "actionComplete",
 }
 

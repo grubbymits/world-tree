@@ -178,7 +178,7 @@ class SceneLevel {
 
     if (node.isRoot && this._roots.indexOf(node.id) == -1) {
       this._roots.push(node.id);
-      console.log("num roots:", this._roots.length);
+      //console.log("num roots:", this._roots.length);
     }
     this._discovered.clear();
     this._topologicalOrder.length = 0;
@@ -217,11 +217,11 @@ class SceneLevel {
       const node = this._nodes[i];
       if (node.preds.length == 0) {
         this._roots.push(node.id);
-        console.log("root id:", node.id);
+        //console.log("root id:", node.id);
       }
     }
 
-    console.log("num scene roots:", this._roots.length);
+    //console.log("num scene roots:", this._roots.length);
     this._discovered.clear();
     this._topologicalOrder.length = 0;
     for (let i in this._roots) {
@@ -230,9 +230,9 @@ class SceneLevel {
       }
       this.topologicalSort(graph, graph.getNode(this._roots[i]));
     }
-    for (let i = this.order.length - 1; i >= 0; i--) {
-      console.log("-", this.order[i].id);
-    }
+    //for (let i = this.order.length - 1; i >= 0; i--) {
+      //console.log("-", this.order[i].id);
+    //}
   }
 
   topologicalSort(graph: SceneGraph, node: SceneNode): void {

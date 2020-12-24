@@ -140,40 +140,77 @@ export class StaticGraphicComponent extends GraphicComponent {
   }
 }
 
-export class OssilateGraphicComponent extends GraphicComponent {
-  private _increase: boolean = true;
-  private _startId: number = 0;
-  private _endId: number = 0;
-  private _nextUpdate: number = 0;
+export class AnimatedGraphicComponent extends GraphicComponent {
+  protected _nextUpdate: number = 0;
+  protected _currentSpriteIdx: number = 0;
+  protected _spriteIds: Array<number> = new Array<number>();
 
   constructor(sprites: Array<Sprite>,
-              private readonly _interval: number) {
+              protected readonly _interval: number) {
     super(sprites[0].id);
-    this._startId = sprites[0].id;
-    this._endId = sprites[sprites.length - 1].id;
-    this._currentSpriteId =
-      Math.floor(Math.random() * (this._endId - this._startId) + this._startId);
+    for (let i in sprites) {
+      this._spriteIds.push(sprites[i].id);
+    }
     this._nextUpdate = Date.now() + _interval;
   }
 
   update(): number {
+    return this._spriteIds[this._currentSpriteIdx];
+  }
+
+  protected get firstId(): number { return this._spriteIds[0] }
+  protected get lastId(): number {
+    return this._spriteIds[this._spriteIds.length - 1];
+  }
+  protected get currentSpriteId(): number {
+    return this._spriteIds[this._currentSpriteIdx];
+  }
+}
+
+export class OssilateGraphicComponent extends AnimatedGraphicComponent {
+
+  private _increase: boolean = true;
+
+  constructor(sprites: Array<Sprite>, interval: number) {
+    super(sprites, interval);
+    this._currentSpriteId =
+      Math.floor(Math.random() * (this.lastId - this.firstId) + this.firstId);
+  }
+
+  update(): number {
     if (this._nextUpdate > Date.now()) {
-      return this._currentSpriteId;
+      return this.currentSpriteId;
     }
 
     if (this._increase) {
-      if (this._currentSpriteId != this._endId) {
-        this._currentSpriteId++;
+      if (this._currentSpriteId != this.lastId) {
+        this._currentSpriteIdx++;
       } else {
         this._increase = false;
       }
-    } else if (this._currentSpriteId != this._startId) {
-      this._currentSpriteId--;
+    } else if (this._currentSpriteIdx != this.firstId) {
+      this._currentSpriteIdx--;
     } else {
       this._increase = true;
     }
 
     this._nextUpdate = Date.now() + this._interval;
-    return this._currentSpriteId;
+    return this.currentSpriteId;
+  }
+}
+
+export class LoopGraphicComponent extends AnimatedGraphicComponent {
+  constructor(sprites: Array<Sprite>, interval: number) {
+    super(sprites, interval);
+    this._currentSpriteId = 0;
+  }
+
+  update(): number {
+    if (this._nextUpdate > Date.now()) {
+      return this.currentSpriteId;
+    }
+    this._currentSpriteIdx = (this._currentSpriteIdx + 1 ) % this._spriteIds.length;
+    this._nextUpdate = Date.now() + this._interval;
+    return this.currentSpriteId;
   }
 }
