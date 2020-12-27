@@ -1,30 +1,31 @@
 import { BoundingCuboid } from "./physics.js";
-import { CuboidGeometry } from "./geometry.js";
+import { Point3D, CuboidGeometry } from "./geometry.js";
 import { EntityEvent, EventHandler } from "./events.js";
 export class Entity {
-    constructor(_context, centre, dimensions, graphicComponent) {
+    constructor(_context, minLocation, dimensions, graphicComponent) {
         this._context = _context;
         this._hasMoved = false;
+        this._graphicComponents = new Array();
         this._visible = true;
         this._drawGeometry = false;
         this._id = Entity._ids;
         Entity._ids++;
-        this._graphicComponents = new Array();
         this._graphicComponents.push(graphicComponent);
-        this._bounds = new BoundingCuboid(centre, dimensions);
-        this._geometry = new CuboidGeometry(this._bounds);
+        let centre = new Point3D(minLocation.x + Math.floor(dimensions.width / 2), minLocation.y + Math.floor(dimensions.depth / 2), minLocation.z + Math.floor(dimensions.height / 2));
+        const bounds = new BoundingCuboid(centre, dimensions);
+        this._geometry = new CuboidGeometry(bounds);
         this._context.addEntity(this);
     }
-    get x() { return this._bounds.minX; }
-    get y() { return this._bounds.minY; }
-    get z() { return this._bounds.minZ; }
-    get width() { return this._bounds.width; }
-    get depth() { return this._bounds.depth; }
-    get height() { return this._bounds.height; }
     get geometry() { return this._geometry; }
-    get dimensions() { return this._bounds.dimensions; }
-    get bounds() { return this._bounds; }
-    get centre() { return this._bounds.centre; }
+    get bounds() { return this._geometry.bounds; }
+    get dimensions() { return this.bounds.dimensions; }
+    get x() { return this.bounds.minX; }
+    get y() { return this.bounds.minY; }
+    get z() { return this.bounds.minZ; }
+    get width() { return this.bounds.width; }
+    get depth() { return this.bounds.depth; }
+    get height() { return this.bounds.height; }
+    get centre() { return this.bounds.centre; }
     get id() { return this._id; }
     get hasMoved() { return this._hasMoved; }
     get visible() { return this._visible; }
@@ -40,7 +41,7 @@ export class Entity {
         this._graphicComponents.push(graphic);
     }
     heightAt(location) {
-        if (!this._bounds.contains(location)) {
+        if (!this.bounds.contains(location)) {
             return null;
         }
         return this.z + this.height;

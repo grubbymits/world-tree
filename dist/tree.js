@@ -45,10 +45,10 @@ class OctNode {
     }
     split() {
         this._children = new Array();
-        let width = Math.floor(this._bounds.width / 2);
-        let depth = Math.floor(this._bounds.depth / 2);
-        let height = Math.floor(this._bounds.height / 2);
-        let dimensions = new Dimensions(width, depth, height);
+        const width = Math.floor(this._bounds.width / 2);
+        const depth = Math.floor(this._bounds.depth / 2);
+        const height = Math.floor(this._bounds.height / 2);
+        const dimensions = new Dimensions(width, depth, height);
         let offset = [-0.5, 0.5];
         for (let z = 0; z < 2; z++) {
             for (let y = 0; y < 2; y++) {

@@ -130,8 +130,8 @@ export class OssilateGraphicComponent extends AnimatedGraphicComponent {
     constructor(sprites, interval) {
         super(sprites, interval);
         this._increase = true;
-        this._currentSpriteId =
-            Math.floor(Math.random() * (this.lastId - this.firstId) + this.firstId);
+        this._currentSpriteIdx =
+            Math.floor(Math.random() * (this._spriteIds.length - 1));
     }
     update() {
         if (this._nextUpdate > Date.now()) {

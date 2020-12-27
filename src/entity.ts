@@ -19,35 +19,37 @@ export class Entity {
   private readonly _id: number;
 
   protected _hasMoved: boolean = false;
-  protected _graphicComponents: Array<GraphicComponent>;
+  protected _graphicComponents: Array<GraphicComponent> =
+    new Array<GraphicComponent>();
   protected _visible: boolean = true;
-  protected _bounds: BoundingCuboid;
   protected _geometry: Geometry;
   protected _drawGeometry: boolean = false;
 
   constructor(protected _context: Context,
-              centre: Point3D,
+              minLocation: Point3D,
               dimensions: Dimensions,
               graphicComponent: GraphicComponent) {
     this._id = Entity._ids;
     Entity._ids++;
-    this._graphicComponents = new Array<GraphicComponent>();
     this._graphicComponents.push(graphicComponent);
-    this._bounds = new BoundingCuboid(centre, dimensions);
-    this._geometry = new CuboidGeometry(this._bounds);
+    let centre = new Point3D(minLocation.x + Math.floor(dimensions.width / 2),
+                             minLocation.y + Math.floor(dimensions.depth / 2),
+                             minLocation.z + Math.floor(dimensions.height / 2));
+    const bounds = new BoundingCuboid(centre, dimensions);
+    this._geometry = new CuboidGeometry(bounds);
     this._context.addEntity(this);
   }
   
-  get x(): number { return this._bounds.minX; }
-  get y(): number { return this._bounds.minY; }
-  get z(): number { return this._bounds.minZ; }
-  get width(): number { return this._bounds.width; }
-  get depth(): number { return this._bounds.depth; }
-  get height(): number { return this._bounds.height; }
   get geometry(): Geometry { return this._geometry; }
-  get dimensions(): Dimensions { return this._bounds.dimensions; }
-  get bounds(): BoundingCuboid { return this._bounds; }
-  get centre(): Point3D { return this._bounds.centre; }
+  get bounds(): BoundingCuboid { return this._geometry.bounds; }
+  get dimensions(): Dimensions { return this.bounds.dimensions; }
+  get x(): number { return this.bounds.minX; }
+  get y(): number { return this.bounds.minY; }
+  get z(): number { return this.bounds.minZ; }
+  get width(): number { return this.bounds.width; }
+  get depth(): number { return this.bounds.depth; }
+  get height(): number { return this.bounds.height; }
+  get centre(): Point3D { return this.bounds.centre; }
   get id(): number { return this._id; }
   get hasMoved(): boolean { return this._hasMoved; }
   get visible(): boolean { return this._visible; }
@@ -69,7 +71,7 @@ export class Entity {
     // Given a world location, does this terrain define what the minimum z
     // coordinate?
     // If the locations is outside of the bounding cuboid, just return null.
-    if (!this._bounds.contains(location)) {
+    if (!this.bounds.contains(location)) {
       return null;
     }
     return this.z + this.height;

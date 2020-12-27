@@ -59,10 +59,10 @@ class OctNode {
   split(): boolean {
     this._children = new Array<OctNode>();
     // split each dimension into 2.
-    let width = Math.floor(this._bounds.width / 2);
-    let depth = Math.floor(this._bounds.depth / 2);
-    let height = Math.floor(this._bounds.height / 2);
-    let dimensions = new Dimensions(width, depth, height);
+    const width = Math.floor(this._bounds.width / 2);
+    const depth = Math.floor(this._bounds.depth / 2);
+    const height = Math.floor(this._bounds.height / 2);
+    const dimensions = new Dimensions(width, depth, height);
     //console.log("splitting into 8x (WxDxH):", width, depth, height);
 
     // half the dimensions again to get the distances to/from the centre.

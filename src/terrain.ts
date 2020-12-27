@@ -315,9 +315,9 @@ export class Terrain extends Entity {
               private readonly _shape: TerrainShape,
               features: number) {
     super(context,
-          new Point3D(_gridX * dimensions.width + Math.floor(dimensions.width / 2),
-                      _gridY * dimensions.depth + Math.floor(dimensions.depth / 2),
-                      _gridZ * dimensions.height + Math.floor(dimensions.height / 2)),
+          new Point3D(_gridX * dimensions.width,
+                      _gridY * dimensions.depth,
+                      _gridZ * dimensions.height),
           dimensions, Terrain.graphics(_type, _shape));
 
     // Pre-calculate the angle of the ramp.
@@ -328,9 +328,9 @@ export class Terrain extends Entity {
       this._tanTheta = 0;
     }
 
-    let x = this._bounds.centre.x;
-    let y = this._bounds.centre.y;
-    let z = this.heightAt(this._bounds.centre)!;
+    let x = this.bounds.centre.x;
+    let y = this.bounds.centre.y;
+    let z = this.heightAt(this.bounds.centre)!;
     this._surfaceLocation = new Point3D(x, y, z);
 
     if (features == TerrainFeature.None) {
@@ -359,7 +359,7 @@ export class Terrain extends Entity {
     // Given a world location, does this terrain define what the minimum z
     // coordinate?
     // If the locations is outside of the bounding cuboid, just return null.
-    if (!this._bounds.contains(location)) {
+    if (!this.bounds.contains(location)) {
       return null;
     }
     if (isFlat(this._shape)) {

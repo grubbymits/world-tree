@@ -212,7 +212,7 @@ export function isRampUp(shape, direction) {
 }
 export class Terrain extends Entity {
     constructor(context, _gridX, _gridY, _gridZ, dimensions, _type, _shape, features) {
-        super(context, new Point3D(_gridX * dimensions.width + Math.floor(dimensions.width / 2), _gridY * dimensions.depth + Math.floor(dimensions.depth / 2), _gridZ * dimensions.height + Math.floor(dimensions.height / 2)), dimensions, Terrain.graphics(_type, _shape));
+        super(context, new Point3D(_gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height), dimensions, Terrain.graphics(_type, _shape));
         this._gridX = _gridX;
         this._gridY = _gridY;
         this._gridZ = _gridZ;
@@ -225,9 +225,9 @@ export class Terrain extends Entity {
         else {
             this._tanTheta = 0;
         }
-        let x = this._bounds.centre.x;
-        let y = this._bounds.centre.y;
-        let z = this.heightAt(this._bounds.centre);
+        let x = this.bounds.centre.x;
+        let y = this.bounds.centre.y;
+        let z = this.heightAt(this.bounds.centre);
         this._surfaceLocation = new Point3D(x, y, z);
         if (features == TerrainFeature.None) {
             return;
@@ -292,7 +292,7 @@ export class Terrain extends Entity {
     get type() { return this._type; }
     get surfaceLocation() { return this._surfaceLocation; }
     heightAt(location) {
-        if (!this._bounds.contains(location)) {
+        if (!this.bounds.contains(location)) {
             return null;
         }
         if (isFlat(this._shape)) {

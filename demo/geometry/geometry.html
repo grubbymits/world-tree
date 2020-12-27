@@ -78,13 +78,9 @@
       let robotController = new RobotController(context);
       context.addController(robotController);
       // place a robot in the middle of the map.
-      robotController.add(new WT.Point3D(//255, 588,
-                                         //2 + Math.floor(worldDims.height / 2 +
-                                           //             physicalDims.height / 2)));
-                                         Math.floor(worldDims.width / 2),
+      robotController.add(new WT.Point3D(Math.floor(worldDims.width / 2),
                                          Math.floor(worldDims.depth / 2),
-                                         2 + Math.floor(worldDims.height / 2 +
-                                                        physicalDims.height / 2)));
+                                         2 + Math.floor(worldDims.height / 2)));
 
       var update = function update() {
         if (document.hasFocus()) {
