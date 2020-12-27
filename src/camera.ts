@@ -72,8 +72,8 @@ export class Camera {
       console.log("undefined camera surface location");
       return;
     }
-    console.log("updating camera to centre on (x,y,z):",
-                newLocation.x, newLocation.y, newLocation.z);
+    //console.log("updating camera to centre on (x,y,z):",
+      //          newLocation.x, newLocation.y, newLocation.z);
     let newPoint: Point2D = this._scene.getDrawCoord(newLocation);
     this.x = newPoint.x;
     this.y = newPoint.y;

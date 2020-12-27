@@ -48,14 +48,17 @@ export class RobotController extends WT.Controller {
     this._context = context;
   }
 
+  get robot() { return this._robot; }
+
   add(position) {
     console.log("adding robot at:", position);
-    let robot = new Robot(this._context, position);
-    console.log("min location:", robot.bounds.minLocation);
+    this._robot = new Robot(this._context, position);
+    console.log("min location:", this.robot.bounds.minLocation);
 
-    this._actors.push(robot);
+    this._actors.push(this.robot);
     let bounds = this._context.bounds;
     let spatialInfo = this._context.spatial;
+    let robot = this.robot;
 
     let moveRandomDirection = function() {
       let dx = Math.round(Math.random() * 2) - 1;

@@ -53,7 +53,6 @@
       context.map = builder.generateMap(context);
       let camera = new WT.MouseCamera(context.scene, canvas,
                                       canvas.width, canvas.height);
-      context.addController(new WT.MouseController(context.scene, canvas, camera));
     
       var update = function update() {
         if (document.hasFocus()) {

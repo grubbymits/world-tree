@@ -82,7 +82,6 @@
       let camera = new WT.TrackerCamera(context.scene,
                                         canvas.width, canvas.height,
                                         robotController.robot);
-      context.addController(new WT.MouseController(context.scene, canvas, camera));
 
       var update = function update() {
         if (document.hasFocus()) {

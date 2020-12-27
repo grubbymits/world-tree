@@ -61,7 +61,6 @@ window.onload = (event) => {
 
   let camera = new WT.MouseCamera(context.scene, canvas,
                                   canvas.width, canvas.height);
-  context.addController(new WT.MouseController(context.scene, canvas, camera));
   context.verify();
 
   let cloudController = new CloudController(context, worldDims);
