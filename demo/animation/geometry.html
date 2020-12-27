@@ -75,6 +75,7 @@
                                       canvas.width, canvas.height);
       context.addController(new WT.MouseController(context.scene, canvas, camera));
 
+      Robot.initGraphics();
       let robotController = new RobotController(context);
       context.addController(robotController);
       // place a robot in the middle of the map.

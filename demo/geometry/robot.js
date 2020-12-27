@@ -1,44 +1,16 @@
 import * as WT from "../../dist/world-tree.js";
 
 export class Robot extends WT.Actor {
-  static sheet = new WT.SpriteSheet("../../../res/img/robot");
-  static directions = [ WT.Direction.North,
-                        WT.Direction.East,
-                        WT.Direction.South,
-                        WT.Direction.West ];
-  static sprites = new Array();
-  static spriteWidth = 96;
-  static spriteHeight = 158;
-  static relativeDims = new WT.Dimensions(2, 2, 3);
+  static sheet = new WT.SpriteSheet("../../../res/img/water");
+  static sprite = new WT.Sprite(Robot.sheet, 0, 0, 256, 248);
+  static graphic = new WT.StaticGraphicComponent(Robot.sprite.id);
+  static spriteWidth = 256;
+  static spriteHeight = 248;
+  static relativeDims = new WT.Dimensions(3, 3, 2);
   static dims = new WT.IsometricPhysicalDimensions(this.spriteWidth, Robot.relativeDims);
-
-  static initGraphics() {
-    for (let x in this.directions) {
-      let direction = this.directions[x];
-      console.log("adding sprites for", WT.getDirectionName(direction));
-      let animationFrames = new Array();
-      for (let y = 0; y < 8; y++) {
-        animationFrames.push(new WT.Sprite(this.sheet, x * this.spriteWidth,
-                                           y * this.spriteHeight,
-                                           this.spriteWidth, this.spriteHeight));
-      }
-      this.sprites.push(animationFrames);
-      console.log("added robot frames:", animationFrames.length);
-      console.log(this.sprites);
-    }
-    this.graphic = new WT.StaticGraphicComponent(this.sprites[0][0].id);
-  }
 
   constructor(context, position) {
     super(context, position, Robot.dims, Robot.graphic, /*debug*/ true);
-    console.assert(Robot.sprites.length == Robot.directions.length);
-    console.log(Robot.sprites);
-    for (let x in Robot.directions) {
-      let direction = Robot.directions[x];
-      let sprites = Robot.sprites[x];
-      let graphic = new WT.LoopGraphicComponent(sprites, 166);
-      this.addDirectionalGraphic(direction, graphic);
-    }
   }
 }
 
@@ -70,7 +42,7 @@ export class RobotController extends WT.Controller {
         dy = 1;
       }
       let moveVector = new WT.Vector3D(dx, dy, dz);
-      robot.action = new WT.MoveForwardsDirection(robot, moveVector, bounds, spatialInfo);
+      robot.action = new WT.MoveDirection(robot, moveVector, bounds, spatialInfo);
     };
 
     // Choose another direction when it can't move anymore.
