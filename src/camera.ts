@@ -1,5 +1,7 @@
 import { EventHandler,
+         EntityEvent,
          InputEvent } from "./events.js"
+import { Actor } from "./entity.js"
 import { Point2D, Point3D } from "./geometry.js"
 import { SceneGraph } from "./scene.js"
 
@@ -34,6 +36,7 @@ export class Camera {
 
   get x(): number { return this._x; }
   get y(): number { return this._y; }
+  get min(): Point2D { return new Point2D(this._lowerX, this._lowerY); }
   get width(): number { return this._width; }
   get height(): number { return this._height; }
   get location(): Point3D|null { return this._surfaceLocation; }
@@ -94,6 +97,19 @@ export class MouseCamera extends Camera {
       }
     });
   }
-
-  get min(): Point2D { return new Point2D(this._lowerX, this._lowerY); }
 }
+
+export class TrackerCamera extends Camera {
+  constructor(scene: SceneGraph,
+              width: number,
+              height: number,
+              actor: Actor) {
+    super(scene, width, height);
+
+    var camera = this;
+    actor.addEventListener(EntityEvent.Move, function() {
+      camera.location = actor.centre;
+    });
+  }
+}
+

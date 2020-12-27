@@ -1,4 +1,4 @@
-import { EventHandler, InputEvent } from "./events.js";
+import { EventHandler, EntityEvent, InputEvent } from "./events.js";
 import { Point2D } from "./geometry.js";
 export class Camera {
     constructor(_scene, _width, _height) {
@@ -24,6 +24,7 @@ export class Camera {
     }
     get x() { return this._x; }
     get y() { return this._y; }
+    get min() { return new Point2D(this._lowerX, this._lowerY); }
     get width() { return this._width; }
     get height() { return this._height; }
     get location() { return this._surfaceLocation; }
@@ -72,5 +73,13 @@ export class MouseCamera extends Camera {
             }
         });
     }
-    get min() { return new Point2D(this._lowerX, this._lowerY); }
+}
+export class TrackerCamera extends Camera {
+    constructor(scene, width, height, actor) {
+        super(scene, width, height);
+        var camera = this;
+        actor.addEventListener(EntityEvent.Move, function () {
+            camera.location = actor.centre;
+        });
+    }
 }

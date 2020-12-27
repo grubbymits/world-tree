@@ -71,9 +71,6 @@
                                           defaultFloor, defaultWall,
                                           physicalDims);
       context.map = builder.generateMap(context);
-      let camera = new WT.MouseCamera(context.scene, canvas,
-                                      canvas.width, canvas.height);
-      context.addController(new WT.MouseController(context.scene, canvas, camera));
 
       let robotController = new RobotController(context);
       context.addController(robotController);
@@ -81,6 +78,11 @@
       robotController.add(new WT.Point3D(Math.floor(worldDims.width / 2),
                                          Math.floor(worldDims.depth / 2),
                                          2 + Math.floor(worldDims.height / 2)));
+
+      let camera = new WT.TrackerCamera(context.scene,
+                                        canvas.width, canvas.height,
+                                        robotController.robot);
+      context.addController(new WT.MouseController(context.scene, canvas, camera));
 
       var update = function update() {
         if (document.hasFocus()) {
