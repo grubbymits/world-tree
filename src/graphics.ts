@@ -57,7 +57,6 @@ export class Sprite {
 
   private readonly _id: number;
   private readonly _spriteOffset: Point2D;
-  private _drawOffset: Point2D;
 
   constructor(private readonly _sheet: SpriteSheet,
               offsetX: number,
@@ -68,29 +67,15 @@ export class Sprite {
     this._spriteOffset = new Point2D(offsetX, offsetY);
     this._sheet = _sheet;
     Sprite.add(this);
-    this._drawOffset = new Point2D(0, _height - 1);
 
     let sprite: Sprite = this;
-    this._sheet.image.addEventListener('load', function() {
-      // Find the top left-most point.
-      for (let x = 0; x < _width; x++) {
-        for (let y = 0; y < _height; y++) {
-          if (!sprite.isTransparentAt(x, y)) {
-            sprite._drawOffset = new Point2D(x, y);
-            console.log("set draw offset:", sprite._drawOffset);
-            return;
-          }
-        }
-      }
-    });
   }
 
   draw(coord: Point2D, ctx: CanvasRenderingContext2D): void {
     ctx.drawImage(this._sheet.image,
                   this._spriteOffset.x, this._spriteOffset.y,
                   this._width, this._height,
-                  coord.x,// + this.drawOffset.x,
-                  coord.y,// - this.drawOffset.y,
+                  coord.x, coord.y,
                   this._width, this._height);
   }
 
@@ -103,8 +88,6 @@ export class Sprite {
   get id(): number { return this._id; }
   get width(): number { return this._width; }
   get height(): number { return this._height; }
-  get drawOffset(): Point2D { return this._drawOffset; }
-  set drawOffset(offset: Point2D) { this._drawOffset = offset; }
 }
 
 // Computer graphics have their origin in the top left corner.
@@ -124,9 +107,6 @@ export abstract class GraphicComponent {
   }
   get height(): number { 
     return Sprite.sprites[this._currentSpriteId].height;
-  }
-  get offset(): Point2D {
-    return Sprite.sprites[this._currentSpriteId].drawOffset;
   }
 }
 

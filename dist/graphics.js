@@ -43,19 +43,7 @@ export class Sprite {
         this._spriteOffset = new Point2D(offsetX, offsetY);
         this._sheet = _sheet;
         Sprite.add(this);
-        this._drawOffset = new Point2D(0, _height - 1);
         let sprite = this;
-        this._sheet.image.addEventListener('load', function () {
-            for (let x = 0; x < _width; x++) {
-                for (let y = 0; y < _height; y++) {
-                    if (!sprite.isTransparentAt(x, y)) {
-                        sprite._drawOffset = new Point2D(x, y);
-                        console.log("set draw offset:", sprite._drawOffset);
-                        return;
-                    }
-                }
-            }
-        });
     }
     static add(sprite) {
         this._sprites.push(sprite);
@@ -74,8 +62,6 @@ export class Sprite {
     get id() { return this._id; }
     get width() { return this._width; }
     get height() { return this._height; }
-    get drawOffset() { return this._drawOffset; }
-    set drawOffset(offset) { this._drawOffset = offset; }
 }
 Sprite._sprites = new Array();
 export class GraphicComponent {
@@ -90,9 +76,6 @@ export class GraphicComponent {
     }
     get height() {
         return Sprite.sprites[this._currentSpriteId].height;
-    }
-    get offset() {
-        return Sprite.sprites[this._currentSpriteId].drawOffset;
     }
 }
 export class StaticGraphicComponent extends GraphicComponent {

@@ -300,8 +300,12 @@ export abstract class SceneGraph {
 
     const renderNode = function(node: SceneNode) {
       const entity: Entity = node.entity;
-      if (entity.visible &&
-          camera.isOnScreen(node.drawCoord, entity.width, entity.depth)) {
+      if (!entity.visible) {
+        return;
+      }
+      const width = entity.graphics[0].width;
+      const height = entity.graphics[0].height; 
+      if (camera.isOnScreen(node.drawCoord, width, height)) {
         const coord = camera.getDrawCoord(node.drawCoord);
         entity.graphics.forEach((component) => {
           const spriteId = component.update();
