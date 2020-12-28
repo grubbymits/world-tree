@@ -47,9 +47,9 @@ export class Sprite {
         let sprite = this;
         this._sheet.image.addEventListener('load', function () {
             for (let x = 0; x < _width; x++) {
-                for (let y = _height - 1; y >= 0; y--) {
+                for (let y = 0; y < _height; y++) {
                     if (!sprite.isTransparentAt(x, y)) {
-                        sprite._drawOffset = new Point2D(x, y - _height);
+                        sprite._drawOffset = new Point2D(x, y);
                         console.log("set draw offset:", sprite._drawOffset);
                         return;
                     }
@@ -64,7 +64,7 @@ export class Sprite {
         return this._sprites;
     }
     draw(coord, ctx) {
-        ctx.drawImage(this._sheet.image, this._spriteOffset.x, this._spriteOffset.y, this._width, this._height, coord.x + this.drawOffset.x, coord.y + this.drawOffset.y, this._width, this._height);
+        ctx.drawImage(this._sheet.image, this._spriteOffset.x, this._spriteOffset.y, this._width, this._height, coord.x, coord.y, this._width, this._height);
     }
     isTransparentAt(x, y) {
         x += this._spriteOffset.x;

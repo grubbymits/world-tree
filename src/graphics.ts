@@ -72,11 +72,11 @@ export class Sprite {
 
     let sprite: Sprite = this;
     this._sheet.image.addEventListener('load', function() {
-      // Find the bottom left-most point.
+      // Find the top left-most point.
       for (let x = 0; x < _width; x++) {
-        for (let y = _height - 1; y >= 0; y--) {
+        for (let y = 0; y < _height; y++) {
           if (!sprite.isTransparentAt(x, y)) {
-            sprite._drawOffset = new Point2D(x, y-_height);
+            sprite._drawOffset = new Point2D(x, y);
             console.log("set draw offset:", sprite._drawOffset);
             return;
           }
@@ -89,8 +89,8 @@ export class Sprite {
     ctx.drawImage(this._sheet.image,
                   this._spriteOffset.x, this._spriteOffset.y,
                   this._width, this._height,
-                  coord.x + this.drawOffset.x,
-                  coord.y + this.drawOffset.y,
+                  coord.x,// + this.drawOffset.x,
+                  coord.y,// - this.drawOffset.y,
                   this._width, this._height);
   }
 

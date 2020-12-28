@@ -20,6 +20,7 @@ class SceneNode {
   private _sideOutlineSegments: Array<Segment2D> = new Array<Segment2D>();
   private _baseOutlineSegments: Array<Segment2D> = new Array<Segment2D>();
   private _drawCoord: Point2D = new Point2D(0, 0);
+  private _drawHeightOffset: Point2D;
 
   private static _graph: SceneGraph;
   static set graph(g: SceneGraph) { this._graph = g; }
@@ -99,6 +100,8 @@ class SceneNode {
     this.baseSegments.forEach(segment => outline.push(segment));
     return outline;
   }
+  get drawHeightOffset(): Point2D { return this._drawHeightOffset; }
+  set drawHeightOffset(coord: Point2D) { this._drawHeightOffset = coord; }
   get entity(): Entity { return this._entity; }
   get preds(): Array<number> { return this._preds; }
   get succs(): Array<number> { return this._succs; }
@@ -303,9 +306,10 @@ export abstract class SceneGraph {
       if (entity.visible &&
           camera.isOnScreen(node.drawCoord, entity.width, entity.depth)) {
         const coord = camera.getDrawCoord(node.drawCoord);
+        const adjustedCoord = new Point2D(coord.x, coord.y - node.drawHeightOffset.y);
         entity.graphics.forEach((component) => {
           const spriteId = component.update();
-          Sprite.sprites[spriteId].draw(coord, ctx);
+          Sprite.sprites[spriteId].draw(adjustedCoord, ctx);
         });
         if (entity.drawGeometry) {
           for (const segment of node.allSegments) {
@@ -430,7 +434,7 @@ export class IsometricRenderer extends SceneGraph {
     const entity: Entity = node.entity;
     const coord =
       IsometricRenderer.getDrawCoord(entity.bounds.minLocation);
-    node.drawCoord = new Point2D(coord.x, coord.y - entity.depth);
+    node.drawCoord = coord; //new Point2D(coord.x, coord.y - entity.depth);
 
     const min: Point3D = entity.bounds.minLocation;
     const max: Point3D = entity.bounds.maxLocation;
@@ -453,6 +457,7 @@ export class IsometricRenderer extends SceneGraph {
     const top2 = this.getDrawCoord(new Point3D(max.x, min.y, max.z));
     node.topSegments.push(new Segment2D(top1, top2));
     node.topSegments.push(new Segment2D(top2, max2D));
+    node.drawHeightOffset = min2D.sub(top2);
 
     node.sideSegments.push(new Segment2D(min2D, top1));
     node.sideSegments.push(new Segment2D(base2, max2D));

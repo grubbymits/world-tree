@@ -321,9 +321,7 @@ export class CollisionDetector {
     const endMinLocation: Point3D = bounds.minLocation.add(path);
     const endMaxLocation: Point3D = bounds.maxLocation.add(path);
 
-    area.dimensions.log();
     let entities: Array<Entity> = this._spatialInfo.getEntities(area);
-    console.log("collision detect entities:", entities.length);
     for (let entity of entities) {
       if (entity.id == actor.id) {
         continue;

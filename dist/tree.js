@@ -127,9 +127,6 @@ class OctNode {
         }
         console.assert(this._bounds.containsBounds(area) ||
             this._bounds.intersects(area));
-        console.log("node contains entities:", this._entities.length);
-        console.log("tree node dimensions");
-        this._bounds.dimensions.log();
         this._entities.forEach(entity => entities.push(entity));
         return entities;
     }

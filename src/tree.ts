@@ -162,9 +162,6 @@ class OctNode {
     }
     console.assert(this._bounds.containsBounds(area) ||
                    this._bounds.intersects(area));
-    console.log("node contains entities:", this._entities.length);
-    console.log("tree node dimensions");
-    this._bounds.dimensions.log();
     this._entities.forEach(entity => entities.push(entity));
     return entities;
   }
@@ -205,19 +202,6 @@ export class Octree {
     console.assert(removed);
     this._numEntities--;
     this.insert(entity);
-    /*
-    let currentNode = function() {
-    }
-    let correctNode = function() {
-    }
-
-    let current = currentNode(entity);
-    let next = correctNode(entity);
-    if (current != next) {
-      current.remove(entity);
-      next.insert(entity);
-    }
-    */
   }
 
   verify(entities: Array<Entity>): boolean {
