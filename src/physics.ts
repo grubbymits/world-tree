@@ -140,6 +140,9 @@ export class Dimensions {
   get width(): number { return this._width; }
   get depth(): number { return this._depth; }
   get height(): number { return this._height; }
+  log(): void {
+    console.log(" - (WxDxH):", this.width, this.depth, this.height);
+  }
 }
 
 // An isometric square has:
@@ -219,6 +222,7 @@ export class BoundingCuboid {
 
   update(d: Vector3D): void {
     this._centre = this._centre.add(d);
+    this._bottomCentre = this._bottomCentre.add(d);
     this._minLocation = this._minLocation.add(d);
     this._maxLocation = this._maxLocation.add(d);
   }
@@ -317,7 +321,9 @@ export class CollisionDetector {
     const endMinLocation: Point3D = bounds.minLocation.add(path);
     const endMaxLocation: Point3D = bounds.maxLocation.add(path);
 
+    area.dimensions.log();
     let entities: Array<Entity> = this._spatialInfo.getEntities(area);
+    console.log("collision detect entities:", entities.length);
     for (let entity of entities) {
       if (entity.id == actor.id) {
         continue;

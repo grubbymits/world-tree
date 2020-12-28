@@ -15,7 +15,6 @@ export class Robot extends WT.Actor {
   static initGraphics() {
     for (let x in this.directions) {
       let direction = this.directions[x];
-      console.log("adding sprites for", WT.getDirectionName(direction));
       let animationFrames = new Array();
       for (let y = 0; y < 8; y++) {
         animationFrames.push(new WT.Sprite(this.sheet, x * this.spriteWidth,
@@ -23,22 +22,19 @@ export class Robot extends WT.Actor {
                                            this.spriteWidth, this.spriteHeight));
       }
       this.sprites.push(animationFrames);
-      console.log("added robot frames:", animationFrames.length);
-      console.log(this.sprites);
     }
     this.graphic = new WT.StaticGraphicComponent(this.sprites[0][0].id);
   }
 
   constructor(context, position) {
     super(context, position, Robot.dims, Robot.graphic, /*debug*/ true);
-    console.assert(Robot.sprites.length == Robot.directions.length);
-    console.log(Robot.sprites);
     for (let x in Robot.directions) {
       let direction = Robot.directions[x];
       let sprites = Robot.sprites[x];
       let graphic = new WT.LoopGraphicComponent(sprites, 166);
       this.addDirectionalGraphic(direction, graphic);
     }
+    this._drawGeometry = true;
   }
 }
 

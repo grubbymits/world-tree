@@ -131,6 +131,9 @@ export class Dimensions {
     get width() { return this._width; }
     get depth() { return this._depth; }
     get height() { return this._height; }
+    log() {
+        console.log(" - (WxDxH):", this.width, this.depth, this.height);
+    }
 }
 export class IsometricPhysicalDimensions extends Dimensions {
     constructor(spriteWidth, relativeDims) {
@@ -189,6 +192,7 @@ export class BoundingCuboid {
     }
     update(d) {
         this._centre = this._centre.add(d);
+        this._bottomCentre = this._bottomCentre.add(d);
         this._minLocation = this._minLocation.add(d);
         this._maxLocation = this._maxLocation.add(d);
     }
@@ -262,7 +266,9 @@ export class CollisionDetector {
         let bounds = actor.bounds;
         const endMinLocation = bounds.minLocation.add(path);
         const endMaxLocation = bounds.maxLocation.add(path);
+        area.dimensions.log();
         let entities = this._spatialInfo.getEntities(area);
+        console.log("collision detect entities:", entities.length);
         for (let entity of entities) {
             if (entity.id == actor.id) {
                 continue;

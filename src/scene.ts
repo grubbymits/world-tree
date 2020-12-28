@@ -92,6 +92,13 @@ class SceneNode {
   get topSegments(): Array<Segment2D> { return this._topOutlineSegments; }
   get baseSegments(): Array<Segment2D> { return this._baseOutlineSegments; }
   get sideSegments(): Array<Segment2D> { return this._sideOutlineSegments; }
+  get allSegments(): Array<Segment2D> {
+    let outline = new Array<Segment2D>();
+    this.topSegments.forEach(segment => outline.push(segment));
+    this.sideSegments.forEach(segment => outline.push(segment));
+    this.baseSegments.forEach(segment => outline.push(segment));
+    return outline;
+  }
   get entity(): Entity { return this._entity; }
   get preds(): Array<number> { return this._preds; }
   get succs(): Array<number> { return this._succs; }
@@ -300,6 +307,16 @@ export abstract class SceneGraph {
           const spriteId = component.update();
           Sprite.sprites[spriteId].draw(coord, ctx);
         });
+        if (entity.drawGeometry) {
+          for (const segment of node.allSegments) {
+            ctx.beginPath();
+            let drawP0 = camera.getDrawCoord(segment.p0);
+            let drawP1 = camera.getDrawCoord(segment.p1);
+            ctx.moveTo(drawP0.x, drawP0.y);
+            ctx.lineTo(drawP1.x, drawP1.y);
+            ctx.stroke();
+          }
+        }
       }
     };
 
@@ -426,8 +443,8 @@ export class IsometricRenderer extends SceneGraph {
     node.sideSegments.length = 0;
 
     const min2D = this.getDrawCoord(min);
-    const base1 = this.getDrawCoord(new Point3D(min.x, min.y + depth, min.z));
-    const base2 = this.getDrawCoord(new Point3D(max.x, min.y + depth, min.z));
+    const base1 = this.getDrawCoord(new Point3D(min.x, max.y, min.z));
+    const base2 = this.getDrawCoord(new Point3D(max.x, max.y, min.z));
     node.baseSegments.push(new Segment2D(min2D, base1));
     node.baseSegments.push(new Segment2D(base1, base2));
 
@@ -438,7 +455,7 @@ export class IsometricRenderer extends SceneGraph {
     node.topSegments.push(new Segment2D(top2, max2D));
 
     node.sideSegments.push(new Segment2D(min2D, top1));
-    node.sideSegments.push(new Segment2D(top2, max2D));
+    node.sideSegments.push(new Segment2D(base2, max2D));
   }
 
   getDrawCoord(location: Point3D): Point2D {

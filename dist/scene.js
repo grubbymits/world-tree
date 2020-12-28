@@ -81,6 +81,13 @@ class SceneNode {
     get topSegments() { return this._topOutlineSegments; }
     get baseSegments() { return this._baseOutlineSegments; }
     get sideSegments() { return this._sideOutlineSegments; }
+    get allSegments() {
+        let outline = new Array();
+        this.topSegments.forEach(segment => outline.push(segment));
+        this.sideSegments.forEach(segment => outline.push(segment));
+        this.baseSegments.forEach(segment => outline.push(segment));
+        return outline;
+    }
     get entity() { return this._entity; }
     get preds() { return this._preds; }
     get succs() { return this._succs; }
@@ -248,6 +255,16 @@ export class SceneGraph {
                     const spriteId = component.update();
                     Sprite.sprites[spriteId].draw(coord, ctx);
                 });
+                if (entity.drawGeometry) {
+                    for (const segment of node.allSegments) {
+                        ctx.beginPath();
+                        let drawP0 = camera.getDrawCoord(segment.p0);
+                        let drawP1 = camera.getDrawCoord(segment.p1);
+                        ctx.moveTo(drawP0.x, drawP0.y);
+                        ctx.lineTo(drawP1.x, drawP1.y);
+                        ctx.stroke();
+                    }
+                }
             }
         };
         let ctx = this._ctx;
@@ -343,8 +360,8 @@ export class IsometricRenderer extends SceneGraph {
         node.baseSegments.length = 0;
         node.sideSegments.length = 0;
         const min2D = this.getDrawCoord(min);
-        const base1 = this.getDrawCoord(new Point3D(min.x, min.y + depth, min.z));
-        const base2 = this.getDrawCoord(new Point3D(max.x, min.y + depth, min.z));
+        const base1 = this.getDrawCoord(new Point3D(min.x, max.y, min.z));
+        const base2 = this.getDrawCoord(new Point3D(max.x, max.y, min.z));
         node.baseSegments.push(new Segment2D(min2D, base1));
         node.baseSegments.push(new Segment2D(base1, base2));
         const max2D = this.getDrawCoord(max);
@@ -353,7 +370,7 @@ export class IsometricRenderer extends SceneGraph {
         node.topSegments.push(new Segment2D(top1, top2));
         node.topSegments.push(new Segment2D(top2, max2D));
         node.sideSegments.push(new Segment2D(min2D, top1));
-        node.sideSegments.push(new Segment2D(top2, max2D));
+        node.sideSegments.push(new Segment2D(base2, max2D));
     }
     getDrawCoord(location) {
         return IsometricRenderer.getDrawCoord(location);

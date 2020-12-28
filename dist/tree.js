@@ -11,13 +11,13 @@ class OctNode {
     get width() { return this._bounds.width; }
     get height() { return this._bounds.height; }
     get depth() { return this._bounds.depth; }
-    get numEntities() {
+    get recursiveCountNumEntities() {
         if (this._entities.length != 0) {
             return this._entities.length;
         }
         let total = 0;
         for (let child of this._children) {
-            total += child.numEntities;
+            total += child.recursiveCountNumEntities;
         }
         return total;
     }
@@ -88,13 +88,27 @@ class OctNode {
         return this._bounds.contains(location);
     }
     containsEntity(entity) {
-        for (let containedEntity of this._entities) {
-            if (containedEntity.id == entity.id) {
+        return this._entities.indexOf(entity) != -1;
+    }
+    recursivelyContainsEntity(entity) {
+        if (this.containsEntity(entity)) {
+            return true;
+        }
+        for (let child of this._children) {
+            if (child.recursivelyContainsEntity(entity)) {
                 return true;
             }
         }
+        return false;
+    }
+    recursiveRemoveEntity(entity) {
+        const idx = this._entities.indexOf(entity);
+        if (idx != -1) {
+            this._entities.splice(idx, 1);
+            return true;
+        }
         for (let child of this._children) {
-            if (child.containsEntity(entity)) {
+            if (child.recursiveRemoveEntity(entity)) {
                 return true;
             }
         }
@@ -108,9 +122,15 @@ class OctNode {
         for (let child of this._children) {
             child.getEntities(area).forEach(entity => entities.push(entity));
         }
-        for (let entity of this._entities) {
-            entities.push(entity);
+        if (this._entities.length == 0) {
+            return entities;
         }
+        console.assert(this._bounds.containsBounds(area) ||
+            this._bounds.intersects(area));
+        console.log("node contains entities:", this._entities.length);
+        console.log("tree node dimensions");
+        this._bounds.dimensions.log();
+        this._entities.forEach(entity => entities.push(entity));
         return entities;
     }
 }
@@ -136,12 +156,16 @@ export class Octree {
         return this._root.getEntities(bounds);
     }
     update(entity) {
+        const removed = this._root.recursiveRemoveEntity(entity);
+        console.assert(removed);
+        this._numEntities--;
+        this.insert(entity);
     }
     verify(entities) {
         console.log("spatial graph should have num entities:", this._numEntities);
-        console.log("counted: ", this._root.numEntities);
+        console.log("counted: ", this._root.recursiveCountNumEntities);
         for (let entity of entities) {
-            if (!this._root.containsEntity(entity)) {
+            if (!this._root.recursivelyContainsEntity(entity)) {
                 console.error("tree doesn't contain entity at (x,y,z):", entity.x, entity.y, entity.z);
                 return false;
             }
