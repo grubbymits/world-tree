@@ -88,8 +88,6 @@ class SceneNode {
         this.baseSegments.forEach(segment => outline.push(segment));
         return outline;
     }
-    get drawHeightOffset() { return this._drawHeightOffset; }
-    set drawHeightOffset(coord) { this._drawHeightOffset = coord; }
     get entity() { return this._entity; }
     get preds() { return this._preds; }
     get succs() { return this._succs; }
@@ -253,10 +251,9 @@ export class SceneGraph {
             if (entity.visible &&
                 camera.isOnScreen(node.drawCoord, entity.width, entity.depth)) {
                 const coord = camera.getDrawCoord(node.drawCoord);
-                const adjustedCoord = new Point2D(coord.x, coord.y - node.drawHeightOffset.y);
                 entity.graphics.forEach((component) => {
                     const spriteId = component.update();
-                    Sprite.sprites[spriteId].draw(adjustedCoord, ctx);
+                    Sprite.sprites[spriteId].draw(coord, ctx);
                 });
                 if (entity.drawGeometry) {
                     for (const segment of node.allSegments) {
@@ -352,8 +349,6 @@ export class IsometricRenderer extends SceneGraph {
     }
     setDrawCoords(node) {
         const entity = node.entity;
-        const coord = IsometricRenderer.getDrawCoord(entity.bounds.minLocation);
-        node.drawCoord = coord;
         const min = entity.bounds.minLocation;
         const max = entity.bounds.maxLocation;
         const width = entity.bounds.width;
@@ -372,9 +367,12 @@ export class IsometricRenderer extends SceneGraph {
         const top2 = this.getDrawCoord(new Point3D(max.x, min.y, max.z));
         node.topSegments.push(new Segment2D(top1, top2));
         node.topSegments.push(new Segment2D(top2, max2D));
-        node.drawHeightOffset = min2D.sub(top2);
         node.sideSegments.push(new Segment2D(min2D, top1));
         node.sideSegments.push(new Segment2D(base2, max2D));
+        const drawHeightOffset = min2D.sub(top2);
+        const coord = IsometricRenderer.getDrawCoord(entity.bounds.minLocation);
+        const adjustedCoord = new Point2D(coord.x, coord.y - drawHeightOffset.y);
+        node.drawCoord = adjustedCoord;
     }
     getDrawCoord(location) {
         return IsometricRenderer.getDrawCoord(location);
