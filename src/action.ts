@@ -52,9 +52,10 @@ export class MoveDirection extends MoveAction {
     const nextPos = currentPos.add(this._d);
     if (this.canMove(currentPos, nextPos)) {
       this.actor.updatePosition(this._d);
-      this.actor.postEvent(EntityEvent.Move);
+      this.actor.postEvent(EntityEvent.Moving);
       return false;
     }
+    this.actor.postEvent(EntityEvent.EndMove);
     return true;
   }
 }
@@ -71,16 +72,12 @@ export class MoveForwardsDirection extends MoveDirection {
 
     if (d.y < 0 && d.y < d.x) {
       this._direction = Direction.North;
-      this._event = EntityEvent.FaceNorth;
     } else if (d.x > d.y && d.x > 0) {
       this._direction = Direction.East;
-      this._event = EntityEvent.FaceEast;
     } else if (d.y > 0 && d.y > d.x) {
       this._direction = Direction.South;
-      this._event = EntityEvent.FaceSouth;
     } else if (d.x < 0 && d.x < d.y) {
       this._direction = Direction.West;
-      this._event = EntityEvent.FaceWest;
     } else {
       console.log("Unhandled direction to face");
       console.log("dx:", d.x, "dy:", d.y);
@@ -89,7 +86,7 @@ export class MoveForwardsDirection extends MoveDirection {
 
   perform(): boolean {
     // TODO: Geometry updates as the actor is spinning on its axis.
-    this.actor.postEvent(this._event);
+    this.actor.postEvent(EntityEvent.FaceDirection);
     this.actor.direction = this._direction;
     return super.perform();
   }
@@ -179,7 +176,7 @@ export class MoveDestination extends MoveAction {
     let maxD: Vector3D = this.destination.subtract(location);
     let minD: Vector3D = maxD.absMin(this._d);
     this.actor.updatePosition(minD);
-    this.actor.postEvent(EntityEvent.Move);
+    this.actor.postEvent(EntityEvent.Moving);
     return bounds.minLocation.isNearlySameAs(this.destination);
   }
 }

@@ -150,10 +150,10 @@ export class Dimensions {
 // - the short diagonal is length = 1,
 // - the long diagonal is length = sqrt(3) ~= 1.73.
 export class IsometricPhysicalDimensions extends Dimensions {
-  private static readonly _widthRatio: number = 1 / Math.sqrt(3);
+  static readonly _oneOverSqrt3: number = 1 / Math.sqrt(3);
 
   static physicalWidth(spriteWidth: number): number {
-    return Math.floor(spriteWidth * this._widthRatio);
+    return Math.floor(spriteWidth * this._oneOverSqrt3);
   }
 
   static physicalDepth(physicalWidth: number,
@@ -172,6 +172,17 @@ export class IsometricPhysicalDimensions extends Dimensions {
               relativeDims: Dimensions) {
     let width = IsometricPhysicalDimensions.physicalWidth(spriteWidth);
     let depth = IsometricPhysicalDimensions.physicalDepth(width, relativeDims);
+    let height = IsometricPhysicalDimensions.physicalHeight(width, relativeDims);
+    super(width, depth, height);
+  }
+}
+
+export class TwoByOneIsometricPhysicalDimensions extends Dimensions {
+  constructor(spriteWidth: number,
+              relativeDims: Dimensions) {
+    let width = Math.floor(spriteWidth * 0.5);
+    let depth = Math.floor(IsometricPhysicalDimensions._oneOverSqrt3 *
+      IsometricPhysicalDimensions.physicalDepth(width, relativeDims));
     let height = IsometricPhysicalDimensions.physicalHeight(width, relativeDims);
     super(width, depth, height);
   }

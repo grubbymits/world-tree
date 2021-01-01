@@ -5,7 +5,9 @@ import { EntityEvent } from "./events.js"
 import { Terrain, TerrainShape, TerrainType } from "./terrain.js"
 import { SquareGrid } from "./map.js"
 import { SceneGraph,
-         IsometricRenderer } from "./scene.js"
+         Perspective,
+         IsometricRenderer,
+         TwoByOneIsometricRenderer } from "./scene.js"
 import { Camera } from "./camera.js"
 import { Controller } from "./controller.js"
 import { Octree } from "./tree.js"
@@ -13,14 +15,25 @@ import { Dimensions,
          BoundingCuboid } from "./physics.js"
 
 export class Context {
-  private _scene: IsometricRenderer;
+  private _scene: SceneGraph;
   private _entities : Array<Entity> = new Array<Entity>();
   private _controllers: Array<Controller> = new Array<Controller>();
   private _octree : Octree;
   private _worldMap: SquareGrid;
 
-  constructor(canvas: HTMLCanvasElement, worldDims: Dimensions) {
-    this._scene = new IsometricRenderer(canvas);
+  constructor(canvas: HTMLCanvasElement, worldDims: Dimensions,
+              perspective = Perspective.TrueIsometric) {
+    switch (perspective) {
+    default:
+      console.error("unhandled perspective");
+      break;
+    case Perspective.TrueIsometric:
+      this._scene = new IsometricRenderer(canvas);
+      break;
+    case Perspective.TwoByOneIsometric:
+      this._scene = new TwoByOneIsometricRenderer(canvas);
+      break;
+    }
     this._octree = new Octree(worldDims);
   }
 
@@ -50,7 +63,7 @@ export class Context {
   addActor(actor: Actor): void {
     let spatialGraph = this._octree;
     let scene = this._scene;
-    actor.addEventListener(EntityEvent.Move, function() {
+    actor.addEventListener(EntityEvent.Moving, function() {
       spatialGraph.update(actor);
       scene.updateEntity(actor);
     });

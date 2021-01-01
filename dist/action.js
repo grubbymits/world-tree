@@ -33,9 +33,10 @@ export class MoveDirection extends MoveAction {
         const nextPos = currentPos.add(this._d);
         if (this.canMove(currentPos, nextPos)) {
             this.actor.updatePosition(this._d);
-            this.actor.postEvent(EntityEvent.Move);
+            this.actor.postEvent(EntityEvent.Moving);
             return false;
         }
+        this.actor.postEvent(EntityEvent.EndMove);
         return true;
     }
 }
@@ -44,19 +45,15 @@ export class MoveForwardsDirection extends MoveDirection {
         super(actor, d, bounds, spatialInfo);
         if (d.y < 0 && d.y < d.x) {
             this._direction = Direction.North;
-            this._event = EntityEvent.FaceNorth;
         }
         else if (d.x > d.y && d.x > 0) {
             this._direction = Direction.East;
-            this._event = EntityEvent.FaceEast;
         }
         else if (d.y > 0 && d.y > d.x) {
             this._direction = Direction.South;
-            this._event = EntityEvent.FaceSouth;
         }
         else if (d.x < 0 && d.x < d.y) {
             this._direction = Direction.West;
-            this._event = EntityEvent.FaceWest;
         }
         else {
             console.log("Unhandled direction to face");
@@ -64,7 +61,7 @@ export class MoveForwardsDirection extends MoveDirection {
         }
     }
     perform() {
-        this.actor.postEvent(this._event);
+        this.actor.postEvent(EntityEvent.FaceDirection);
         this.actor.direction = this._direction;
         return super.perform();
     }
@@ -144,7 +141,7 @@ export class MoveDestination extends MoveAction {
         let maxD = this.destination.subtract(location);
         let minD = maxD.absMin(this._d);
         this.actor.updatePosition(minD);
-        this.actor.postEvent(EntityEvent.Move);
+        this.actor.postEvent(EntityEvent.Moving);
         return bounds.minLocation.isNearlySameAs(this.destination);
     }
 }

@@ -1,11 +1,21 @@
 import { EntityEvent } from "./events.js";
-import { IsometricRenderer } from "./scene.js";
+import { Perspective, IsometricRenderer, TwoByOneIsometricRenderer } from "./scene.js";
 import { Octree } from "./tree.js";
 export class Context {
-    constructor(canvas, worldDims) {
+    constructor(canvas, worldDims, perspective = Perspective.TrueIsometric) {
         this._entities = new Array();
         this._controllers = new Array();
-        this._scene = new IsometricRenderer(canvas);
+        switch (perspective) {
+            default:
+                console.error("unhandled perspective");
+                break;
+            case Perspective.TrueIsometric:
+                this._scene = new IsometricRenderer(canvas);
+                break;
+            case Perspective.TwoByOneIsometric:
+                this._scene = new TwoByOneIsometricRenderer(canvas);
+                break;
+        }
         this._octree = new Octree(worldDims);
     }
     get scene() { return this._scene; }
@@ -29,7 +39,7 @@ export class Context {
     addActor(actor) {
         let spatialGraph = this._octree;
         let scene = this._scene;
-        actor.addEventListener(EntityEvent.Move, function () {
+        actor.addEventListener(EntityEvent.Moving, function () {
             spatialGraph.update(actor);
             scene.updateEntity(actor);
         });

@@ -1,6 +1,6 @@
 import { BoundingCuboid } from "./physics.js";
 import { Point3D, CuboidGeometry } from "./geometry.js";
-import { EntityEvent, EventHandler } from "./events.js";
+import { EventHandler } from "./events.js";
 export class Entity {
     constructor(_context, minLocation, dimensions, graphicComponent) {
         this._context = _context;
@@ -70,36 +70,19 @@ export class Actor extends EventableEntity {
         super(context, location, dimensions, graphicComponent);
         this._canSwim = false;
         this._canFly = false;
-        this._directionalGraphics = new Map();
         context.addActor(this);
     }
     update() {
         this._handler.service();
         if (this._action != undefined && this._action.perform()) {
             console.log("completed action");
-            this.postEvent(EntityEvent.ActionComplete);
             this._action = null;
         }
-    }
-    addDirectionalGraphic(direction, graphic) {
-        this._directionalGraphics.set(direction, graphic);
     }
     postEvent(event) {
         this._handler.post(event);
     }
     get direction() { return this._direction; }
-    get graphic() {
-        if (this._directionalGraphics.has(this.direction)) {
-            return this._directionalGraphics.get(this.direction);
-        }
-        return super.graphic;
-    }
-    get graphics() {
-        if (this._directionalGraphics.has(this.direction)) {
-            return [this._directionalGraphics.get(this.direction)];
-        }
-        return super.graphics;
-    }
     set direction(direction) {
         this._direction = direction;
     }

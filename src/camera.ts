@@ -107,7 +107,7 @@ export class TrackerCamera extends Camera {
     super(scene, width, height);
 
     var camera = this;
-    actor.addEventListener(EntityEvent.Move, function() {
+    actor.addEventListener(EntityEvent.Moving, function() {
       camera.location = actor.centre;
     });
   }

@@ -109,8 +109,6 @@ export class Actor extends EventableEntity {
   protected readonly _canFly: boolean = false;
   protected _direction: Direction;
   protected _action: Action|null;
-  protected _directionalGraphics =
-    new Map<Direction, GraphicComponent>();
 
   constructor(context: Context,
               location: Point3D,
@@ -124,13 +122,9 @@ export class Actor extends EventableEntity {
     this._handler.service();
     if (this._action != undefined && this._action.perform()) {
       console.log("completed action");
-      this.postEvent(EntityEvent.ActionComplete);
+      //this.postEvent(EntityEvent.ActionComplete);
       this._action = null;
     }
-  }
-
-  addDirectionalGraphic(direction: Direction, graphic: GraphicComponent): void {
-    this._directionalGraphics.set(direction, graphic);
   }
 
   postEvent(event: EntityEvent): void {
@@ -138,20 +132,6 @@ export class Actor extends EventableEntity {
   }
 
   get direction(): Direction { return this._direction; }
-
-  get graphic(): GraphicComponent {
-    if (this._directionalGraphics.has(this.direction)) {
-      return this._directionalGraphics.get(this.direction)!;
-    }
-    return super.graphic;
-  }
-
-  get graphics(): Array<GraphicComponent> {
-    if (this._directionalGraphics.has(this.direction)) {
-      return [ this._directionalGraphics.get(this.direction)! ];
-    }
-    return super.graphics;
-  }
 
   set direction(direction: Direction) {
     this._direction = direction;

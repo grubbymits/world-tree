@@ -143,7 +143,7 @@ export class IsometricPhysicalDimensions extends Dimensions {
         super(width, depth, height);
     }
     static physicalWidth(spriteWidth) {
-        return Math.floor(spriteWidth * this._widthRatio);
+        return Math.floor(spriteWidth * this._oneOverSqrt3);
     }
     static physicalDepth(physicalWidth, relativeDims) {
         let depthRatio = relativeDims.depth / relativeDims.width;
@@ -154,7 +154,16 @@ export class IsometricPhysicalDimensions extends Dimensions {
         return Math.floor(physicalWidth * heightRatio);
     }
 }
-IsometricPhysicalDimensions._widthRatio = 1 / Math.sqrt(3);
+IsometricPhysicalDimensions._oneOverSqrt3 = 1 / Math.sqrt(3);
+export class TwoByOneIsometricPhysicalDimensions extends Dimensions {
+    constructor(spriteWidth, relativeDims) {
+        let width = Math.floor(spriteWidth * 0.5);
+        let depth = Math.floor(IsometricPhysicalDimensions._oneOverSqrt3 *
+            IsometricPhysicalDimensions.physicalDepth(width, relativeDims));
+        let height = IsometricPhysicalDimensions.physicalHeight(width, relativeDims);
+        super(width, depth, height);
+    }
+}
 export class BoundingCuboid {
     constructor(_centre, _dimensions) {
         this._centre = _centre;

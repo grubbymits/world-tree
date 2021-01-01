@@ -1,10 +1,7 @@
 export enum EntityEvent {
-  Move = "move",
-  FaceNorth = "faceNorth",
-  FaceEast = "faceEast",
-  FaceSouth = "faceSouth",
-  FaceWest = "faceWest",
-  ActionComplete = "actionComplete",
+  Moving = "moving",
+  EndMove = "endMove",
+  FaceDirection = "faceDirection"
 }
 
 export enum InputEvent {

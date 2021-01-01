@@ -342,6 +342,11 @@ export class SceneGraph {
         return null;
     }
 }
+export var Perspective;
+(function (Perspective) {
+    Perspective[Perspective["TrueIsometric"] = 0] = "TrueIsometric";
+    Perspective[Perspective["TwoByOneIsometric"] = 1] = "TwoByOneIsometric";
+})(Perspective || (Perspective = {}));
 export class IsometricRenderer extends SceneGraph {
     constructor(canvas) {
         super(canvas);
@@ -406,3 +411,16 @@ export class IsometricRenderer extends SceneGraph {
 }
 IsometricRenderer._sqrt3 = Math.sqrt(3);
 IsometricRenderer._halfSqrt3 = Math.sqrt(3) * 0.5;
+export class TwoByOneIsometricRenderer extends IsometricRenderer {
+    constructor(canvas) {
+        super(canvas);
+    }
+    static getDrawCoord(loc) {
+        let dx = Math.floor(2 * (loc.x + loc.y));
+        let dy = Math.floor(loc.y - loc.x - loc.z);
+        return new Point2D(dx, dy);
+    }
+    getDrawCoord(location) {
+        return TwoByOneIsometricRenderer.getDrawCoord(location);
+    }
+}

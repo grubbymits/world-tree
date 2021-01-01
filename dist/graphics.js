@@ -67,6 +67,9 @@ Sprite._sprites = new Array();
 export class GraphicComponent {
     constructor(_currentSpriteId) {
         this._currentSpriteId = _currentSpriteId;
+        console.assert(typeof (this._currentSpriteId) == "number", "spriteId not a number");
+        console.assert(this._currentSpriteId > -1 &&
+            this._currentSpriteId < Sprite.sprites.length, "spriteId not in range:", this._currentSpriteId);
     }
     isTransparentAt(x, y) {
         return Sprite.sprites[this._currentSpriteId].isTransparentAt(x, y);
@@ -141,7 +144,7 @@ export class OssilateGraphicComponent extends AnimatedGraphicComponent {
 export class LoopGraphicComponent extends AnimatedGraphicComponent {
     constructor(sprites, interval) {
         super(sprites, interval);
-        this._currentSpriteId = 0;
+        this._currentSpriteIdx = 0;
     }
     update() {
         if (this._nextUpdate > Date.now()) {
@@ -150,5 +153,36 @@ export class LoopGraphicComponent extends AnimatedGraphicComponent {
         this._currentSpriteIdx = (this._currentSpriteIdx + 1) % this._spriteIds.length;
         this._nextUpdate = Date.now() + this._interval;
         return this.currentSpriteId;
+    }
+}
+export class DirectionalGraphicComponent extends GraphicComponent {
+    constructor(_staticGraphics, _movementGraphics) {
+        super(0);
+        this._staticGraphics = _staticGraphics;
+        this._movementGraphics = _movementGraphics;
+        this._stationary = true;
+    }
+    get stationary() { return this._stationary; }
+    get direction() { return this._direction; }
+    set stationary(stationary) { this._stationary = stationary; }
+    set direction(direction) {
+        if (!this._staticGraphics.has(direction) ||
+            !this._movementGraphics.has(direction)) {
+            console.log("graphic direction unsupported");
+        }
+        this._direction = direction;
+    }
+    update() {
+        if (!this.stationary && this._movementGraphics.has(this.direction)) {
+            const spriteId = this._movementGraphics.get(this.direction).update();
+            return spriteId;
+        }
+        if (this.stationary && this._staticGraphics.has(this.direction)) {
+            const component = this._staticGraphics.get(this.direction);
+            const spriteId = component.update();
+            return spriteId;
+        }
+        console.error("unhandled graphic");
+        return 0;
     }
 }

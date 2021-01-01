@@ -1,4 +1,5 @@
 import { Point2D } from "./geometry.js"
+import { Direction } from "./physics.js"
 
 export class SpriteSheet {
   private static _sheets = new Array<SpriteSheet>();
@@ -90,13 +91,13 @@ export class Sprite {
   get height(): number { return this._height; }
 }
 
-// Computer graphics have their origin in the top left corner.
-// But the entity's position should be rooted at it's base, not possibly above
-// it, so we need to make an adjustment when drawing. I'm not sure how to
-// handle it because I guess we'll need to inverse for handling clicks.
-
 export abstract class GraphicComponent {
-  constructor(protected _currentSpriteId: number) { }
+  constructor(protected _currentSpriteId: number) {
+    console.assert(typeof(this._currentSpriteId) == "number", "spriteId not a number");
+    console.assert(this._currentSpriteId > -1 &&
+                   this._currentSpriteId < Sprite.sprites.length,
+                   "spriteId not in range:", this._currentSpriteId);
+  }
               
   abstract update(): number;
   isTransparentAt(x: number, y: number): boolean {
@@ -182,7 +183,7 @@ export class OssilateGraphicComponent extends AnimatedGraphicComponent {
 export class LoopGraphicComponent extends AnimatedGraphicComponent {
   constructor(sprites: Array<Sprite>, interval: number) {
     super(sprites, interval);
-    this._currentSpriteId = 0;
+    this._currentSpriteIdx = 0;
   }
 
   update(): number {
@@ -192,5 +193,43 @@ export class LoopGraphicComponent extends AnimatedGraphicComponent {
     this._currentSpriteIdx = (this._currentSpriteIdx + 1 ) % this._spriteIds.length;
     this._nextUpdate = Date.now() + this._interval;
     return this.currentSpriteId;
+  }
+}
+
+export class DirectionalGraphicComponent extends GraphicComponent {
+  protected _stationary: boolean = true;
+  protected _direction: Direction;
+
+  constructor(protected _staticGraphics: Map<Direction, GraphicComponent>,
+              protected _movementGraphics: Map<Direction, GraphicComponent>) {
+    super(0);
+  }
+
+  get stationary(): boolean { return this._stationary; }
+  get direction(): Direction { return this._direction; }
+  set stationary(stationary: boolean) { this._stationary = stationary; }
+  set direction(direction: Direction) {
+    if (!this._staticGraphics.has(direction) ||
+        !this._movementGraphics.has(direction)) {
+      console.log("graphic direction unsupported");
+    }
+    this._direction = direction;
+  } 
+
+  update(): number {
+    if (!this.stationary && this._movementGraphics.has(this.direction)) {
+      const spriteId = this._movementGraphics.get(this.direction)!.update();
+      //console.assert(typeof(spriteId) == "number", "movement spriteId not a number",
+        //             this._movementGraphics.get(this.direction)!);
+      return spriteId;
+    }
+    if (this.stationary && this._staticGraphics.has(this.direction)) {
+      const component: GraphicComponent = this._staticGraphics.get(this.direction)!;
+      const spriteId = component.update();
+      //console.assert(typeof(spriteId) == "number", "static spriteId not a number", spriteId);
+      return spriteId;
+    }
+    console.error("unhandled graphic");
+    return 0;
   }
 }

@@ -308,7 +308,7 @@ export abstract class SceneGraph {
       if (camera.isOnScreen(node.drawCoord, width, height)) {
         const coord = camera.getDrawCoord(node.drawCoord);
         entity.graphics.forEach((component) => {
-          const spriteId = component.update();
+          const spriteId: number = component.update();
           Sprite.sprites[spriteId].draw(coord, ctx);
         });
         if (entity.drawGeometry) {
@@ -407,13 +407,18 @@ export abstract class SceneGraph {
   }
 }
 
+export enum Perspective {
+  TrueIsometric,
+  TwoByOneIsometric,
+}
+
 export class IsometricRenderer extends SceneGraph {
   constructor(canvas: HTMLCanvasElement) {
     super(canvas);
   }
 
-  private static readonly _sqrt3 = Math.sqrt(3);
-  private static readonly _halfSqrt3 = Math.sqrt(3) * 0.5;
+  protected static readonly _sqrt3 = Math.sqrt(3);
+  protected static readonly _halfSqrt3 = Math.sqrt(3) * 0.5;
 
   static getDrawCoord(loc: Point3D): Point2D {
     // An isometric square has:
@@ -493,5 +498,30 @@ export class IsometricRenderer extends SceneGraph {
       return RenderOrder.After;
     }
     return RenderOrder.Any;
+  }
+}
+
+export class TwoByOneIsometricRenderer extends IsometricRenderer {
+  constructor(canvas: HTMLCanvasElement) {
+    super(canvas);
+  }
+
+  static getDrawCoord(loc: Point3D): Point2D {
+    // An isometric square has:
+    // - sides equal length = sqrt(3) ~= 1.73,
+    // - the short diagonal is length = 2,
+    // - the long diagonal is length = 4.
+    // We're allowing the height to vary, so its a cuboid, not a cube, but with
+    // a square top.
+
+    // Tiles are placed overlapping each other by half.
+    // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
+    let dx = Math.floor(2 * (loc.x + loc.y));
+    let dy = Math.floor(loc.y - loc.x - loc.z);
+    return new Point2D(dx, dy);
+  }
+
+  getDrawCoord(location: Point3D): Point2D {
+    return TwoByOneIsometricRenderer.getDrawCoord(location);
   }
 }
