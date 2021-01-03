@@ -155,15 +155,22 @@ export class IsometricPhysicalDimensions extends Dimensions {
     }
 }
 IsometricPhysicalDimensions._oneOverSqrt3 = 1 / Math.sqrt(3);
-export class TwoByOneIsometricPhysicalDimensions extends Dimensions {
-    constructor(spriteWidth, relativeDims) {
-        let width = Math.floor(spriteWidth * 0.5);
-        let depth = Math.floor(IsometricPhysicalDimensions._oneOverSqrt3 *
-            IsometricPhysicalDimensions.physicalDepth(width, relativeDims));
-        let height = IsometricPhysicalDimensions.physicalHeight(width, relativeDims);
+export class TwoByOneIsometricDimensions extends Dimensions {
+    constructor(spriteWidth, spriteHeight) {
+        const width = TwoByOneIsometricDimensions.physicalWidth(spriteWidth);
+        const depth = width;
+        const height = TwoByOneIsometricDimensions.physicalHeight(spriteWidth, spriteHeight);
         super(width, depth, height);
     }
+    static physicalWidth(spriteWidth) {
+        return spriteWidth * 0.25 * this._sqrt5;
+    }
+    static physicalHeight(spriteWidth, spriteHeight) {
+        const spriteShortDiagonal = 2 * spriteWidth * 0.25;
+        return spriteHeight - spriteShortDiagonal;
+    }
 }
+TwoByOneIsometricDimensions._sqrt5 = Math.sqrt(5);
 export class BoundingCuboid {
     constructor(_centre, _dimensions) {
         this._centre = _centre;

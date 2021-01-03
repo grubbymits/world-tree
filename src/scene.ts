@@ -311,7 +311,7 @@ export abstract class SceneGraph {
           const spriteId: number = component.update();
           Sprite.sprites[spriteId].draw(coord, ctx);
         });
-        if (entity.drawGeometry) {
+        if (true) { //entity.drawGeometry) {
           for (const segment of node.allSegments) {
             ctx.beginPath();
             let drawP0 = camera.getDrawCoord(segment.p0);
@@ -508,7 +508,7 @@ export class TwoByOneIsometricRenderer extends IsometricRenderer {
 
   static getDrawCoord(loc: Point3D): Point2D {
     // An isometric square has:
-    // - sides equal length = sqrt(3) ~= 1.73,
+    // - sides equal length = sqrt(5)
     // - the short diagonal is length = 2,
     // - the long diagonal is length = 4.
     // We're allowing the height to vary, so its a cuboid, not a cube, but with

@@ -259,7 +259,7 @@ export class SceneGraph {
                     const spriteId = component.update();
                     Sprite.sprites[spriteId].draw(coord, ctx);
                 });
-                if (entity.drawGeometry) {
+                if (true) {
                     for (const segment of node.allSegments) {
                         ctx.beginPath();
                         let drawP0 = camera.getDrawCoord(segment.p0);

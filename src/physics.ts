@@ -150,7 +150,7 @@ export class Dimensions {
 // - the short diagonal is length = 1,
 // - the long diagonal is length = sqrt(3) ~= 1.73.
 export class IsometricPhysicalDimensions extends Dimensions {
-  static readonly _oneOverSqrt3: number = 1 / Math.sqrt(3);
+  private static readonly _oneOverSqrt3: number = 1 / Math.sqrt(3);
 
   static physicalWidth(spriteWidth: number): number {
     return Math.floor(spriteWidth * this._oneOverSqrt3);
@@ -177,13 +177,29 @@ export class IsometricPhysicalDimensions extends Dimensions {
   }
 }
 
-export class TwoByOneIsometricPhysicalDimensions extends Dimensions {
+// An isometric square has:
+// - sides equal length = sqrt(5)
+// - the short diagonal is length = 2,
+// - the long diagonal is length = 4.
+export class TwoByOneIsometricDimensions extends Dimensions {
+  private static readonly _sqrt5: number = Math.sqrt(5);
+
+  static physicalWidth(spriteWidth: number): number {
+    return spriteWidth * 0.25 * this._sqrt5;
+  }
+
+  static physicalHeight(spriteWidth: number,
+                        spriteHeight: number): number {
+    const spriteShortDiagonal = 2 * spriteWidth * 0.25;
+    return spriteHeight - spriteShortDiagonal;
+  }
+
   constructor(spriteWidth: number,
-              relativeDims: Dimensions) {
-    let width = Math.floor(spriteWidth * 0.5);
-    let depth = Math.floor(IsometricPhysicalDimensions._oneOverSqrt3 *
-      IsometricPhysicalDimensions.physicalDepth(width, relativeDims));
-    let height = IsometricPhysicalDimensions.physicalHeight(width, relativeDims);
+              spriteHeight: number) {
+    const width = TwoByOneIsometricDimensions.physicalWidth(spriteWidth);
+    const depth = width;
+    const height =
+      TwoByOneIsometricDimensions.physicalHeight(spriteWidth, spriteHeight);
     super(width, depth, height);
   }
 }

@@ -13,10 +13,10 @@
     import * as WT from "../../dist/world-tree.js";
     import { Robot, RobotController } from "./robot.js"
 
-    const spriteWidth = 200;
-    const spriteHeight = 180;
+    const spriteWidth = 128;
+    const spriteHeight = 107;
 
-    let sheet = new WT.SpriteSheet("../../../res/img/basic-dungeon-2-1");
+    let sheet = new WT.SpriteSheet("../../../res/img/inside-basic-dungeon-2-1");
     WT.Terrain.addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Flat,
                           sheet, 0, 0, spriteWidth, spriteHeight);
     WT.Terrain.addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Wall,
@@ -26,9 +26,10 @@
 
     // 9x9 area with a wall around the edge and some raised sections in the
     // middle too.
-    const cellsX = 9;
-    const cellsY = 9;
+    const cellsX = 5;
+    const cellsY = 5;
     const terraces = 1;
+    /*
     let heightMap = [ [ 2, 2, 2, 2, 2, 2, 2, 2, 2 ],
                       [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
                       [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
@@ -38,28 +39,21 @@
                       [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
                       [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
                       [ 2, 2, 2, 2, 2, 2, 2, 2, 2] ];
-    /*
-    let heightMap = [ [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1] ];
     */
+    let heightMap = [ [ 2, 2, 2, 2, 2 ],
+                      [ 2, 1, 1, 1, 2 ],
+                      [ 2, 1, 1, 1, 2 ],
+                      [ 2, 1, 1, 1, 2 ],
+                      [ 2, 2, 2, 2, 2] ];
 
-    const relativeDims = new WT.Dimensions(14, 14, 11);
-    const physicalDims =
-      new WT.TwoByOneIsometricPhysicalDimensions(spriteWidth, relativeDims);
-    const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
-                                        physicalDims.depth * cellsY,
-                                        physicalDims.height * (1 + terraces));
-    
     window.onload = (event) => {
       console.log("window loaded");
       let canvas = document.getElementById("demoCanvas");
+      const physicalDims =
+        new WT.TwoByOneIsometricDimensions(spriteWidth, spriteHeight);
+      const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
+                                          physicalDims.depth * cellsY,
+                                          physicalDims.height * (1 + terraces));
       let context = new WT.Context(canvas, worldDims,
                                    WT.TwoByOneIsometric);
     

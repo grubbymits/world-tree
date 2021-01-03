@@ -1,0 +1,2102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="297mm"
+   height="210mm"
+   viewBox="0 0 297 210"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
+   sodipodi:docname="inside-basic-dungen.svg"
+   inkscape:export-filename="/home/samuel/src/world-tree/res/img/light-grass-rock.png"
+   inkscape:export-xdpi="96.071075"
+   inkscape:export-ydpi="96.071075">
+  <defs
+     id="defs2">
+    <linearGradient
+       id="linearGradient6193"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#c37131;stop-opacity:1;"
+         offset="0"
+         id="stop6191" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.8101934"
+     inkscape:cx="500.92335"
+     inkscape:cy="471.30691"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     objecttolerance="10000"
+     guidetolerance="10000"
+     inkscape:window-width="3840"
+     inkscape:window-height="2079"
+     inkscape:window-x="0"
+     inkscape:window-y="44"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="axonomgrid"
+       id="grid10"
+       units="px"
+       empspacing="5"
+       spacingy="2.6458333" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-87)">
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.34395832;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 34.370382,91.947923 2.4474915e-6,111.79167 34.370382,131.63542 68.740762,111.79167 Z"
+       id="path1625-6-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 16.039512,107.82291 4.58271,-2.64583 4.58272,2.64584 -4.58271,2.64583 z"
+       id="path6567-2-5-5-1-9-1-7-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 41.244462,106.5 4.58271,-2.64583 4.58272,2.64584 -4.58271,2.64583 z"
+       id="path6567-2-5-5-1-9-8-5-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 27.496302,98.562503 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-44-3-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 32.079012,125.02082 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-3-5-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 29.787662,105.17709 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-0-6-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 41.244462,117.08334 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-78-2-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 25.204942,118.40624 4.58271,-2.64583 4.58272,2.64584 -4.58271,2.64583 z"
+       id="path6567-2-5-5-1-9-8-0-9-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 54.992612,111.79166 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-3-6-1-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 13.748142,117.08332 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-3-1-2-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#99998c;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 2.4474915e-6,111.79167 V 138.25 L 34.370382,158.09375 v -26.45834 z"
+       id="path1596-2-7-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#808075;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 68.740762,111.79166 v 26.45833 l -34.37038,19.84375 v -26.45833 z"
+       id="path1573-3-0-0-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#99998c;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 9.1654424,111.79166 2.2913596,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-9-1-8-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 36.661742,109.14584 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-9-04-0-9-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 34.370392,99.885413 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.322917 z"
+       id="path6659-5-6-6-9-04-3-7-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#99998c;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 50.409892,114.4375 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-9-044-3-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 41.244462,122.375 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-9-04-4-6-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 22.913582,114.4375 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-9-04-47-1-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 36.661742,140.89583 v 5.29166 l 4.58273,-2.64583 V 138.25 Z"
+       id="path2381-5-9-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 61.866682,121.05208 4.58272,-2.64584 v 2.64584 l -4.58271,2.64583 z"
+       id="path2387-8-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 54.992612,138.25 v 2.64583 l 2.29136,-1.32292 v -2.64583 z"
+       id="path2385-9-85-3-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 43.535822,131.63542 v 2.64583 l 2.29136,-1.32292 v -2.64583 z"
+       id="path2385-9-85-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 45.827192,143.54166 4.58272,-2.64584 v 2.64584 l -4.58271,2.64583 z"
+       id="path2387-4-3-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 59.575312,130.3125 v 5.29167 l 4.58273,-2.64583 v -5.29167 z"
+       id="path2381-90-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 52.701252,128.98959 v 2.64583 l 2.29136,-1.32292 v -2.64583 z"
+       id="path2385-09-6-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 16.039522,126.34375 v 5.29167 l 4.58273,2.64584 v -5.29167 z"
+       id="path2389-9-8-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 4.5827324,130.31249 v 5.29167 l 4.58272,2.64584 v -5.29167 z"
+       id="path2389-5-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 2.2913624,118.40625 4.58273,2.64583 v 2.64584 l -4.58273,-2.64584 z"
+       id="path2391-0-56-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 25.204942,144.86458 4.58271,2.64584 v 2.64583 l -4.58271,-2.64583 z"
+       id="path2391-9-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 16.039512,139.57292 v 2.64583 l 2.29136,1.32292 v -2.64583 z"
+       id="path2393-9-11-4-89"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 27.496312,132.95833 v 2.64583 l 2.29136,1.32292 v -2.64583 z"
+       id="path2393-9-11-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 9.1654424,125.02083 v 2.64583 l 2.2913596,1.32292 v -2.64583 z"
+       id="path2393-8-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 22.913582,138.25 v 2.64583 l 2.29136,1.32292 v -2.64583 z"
+       id="path2393-8-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path2681"
+       d="m 153.52105,308.90625 v 26.45833 l 32.07902,18.52084 v -26.45833 z"
+       style="fill:#99998c;fill-opacity:1;stroke:#99998c;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:export-ydpi="96.071075"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:connector-curvature="0"
+       id="path2683"
+       d="m 190.18279,327.42709 v 26.45833 h -4.58272 v -26.45833 z"
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path2685"
+       d="m 222.26181,308.90626 v 26.45833 l -32.07902,18.52084 v -26.45834 z"
+       style="fill:#808075;fill-opacity:1;stroke:#808075;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path2687"
+       d="m 187.89143,289.0625 -34.37038,19.84375 34.37038,19.84375 34.37039,-19.84375 z"
+       style="fill:#55554b;fill-opacity:1;stroke:#55554b;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path2689"
+       d="m 153.52105,308.90625 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29135,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29135,-1.32292 v 2.64584 l 2.29136,-1.32292 V 328.75 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 z"
+       style="fill:#55554b;fill-opacity:1;stroke:#55554b;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path2691"
+       d="m 222.26181,308.90625 v 2.64584 l -2.29135,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29135,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 V 328.75 l -2.29136,-1.32291 v 2.64583 L 187.89143,328.75 Z"
+       style="fill:#55554b;fill-opacity:1;stroke:#55554b;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#73736a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 192.47416,352.5625 v -2.64583 l 2.29136,1.32292 v -2.64584 l 2.29135,1.32292 v -2.64583 l 2.29136,1.32291 v -2.64583 l 2.29136,1.32292 V 344.625 l 2.29135,1.32292 v -2.64583 l 2.29136,1.32291 v -2.64583 l 2.29136,1.32292 v -2.64584 l 2.29136,1.32292 v -2.64583 l 2.29136,1.32291 v -2.64583 l 2.29136,1.32292 v -2.64584 l 2.29135,1.32292 v -2.64583 l 2.29136,1.32291 v -2.64583 l 2.29136,1.32292 z"
+       id="path2693"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 183.30871,352.5625 v -2.64583 l -2.29136,1.32292 v -2.64584 l -2.29135,1.32292 v -2.64583 l -2.29136,1.32291 v -2.64583 l -2.29136,1.32292 V 344.625 l -2.29136,1.32292 v -2.64583 l -2.29135,1.32291 v -2.64583 l -2.29136,1.32292 v -2.64584 l -2.29136,1.32292 v -2.64583 l -2.29136,1.32291 v -2.64583 l -2.29136,1.32292 v -2.64584 l -2.29135,1.32292 v -2.64583 l -2.29136,1.32291 v -2.64583 l -2.29136,1.32292 z"
+       id="path2695"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path2697"
+       d="m 192.47415,352.5625 -2.29136,-1.32291 v 2.64583 z"
+       style="fill:#73736a;fill-opacity:1;stroke:#73736a;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path2699"
+       d="m 183.30871,352.5625 2.29136,-1.32291 v 2.64583 z"
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 192.47415,336.6875 v 5.29166 l 4.58273,-2.64583 v -5.29166 z"
+       id="path2701"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:export-ydpi="96.071075"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:connector-curvature="0"
+       id="path2703"
+       d="m 197.05687,328.75 4.58272,-2.64584 V 328.75 l -4.58271,2.64583 z"
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 206.2223,328.75001 v 2.64583 l 2.29136,-1.32292 v -2.64583 z"
+       id="path2705"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 213.09638,332.71875 4.58272,-2.64584 v 2.64584 l -4.58271,2.64583 z"
+       id="path2707"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 215.38774,318.16667 v 5.29166 l 4.58273,-2.64583 v -5.29166 z"
+       id="path2709"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 208.51366,322.13542 v 2.64583 l 2.29136,-1.32292 v -2.64583 z"
+       id="path2711"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <g
+       transform="translate(82.488933,113.77084)"
+       id="g2715"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075">
+      <path
+         inkscape:export-ydpi="96.071075"
+         inkscape:export-xdpi="96.071075"
+         inkscape:export-filename="/home/samuel/src/world-tree/res/img/rock.png"
+         inkscape:connector-curvature="0"
+         id="path2713"
+         d="m 112.27658,229.53125 v 2.64583 l 2.29136,-1.32292 v -2.64583 z"
+         style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 176.43464,330.07292 v 5.29167 l 4.58272,2.64584 v -5.29167 z"
+       id="path2717"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 155.81241,326.10417 v 5.29167 l 4.58273,2.64584 v -5.29167 z"
+       id="path2719"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:export-ydpi="96.071075"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:connector-curvature="0"
+       id="path2721"
+       d="m 158.10377,316.84375 4.58272,2.64584 v 2.64583 l -4.58272,-2.64583 z"
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 171.85191,338.01042 4.58273,2.64584 v 2.64583 l -4.58273,-2.64583 z"
+       id="path2723"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:export-ydpi="96.071075"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:connector-curvature="0"
+       id="path2725"
+       d="M 164.97784,326.10417 V 328.75 l 2.29136,1.32292 v -2.64583 z"
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 181.01735,343.30209 v 2.64583 l 2.29137,1.32292 v -2.64583 z"
+       id="path2727"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:export-ydpi="96.071075"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:connector-curvature="0"
+       id="path2729"
+       d="m 203.93093,335.36459 v 5.29166 l 4.58273,-2.64583 v -5.29166 z"
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       inkscape:export-ydpi="96.071075"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:connector-curvature="0"
+       id="path2731"
+       d="m 171.85191,324.78125 v 2.64583 l 2.29137,1.32292 v -2.64583 z"
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 167.2692,332.71876 v 2.64583 l 2.29137,1.32292 v -2.64583 z"
+       id="path2733"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/grubbymitts69/src/world-tree/res/img/dungeon-wall.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#99998c;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 68.740771,111.79167 V 138.25 l 34.370379,19.84375 v -26.45834 z"
+       id="path1596-2-7-4-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#808075;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 137.48153,111.79167 V 138.25 l -34.37038,19.84375 v -26.45833 z"
+       id="path1573-3-0-0-5-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#323232;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 68.740771,111.79167 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29135,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 L 87.07164,122.375 v 2.64583 l 2.291361,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29135,-1.32292 v 2.64584 l 2.291359,-1.32292 v 2.64583 l 2.29136,-1.32291 z"
+       id="path2074-3-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#323232;fill-opacity:1;stroke:#73736a;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 137.48154,111.79167 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29135,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 z"
+       id="path2062-6-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#73736a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 137.48154,138.25 -2.29137,-1.32292 1e-5,2.64584 -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29135,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 z"
+       id="path1940-9-4-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 68.740771,138.25 2.29135,-1.32292 1e-5,2.64583 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29135,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64584 l 2.291359,-1.32292 v 2.64583 l 2.291361,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29135,-1.32292 v 2.64584 l 2.291359,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 z"
+       id="path1938-6-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 105.40251,140.89583 v 5.29166 l 4.58273,-2.64583 V 138.25 Z"
+       id="path2381-5-9-9-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 130.60745,121.05208 4.58272,-2.64584 v 2.64584 l -4.58271,2.64583 z"
+       id="path2387-8-2-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 123.73338,138.25 v 2.64583 l 2.29136,-1.32292 v -2.64583 z"
+       id="path2385-9-85-3-2-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 112.27659,131.63542 v 2.64583 l 2.29136,-1.32292 v -2.64583 z"
+       id="path2385-9-85-4-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 114.56796,143.54166 4.58272,-2.64584 v 2.64584 l -4.58271,2.64583 z"
+       id="path2387-4-3-7-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 128.31608,130.3125 v 5.29167 l 4.58273,-2.64583 v -5.29167 z"
+       id="path2381-90-7-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 121.44202,128.98959 v 2.64583 l 2.29136,-1.32292 v -2.64583 z"
+       id="path2385-09-6-5-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 84.780291,126.34375 v 5.29167 l 4.58273,2.64584 v -5.29167 z"
+       id="path2389-9-8-4-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 73.323501,130.31249 v 5.29167 l 4.58272,2.64584 v -5.29167 z"
+       id="path2389-5-8-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 71.032131,118.40625 4.58273,2.64583 v 2.64584 l -4.58273,-2.64584 z"
+       id="path2391-0-56-1-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 93.945711,144.86458 4.582709,2.64584 v 2.64583 l -4.582709,-2.64583 z"
+       id="path2391-9-2-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 84.780281,139.57292 v 2.64583 l 2.291359,1.32292 v -2.64583 z"
+       id="path2393-9-11-4-89-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 96.237081,132.95833 v 2.64583 l 2.29136,1.32292 v -2.64583 z"
+       id="path2393-9-11-3-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 77.906211,125.02083 v 2.64583 l 2.29136,1.32292 v -2.64583 z"
+       id="path2393-8-6-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 91.654351,138.25 v 2.64583 l 2.29136,1.32292 v -2.64583 z"
+       id="path2393-8-8-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path2687-6"
+       d="m 103.11115,91.94792 -34.37038,19.84375 34.37038,19.84376 34.37039,-19.84376 z"
+       style="fill:#323232;fill-opacity:1;stroke:#323232;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#92732c;fill-opacity:1;stroke:#92732c;stroke-width:0.34395832;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 171.85191,91.94792 -34.37038,19.84375 34.37038,19.84375 34.37038,-19.84375 z"
+       id="path1625-6-5-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 153.52104,107.82291 4.58271,-2.64583 4.58272,2.64584 -4.58271,2.64583 z"
+       id="path6567-2-5-5-1-9-1-7-5-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 183.30871,109.14583 4.58271,-2.64583 4.58272,2.64584 -4.58271,2.64583 z"
+       id="path6567-2-5-5-1-9-8-5-4-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 164.97783,98.562503 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-44-3-7-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 169.56054,125.02082 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-3-5-6-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 167.26919,105.17709 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-0-6-5-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 176.43463,115.76042 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-78-2-6-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 162.68648,121.05208 4.58271,-2.64583 4.58272,2.64584 -4.58271,2.64583 z"
+       id="path6567-2-5-5-1-9-8-0-9-9-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 197.05686,111.79167 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-3-6-1-3-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 151.22967,117.08332 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-3-1-2-7-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#886e2c;fill-opacity:1;stroke:#886e2c;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 137.48153,111.79167 v 26.45832 l 34.37038,19.84375 v -26.45833 z"
+       id="path1596-2-7-4-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#755f26;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 206.22229,111.79166 v 26.45832 l -34.37038,19.84375 v -26.45832 z"
+       id="path1573-3-0-0-5-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#99998c;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 146.64697,111.79166 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-9-1-8-2-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 174.14327,109.14584 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-9-04-0-9-5-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 171.85192,99.885413 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.322917 z"
+       id="path6659-5-6-6-9-04-3-7-4-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#99998c;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 187.89142,114.4375 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-9-044-3-7-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 178.72599,122.375 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-9-04-4-6-4-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 160.39511,114.4375 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-6-9-04-47-1-4-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#755f26;stroke-width:0.34395832;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 238.30133,331.39583 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29135,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29135,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 z"
+       id="path2074-3-20"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#6c5724;fill-opacity:1;stroke:#6c5724;stroke-width:0.34395832;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 307.0421,331.39583 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29135,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 z"
+       id="path2062-6-61"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#6c5724;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 307.0421,344.625 -2.29137,-1.32292 1e-5,2.64584 -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29135,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29136,-1.32291 V 360.5 l -2.29136,-1.32292 v 2.64584 L 274.96307,360.5 v 2.64583 l -2.29136,-1.32291 v 2.64583 z"
+       id="path1940-9-4-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 238.30133,344.625 2.29135,-1.32292 1e-5,2.64583 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29135,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 V 360.5 l 2.29135,-1.32292 v 2.64584 L 270.38035,360.5 v 2.64583 l 2.29136,-1.32291 v 2.64583 z"
+       id="path1938-6-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#886e2c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 174.14327,140.89582 v 5.29166 l 4.58273,-2.64583 v -5.29166 z"
+       id="path2381-5-9-9-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#886e2c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 199.34821,121.05208 4.58272,-2.64584 v 2.64584 l -4.58271,2.64583 z"
+       id="path2387-8-2-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 192.47414,138.24999 v 2.64583 l 2.29136,-1.32292 v -2.64583 z"
+       id="path2385-9-85-3-2-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 181.01735,131.63542 v 2.64582 l 2.29136,-1.32291 v -2.64583 z"
+       id="path2385-9-85-4-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#886e2c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 183.30872,143.54165 4.58272,-2.64584 v 2.64584 l -4.58271,2.64583 z"
+       id="path2387-4-3-7-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#886e2c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 197.05684,130.3125 v 5.29166 l 4.58273,-2.64582 v -5.29167 z"
+       id="path2381-90-7-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#886e2c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 190.18278,128.98959 v 2.64583 l 2.29136,-1.32292 v -2.64583 z"
+       id="path2385-09-6-5-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 153.52105,126.34375 v 5.29167 l 4.58273,2.64583 v -5.29166 z"
+       id="path2389-9-8-4-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 142.06426,130.31249 v 5.29166 l 4.58272,2.64584 v -5.29166 z"
+       id="path2389-5-8-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 139.77289,118.40625 4.58273,2.64583 v 2.64584 l -4.58273,-2.64584 z"
+       id="path2391-0-56-1-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 162.68647,144.86457 4.58271,2.64584 v 2.64583 l -4.58271,-2.64583 z"
+       id="path2391-9-2-25"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#92732c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 153.52104,139.57291 v 2.64583 l 2.29136,1.32292 v -2.64583 z"
+       id="path2393-9-11-4-89-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#92732c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 164.97784,132.95833 v 2.64582 l 2.29136,1.32292 v -2.64583 z"
+       id="path2393-9-11-3-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#886e2c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 146.64697,125.02083 v 2.64583 l 2.29136,1.32292 v -2.64583 z"
+       id="path2393-8-6-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 160.39511,138.24999 v 2.64583 l 2.29136,1.32292 v -2.64583 z"
+       id="path2393-8-8-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#92732c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 146.64697,125.02085 v 2.64582 l 2.29136,1.32292 v -2.64583 z"
+       id="path2393-9-11-3-7-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#576e7f;fill-opacity:1;stroke:#576e7f;stroke-width:0.13229166;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 274.96305,111.79169 v 26.45833 l -34.37038,19.84375 v -26.45833 z"
+       id="path4660-6-0-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#4d7f88;fill-opacity:1;stroke:#4d7f88;stroke-width:0.13229166;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 206.22228,111.79169 v 26.45833 l 34.37039,19.84375 v -26.45833 z"
+       id="path4662-3-3-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#448f90;fill-opacity:1;stroke:#448f90;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 240.59267,91.947934 34.37038,19.843756 -34.37038,19.84375 -34.37039,-19.84375 z"
+       id="path4597-3-2-61-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#4d7f88;fill-opacity:1;stroke:#4d7f88;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 226.84451,115.76043 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-4-0-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#4d7f88;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 242.88403,111.79167 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-2-7-6-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#4d7f88;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 252.04946,119.72918 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-3-6-3-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#4d7f88;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 238.30131,98.562514 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-7-5-2-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#4d7f88;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 222.26179,107.82293 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-5-6-0-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#576e7f;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 224.55316,143.54167 v 2.64583 l 2.29136,1.32292 v -2.64584 z"
+       id="path1041-61-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#576e7f;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 231.42724,134.28125 2.29136,1.32291 v 7.9375 l -2.29136,-1.32291 z"
+       id="path1043-5-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#576e7f;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 208.51365,126.34376 2.29136,1.32291 v 7.9375 l -2.29136,-1.32291 z"
+       id="path1043-3-5-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#576e7f;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 215.38773,132.95834 v 2.64583 l 2.29136,1.32292 v -2.64584 z"
+       id="path1041-6-4-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#576e7f;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 208.51365,115.76042 v 2.64583 l 2.29136,1.32292 v -2.64584 z"
+       id="path1041-7-76-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#576e7f;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 236.00995,150.15626 v 2.64583 l 2.29136,1.32292 v -2.64584 z"
+       id="path1041-5-56-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#576e7f;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 219.97044,125.02084 v 2.64583 l 2.29136,1.32292 v -2.64584 z"
+       id="path1041-3-93-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#576e7f;fill-opacity:1;stroke:#4d7f88;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 238.30132,125.02084 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-4-2-7-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#576e7f;fill-opacity:1;stroke:#4d7f88;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 236.00996,105.17709 2.29136,-1.32293 2.29136,1.32293 -2.29136,1.32292 z"
+       id="path6659-4-2-9-4-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#576e7f;fill-opacity:1;stroke:#4d7f88;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 258.92355,110.46876 2.29136,-1.32292 2.29136,1.32292 -2.29136,1.32292 z"
+       id="path6659-4-2-1-5-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#576e7f;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 229.13588,127.66667 v 2.64583 l 2.29136,1.32292 v -2.64584 z"
+       id="path1041-3-2-2-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#4d7f88;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 247.46675,135.60417 v 2.64584 l 2.29136,-1.32292 v -2.64583 z"
+       id="path1152-5-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#4d7f88;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 263.50626,126.34375 2.29136,-1.32291 v 7.9375 l -2.29136,1.32291 z"
+       id="path1154-4-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#4d7f88;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 256.63219,140.89583 v 2.64584 l 2.29136,-1.32292 v -2.64583 z"
+       id="path1152-7-7-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#4d7f88;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 245.17539,147.51042 v 2.64584 l 2.29136,-1.32292 v -2.64583 z"
+       id="path1152-0-4-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#4d7f88;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 256.63219,125.02083 v 2.64584 l 2.29136,-1.32292 v -2.64583 z"
+       id="path1152-9-4-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#4d7f88;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 270.38034,119.72917 v 2.64584 l 2.29136,-1.32292 v -2.64583 z"
+       id="path1152-3-3-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#4d7f88;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 265.79762,135.60417 v 2.64584 l 2.29136,-1.32292 v -2.64583 z"
+       id="path1152-6-0-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#4d7f88;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 263.50626,126.34375 2.29136,-1.32291 v 7.9375 l -2.29136,1.32291 z"
+       id="path1154-2-7-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#4d7f88;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 249.75811,142.21875 2.29136,-1.32291 v 7.9375 l -2.29136,1.32291 z"
+       id="path1154-6-8-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#4d7f88;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 233.7186,122.375 6.87407,-3.96875 2.29136,1.32292 -6.87407,3.96875 z"
+       id="path1222-6-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#576e7f;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 245.17539,105.17709 6.87407,-3.96876 2.29136,1.32292 -6.87407,3.96876 z"
+       id="path1222-1-8-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#99998c;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="M 34.370388,224.23957 -2.8575844e-7,204.39582 34.370388,197.78124 Z"
+       id="path6341"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#808075;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="M 34.370388,224.23957 68.740769,204.39582 V 177.93749 L 34.370388,197.78124 Z"
+       id="path6353"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="M -2.8575844e-7,204.39582 34.370388,184.55207 68.740769,177.93749 34.370388,197.78124 Z"
+       id="path6351"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 68.740769,177.93749 v 2.64583 l -2.291361,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.291358,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.291361,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.29135,-1.32291 v 2.64583 l -2.291361,-1.32292 v 2.64584 l -2.29136,-1.32292 v 2.64583 l -2.291358,-1.32291 v 2.64583 l -2.29136,-1.32292 v 2.64584 l -2.291361,-1.32292 v 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.291361,-1.32292 v 2.64584 l -2.29135,-1.32292 z"
+       id="path6355"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 4.5827197,201.74999 v 2.64583 l 2.29136,-1.32291 z"
+       id="path6373"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 9.1654397,201.74999 v 2.64583 l 4.5827203,-2.64583 z"
+       id="path6375"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 22.913589,199.10416 v 2.64583 l 4.58272,-2.64583 z"
+       id="path6377"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 18.330871,199.10415 v 2.64584 l 2.291359,-1.32292 z"
+       id="path6379"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 32.07903,196.45832 v 2.64583 l 2.291358,-1.32291 z"
+       id="path6381"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 29.78767,197.78124 v 2.64583 l 2.29136,-3.96875 z"
+       id="path6383"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 32.079024,196.45833 4.582711,-2.64583 h -4.582711 z"
+       id="path6569"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#92732c;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 50.409898,185.87498 4.582711,-2.64583 h -4.582711 z"
+       id="path6569-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 34.370388,189.84373 4.582711,-2.64583 h -4.582711 z"
+       id="path6569-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 16.039512,200.42708 4.582718,-2.64583 h -4.582718 z"
+       id="path6569-0-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 27.496309,209.6875 v 5.29167 l 4.582721,2.64583 v -5.29167 z"
+       id="path7925"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 25.204949,208.36458 -4.582719,-2.64583 v -2.64584 l 4.582719,2.64584 z"
+       id="path7929"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 11.456801,203.07291 2.291349,1.32292 v 2.64583 l -2.291349,-1.32291 z"
+       id="path7931"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 2.2913567,205.71873 2.291358,-1.32292 -1e-6,2.64583 2.291358,-1.32291 v 2.64583 l 2.291359,-1.32292 v 2.64584 l 2.2913593,-1.32292 v 2.64583 l 2.291359,-1.32291 v 2.64583 l 2.291359,-1.32292 v 2.64584 l 2.291359,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.291357,-1.32292 v 2.64584 l 2.291359,-1.32292 v 2.64583 l 2.291359,-1.32291 v 2.64583 l 2.291357,-1.32292 v 2.64584 l 2.291363,-1.32292 v 2.64583 l 2.291358,-1.32291 v 2.64583 z"
+       id="path2583-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#808075;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 206.22228,177.93751 v 26.45833 l -34.37038,19.84375 z"
+       id="path4676-7-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 206.22228,177.93751 -34.37038,-19.84375 -34.37038,46.30208 34.37038,19.84375"
+       id="path4678-1-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 203.93092,179.26041 v 2.64584 l -2.29135,-1.32292 v 5.29167 l -2.29136,-1.32292 v 5.29167 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 5.29167 l -2.29136,-1.32292 v 2.64583 l -2.29135,-1.32291 v 5.29166 l -2.29136,-1.32291 v 5.29166 l -2.29136,-1.32291 v 2.64583 2.64583 l -2.29136,-1.32291 v 2.64583 l -2.29136,-1.32292 v 5.29167 l -2.29136,-1.32292 v 2.64584 l -2.29136,-1.32292 v 5.29167 l -20.62223,-11.90625 50.4099,-29.10417"
+       id="path6241-1-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.02645833;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 206.22228,177.9375 v 2.64583 l -2.29135,-1.32291 z"
+       id="path6243-5-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 176.43463,173.96875 4.58271,2.64583 -4.58271,2.64584 z"
+       id="path6557-9-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 171.85192,200.42709 4.58271,2.64583 -4.58271,2.64584 z"
+       id="path6557-8-7-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 148.93833,192.48959 4.58272,2.64583 -4.58272,2.64584 z"
+       id="path6557-7-7-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 187.89142,183.22917 2.29136,1.32291 -2.29136,1.32292 z"
+       id="path6657-7-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 164.97783,180.58334 2.29136,1.32291 -2.29136,1.32292 z"
+       id="path6657-3-3-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#73736a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 164.97783,207.04167 2.29136,1.32291 -2.29136,1.32292 z"
+       id="path6657-6-6-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 144.3556,200.42709 2.29136,1.32291 -2.29136,1.32292 z"
+       id="path6657-1-5-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 171.8519,163.38542 2.29137,1.32291 -2.29137,1.32292 z"
+       id="path6657-2-6-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 190.18278,173.96875 2.29135,1.32291 -2.29135,1.32292 z"
+       id="path6657-9-3-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 169.56055,217.625 2.29135,1.32291 -2.29135,1.32292 z"
+       id="path6657-31-9-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 183.3087,196.45834 2.29136,1.32291 -2.29136,1.32292 z"
+       id="path6657-94-4-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 197.05685,196.45833 v 5.29166 l -4.58271,2.64584 v -5.29167 z"
+       id="path7756-8-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 185.60007,208.36458 v 2.64584 l 2.29136,-1.32292 v -2.64583 z"
+       id="path7758-1-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#73736a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 176.43463,221.59375 v -2.64584 l 2.29136,1.32292 V 217.625 l 2.29136,1.32291 v -2.64583 l 2.29136,1.32292 v -2.64584 l 2.29136,1.32292 v -2.64583 l 2.29135,1.32291 v -2.64583 l 2.29136,1.32292 v -2.64584 l 2.29136,1.32292 v -2.64583 l 2.29136,1.32291 v -2.64583 l 2.29136,1.32292 v -2.64584 l 2.29135,1.32292 v -2.64583 l 2.29136,1.32291 v -2.64583 l 2.29136,1.32292 v -2.64584 l 2.29136,1.32292 z"
+       id="path2622-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#99998c;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 68.740774,204.39584 34.370376,19.84375 V 197.78125 L 68.740774,177.9375 Z"
+       id="path6397-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#808075;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 103.11115,224.23959 34.37038,-19.84375 -34.37038,-6.61459 z"
+       id="path6399-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="M 137.48153,204.39584 103.11115,184.55209 68.740774,177.9375 103.11115,197.78125 Z"
+       id="path6401-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 68.740774,177.9375 v 2.64584 l 2.291358,-1.32293 v 2.64584 l 2.29136,-1.32291 v 2.64582 l 2.291361,-1.32291 v 2.64584 l 2.29136,-1.32293 v 2.64584 l 2.29135,-1.32291 v 2.64582 l 2.291362,-1.32291 v 2.64584 l 2.29136,-1.32293 v 2.64584 l 2.29136,-1.32291 v 2.64582 l 2.29136,-1.32291 v 2.64584 l 2.29136,-1.32293 v 2.64584 l 2.29136,-1.32291 v 2.64582 l 2.29136,-1.32291 v 2.64584 l 2.29135,-1.32293 v 2.64584 l 2.291355,-1.32291 v 2.64582 l 2.29136,-1.32291 z"
+       id="path6435-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 103.11115,197.78125 h 4.58272 v 2.64584 z"
+       id="path6437-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 109.98522,199.10416 2.29137,1.32293 v -2.64584 z"
+       id="path6439-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 114.56794,199.10416 2.29136,3.96875 10e-6,-2.64582 z"
+       id="path6441-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 123.73338,201.75 4.58272,2.64584 V 201.75 Z"
+       id="path6443-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 123.73338,201.75 v 2.64584 l -2.29136,-3.96875 z"
+       id="path6445-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 121.44202,200.42709 v 2.64582 l -4.58271,-2.64582 z"
+       id="path6447-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 128.3161,201.75 2.29136,3.96875 v -2.64584 z"
+       id="path6449-63"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 130.60746,203.07291 2.29135,-1.32291 1e-5,2.64584 -2.29136,-1.32293"
+       id="path6451-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#99998c;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 123.73337,204.39584 v 2.64582 l -4.5827,2.64584 v -2.64584 z"
+       id="path7654-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 105.40251,204.39584 v 5.29167 l 4.5827,-2.64584 v -5.29166 z"
+       id="path7656-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 112.27658,208.36458 v 2.64584 l 2.29138,-1.32293 v -2.64582 z"
+       id="path7658-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#73736a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 103.11116,224.23959 v -2.64584 l 2.29136,1.32291 v -2.64582 l 2.29135,1.32291 v -2.64584 l 2.29136,1.32293 V 217.625 l 2.29136,1.32291 v -2.64582 l 2.29136,1.32291 v -2.64584 l 2.29136,1.32293 v -2.64584 l 2.29136,1.32291 v -2.64582 l 2.29136,1.32291 v -2.64584 l 2.29135,1.32293 v -2.64584 l 2.29136,1.32291 v -2.64582 l 2.29136,1.32291 v -2.64584 l 2.29136,1.32293 v -2.64584 l 2.29136,1.32291 v -2.64582 l 2.29136,1.32291 z"
+       id="path2837-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#99998c;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 206.22229,177.93751 v 26.45834 l 34.37038,19.84375 z"
+       id="path4672-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 240.59267,224.23958 34.37037,-19.84375 -34.37037,-46.30208 -34.37038,19.84375"
+       id="path4674-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 206.22229,177.93751 v 2.64584 l 2.29136,-1.32292 z"
+       id="path6255-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 208.51365,179.26043 v 0 2.64583 l 2.29136,-1.32291 -2.29136,-1.32292"
+       id="path6257-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 210.80501,183.22918 v 2.64583 l 2.29136,-1.32291 z"
+       id="path6259-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 215.38773,188.52085 v 2.64582 l 2.29135,-1.32291 z"
+       id="path6261-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 217.67908,192.4896 v 2.64582 l 2.29136,-1.32291 z"
+       id="path6263-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 219.97044,196.45835 v 2.64582 l 2.29135,-1.32291 z"
+       id="path6265-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 224.55315,201.75001 v 2.64584 l 2.29136,-1.32292 z"
+       id="path6267-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 229.13587,207.04167 v 2.64584 l 2.29136,-1.32291 z"
+       id="path6269-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 231.42723,211.01042 v 2.64584 l 2.29136,-1.32291 z"
+       id="path6271-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#8c8c80;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 236.00994,216.3021 v 2.64582 l 2.29138,-1.32291 z"
+       id="path6273-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 229.13586,183.22918 -4.58271,-2.64585 4.58272,-2.64583 z"
+       id="path6563-62"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 256.63218,193.8125 -4.58271,-2.64583 4.58272,-2.64584 z"
+       id="path6563-6-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 245.17538,213.65625 -4.58271,-2.64583 4.58272,-2.64584 z"
+       id="path6563-1-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 240.59267,181.90625 2.29135,-1.32292 1e-5,2.64585 z"
+       id="path6655-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 229.13587,196.45835 2.29136,-1.32293 1e-5,2.64584 z"
+       id="path6655-9-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 258.92353,203.07292 2.29136,-1.32292 10e-6,2.64585 z"
+       id="path6655-2-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 236.00994,168.67708 2.29137,-1.32291 1e-5,2.64583 z"
+       id="path6655-28-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 213.09637,179.26043 2.29135,-1.32293 1e-5,2.64585 z"
+       id="path6655-97-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#73736a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 222.26178,205.71876 v 2.64583 l 4.58272,2.64584 v -2.64584 z"
+       id="path7553-5-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 210.805,191.16667 4.58272,2.64582 v 5.29168 l -4.58271,-2.64584 z"
+       id="path7555-0-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 206.22227,204.39584 2.29136,-1.32291 0,2.64583 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29135,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 l 2.29136,-1.32292 v 2.64583 l 2.29136,-1.32291 v 2.64583 l 2.29136,-1.32292 v 2.64584 z"
+       id="path2941-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#99998c;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 203.93092,189.84376 v 2.64582 l -4.5827,2.64584 v -2.64584 z"
+       id="path7654-9-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 201.63958,199.10416 V 201.75 l 2.29137,-1.32293 v -2.64582 z"
+       id="path7658-4-05"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 29.787675,200.42708 v 2.64583 l 2.291358,1.32292 V 201.75 Z"
+       id="path2393-9-15-3-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 208.51364,197.78125 v 2.64583 L 210.805,201.75 v -2.64583 z"
+       id="path2393-9-15-3-10"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#8c8c80;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 105.40251,214.97916 v 2.64584 l 2.29137,-1.32293 v -2.64582 z"
+       id="path7658-4-0-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 18.330876,207.04166 v 2.64583 l 2.29136,1.32292 v -2.64583 z"
+       id="path2393-9-15-3-1-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#886e2c;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 162.68648,176.61459 4.58271,2.64583 -4.58271,2.64584 z"
+       id="path6557-8-7-5-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#92732c;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 183.30872,191.16667 4.58271,2.64583 -4.58271,2.64584 z"
+       id="path6557-8-7-5-3-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#92732c;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 164.97785,188.52084 4.58271,2.64583 -4.58271,2.64584 z"
+       id="path6557-8-7-5-3-6-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 176.43463,187.19792 2.29135,1.32291 -2.29135,1.32292 z"
+       id="path6657-9-3-5-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#73736a;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 151.22968,204.39584 2.29136,1.32291 -2.29136,1.32292 z"
+       id="path6657-6-6-7-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 236.00994,195.13543 -4.58271,-2.64585 4.58272,-2.64583 z"
+       id="path6563-62-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#92732c;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 245.17539,195.13542 -4.58271,-2.64583 4.58272,-2.64584 z"
+       id="path6563-6-1-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#92732c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 238.30131,170 2.29135,-1.32292 1e-5,2.64585 z"
+       id="path6655-5-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#92732c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 233.71859,201.75 2.29135,-1.32292 1e-5,2.64585 z"
+       id="path6655-5-2-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#92732c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 261.2149,204.39583 2.29135,-1.32292 10e-6,2.64585 z"
+       id="path6655-5-2-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 249.75811,200.4271 2.29135,-1.32293 1e-5,2.64585 z"
+       id="path6655-97-8-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#808075;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 219.97044,191.16667 2.29135,-1.32292 1e-5,2.64585 z"
+       id="path6655-5-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 160.39512,199.10417 2.29135,1.32291 -2.29135,1.32292 z"
+       id="path6657-31-9-6-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 89.362993,187.19791 6.874079,1.32292 -2.291359,1.32292 z"
+       id="path1345"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#886e2c;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
+       d="m 82.488916,183.22917 4.58272,2.64583 4.58272,-2.64583 z"
+       id="path1347"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#73736a;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
+       d="m 103.11115,195.13542 2.29136,-3.96875 h -9.165442 z"
+       id="path1349"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
+       d="m 116.8593,197.78125 6.87408,1.32292 -2.29136,1.32292 z"
+       id="path1345-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#886e2c;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
+       d="m 105.4025,193.81251 4.58272,2.64583 4.58272,-2.64583 z"
+       id="path1347-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#755f26;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 98.528428,187.19791 6.874082,1.32292 -2.29136,1.32292 z"
+       id="path1345-3-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#886e2c;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 34.370383,189.84375 4.582711,-2.64583 h -4.582711 z"
+       id="path6569-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#99998c;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 25.204947,195.13542 4.58271,-2.64583 h -4.58271 z"
+       id="path6569-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+    <path
+       style="fill:#73736a;fill-opacity:1;stroke:#755f26;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 41.244459,191.16667 4.582711,-2.64583 h -4.582711 z"
+       id="path6569-61"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/samuel/src/world-tree/res/img/basic-dungeon.png"
+       inkscape:export-xdpi="96.071075"
+       inkscape:export-ydpi="96.071075" />
+  </g>
+</svg>
