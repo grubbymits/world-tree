@@ -22,15 +22,17 @@ export class Context {
   private _worldMap: SquareGrid;
 
   constructor(canvas: HTMLCanvasElement, worldDims: Dimensions,
-              perspective = Perspective.TrueIsometric) {
+              perspective: Perspective) {
     switch (perspective) {
     default:
       console.error("unhandled perspective");
       break;
     case Perspective.TrueIsometric:
+      console.log("true isometric");
       this._scene = new IsometricRenderer(canvas);
       break;
     case Perspective.TwoByOneIsometric:
+      console.log("2:1 isometric");
       this._scene = new TwoByOneIsometricRenderer(canvas);
       break;
     }

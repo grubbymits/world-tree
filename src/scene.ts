@@ -268,8 +268,40 @@ export abstract class SceneGraph {
   }
 
   abstract getDrawCoord(location: Point3D): Point2D;
-  abstract setDrawCoords(node: SceneNode): void;
   abstract drawOrder(firstId: number, secondId: number): RenderOrder;
+
+  setDrawCoords(node: SceneNode): void {
+    const entity: Entity = node.entity;
+    const min: Point3D = entity.bounds.minLocation;
+    const max: Point3D = entity.bounds.maxLocation;
+    const width = entity.bounds.width;
+    const depth = entity.bounds.depth;
+    const height = entity.bounds.height;
+
+    node.topSegments.length = 0;
+    node.baseSegments.length = 0;
+    node.sideSegments.length = 0;
+
+    const min2D = this.getDrawCoord(min);
+    const base1 = this.getDrawCoord(new Point3D(min.x, max.y, min.z));
+    const base2 = this.getDrawCoord(new Point3D(max.x, max.y, min.z));
+    node.baseSegments.push(new Segment2D(min2D, base1));
+    node.baseSegments.push(new Segment2D(base1, base2));
+
+    const max2D = this.getDrawCoord(max);
+    const top1 = this.getDrawCoord(new Point3D(min.x, min.y, max.z));
+    const top2 = this.getDrawCoord(new Point3D(max.x, min.y, max.z));
+    node.topSegments.push(new Segment2D(top1, top2));
+    node.topSegments.push(new Segment2D(top2, max2D));
+
+    node.sideSegments.push(new Segment2D(min2D, top1));
+    node.sideSegments.push(new Segment2D(base2, max2D));
+
+    const drawHeightOffset = min2D.sub(top2);
+    const coord = this.getDrawCoord(entity.bounds.minLocation);
+    const adjustedCoord = new Point2D(coord.x, coord.y - drawHeightOffset.y);
+    node.drawCoord = adjustedCoord;
+  }
 
   get nodes(): Map<number, SceneNode> { return this._nodes; }
 
@@ -430,46 +462,13 @@ export class IsometricRenderer extends SceneGraph {
 
     // Tiles are placed overlapping each other by half.
     // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
-    let dx = Math.floor(this._halfSqrt3 * (loc.x + loc.y));
-    let dy = Math.floor((0.5 * (loc.y - loc.x)) - loc.z);
+    const dx = Math.floor(this._halfSqrt3 * (loc.x + loc.y));
+    const dy = Math.floor((0.5 * (loc.y - loc.x)) - loc.z);
     return new Point2D(dx, dy);
   }
 
-  setDrawCoords(node: SceneNode): void {
-    const entity: Entity = node.entity;
-    const min: Point3D = entity.bounds.minLocation;
-    const max: Point3D = entity.bounds.maxLocation;
-    const width = entity.bounds.width;
-    const depth = entity.bounds.depth;
-    const height = entity.bounds.height;
-
-    node.topSegments.length = 0;
-    node.baseSegments.length = 0;
-    node.sideSegments.length = 0;
-
-    const min2D = this.getDrawCoord(min);
-    const base1 = this.getDrawCoord(new Point3D(min.x, max.y, min.z));
-    const base2 = this.getDrawCoord(new Point3D(max.x, max.y, min.z));
-    node.baseSegments.push(new Segment2D(min2D, base1));
-    node.baseSegments.push(new Segment2D(base1, base2));
-
-    const max2D = this.getDrawCoord(max);
-    const top1 = this.getDrawCoord(new Point3D(min.x, min.y, max.z));
-    const top2 = this.getDrawCoord(new Point3D(max.x, min.y, max.z));
-    node.topSegments.push(new Segment2D(top1, top2));
-    node.topSegments.push(new Segment2D(top2, max2D));
-
-    node.sideSegments.push(new Segment2D(min2D, top1));
-    node.sideSegments.push(new Segment2D(base2, max2D));
-
-    const drawHeightOffset = min2D.sub(top2);
-    const coord =
-      IsometricRenderer.getDrawCoord(entity.bounds.minLocation);
-    const adjustedCoord = new Point2D(coord.x, coord.y - drawHeightOffset.y);
-    node.drawCoord = adjustedCoord;
-  }
-
   getDrawCoord(location: Point3D): Point2D {
+    console.error('wtf');
     return IsometricRenderer.getDrawCoord(location);
   }
 
@@ -501,7 +500,7 @@ export class IsometricRenderer extends SceneGraph {
   }
 }
 
-export class TwoByOneIsometricRenderer extends IsometricRenderer {
+export class TwoByOneIsometricRenderer extends SceneGraph {
   constructor(canvas: HTMLCanvasElement) {
     super(canvas);
   }
@@ -516,12 +515,40 @@ export class TwoByOneIsometricRenderer extends IsometricRenderer {
 
     // Tiles are placed overlapping each other by half.
     // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
-    let dx = Math.floor(2 * (loc.x + loc.y));
-    let dy = Math.floor(loc.y - loc.x - loc.z);
+    const dx = Math.floor(2 * (loc.x + loc.y));
+    const dy = Math.floor((loc.y - loc.x) - loc.z);
+
     return new Point2D(dx, dy);
   }
 
   getDrawCoord(location: Point3D): Point2D {
     return TwoByOneIsometricRenderer.getDrawCoord(location);
+  }
+
+  drawOrder(firstId: number, secondId: number): RenderOrder {
+    const first: SceneNode = this._nodes.get(firstId)!;
+    const second: SceneNode = this._nodes.get(secondId)!;
+    // priority ordering:
+    // - smaller y
+    // - greater x
+
+    if (first.overlapX(second)) {
+      return first.entity.bounds.minY <= second.entity.bounds.minY ?
+        RenderOrder.Before : RenderOrder.After;
+    }
+    if (first.overlapY(second)) {
+      return first.entity.bounds.minX >= second.entity.bounds.minX ?
+        RenderOrder.Before : RenderOrder.After;
+    }
+    if (!first.overlapZ(second)) {
+      return RenderOrder.Any;
+    }
+    if (first.intersectsTop(second)) {
+      return RenderOrder.Before;
+    }
+    if (second.intersectsTop(first)) {
+      return RenderOrder.After;
+    }
+    return RenderOrder.Any;
   }
 }

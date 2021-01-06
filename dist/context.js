@@ -2,7 +2,7 @@ import { EntityEvent } from "./events.js";
 import { Perspective, IsometricRenderer, TwoByOneIsometricRenderer } from "./scene.js";
 import { Octree } from "./tree.js";
 export class Context {
-    constructor(canvas, worldDims, perspective = Perspective.TrueIsometric) {
+    constructor(canvas, worldDims, perspective) {
         this._entities = new Array();
         this._controllers = new Array();
         switch (perspective) {
@@ -10,9 +10,11 @@ export class Context {
                 console.error("unhandled perspective");
                 break;
             case Perspective.TrueIsometric:
+                console.log("true isometric");
                 this._scene = new IsometricRenderer(canvas);
                 break;
             case Perspective.TwoByOneIsometric:
+                console.log("2:1 isometric");
                 this._scene = new TwoByOneIsometricRenderer(canvas);
                 break;
         }

@@ -223,6 +223,33 @@ export class SceneGraph {
         this._ctx = this._canvas.getContext("2d", { alpha: false });
         SceneNode.graph = this;
     }
+    setDrawCoords(node) {
+        const entity = node.entity;
+        const min = entity.bounds.minLocation;
+        const max = entity.bounds.maxLocation;
+        const width = entity.bounds.width;
+        const depth = entity.bounds.depth;
+        const height = entity.bounds.height;
+        node.topSegments.length = 0;
+        node.baseSegments.length = 0;
+        node.sideSegments.length = 0;
+        const min2D = this.getDrawCoord(min);
+        const base1 = this.getDrawCoord(new Point3D(min.x, max.y, min.z));
+        const base2 = this.getDrawCoord(new Point3D(max.x, max.y, min.z));
+        node.baseSegments.push(new Segment2D(min2D, base1));
+        node.baseSegments.push(new Segment2D(base1, base2));
+        const max2D = this.getDrawCoord(max);
+        const top1 = this.getDrawCoord(new Point3D(min.x, min.y, max.z));
+        const top2 = this.getDrawCoord(new Point3D(max.x, min.y, max.z));
+        node.topSegments.push(new Segment2D(top1, top2));
+        node.topSegments.push(new Segment2D(top2, max2D));
+        node.sideSegments.push(new Segment2D(min2D, top1));
+        node.sideSegments.push(new Segment2D(base2, max2D));
+        const drawHeightOffset = min2D.sub(top2);
+        const coord = this.getDrawCoord(entity.bounds.minLocation);
+        const adjustedCoord = new Point2D(coord.x, coord.y - drawHeightOffset.y);
+        node.drawCoord = adjustedCoord;
+    }
     get nodes() { return this._nodes; }
     getNode(id) {
         console.assert(this._nodes.has(id));
@@ -352,38 +379,12 @@ export class IsometricRenderer extends SceneGraph {
         super(canvas);
     }
     static getDrawCoord(loc) {
-        let dx = Math.floor(this._halfSqrt3 * (loc.x + loc.y));
-        let dy = Math.floor((0.5 * (loc.y - loc.x)) - loc.z);
+        const dx = Math.floor(this._halfSqrt3 * (loc.x + loc.y));
+        const dy = Math.floor((0.5 * (loc.y - loc.x)) - loc.z);
         return new Point2D(dx, dy);
     }
-    setDrawCoords(node) {
-        const entity = node.entity;
-        const min = entity.bounds.minLocation;
-        const max = entity.bounds.maxLocation;
-        const width = entity.bounds.width;
-        const depth = entity.bounds.depth;
-        const height = entity.bounds.height;
-        node.topSegments.length = 0;
-        node.baseSegments.length = 0;
-        node.sideSegments.length = 0;
-        const min2D = this.getDrawCoord(min);
-        const base1 = this.getDrawCoord(new Point3D(min.x, max.y, min.z));
-        const base2 = this.getDrawCoord(new Point3D(max.x, max.y, min.z));
-        node.baseSegments.push(new Segment2D(min2D, base1));
-        node.baseSegments.push(new Segment2D(base1, base2));
-        const max2D = this.getDrawCoord(max);
-        const top1 = this.getDrawCoord(new Point3D(min.x, min.y, max.z));
-        const top2 = this.getDrawCoord(new Point3D(max.x, min.y, max.z));
-        node.topSegments.push(new Segment2D(top1, top2));
-        node.topSegments.push(new Segment2D(top2, max2D));
-        node.sideSegments.push(new Segment2D(min2D, top1));
-        node.sideSegments.push(new Segment2D(base2, max2D));
-        const drawHeightOffset = min2D.sub(top2);
-        const coord = IsometricRenderer.getDrawCoord(entity.bounds.minLocation);
-        const adjustedCoord = new Point2D(coord.x, coord.y - drawHeightOffset.y);
-        node.drawCoord = adjustedCoord;
-    }
     getDrawCoord(location) {
+        console.error('wtf');
         return IsometricRenderer.getDrawCoord(location);
     }
     drawOrder(firstId, secondId) {
@@ -411,16 +412,38 @@ export class IsometricRenderer extends SceneGraph {
 }
 IsometricRenderer._sqrt3 = Math.sqrt(3);
 IsometricRenderer._halfSqrt3 = Math.sqrt(3) * 0.5;
-export class TwoByOneIsometricRenderer extends IsometricRenderer {
+export class TwoByOneIsometricRenderer extends SceneGraph {
     constructor(canvas) {
         super(canvas);
     }
     static getDrawCoord(loc) {
-        let dx = Math.floor(2 * (loc.x + loc.y));
-        let dy = Math.floor(loc.y - loc.x - loc.z);
+        const dx = Math.floor(2 * (loc.x + loc.y));
+        const dy = Math.floor((loc.y - loc.x) - loc.z);
         return new Point2D(dx, dy);
     }
     getDrawCoord(location) {
         return TwoByOneIsometricRenderer.getDrawCoord(location);
+    }
+    drawOrder(firstId, secondId) {
+        const first = this._nodes.get(firstId);
+        const second = this._nodes.get(secondId);
+        if (first.overlapX(second)) {
+            return first.entity.bounds.minY <= second.entity.bounds.minY ?
+                RenderOrder.Before : RenderOrder.After;
+        }
+        if (first.overlapY(second)) {
+            return first.entity.bounds.minX >= second.entity.bounds.minX ?
+                RenderOrder.Before : RenderOrder.After;
+        }
+        if (!first.overlapZ(second)) {
+            return RenderOrder.Any;
+        }
+        if (first.intersectsTop(second)) {
+            return RenderOrder.Before;
+        }
+        if (second.intersectsTop(first)) {
+            return RenderOrder.After;
+        }
+        return RenderOrder.Any;
     }
 }

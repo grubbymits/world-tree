@@ -163,14 +163,31 @@ export class TwoByOneIsometricDimensions extends Dimensions {
         super(width, depth, height);
     }
     static physicalWidth(spriteWidth) {
-        return spriteWidth * 0.25 * this._sqrt5;
+        console.log("spriteWidth:", spriteWidth);
+        console.log("2:1 horizontal angle:", this._horizontalAngle);
+        console.log("2:1 vertical angle:", this._verticalAngle);
+        console.log("width factor:", this._widthFactor);
+        const oneUnit = spriteWidth * 0.25;
+        const twoUnits = spriteWidth * 0.5;
+        const widthDiagonal2D = Math.sqrt(Math.pow(oneUnit, 2) + Math.pow(twoUnits, 2));
+        console.log("widthDiagonal2D:", widthDiagonal2D);
+        const width = oneUnit * this._widthFactor;
+        const depth = twoUnits * this._depthFactor;
+        console.assert(width == depth);
+        console.log("width:", width);
+        console.log("depth:", depth);
+        return width;
     }
     static physicalHeight(spriteWidth, spriteHeight) {
         const spriteShortDiagonal = 2 * spriteWidth * 0.25;
-        return spriteHeight - spriteShortDiagonal;
+        return Math.floor(spriteHeight - spriteShortDiagonal);
     }
 }
-TwoByOneIsometricDimensions._sqrt5 = Math.sqrt(5);
+TwoByOneIsometricDimensions._sqrt2 = Math.sqrt(2);
+TwoByOneIsometricDimensions._verticalAngle = (180 / Math.PI) * Math.atan(0.5);
+TwoByOneIsometricDimensions._horizontalAngle = (180 / Math.PI) * Math.acos(1 / Math.sqrt(2));
+TwoByOneIsometricDimensions._widthFactor = Math.cos(Math.atan(0.5));
+TwoByOneIsometricDimensions._depthFactor = Math.sin(Math.atan(0.5));
 export class BoundingCuboid {
     constructor(_centre, _dimensions) {
         this._centre = _centre;

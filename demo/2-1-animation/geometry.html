@@ -13,8 +13,8 @@
     import * as WT from "../../dist/world-tree.js";
     import { Robot, RobotController } from "./robot.js"
 
-    const spriteWidth = 128;
-    const spriteHeight = 107;
+    const spriteWidth = 322;
+    const spriteHeight = 270;
 
     let sheet = new WT.SpriteSheet("../../../res/img/inside-basic-dungeon-2-1");
     WT.Terrain.addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Flat,
@@ -55,7 +55,7 @@
                                           physicalDims.depth * cellsY,
                                           physicalDims.height * (1 + terraces));
       let context = new WT.Context(canvas, worldDims,
-                                   WT.TwoByOneIsometric);
+                                   WT.Perspective.TwoByOneIsometric);
     
       const hasWater = false;
       const waterLine = 0;

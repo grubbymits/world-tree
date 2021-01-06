@@ -177,28 +177,59 @@ export class IsometricPhysicalDimensions extends Dimensions {
   }
 }
 
+// http://www.gandraxa.com/isometric_projection.xml
+
 // An isometric square has:
 // - sides equal length = sqrt(5)
 // - the short diagonal is length = 2,
 // - the long diagonal is length = 4.
 export class TwoByOneIsometricDimensions extends Dimensions {
-  private static readonly _sqrt5: number = Math.sqrt(5);
+
+  private static readonly _sqrt2 = Math.sqrt(2);
+
+  // tan-1 (1/2)
+  private static readonly _verticalAngle =
+    (180 / Math.PI) * Math.atan(0.5);
+
+  private static readonly _horizontalAngle: number =
+    (180 / Math.PI) * Math.acos(1 / Math.sqrt(2));
+
+  private static readonly _widthFactor: number =
+    Math.cos(Math.atan(0.5));
+
+  private static readonly _depthFactor: number =
+    Math.sin(Math.atan(0.5));
 
   static physicalWidth(spriteWidth: number): number {
-    return spriteWidth * 0.25 * this._sqrt5;
+    console.log("spriteWidth:", spriteWidth);
+    console.log("2:1 horizontal angle:", this._horizontalAngle);
+    console.log("2:1 vertical angle:", this._verticalAngle);
+    console.log("width factor:", this._widthFactor);
+
+    const oneUnit = spriteWidth * 0.25;
+    const twoUnits = spriteWidth * 0.5;
+    const widthDiagonal2D = Math.sqrt(Math.pow(oneUnit, 2) + Math.pow(twoUnits, 2));
+    console.log("widthDiagonal2D:", widthDiagonal2D);
+
+    const width = oneUnit * this._widthFactor;
+    const depth = twoUnits * this._depthFactor;
+    console.assert(width == depth);
+    console.log("width:", width);
+    console.log("depth:", depth);
+    return width;
   }
 
   static physicalHeight(spriteWidth: number,
                         spriteHeight: number): number {
     const spriteShortDiagonal = 2 * spriteWidth * 0.25;
-    return spriteHeight - spriteShortDiagonal;
+    return Math.floor(spriteHeight - spriteShortDiagonal);
   }
 
   constructor(spriteWidth: number,
               spriteHeight: number) {
     const width = TwoByOneIsometricDimensions.physicalWidth(spriteWidth);
     const depth = width;
-    const height =
+    const height = 
       TwoByOneIsometricDimensions.physicalHeight(spriteWidth, spriteHeight);
     super(width, depth, height);
   }

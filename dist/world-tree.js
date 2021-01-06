@@ -1,5 +1,6 @@
 export * from "./map.js";
 export * from "./graphics.js";
+export * from "./scene.js";
 export * from "./terrain.js";
 export * from "./builder.js";
 export * from "./context.js";
