@@ -9,7 +9,8 @@ export class Robot extends WT.Actor {
   static sprites = new Array();
   static spriteWidth = 80;
   static spriteHeight = 114;
-  static dims = new WT.TwoByOneIsometricDimensions(this.spriteWidth, this.spriteHeight);
+  static dims =
+    WT.TwoByOneIsometricRenderer.getDimensions(this.spriteWidth, this.spriteHeight);
 
   static initGraphics() {
     this._staticGraphics = new Map();

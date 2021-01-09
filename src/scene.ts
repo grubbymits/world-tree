@@ -5,6 +5,7 @@ import { Point2D,
          Segment2D } from "./geometry.js"
 import { Sprite,
          GraphicComponent } from "./graphics.js"
+import { Dimensions } from "./physics.js"
 
 enum RenderOrder {
   Before = -1,
@@ -343,7 +344,8 @@ export abstract class SceneGraph {
           const spriteId: number = component.update();
           Sprite.sprites[spriteId].draw(coord, ctx);
         });
-        if (true) { //entity.drawGeometry) {
+        if (entity.drawGeometry) {
+          ctx.strokeStyle = "Orange";
           for (const segment of node.allSegments) {
             ctx.beginPath();
             let drawP0 = camera.getDrawCoord(segment.p0);
@@ -444,6 +446,38 @@ export enum Perspective {
   TwoByOneIsometric,
 }
 
+// An isometric square has:
+// - sides equal length = 1,
+// - the short diagonal is length = 1,
+// - the long diagonal is length = sqrt(3) ~= 1.73.
+export class IsometricPhysicalDimensions extends Dimensions {
+  private static readonly _oneOverSqrt3: number = 1 / Math.sqrt(3);
+
+  static physicalWidth(spriteWidth: number): number {
+    return Math.floor(spriteWidth * this._oneOverSqrt3);
+  }
+
+  static physicalDepth(physicalWidth: number,
+                       relativeDims: Dimensions) {
+    let depthRatio: number = relativeDims.depth / relativeDims.width;
+    return Math.floor(physicalWidth * depthRatio);
+  }
+
+  static physicalHeight(physicalWidth: number,
+                        relativeDims: Dimensions): number {
+    let heightRatio: number = relativeDims.height / relativeDims.width;
+    return Math.floor(physicalWidth * heightRatio);
+  }
+
+  constructor(spriteWidth: number,
+              relativeDims: Dimensions) {
+    let width = IsometricPhysicalDimensions.physicalWidth(spriteWidth);
+    let depth = IsometricPhysicalDimensions.physicalDepth(width, relativeDims);
+    let height = IsometricPhysicalDimensions.physicalHeight(width, relativeDims);
+    super(width, depth, height);
+  }
+}
+
 export class IsometricRenderer extends SceneGraph {
   constructor(canvas: HTMLCanvasElement) {
     super(canvas);
@@ -500,25 +534,41 @@ export class IsometricRenderer extends SceneGraph {
   }
 }
 
+// http://www.gandraxa.com/isometric_projection.xml
+// An isometric square has:
+// - sides equal length = sqrt(5)
+// - the short diagonal is length = 2,
+// - the long diagonal is length = 4.
 export class TwoByOneIsometricRenderer extends SceneGraph {
   constructor(canvas: HTMLCanvasElement) {
     super(canvas);
   }
 
+  private static readonly _magicRatio: number = 
+    Math.cos(Math.atan(0.5));
+
+  private static readonly _oneOverMagicRatio: number =
+    1 / Math.cos(Math.atan(0.5));
+
   static getDrawCoord(loc: Point3D): Point2D {
-    // An isometric square has:
-    // - sides equal length = sqrt(5)
-    // - the short diagonal is length = 2,
-    // - the long diagonal is length = 4.
     // We're allowing the height to vary, so its a cuboid, not a cube, but with
     // a square top.
 
     // Tiles are placed overlapping each other by half.
     // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
-    const dx = Math.floor(2 * (loc.x + loc.y));
-    const dy = Math.floor((loc.y - loc.x) - loc.z);
-
+    const dx = Math.round((loc.x + loc.y) * 2 * this._oneOverMagicRatio);
+    const dy = Math.round((loc.y - loc.x - loc.z) * this._oneOverMagicRatio);
     return new Point2D(dx, dy);
+  }
+
+  static getDimensions(spriteWidth: number,
+                       spriteHeight: number): Dimensions {
+    const oneUnit = spriteWidth * 0.25;
+    const twoUnits = spriteWidth * 0.5;
+    const width = oneUnit * this._magicRatio;
+    const depth = twoUnits * Math.sin(Math.atan(0.5));
+    const height = (spriteHeight - twoUnits) * this._magicRatio;
+    return new Dimensions(width, depth, height);
   }
 
   getDrawCoord(location: Point3D): Point2D {

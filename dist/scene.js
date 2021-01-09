@@ -1,5 +1,6 @@
 import { Point2D, Point3D, Segment2D } from "./geometry.js";
 import { Sprite } from "./graphics.js";
+import { Dimensions } from "./physics.js";
 var RenderOrder;
 (function (RenderOrder) {
     RenderOrder[RenderOrder["Before"] = -1] = "Before";
@@ -286,7 +287,8 @@ export class SceneGraph {
                     const spriteId = component.update();
                     Sprite.sprites[spriteId].draw(coord, ctx);
                 });
-                if (true) {
+                if (entity.drawGeometry) {
+                    ctx.strokeStyle = "Orange";
                     for (const segment of node.allSegments) {
                         ctx.beginPath();
                         let drawP0 = camera.getDrawCoord(segment.p0);
@@ -374,6 +376,26 @@ export var Perspective;
     Perspective[Perspective["TrueIsometric"] = 0] = "TrueIsometric";
     Perspective[Perspective["TwoByOneIsometric"] = 1] = "TwoByOneIsometric";
 })(Perspective || (Perspective = {}));
+export class IsometricPhysicalDimensions extends Dimensions {
+    constructor(spriteWidth, relativeDims) {
+        let width = IsometricPhysicalDimensions.physicalWidth(spriteWidth);
+        let depth = IsometricPhysicalDimensions.physicalDepth(width, relativeDims);
+        let height = IsometricPhysicalDimensions.physicalHeight(width, relativeDims);
+        super(width, depth, height);
+    }
+    static physicalWidth(spriteWidth) {
+        return Math.floor(spriteWidth * this._oneOverSqrt3);
+    }
+    static physicalDepth(physicalWidth, relativeDims) {
+        let depthRatio = relativeDims.depth / relativeDims.width;
+        return Math.floor(physicalWidth * depthRatio);
+    }
+    static physicalHeight(physicalWidth, relativeDims) {
+        let heightRatio = relativeDims.height / relativeDims.width;
+        return Math.floor(physicalWidth * heightRatio);
+    }
+}
+IsometricPhysicalDimensions._oneOverSqrt3 = 1 / Math.sqrt(3);
 export class IsometricRenderer extends SceneGraph {
     constructor(canvas) {
         super(canvas);
@@ -417,9 +439,17 @@ export class TwoByOneIsometricRenderer extends SceneGraph {
         super(canvas);
     }
     static getDrawCoord(loc) {
-        const dx = Math.floor(2 * (loc.x + loc.y));
-        const dy = Math.floor((loc.y - loc.x) - loc.z);
+        const dx = Math.round((loc.x + loc.y) * 2 * this._oneOverMagicRatio);
+        const dy = Math.round((loc.y - loc.x - loc.z) * this._oneOverMagicRatio);
         return new Point2D(dx, dy);
+    }
+    static getDimensions(spriteWidth, spriteHeight) {
+        const oneUnit = spriteWidth * 0.25;
+        const twoUnits = spriteWidth * 0.5;
+        const width = oneUnit * this._magicRatio;
+        const depth = twoUnits * Math.sin(Math.atan(0.5));
+        const height = (spriteHeight - twoUnits) * this._magicRatio;
+        return new Dimensions(width, depth, height);
     }
     getDrawCoord(location) {
         return TwoByOneIsometricRenderer.getDrawCoord(location);
@@ -447,3 +477,5 @@ export class TwoByOneIsometricRenderer extends SceneGraph {
         return RenderOrder.Any;
     }
 }
+TwoByOneIsometricRenderer._magicRatio = Math.cos(Math.atan(0.5));
+TwoByOneIsometricRenderer._oneOverMagicRatio = 1 / Math.cos(Math.atan(0.5));

@@ -135,59 +135,6 @@ export class Dimensions {
         console.log(" - (WxDxH):", this.width, this.depth, this.height);
     }
 }
-export class IsometricPhysicalDimensions extends Dimensions {
-    constructor(spriteWidth, relativeDims) {
-        let width = IsometricPhysicalDimensions.physicalWidth(spriteWidth);
-        let depth = IsometricPhysicalDimensions.physicalDepth(width, relativeDims);
-        let height = IsometricPhysicalDimensions.physicalHeight(width, relativeDims);
-        super(width, depth, height);
-    }
-    static physicalWidth(spriteWidth) {
-        return Math.floor(spriteWidth * this._oneOverSqrt3);
-    }
-    static physicalDepth(physicalWidth, relativeDims) {
-        let depthRatio = relativeDims.depth / relativeDims.width;
-        return Math.floor(physicalWidth * depthRatio);
-    }
-    static physicalHeight(physicalWidth, relativeDims) {
-        let heightRatio = relativeDims.height / relativeDims.width;
-        return Math.floor(physicalWidth * heightRatio);
-    }
-}
-IsometricPhysicalDimensions._oneOverSqrt3 = 1 / Math.sqrt(3);
-export class TwoByOneIsometricDimensions extends Dimensions {
-    constructor(spriteWidth, spriteHeight) {
-        const width = TwoByOneIsometricDimensions.physicalWidth(spriteWidth);
-        const depth = width;
-        const height = TwoByOneIsometricDimensions.physicalHeight(spriteWidth, spriteHeight);
-        super(width, depth, height);
-    }
-    static physicalWidth(spriteWidth) {
-        console.log("spriteWidth:", spriteWidth);
-        console.log("2:1 horizontal angle:", this._horizontalAngle);
-        console.log("2:1 vertical angle:", this._verticalAngle);
-        console.log("width factor:", this._widthFactor);
-        const oneUnit = spriteWidth * 0.25;
-        const twoUnits = spriteWidth * 0.5;
-        const widthDiagonal2D = Math.sqrt(Math.pow(oneUnit, 2) + Math.pow(twoUnits, 2));
-        console.log("widthDiagonal2D:", widthDiagonal2D);
-        const width = oneUnit * this._widthFactor;
-        const depth = twoUnits * this._depthFactor;
-        console.assert(width == depth);
-        console.log("width:", width);
-        console.log("depth:", depth);
-        return width;
-    }
-    static physicalHeight(spriteWidth, spriteHeight) {
-        const spriteShortDiagonal = 2 * spriteWidth * 0.25;
-        return Math.floor(spriteHeight - spriteShortDiagonal);
-    }
-}
-TwoByOneIsometricDimensions._sqrt2 = Math.sqrt(2);
-TwoByOneIsometricDimensions._verticalAngle = (180 / Math.PI) * Math.atan(0.5);
-TwoByOneIsometricDimensions._horizontalAngle = (180 / Math.PI) * Math.acos(1 / Math.sqrt(2));
-TwoByOneIsometricDimensions._widthFactor = Math.cos(Math.atan(0.5));
-TwoByOneIsometricDimensions._depthFactor = Math.sin(Math.atan(0.5));
 export class BoundingCuboid {
     constructor(_centre, _dimensions) {
         this._centre = _centre;

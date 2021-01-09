@@ -26,31 +26,24 @@
 
     // 9x9 area with a wall around the edge and some raised sections in the
     // middle too.
-    const cellsX = 5;
-    const cellsY = 5;
+    const cellsX = 9;
+    const cellsY = 9;
     const terraces = 1;
-    /*
     let heightMap = [ [ 2, 2, 2, 2, 2, 2, 2, 2, 2 ],
+                      [ 2, 2, 1, 1, 1, 2, 1, 1, 2 ],
+                      [ 2, 1, 1, 1, 1, 2, 1, 1, 2 ],
                       [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
+                      [ 2, 1, 1, 1, 1, 1, 1, 2, 2 ],
+                      [ 2, 1, 2, 1, 1, 1, 1, 1, 2 ],
                       [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
+                      [ 2, 2, 1, 1, 1, 1, 2, 1, 2 ],
                       [ 2, 2, 2, 2, 2, 2, 2, 2, 2] ];
-    */
-    let heightMap = [ [ 2, 2, 2, 2, 2 ],
-                      [ 2, 1, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 2 ],
-                      [ 2, 2, 2, 2, 2] ];
 
     window.onload = (event) => {
       console.log("window loaded");
       let canvas = document.getElementById("demoCanvas");
       const physicalDims =
-        new WT.TwoByOneIsometricDimensions(spriteWidth, spriteHeight);
+        WT.TwoByOneIsometricRenderer.getDimensions(spriteWidth, spriteHeight);
       const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
                                           physicalDims.depth * cellsY,
                                           physicalDims.height * (1 + terraces));
