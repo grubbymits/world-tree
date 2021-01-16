@@ -534,6 +534,7 @@ export class IsometricRenderer extends SceneGraph {
   }
 }
 
+// https://www.significant-bits.com/a-laymans-guide-to-projection-in-videogames/
 // http://www.gandraxa.com/isometric_projection.xml
 // An isometric square has:
 // - sides equal length = sqrt(5)

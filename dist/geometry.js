@@ -84,7 +84,10 @@ export class Point3D {
     add(vector) {
         return new Point3D(this.x + vector.x, this.y + vector.y, this.z + vector.z);
     }
-    subtract(other) {
+    sub(vector) {
+        return new Point3D(this.x - vector.x, this.y - vector.y, this.z - vector.z);
+    }
+    vec(other) {
         return new Vector3D(this.x - other.x, this.y - other.y, this.z - other.z);
     }
     isNearlySameAs(other) {
@@ -130,8 +133,8 @@ export class Vector3D {
 class Vertex3D {
     constructor(_point, v1, v2) {
         this._point = _point;
-        this._u = v1.subtract(_point);
-        this._v = v2.subtract(_point);
+        this._u = v1.vec(_point);
+        this._v = v2.vec(_point);
         this._normal = this.u.cross(this.v);
     }
     get point() { return this._point; }
@@ -142,14 +145,14 @@ class Vertex3D {
         this._point = this.point.add(d);
     }
     intersects(begin, end) {
-        let u = end.subtract(begin);
-        let D = this.normal.dot(u);
+        const u = end.vec(begin);
+        const D = this.normal.dot(u);
         if (Math.abs(D) < 0.01) {
             return false;
         }
-        let w = begin.subtract(this.point);
-        let N = -this.normal.dot(w);
-        let intersection = N / D;
+        const w = begin.vec(this.point);
+        const N = -this.normal.dot(w);
+        const intersection = N / D;
         return intersection >= 0 && intersection <= 1;
     }
 }
@@ -182,7 +185,7 @@ class TriangleFace3D extends Face3D {
         this.vertex.transform(d);
     }
     intersects(end) {
-        let w = end.subtract(this.vertex.point);
+        let w = end.vec(this.vertex.point);
         let u = this.vertex.u;
         let v = this.vertex.v;
         let wDotv = w.dot(v);

@@ -1,4 +1,4 @@
-import { Point2D, Point3D } from "./geometry.js";
+import { Point2D, Point3D, Vector3D } from "./geometry.js";
 export var Direction;
 (function (Direction) {
     Direction[Direction["North"] = 0] = "North";
@@ -243,22 +243,33 @@ export class CollisionDetector {
         this._spatialInfo = _spatialInfo;
     }
     detectInArea(actor, path, area) {
-        let bounds = actor.bounds;
-        const endMinLocation = bounds.minLocation.add(path);
-        const endMaxLocation = bounds.maxLocation.add(path);
+        const bounds = actor.bounds;
+        const widthVec3D = new Vector3D(bounds.width, 0, 0);
+        const depthVec3D = new Vector3D(0, bounds.depth, 0);
+        const heightVec3D = new Vector3D(0, 0, bounds.height);
+        const beginPoints = [
+            bounds.minLocation,
+            bounds.minLocation.add(heightVec3D),
+            bounds.minLocation.add(depthVec3D),
+            bounds.minLocation.add(widthVec3D),
+            bounds.maxLocation.sub(heightVec3D),
+            bounds.maxLocation.sub(depthVec3D),
+            bounds.maxLocation.sub(widthVec3D),
+            bounds.maxLocation
+        ];
         let entities = this._spatialInfo.getEntities(area);
         for (let entity of entities) {
             if (entity.id == actor.id) {
                 continue;
             }
             const geometry = entity.geometry;
-            if (geometry.obstructs(actor.bounds.minLocation, endMinLocation) ||
-                geometry.obstructs(actor.bounds.minLocation, endMaxLocation) ||
-                geometry.obstructs(actor.bounds.maxLocation, endMaxLocation) ||
-                geometry.obstructs(actor.bounds.maxLocation, endMinLocation)) {
-                console.log("actor at", actor.bounds.minLocation);
-                console.log("obstructed by entity at", entity.bounds.minLocation);
-                return true;
+            for (const beginPoint of beginPoints) {
+                const endPoint = beginPoint.add(path);
+                if (geometry.obstructs(beginPoint, endPoint)) {
+                    console.log("actor at", bounds.minLocation);
+                    console.log("obstructed by entity at", entity.bounds.minLocation);
+                    return true;
+                }
             }
         }
         return false;

@@ -45,6 +45,7 @@ export class Robot extends WT.Actor {
     let graphics = new WT.DirectionalGraphicComponent(Robot._staticGraphics,
                                                       movementGraphics);
     super(context, position, Robot.dims, graphics, /*debug*/ true);
+    console.log("creating robot of dimensions:", Robot.dims);
 
     this._drawGeometry = true;
     let robot = this;

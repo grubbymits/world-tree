@@ -99,7 +99,13 @@ export class Point3D {
                        this.z + vector.z);
   }
 
-  subtract(other: Point3D): Vector3D {
+  sub(vector: Vector3D): Point3D {
+    return new Point3D(this.x - vector.x,
+                       this.y - vector.y,
+                       this.z - vector.z);
+  }
+
+  vec(other: Point3D): Vector3D {
     return new Vector3D(this.x - other.x,
                         this.y - other.y,
                         this.z - other.z);
@@ -158,8 +164,8 @@ class Vertex3D {
   constructor(private _point: Point3D,
               v1: Point3D,
               v2: Point3D) {
-    this._u = v1.subtract(_point);
-    this._v = v2.subtract(_point);
+    this._u = v1.vec(_point);
+    this._v = v2.vec(_point);
     this._normal = this.u.cross(this.v);
   }
   get point(): Point3D { return this._point; }
@@ -175,14 +181,14 @@ class Vertex3D {
   intersects(begin: Point3D, end: Point3D): boolean {
     // Use the vertex to represent a plane and calculate whether the segment
     // (begin, end) intersects that plane.
-    let u = end.subtract(begin);
-    let D = this.normal.dot(u);
+    const u = end.vec(begin);
+    const D = this.normal.dot(u);
     if (Math.abs(D) < 0.01) {
       return false;
     }
-    let w = begin.subtract(this.point);
-    let N = -this.normal.dot(w);
-    let intersection = N / D;
+    const w = begin.vec(this.point);
+    const N = -this.normal.dot(w);
+    const intersection = N / D;
     return intersection >= 0 && intersection <= 1;
   }
 }
@@ -229,7 +235,7 @@ class TriangleFace3D extends Face3D {
   intersects(end: Point3D): boolean {
     // Given that a segment intersects the plane of this face, calculate
     // whether the intersection point is within the triangle.
-    let w = end.subtract(this.vertex.point);
+    let w = end.vec(this.vertex.point);
     let u = this.vertex.u;
     let v = this.vertex.v;
     let wDotv = w.dot(v);

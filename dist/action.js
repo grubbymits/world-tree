@@ -15,7 +15,7 @@ class MoveAction extends Action {
     }
     canMove(from, to) {
         let bounds = this._actor.bounds;
-        let path = to.subtract(from);
+        let path = to.vec(from);
         let area = new BoundingCuboid(to, bounds.dimensions);
         area.insert(bounds);
         return !this._collisionDetector.detectInArea(this._actor, path, area);
@@ -78,7 +78,7 @@ export class MoveDestination extends MoveAction {
     set destination(destination) {
         this._destination = destination;
         let currentPos = this.actor.bounds.minLocation;
-        let maxD = destination.subtract(currentPos);
+        let maxD = destination.vec(currentPos);
         console.assert(maxD.x == 0 || maxD.y == 0 || maxD.z == 0, "can only change distance along two axes simultaneously");
         let dx = 0;
         let dy = 0;
@@ -138,7 +138,7 @@ export class MoveDestination extends MoveAction {
         console.log("perform action");
         let bounds = this.actor.bounds;
         let location = bounds.minLocation;
-        let maxD = this.destination.subtract(location);
+        let maxD = this.destination.vec(location);
         let minD = maxD.absMin(this._d);
         this.actor.updatePosition(minD);
         this.actor.postEvent(EntityEvent.Moving);

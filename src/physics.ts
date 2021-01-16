@@ -285,9 +285,21 @@ export class CollisionDetector {
   constructor(private readonly _spatialInfo : Octree) { }
 
   detectInArea(actor: Actor, path: Vector3D, area: BoundingCuboid): boolean {
-    let bounds = actor.bounds;
-    const endMinLocation: Point3D = bounds.minLocation.add(path);
-    const endMaxLocation: Point3D = bounds.maxLocation.add(path);
+    const bounds = actor.bounds;
+    const widthVec3D = new Vector3D(bounds.width, 0, 0);
+    const depthVec3D = new Vector3D(0, bounds.depth, 0);
+    const heightVec3D = new Vector3D(0, 0, bounds.height);
+
+    const beginPoints: Array<Point3D> = [
+      bounds.minLocation, 
+      bounds.minLocation.add(heightVec3D),
+      bounds.minLocation.add(depthVec3D),
+      bounds.minLocation.add(widthVec3D),
+      bounds.maxLocation.sub(heightVec3D),
+      bounds.maxLocation.sub(depthVec3D),
+      bounds.maxLocation.sub(widthVec3D),
+      bounds.maxLocation
+    ];
 
     let entities: Array<Entity> = this._spatialInfo.getEntities(area);
     for (let entity of entities) {
@@ -295,13 +307,14 @@ export class CollisionDetector {
         continue;
       }
       const geometry: Geometry = entity.geometry;
-      if (geometry.obstructs(actor.bounds.minLocation, endMinLocation) ||
-          geometry.obstructs(actor.bounds.minLocation, endMaxLocation) ||
-          geometry.obstructs(actor.bounds.maxLocation, endMaxLocation) ||
-          geometry.obstructs(actor.bounds.maxLocation, endMinLocation)) {
-        console.log("actor at", actor.bounds.minLocation);
-        console.log("obstructed by entity at", entity.bounds.minLocation);
-        return true;
+      for (const beginPoint of beginPoints) {
+        const endPoint = beginPoint.add(path);
+
+        if (geometry.obstructs(beginPoint, endPoint)) {
+          console.log("actor at", bounds.minLocation);
+          console.log("obstructed by entity at", entity.bounds.minLocation);
+          return true;
+        }
       }
     }
     return false;
