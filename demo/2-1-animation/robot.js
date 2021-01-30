@@ -7,8 +7,8 @@ export class Robot extends WT.Actor {
                         WT.Direction.East,
                         WT.Direction.South ];
   static sprites = new Array();
-  static spriteWidth = 80;
-  static spriteHeight = 114;
+  static spriteWidth = 85;
+  static spriteHeight = 113;
   static dims =
     WT.TwoByOneIsometricRenderer.getDimensions(this.spriteWidth, this.spriteHeight);
 
