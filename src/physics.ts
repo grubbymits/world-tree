@@ -5,8 +5,10 @@ import { SquareGrid } from "./map.js"
 import { Point2D,
          Point3D,
          Vector3D,
-         Geometry } from "./geometry.js"
+         Geometry,
+         IntersectInfo } from "./geometry.js"
 import { Octree } from "./tree.js"
+import { EntityEvent } from "./events.js"
 
 export enum Direction {
   North,
@@ -281,10 +283,35 @@ export class BoundingCuboid {
   }
 }
 
-export class CollisionDetector {
-  constructor(private readonly _spatialInfo : Octree) { }
+export class CollisionInfo {
+  constructor(private readonly _collidedEntity: Entity,
+              private readonly _intersectInfo: IntersectInfo) { }
+  get entity(): Entity { return this._collidedEntity; }
+  get intersectInfo(): IntersectInfo { return this._intersectInfo; }
+}
 
-  detectInArea(actor: Actor, path: Vector3D, area: BoundingCuboid): boolean {
+export class CollisionDetector {
+  private static _collisionInfo: Map<Actor, CollisionInfo>;
+  private static _spatialInfo: Octree;
+
+  static init(spatialInfo: Octree): void {
+    this._spatialInfo = spatialInfo;
+    this._collisionInfo = new Map();
+  }
+
+  static hasInfo(actor: Actor): boolean {
+    return this._collisionInfo.has(actor);
+  }
+
+  static getInfo(actor: Actor): CollisionInfo {
+    return this._collisionInfo.get(actor)!;
+  }
+
+  static removeInfo(actor: Actor): void {
+    this._collisionInfo.delete(actor);
+  }
+
+  static detectInArea(actor: Actor, path: Vector3D, area: BoundingCuboid): boolean {
     const bounds = actor.bounds;
     const widthVec3D = new Vector3D(bounds.width, 0, 0);
     const depthVec3D = new Vector3D(0, bounds.depth, 0);
@@ -311,8 +338,9 @@ export class CollisionDetector {
         const endPoint = beginPoint.add(path);
 
         if (geometry.obstructs(beginPoint, endPoint)) {
-          console.log("actor at", bounds.minLocation);
-          console.log("obstructed by entity at", entity.bounds.minLocation);
+          this._collisionInfo.set(actor,
+            new CollisionInfo(entity, geometry.intersectInfo!));
+          actor.postEvent(EntityEvent.Collision);
           return true;
         }
       }

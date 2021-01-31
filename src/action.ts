@@ -20,11 +20,8 @@ export abstract class Action {
 }
 
 class MoveAction extends Action {
-  protected readonly _collisionDetector : CollisionDetector;
-  constructor(actor: Actor,
-              spatialInfo: Octree) {
+  constructor(actor: Actor) {
     super(actor);
-    this._collisionDetector = new CollisionDetector(spatialInfo);
   }
 
   canMove(from: Point3D, to: Point3D): boolean {
@@ -33,7 +30,7 @@ class MoveAction extends Action {
     let path: Vector3D = to.vec(from);
     let area = new BoundingCuboid(to, bounds.dimensions);
     area.insert(bounds);
-    return !this._collisionDetector.detectInArea(this._actor, path, area);
+    return !CollisionDetector.detectInArea(this._actor, path, area);
   }
 
   perform(): boolean { return true; }
@@ -42,9 +39,8 @@ class MoveAction extends Action {
 export class MoveDirection extends MoveAction {
   constructor(actor: Actor,
               private readonly _d: Vector3D,
-              private _bounds: BoundingCuboid,
-              spatialInfo: Octree) {
-    super(actor, spatialInfo);
+              private _bounds: BoundingCuboid) {
+    super(actor);
   }
 
   perform(): boolean {
@@ -66,9 +62,8 @@ export class MoveForwardsDirection extends MoveDirection {
 
   constructor(actor: Actor,
               d: Vector3D,
-              bounds: BoundingCuboid,
-              spatialInfo: Octree) {
-    super(actor, d, bounds, spatialInfo);
+              bounds: BoundingCuboid) {
+    super(actor, d, bounds);
 
     if (d.y < 0 && d.y < d.x) {
       this._direction = Direction.North;
@@ -97,9 +92,8 @@ export class MoveDestination extends MoveAction {
 
   constructor(actor: Actor,
               private _step: number,
-              private _destination: Point3D,
-              spatialInfo: Octree) {
-    super(actor, spatialInfo);
+              private _destination: Point3D) {
+    super(actor);
     this.destination = _destination;
   }
 
@@ -198,13 +192,12 @@ export class Navigate extends Action {
   constructor(actor: Actor,
               private readonly _step: number,
               private readonly _destination: Point3D,
-              private readonly _map: SquareGrid,
-              private readonly _spatialInfo: Octree) {
+              private readonly _map: SquareGrid) {
     super(actor);
     this._waypoints = this.findPath();
     if (this._waypoints.length != 0) {
       this._currentStep =
-        new MoveDestination(actor, _step, this._waypoints[0], _spatialInfo);
+        new MoveDestination(actor, _step, this._waypoints[0]);
     }
   }
 
@@ -229,8 +222,7 @@ export class Navigate extends Action {
       if (this._waypoints.length != 0) {
         this._index = 0;
         this._currentStep =
-          new MoveDestination(this._actor, this._step, this._waypoints[0],
-                              this._spatialInfo);
+          new MoveDestination(this._actor, this._step, this._waypoints[0]);
         return false;
       }
       return true; // can no longer reach the destination.
@@ -243,8 +235,7 @@ export class Navigate extends Action {
 
     let nextLocation = this._waypoints[this._index];
     this._currentStep =
-      new MoveDestination(this._actor, this._step, nextLocation,
-                          this._spatialInfo);
+      new MoveDestination(this._actor, this._step, nextLocation);
     return false;
   }
 

@@ -3,6 +3,7 @@ export var EntityEvent;
     EntityEvent["Moving"] = "moving";
     EntityEvent["EndMove"] = "endMove";
     EntityEvent["FaceDirection"] = "faceDirection";
+    EntityEvent["Collision"] = "collision";
 })(EntityEvent || (EntityEvent = {}));
 export var InputEvent;
 (function (InputEvent) {
@@ -50,6 +51,22 @@ export class EventHandler {
         const index = callbacks.indexOf(callback, 0);
         if (index > -1) {
             callbacks.splice(index, 1);
+        }
+    }
+}
+export class TimedEventHandler {
+    constructor() {
+        this._callbacks = new Array();
+    }
+    add(callback) {
+        this._callbacks.push(callback);
+    }
+    service() {
+        for (let i = this._callbacks.length - 1; i >= 0; i--) {
+            const finished = this._callbacks[i]();
+            if (finished) {
+                this._callbacks.splice(i, 1);
+            }
         }
     }
 }

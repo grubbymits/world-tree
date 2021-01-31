@@ -33,9 +33,9 @@
                       [ 2, 2, 1, 1, 1, 2, 1, 1, 2 ],
                       [ 2, 1, 1, 1, 1, 2, 1, 1, 2 ],
                       [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 1, 1, 1, 2, 2 ],
+                      [ 2, 1, 1, 2, 1, 1, 1, 2, 2 ],
                       [ 2, 1, 2, 1, 1, 1, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
+                      [ 2, 1, 1, 1, 2, 1, 1, 1, 2 ],
                       [ 2, 2, 1, 1, 1, 1, 2, 1, 2 ],
                       [ 2, 2, 2, 2, 2, 2, 2, 2, 2] ];
 
@@ -71,6 +71,7 @@
       let camera = new WT.TrackerCamera(context.scene,
                                         canvas.width, canvas.height,
                                         robotController.robot);
+      var actorDebugger = new WT.ActorDebug(robotController.robot, camera, true);
 
       var update = function update() {
         if (document.hasFocus()) {

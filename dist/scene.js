@@ -1,6 +1,7 @@
 import { Point2D, Point3D, Segment2D } from "./geometry.js";
 import { Sprite } from "./graphics.js";
 import { Dimensions } from "./physics.js";
+import { TimedEventHandler } from "./events.js";
 var RenderOrder;
 (function (RenderOrder) {
     RenderOrder[RenderOrder["Before"] = -1] = "Before";
@@ -219,10 +220,14 @@ export class SceneGraph {
         this._canvas = _canvas;
         this._levels = new Array();
         this._nodes = new Map();
+        this._handler = new TimedEventHandler();
         this._width = _canvas.width;
         this._height = _canvas.height;
         this._ctx = this._canvas.getContext("2d", { alpha: false });
         SceneNode.graph = this;
+    }
+    addTimedEvent(callback) {
+        this._handler.add(callback);
     }
     setDrawCoords(node) {
         const entity = node.entity;
@@ -251,6 +256,7 @@ export class SceneGraph {
         const adjustedCoord = new Point2D(coord.x, coord.y - drawHeightOffset.y);
         node.drawCoord = adjustedCoord;
     }
+    get ctx() { return this._ctx; }
     get nodes() { return this._nodes; }
     getNode(id) {
         console.assert(this._nodes.has(id));
@@ -287,17 +293,6 @@ export class SceneGraph {
                     const spriteId = component.update();
                     Sprite.sprites[spriteId].draw(coord, ctx);
                 });
-                if (entity.drawGeometry) {
-                    ctx.strokeStyle = "Orange";
-                    for (const segment of node.allSegments) {
-                        ctx.beginPath();
-                        let drawP0 = camera.getDrawCoord(segment.p0);
-                        let drawP1 = camera.getDrawCoord(segment.p1);
-                        ctx.moveTo(drawP0.x, drawP0.y);
-                        ctx.lineTo(drawP1.x, drawP1.y);
-                        ctx.stroke();
-                    }
-                }
             }
         };
         let ctx = this._ctx;
@@ -308,6 +303,7 @@ export class SceneGraph {
                 renderNode(node);
             }
         });
+        this._handler.service();
     }
     insertEntity(entity) {
         let node = new SceneNode(entity);

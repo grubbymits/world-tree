@@ -1,7 +1,8 @@
 export enum EntityEvent {
   Moving = "moving",
   EndMove = "endMove",
-  FaceDirection = "faceDirection"
+  FaceDirection = "faceDirection",
+  Collision = "collision"
 }
 
 export enum InputEvent {
@@ -54,6 +55,25 @@ export class EventHandler<T> {
     const index = callbacks.indexOf(callback, 0);
     if (index > -1) {
       callbacks.splice(index, 1);
+    }
+  }
+}
+
+export class TimedEventHandler {
+  private _callbacks: Array<Function> = new Array<Function>();
+
+  constructor() { }
+
+  add(callback: Function): void {
+    this._callbacks.push(callback);
+  }
+
+  service(): void {
+    for (let i = this._callbacks.length - 1; i >= 0; i--) {
+      const finished: boolean = this._callbacks[i]();
+      if (finished) {
+        this._callbacks.splice(i, 1);
+      }
     }
   }
 }

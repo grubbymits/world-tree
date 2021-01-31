@@ -12,7 +12,8 @@ import { Camera } from "./camera.js"
 import { Controller } from "./controller.js"
 import { Octree } from "./tree.js"
 import { Dimensions,
-         BoundingCuboid } from "./physics.js"
+         BoundingCuboid,
+         CollisionDetector } from "./physics.js"
 
 export class Context {
   private _scene: SceneGraph;
@@ -37,6 +38,7 @@ export class Context {
       break;
     }
     this._octree = new Octree(worldDims);
+    CollisionDetector.init(this._octree);
   }
 
   get scene(): SceneGraph { return this._scene; }

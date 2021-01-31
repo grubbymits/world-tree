@@ -6,6 +6,7 @@ import { Point2D,
 import { Sprite,
          GraphicComponent } from "./graphics.js"
 import { Dimensions } from "./physics.js"
+import { TimedEventHandler } from "./events.js"
 
 enum RenderOrder {
   Before = -1,
@@ -260,6 +261,7 @@ export abstract class SceneGraph {
   protected _ctx: CanvasRenderingContext2D;
   protected _levels: Array<SceneLevel> = new Array<SceneLevel>();
   protected _nodes: Map<number, SceneNode> = new Map<number, SceneNode>();
+  protected _handler = new TimedEventHandler();
 
   constructor(protected _canvas: HTMLCanvasElement) {
     this._width = _canvas.width;
@@ -270,6 +272,10 @@ export abstract class SceneGraph {
 
   abstract getDrawCoord(location: Point3D): Point2D;
   abstract drawOrder(firstId: number, secondId: number): RenderOrder;
+
+  addTimedEvent(callback: Function): void {
+    this._handler.add(callback);
+  }
 
   setDrawCoords(node: SceneNode): void {
     const entity: Entity = node.entity;
@@ -304,6 +310,7 @@ export abstract class SceneGraph {
     node.drawCoord = adjustedCoord;
   }
 
+  get ctx(): CanvasRenderingContext2D { return this._ctx; }
   get nodes(): Map<number, SceneNode> { return this._nodes; }
 
   getNode(id: number): SceneNode {
@@ -344,17 +351,6 @@ export abstract class SceneGraph {
           const spriteId: number = component.update();
           Sprite.sprites[spriteId].draw(coord, ctx);
         });
-        if (entity.drawGeometry) {
-          ctx.strokeStyle = "Orange";
-          for (const segment of node.allSegments) {
-            ctx.beginPath();
-            let drawP0 = camera.getDrawCoord(segment.p0);
-            let drawP1 = camera.getDrawCoord(segment.p1);
-            ctx.moveTo(drawP0.x, drawP0.y);
-            ctx.lineTo(drawP1.x, drawP1.y);
-            ctx.stroke();
-          }
-        }
       }
     };
 
@@ -366,6 +362,8 @@ export abstract class SceneGraph {
         renderNode(node);
       }
     });
+
+    this._handler.service();
   }
 
   insertEntity(entity: Entity): void {

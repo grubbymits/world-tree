@@ -39,7 +39,8 @@ export class Entity {
     this._geometry = new CuboidGeometry(bounds);
     this._context.addEntity(this);
   }
-  
+
+  get context(): Context { return this._context; }  
   get geometry(): Geometry { return this._geometry; }
   get bounds(): BoundingCuboid { return this._geometry.bounds; }
   get dimensions(): Dimensions { return this.bounds.dimensions; }

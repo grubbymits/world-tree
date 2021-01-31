@@ -1,6 +1,7 @@
 import { EntityEvent } from "./events.js";
 import { Perspective, IsometricRenderer, TwoByOneIsometricRenderer } from "./scene.js";
 import { Octree } from "./tree.js";
+import { CollisionDetector } from "./physics.js";
 export class Context {
     constructor(canvas, worldDims, perspective) {
         this._entities = new Array();
@@ -19,6 +20,7 @@ export class Context {
                 break;
         }
         this._octree = new Octree(worldDims);
+        CollisionDetector.init(this._octree);
     }
     get scene() { return this._scene; }
     get bounds() { return this._octree.bounds; }

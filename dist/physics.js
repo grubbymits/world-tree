@@ -1,4 +1,5 @@
 import { Point2D, Point3D, Vector3D } from "./geometry.js";
+import { EntityEvent } from "./events.js";
 export var Direction;
 (function (Direction) {
     Direction[Direction["North"] = 0] = "North";
@@ -238,11 +239,29 @@ export class BoundingCuboid {
         console.log(" - dimensions (WxDxH):", this.width, this.depth, this.height);
     }
 }
-export class CollisionDetector {
-    constructor(_spatialInfo) {
-        this._spatialInfo = _spatialInfo;
+export class CollisionInfo {
+    constructor(_collidedEntity, _intersectInfo) {
+        this._collidedEntity = _collidedEntity;
+        this._intersectInfo = _intersectInfo;
     }
-    detectInArea(actor, path, area) {
+    get entity() { return this._collidedEntity; }
+    get intersectInfo() { return this._intersectInfo; }
+}
+export class CollisionDetector {
+    static init(spatialInfo) {
+        this._spatialInfo = spatialInfo;
+        this._collisionInfo = new Map();
+    }
+    static hasInfo(actor) {
+        return this._collisionInfo.has(actor);
+    }
+    static getInfo(actor) {
+        return this._collisionInfo.get(actor);
+    }
+    static removeInfo(actor) {
+        this._collisionInfo.delete(actor);
+    }
+    static detectInArea(actor, path, area) {
         const bounds = actor.bounds;
         const widthVec3D = new Vector3D(bounds.width, 0, 0);
         const depthVec3D = new Vector3D(0, bounds.depth, 0);
@@ -266,8 +285,8 @@ export class CollisionDetector {
             for (const beginPoint of beginPoints) {
                 const endPoint = beginPoint.add(path);
                 if (geometry.obstructs(beginPoint, endPoint)) {
-                    console.log("actor at", bounds.minLocation);
-                    console.log("obstructed by entity at", entity.bounds.minLocation);
+                    this._collisionInfo.set(actor, new CollisionInfo(entity, geometry.intersectInfo));
+                    actor.postEvent(EntityEvent.Collision);
                     return true;
                 }
             }

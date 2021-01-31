@@ -77,7 +77,6 @@ export class RobotController extends WT.Controller {
 
     this._actors.push(this.robot);
     let bounds = this._context.bounds;
-    let spatialInfo = this._context.spatial;
     let robot = this.robot;
 
     let moveRandomDirection = function() {
@@ -93,7 +92,7 @@ export class RobotController extends WT.Controller {
         dy = 1;
       }
       let moveVector = new WT.Vector3D(dx, dy, dz);
-      robot.action = new WT.MoveForwardsDirection(robot, moveVector, bounds, spatialInfo);
+      robot.action = new WT.MoveForwardsDirection(robot, moveVector, bounds);
     };
 
     // Choose another direction when it can't move anymore.

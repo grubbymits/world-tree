@@ -9,22 +9,21 @@ export class Action {
     set actor(actor) { this._actor = actor; }
 }
 class MoveAction extends Action {
-    constructor(actor, spatialInfo) {
+    constructor(actor) {
         super(actor);
-        this._collisionDetector = new CollisionDetector(spatialInfo);
     }
     canMove(from, to) {
         let bounds = this._actor.bounds;
         let path = to.vec(from);
         let area = new BoundingCuboid(to, bounds.dimensions);
         area.insert(bounds);
-        return !this._collisionDetector.detectInArea(this._actor, path, area);
+        return !CollisionDetector.detectInArea(this._actor, path, area);
     }
     perform() { return true; }
 }
 export class MoveDirection extends MoveAction {
-    constructor(actor, _d, _bounds, spatialInfo) {
-        super(actor, spatialInfo);
+    constructor(actor, _d, _bounds) {
+        super(actor);
         this._d = _d;
         this._bounds = _bounds;
     }
@@ -41,8 +40,8 @@ export class MoveDirection extends MoveAction {
     }
 }
 export class MoveForwardsDirection extends MoveDirection {
-    constructor(actor, d, bounds, spatialInfo) {
-        super(actor, d, bounds, spatialInfo);
+    constructor(actor, d, bounds) {
+        super(actor, d, bounds);
         if (d.y < 0 && d.y < d.x) {
             this._direction = Direction.North;
         }
@@ -67,8 +66,8 @@ export class MoveForwardsDirection extends MoveDirection {
     }
 }
 export class MoveDestination extends MoveAction {
-    constructor(actor, _step, _destination, spatialInfo) {
-        super(actor, spatialInfo);
+    constructor(actor, _step, _destination) {
+        super(actor);
         this._step = _step;
         this._destination = _destination;
         this.destination = _destination;
@@ -146,17 +145,16 @@ export class MoveDestination extends MoveAction {
     }
 }
 export class Navigate extends Action {
-    constructor(actor, _step, _destination, _map, _spatialInfo) {
+    constructor(actor, _step, _destination, _map) {
         super(actor);
         this._step = _step;
         this._destination = _destination;
         this._map = _map;
-        this._spatialInfo = _spatialInfo;
         this._index = 0;
         this._waypoints = this.findPath();
         if (this._waypoints.length != 0) {
             this._currentStep =
-                new MoveDestination(actor, _step, this._waypoints[0], _spatialInfo);
+                new MoveDestination(actor, _step, this._waypoints[0]);
         }
     }
     perform() {
@@ -172,7 +170,7 @@ export class Navigate extends Action {
             if (this._waypoints.length != 0) {
                 this._index = 0;
                 this._currentStep =
-                    new MoveDestination(this._actor, this._step, this._waypoints[0], this._spatialInfo);
+                    new MoveDestination(this._actor, this._step, this._waypoints[0]);
                 return false;
             }
             return true;
@@ -183,7 +181,7 @@ export class Navigate extends Action {
         }
         let nextLocation = this._waypoints[this._index];
         this._currentStep =
-            new MoveDestination(this._actor, this._step, nextLocation, this._spatialInfo);
+            new MoveDestination(this._actor, this._step, nextLocation);
         return false;
     }
     findPath() {
