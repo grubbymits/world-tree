@@ -23,15 +23,41 @@ export class ActorDebug {
   private debugCollision(actor: Actor, camera: Camera): void {
     const context: Context = actor.context;
 
+    actor.addEventListener(EntityEvent.Moving, function() {
+      if (!CollisionDetector.hasMissInfo(actor)) {
+        return;
+      }
+      let missedEntities: Array<Entity> = CollisionDetector.getMissInfo(actor);
+      let scene: SceneGraph = context.scene;
+      const start = Date.now();
+
+      scene.addTimedEvent(function() {
+        // outline the actor in green
+        scene.ctx.strokeStyle = "Green";
+        for (let entity of missedEntities) {
+          for (const segment of scene.getNode(entity.id).allSegments) {
+            scene.ctx.beginPath();
+            let drawP0 = camera.getDrawCoord(segment.p0);
+            let drawP1 = camera.getDrawCoord(segment.p1);
+            scene.ctx.moveTo(drawP0.x, drawP0.y);
+            scene.ctx.lineTo(drawP1.x, drawP1.y);
+            scene.ctx.stroke();
+          }
+        }
+        // Draw for ~1 second.
+        return Date.now() > start + 1000;
+      });
+    });
+
     actor.addEventListener(EntityEvent.Collision, function() {
       console.log("collision detected");
 
-      if (!CollisionDetector.hasInfo(actor)) {
+      if (!CollisionDetector.hasCollideInfo(actor)) {
         console.log("but no info available");
         return;
       }
 
-      const collisionInfo: CollisionInfo = CollisionDetector.getInfo(actor);
+      const collisionInfo: CollisionInfo = CollisionDetector.getCollideInfo(actor);
       const intersectInfo: IntersectInfo = collisionInfo.intersectInfo;
       const collidedEntity: Entity = collisionInfo.entity;
       const collidedFace: Face3D = intersectInfo.face 

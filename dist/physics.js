@@ -33,7 +33,7 @@ export function getDirectionName(direction) {
         case Direction.NorthWest:
             return "north west";
     }
-    console.error("unhandled direction when getting name");
+    console.error("unhandled direction when getting name:", direction);
     return "error";
 }
 export function getDirectionCoords(x, y, direction) {
@@ -251,15 +251,30 @@ export class CollisionDetector {
     static init(spatialInfo) {
         this._spatialInfo = spatialInfo;
         this._collisionInfo = new Map();
+        this._missInfo = new Map();
     }
-    static hasInfo(actor) {
+    static hasCollideInfo(actor) {
         return this._collisionInfo.has(actor);
     }
-    static getInfo(actor) {
+    static getCollideInfo(actor) {
+        console.assert(this.hasCollideInfo(actor));
         return this._collisionInfo.get(actor);
     }
     static removeInfo(actor) {
         this._collisionInfo.delete(actor);
+    }
+    static removeMissInfo(actor) {
+        this._missInfo.delete(actor);
+    }
+    static addMissInfo(actor, entities) {
+        this._missInfo.set(actor, entities);
+    }
+    static hasMissInfo(actor) {
+        return this._missInfo.has(actor);
+    }
+    static getMissInfo(actor) {
+        console.assert(this.hasMissInfo(actor));
+        return this._missInfo.get(actor);
     }
     static detectInArea(actor, path, area) {
         const bounds = actor.bounds;
@@ -276,6 +291,7 @@ export class CollisionDetector {
             bounds.maxLocation.sub(widthVec3D),
             bounds.maxLocation
         ];
+        let misses = new Array();
         let entities = this._spatialInfo.getEntities(area);
         for (let entity of entities) {
             if (entity.id == actor.id) {
@@ -289,8 +305,16 @@ export class CollisionDetector {
                     actor.postEvent(EntityEvent.Collision);
                     return true;
                 }
+                else {
+                    misses.push(entity);
+                    actor.postEvent(EntityEvent.NoCollision);
+                }
+            }
+            if (actor.bounds.intersects(entity.bounds)) {
+                console.error("actor intersects entity but hasn't collided!");
             }
         }
+        this.addMissInfo(actor, misses);
         return false;
     }
 }

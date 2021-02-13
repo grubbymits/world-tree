@@ -1,5 +1,6 @@
 import { Point2D } from "./geometry.js"
-import { Direction } from "./physics.js"
+import { getDirectionName,
+         Direction } from "./physics.js"
 
 export class SpriteSheet {
   private static _sheets = new Array<SpriteSheet>();
@@ -219,17 +220,18 @@ export class DirectionalGraphicComponent extends GraphicComponent {
   update(): number {
     if (!this.stationary && this._movementGraphics.has(this.direction)) {
       const spriteId = this._movementGraphics.get(this.direction)!.update();
-      //console.assert(typeof(spriteId) == "number", "movement spriteId not a number",
-        //             this._movementGraphics.get(this.direction)!);
       return spriteId;
     }
     if (this.stationary && this._staticGraphics.has(this.direction)) {
       const component: GraphicComponent = this._staticGraphics.get(this.direction)!;
       const spriteId = component.update();
-      //console.assert(typeof(spriteId) == "number", "static spriteId not a number", spriteId);
       return spriteId;
     }
-    console.error("unhandled graphic");
+    if (this.stationary) {
+      console.error("unhandled stationary graphic:", getDirectionName(this.direction));
+    } else {
+      console.error("unhandled movement graphic:", getDirectionName(this.direction));
+    }
     return 0;
   }
 }

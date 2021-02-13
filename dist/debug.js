@@ -8,13 +8,35 @@ export class ActorDebug {
     }
     debugCollision(actor, camera) {
         const context = actor.context;
+        actor.addEventListener(EntityEvent.Moving, function () {
+            if (!CollisionDetector.hasMissInfo(actor)) {
+                return;
+            }
+            let missedEntities = CollisionDetector.getMissInfo(actor);
+            let scene = context.scene;
+            const start = Date.now();
+            scene.addTimedEvent(function () {
+                scene.ctx.strokeStyle = "Green";
+                for (let entity of missedEntities) {
+                    for (const segment of scene.getNode(entity.id).allSegments) {
+                        scene.ctx.beginPath();
+                        let drawP0 = camera.getDrawCoord(segment.p0);
+                        let drawP1 = camera.getDrawCoord(segment.p1);
+                        scene.ctx.moveTo(drawP0.x, drawP0.y);
+                        scene.ctx.lineTo(drawP1.x, drawP1.y);
+                        scene.ctx.stroke();
+                    }
+                }
+                return Date.now() > start + 1000;
+            });
+        });
         actor.addEventListener(EntityEvent.Collision, function () {
             console.log("collision detected");
-            if (!CollisionDetector.hasInfo(actor)) {
+            if (!CollisionDetector.hasCollideInfo(actor)) {
                 console.log("but no info available");
                 return;
             }
-            const collisionInfo = CollisionDetector.getInfo(actor);
+            const collisionInfo = CollisionDetector.getCollideInfo(actor);
             const intersectInfo = collisionInfo.intersectInfo;
             const collidedEntity = collisionInfo.entity;
             const collidedFace = intersectInfo.face;

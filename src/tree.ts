@@ -7,11 +7,13 @@ import { Point3D } from "./geometry.js"
 
 class OctNode {
   // 3x3x3 rounded up to a nice number.
-  static readonly MaxEntities: number = 32;
+  static readonly MaxEntities: number = 9;
 
   private _children: Array<OctNode> = new Array<OctNode>();
   private _entities: Array<Entity> = new Array<Entity>();
 
+  get children(): Array<OctNode> { return this._children; }
+  get entities(): Array<Entity> { return this._entities; }
   get bounds(): BoundingCuboid { return this._bounds; }
   get centre(): Point3D { return this._bounds.centre; }
   get width(): number { return this._bounds.width; }
@@ -36,9 +38,10 @@ class OctNode {
       // For a leaf node, insert it into the entity list and check that we're
       // within the size limit.
       this._entities.push(entity);
-      //console.log("inserted entity into octree node");
+      // Allow the bounds to grow to completely contain the entity. This means
+      // that some of the nodes could overlap.
+      this.bounds.insert(entity.bounds);
       if (this._entities.length > OctNode.MaxEntities) {
-        //console.log("entity insertion has crossed entity limit");
         inserted = this.split();
       } else {
         inserted = true;
@@ -148,23 +151,6 @@ class OctNode {
     }
     return false;
   }
-
-  getEntities(area: BoundingCuboid): Array<Entity> {
-    let entities = new Array<Entity>();
-    if (!this._bounds.containsBounds(area) && !this._bounds.intersects(area)) {
-      return entities;
-    }
-    for (let child of this._children) {
-      child.getEntities(area).forEach(entity => entities.push(entity));
-    }
-    if (this._entities.length == 0) {
-      return entities;
-    }
-    console.assert(this._bounds.containsBounds(area) ||
-                   this._bounds.intersects(area));
-    this._entities.forEach(entity => entities.push(entity));
-    return entities;
-  }
 }
 
 export class Octree {
@@ -193,8 +179,23 @@ export class Octree {
     this._numEntities++;
   }
 
-  getEntities(bounds: BoundingCuboid): Array<Entity> {
-    return this._root.getEntities(bounds);
+  findEntitiesInArea(root: OctNode, area: BoundingCuboid, entities: Array<Entity>) {
+    for (let child of root.children) {
+      if (!child.bounds.intersects(area)) {
+        continue;
+      }
+      if (child.entities.length != 0) {
+        child.entities.forEach(entity => entities.push(entity));
+      } else {
+        this.findEntitiesInArea(child, area, entities);
+      }
+    }
+  }
+
+  getEntities(area: BoundingCuboid): Array<Entity> {
+    let entities = new Array<Entity>();
+    this.findEntitiesInArea(this._root, area, entities);
+    return entities;
   }
 
   update(entity: Entity): void {

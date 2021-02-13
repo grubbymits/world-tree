@@ -4,6 +4,7 @@ export var EntityEvent;
     EntityEvent["EndMove"] = "endMove";
     EntityEvent["FaceDirection"] = "faceDirection";
     EntityEvent["Collision"] = "collision";
+    EntityEvent["NoCollision"] = "noCollision";
 })(EntityEvent || (EntityEvent = {}));
 export var InputEvent;
 (function (InputEvent) {

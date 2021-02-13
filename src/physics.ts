@@ -43,7 +43,7 @@ export function getDirectionName(direction: Direction): string {
   case Direction.NorthWest:
     return "north west";
   }
-  console.error("unhandled direction when getting name");
+  console.error("unhandled direction when getting name:", direction);
   return "error";
 }
 
@@ -292,23 +292,43 @@ export class CollisionInfo {
 
 export class CollisionDetector {
   private static _collisionInfo: Map<Actor, CollisionInfo>;
+  private static _missInfo: Map<Actor, Array<Entity>>;
   private static _spatialInfo: Octree;
 
   static init(spatialInfo: Octree): void {
     this._spatialInfo = spatialInfo;
     this._collisionInfo = new Map();
+    this._missInfo = new Map();
   }
 
-  static hasInfo(actor: Actor): boolean {
+  static hasCollideInfo(actor: Actor): boolean {
     return this._collisionInfo.has(actor);
   }
 
-  static getInfo(actor: Actor): CollisionInfo {
+  static getCollideInfo(actor: Actor): CollisionInfo {
+    console.assert(this.hasCollideInfo(actor));
     return this._collisionInfo.get(actor)!;
   }
 
   static removeInfo(actor: Actor): void {
     this._collisionInfo.delete(actor);
+  }
+  
+  static removeMissInfo(actor: Actor): void {
+    this._missInfo.delete(actor);
+  }
+
+  static addMissInfo(actor: Actor, entities: Array<Entity>): void {
+    this._missInfo.set(actor, entities);
+  }
+
+  static hasMissInfo(actor: Actor): boolean {
+    return this._missInfo.has(actor);
+  }
+
+  static getMissInfo(actor: Actor): Array<Entity> {
+    console.assert(this.hasMissInfo(actor));
+    return this._missInfo.get(actor)!;
   }
 
   static detectInArea(actor: Actor, path: Vector3D, area: BoundingCuboid): boolean {
@@ -328,7 +348,9 @@ export class CollisionDetector {
       bounds.maxLocation
     ];
 
+    let misses: Array<Entity> = new Array<Entity>();
     let entities: Array<Entity> = this._spatialInfo.getEntities(area);
+
     for (let entity of entities) {
       if (entity.id == actor.id) {
         continue;
@@ -342,9 +364,16 @@ export class CollisionDetector {
             new CollisionInfo(entity, geometry.intersectInfo!));
           actor.postEvent(EntityEvent.Collision);
           return true;
+        } else {
+          misses.push(entity);
+          actor.postEvent(EntityEvent.NoCollision);
         }
       }
+      if (actor.bounds.intersects(entity.bounds)) {
+        console.error("actor intersects entity but hasn't collided!");
+      }
     }
+    this.addMissInfo(actor, misses);
     return false;
   }
 }

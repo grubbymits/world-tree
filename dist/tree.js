@@ -6,6 +6,8 @@ class OctNode {
         this._children = new Array();
         this._entities = new Array();
     }
+    get children() { return this._children; }
+    get entities() { return this._entities; }
     get bounds() { return this._bounds; }
     get centre() { return this._bounds.centre; }
     get width() { return this._bounds.width; }
@@ -25,6 +27,7 @@ class OctNode {
         let inserted = false;
         if (this._children.length == 0) {
             this._entities.push(entity);
+            this.bounds.insert(entity.bounds);
             if (this._entities.length > OctNode.MaxEntities) {
                 inserted = this.split();
             }
@@ -114,24 +117,8 @@ class OctNode {
         }
         return false;
     }
-    getEntities(area) {
-        let entities = new Array();
-        if (!this._bounds.containsBounds(area) && !this._bounds.intersects(area)) {
-            return entities;
-        }
-        for (let child of this._children) {
-            child.getEntities(area).forEach(entity => entities.push(entity));
-        }
-        if (this._entities.length == 0) {
-            return entities;
-        }
-        console.assert(this._bounds.containsBounds(area) ||
-            this._bounds.intersects(area));
-        this._entities.forEach(entity => entities.push(entity));
-        return entities;
-    }
 }
-OctNode.MaxEntities = 32;
+OctNode.MaxEntities = 9;
 export class Octree {
     constructor(dimensions) {
         this._numEntities = 0;
@@ -149,8 +136,23 @@ export class Octree {
         console.assert(inserted, "failed to insert");
         this._numEntities++;
     }
-    getEntities(bounds) {
-        return this._root.getEntities(bounds);
+    findEntitiesInArea(root, area, entities) {
+        for (let child of root.children) {
+            if (!child.bounds.intersects(area)) {
+                continue;
+            }
+            if (child.entities.length != 0) {
+                child.entities.forEach(entity => entities.push(entity));
+            }
+            else {
+                this.findEntitiesInArea(child, area, entities);
+            }
+        }
+    }
+    getEntities(area) {
+        let entities = new Array();
+        this.findEntitiesInArea(this._root, area, entities);
+        return entities;
     }
     update(entity) {
         const removed = this._root.recursiveRemoveEntity(entity);

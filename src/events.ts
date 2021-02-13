@@ -2,7 +2,8 @@ export enum EntityEvent {
   Moving = "moving",
   EndMove = "endMove",
   FaceDirection = "faceDirection",
-  Collision = "collision"
+  Collision = "collision",
+  NoCollision = "noCollision"
 }
 
 export enum InputEvent {

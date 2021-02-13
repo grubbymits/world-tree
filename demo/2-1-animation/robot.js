@@ -44,10 +44,11 @@ export class Robot extends WT.Actor {
     }
     let graphics = new WT.DirectionalGraphicComponent(Robot._staticGraphics,
                                                       movementGraphics);
-    super(context, position, Robot.dims, graphics, /*debug*/ true);
+    super(context, position, Robot.dims, graphics);
     console.log("creating robot of dimensions:", Robot.dims);
-
-    this._drawGeometry = true;
+    
+    this.direction = WT.Direction.South;
+    graphics.direction = WT.Direction.South;
     let robot = this;
 
     this.addEventListener(WT.EntityEvent.FaceDirection, function() {

@@ -71,7 +71,7 @@
       let camera = new WT.TrackerCamera(context.scene,
                                         canvas.width, canvas.height,
                                         robotController.robot);
-      var actorDebugger = new WT.ActorDebug(robotController.robot, camera, true);
+      var actorDebugger = new WT.ActorDebug(robotController.robot, camera, false);
 
       var update = function update() {
         if (document.hasFocus()) {
