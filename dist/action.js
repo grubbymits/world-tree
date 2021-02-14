@@ -1,4 +1,4 @@
-import { EntityEvent } from "./events.js";
+import { EntityEvent } from "./events";
 import { Direction, BoundingCuboid, CollisionDetector } from "./physics.js";
 import { Vector3D } from "./geometry.js";
 export class Action {

@@ -37,13 +37,21 @@ class OctNode {
         }
         else {
             for (let child of this._children) {
-                if (child.containsLocation(entity.centre)) {
+                if (child.bounds.containsBounds(entity.bounds)) {
                     inserted = child.insert(entity);
                     break;
                 }
             }
+            if (!inserted) {
+                for (let child of this._children) {
+                    if (child.containsLocation(entity.centre)) {
+                        inserted = child.insert(entity);
+                        break;
+                    }
+                }
+            }
         }
-        console.assert(inserted, "failed to insert location");
+        console.assert(inserted, "failed to insert entity into octree node");
         return inserted;
     }
     split() {

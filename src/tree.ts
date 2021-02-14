@@ -48,14 +48,26 @@ class OctNode {
       }
     } else {
       // Other wise, pass the entity down through one of the children.
+      // First try inserting an entity that is fully contained by an existing
+      // boundary.
       for (let child of this._children) {
-        if (child.containsLocation(entity.centre)) {
+        if (child.bounds.containsBounds(entity.bounds)) {
           inserted = child.insert(entity);
           break;
         }
       }
+      // Otherwise, place it based on the entity's centre point and we will then
+      // grow the bounds.
+      if (!inserted) {
+        for (let child of this._children) {
+          if (child.containsLocation(entity.centre)) {
+            inserted = child.insert(entity);
+            break;
+          }
+        }
+      }
     }
-    console.assert(inserted, "failed to insert location");
+    console.assert(inserted, "failed to insert entity into octree node");
     return inserted;
   }
 

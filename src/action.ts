@@ -1,6 +1,6 @@
 import { Entity,
-         Actor } from "./entity.js"
-import { EntityEvent } from "./events.js"
+         Actor } from "./entity"
+import { EntityEvent } from "./events"
 import { Direction,
          getDirectionName,
          BoundingCuboid,
