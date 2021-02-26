@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-  <title>Ramps Demo</title>
+  <title>Small Island Demo</title>
 </head>
 <body>
   <div>
@@ -13,10 +13,12 @@
     const spriteWidth = 322;
     const spriteHeight = 270;
 
-    // rock, grass/rock, grass/sand, sand, water
-    // rock ramps
-    // grass/rock ramps
-    // grass/sand ramps
+    // Sprite sheet layout
+    // flat: rock, grass/rock, grass/sand, sand, water
+    // ramps: (south, west, east, north)
+    //  - rock
+    //  - grass/rock
+    //  - grass/sand
     let sheet = new WT.SpriteSheet("../../../res/img/basic-outside");
     WT.Terrain.addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Flat,
                           sheet, 0, 0, spriteWidth, spriteHeight);
@@ -43,11 +45,11 @@
     const terraces = 1;
     let heightMap = [ [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
                       [ 0, 1, 1, 1, 1, 1, 1, 1, 0 ],
-                      [ 0, 1, 2, 2, 1, 1, 1, 1, 0 ],
-                      [ 0, 1, 2, 2, 2, 2, 1, 1, 0 ],
+                      [ 0, 1, 1, 1, 1, 1, 1, 1, 0 ],
+                      [ 0, 1, 1, 2, 2, 2, 1, 1, 0 ],
                       [ 0, 1, 1, 2, 2, 2, 1, 1, 0 ],
                       [ 0, 1, 1, 1, 2, 2, 2, 1, 0 ],
-                      [ 0, 1, 1, 1, 2, 2, 2, 1, 0 ],
+                      [ 0, 1, 1, 1, 1, 2, 2, 1, 0 ],
                       [ 0, 1, 1, 1, 1, 1, 1, 1, 0 ],
                       [ 0, 0, 0, 0, 0, 0, 0, 0, 0] ];
 

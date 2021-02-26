@@ -172,6 +172,7 @@ export class TerrainAttributes {
   private _type: TerrainType;
   private _shape: TerrainShape;
   private _features: number;
+  private _fixed: boolean = false;
   
   constructor(private readonly _x: number,
               private readonly _y: number,
@@ -194,6 +195,7 @@ export class TerrainAttributes {
   get features(): number { return this._features; }
   get moisture(): number { return this._moisture; }
   get biome(): Biome { return this._biome; }
+  get fixed(): boolean { return this._fixed; }
 
   set moisture(m: number) { this._moisture = m; }
   set terrace(t: number) { this._terrace = t; }
@@ -201,6 +203,7 @@ export class TerrainAttributes {
   set shape(s: TerrainShape) { this._shape = s; }
   set features(f: number) { this._features |= f; }
   set biome(b: Biome) { this._biome = b; }
+  set fixed(f: boolean) { this._fixed = f; }
 }
 
 export class Surface {
@@ -299,6 +302,7 @@ export class TerrainBuilder {
       }
       maxHeight += minHeight;
     }
+    console.assert(_numTerraces != 0);
     this._terraceSpacing = maxHeight / _numTerraces;
     console.log("Terrain builder",
                 "- with a ceiling of:", maxHeight, "\n",
@@ -380,9 +384,12 @@ export class TerrainBuilder {
     // Find locations that have heights that sit exactly between two terraces
     // and then find their adjacent locations that are higher terraces. Set
     // those locations to be ramps.
-    for (let y = 1; y < this._surface.depth - 1; y++) {
-      for (let x = 1; x < this._surface.width - 1; x++) {
+    for (let y = 2; y < this._surface.depth - 2; y++) {
+      for (let x = 2; x < this._surface.width - 2; x++) {
         let centre: TerrainAttributes = this._surface.at(x, y);
+        if (!isFlat(centre.shape)) {
+          continue;
+        }
 
         let roundUpHeight = centre.height + (this._terraceSpacing / 2);
         if (roundUpHeight != (centre.terrace + 1) * this._terraceSpacing) {
@@ -392,9 +399,15 @@ export class TerrainBuilder {
         for (let i in coordOffsets) {
           let offset: Point2D = coordOffsets[i];
           let neighbour: TerrainAttributes =
-              this._surface.at(centre.x + offset.x, centre.y + offset.y);
-          if (neighbour.terrace == centre.terrace + 1) {
+            this._surface.at(centre.x + offset.x, centre.y + offset.y);
+          let nextNeighbour: TerrainAttributes =
+            this._surface.at(neighbour.x + offset.x, neighbour.y + offset.y);
+          if (!neighbour.fixed && !nextNeighbour.fixed &&
+              neighbour.terrace == centre.terrace + 1 &&
+              neighbour.terrace == nextNeighbour.terrace) {
             neighbour.shape = ramps[i];
+            neighbour.fixed = true;
+            nextNeighbour.fixed = true;
           }
         }
       }

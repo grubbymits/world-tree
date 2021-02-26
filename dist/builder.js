@@ -133,6 +133,7 @@ export class TerrainAttributes {
         this._x = _x;
         this._y = _y;
         this._height = _height;
+        this._fixed = false;
         this._moisture = 0.0;
         this._biome = Biome.Water;
         this._terrace = 0;
@@ -150,12 +151,14 @@ export class TerrainAttributes {
     get features() { return this._features; }
     get moisture() { return this._moisture; }
     get biome() { return this._biome; }
+    get fixed() { return this._fixed; }
     set moisture(m) { this._moisture = m; }
     set terrace(t) { this._terrace = t; }
     set type(t) { this._type = t; }
     set shape(s) { this._shape = s; }
     set features(f) { this._features |= f; }
     set biome(b) { this._biome = b; }
+    set fixed(f) { this._fixed = f; }
 }
 export class Surface {
     constructor(_width, _depth) {
@@ -292,9 +295,12 @@ export class TerrainBuilder {
             TerrainShape.RampUpEast,
             TerrainShape.RampUpSouth,
             TerrainShape.RampUpWest];
-        for (let y = 1; y < this._surface.depth - 1; y++) {
-            for (let x = 1; x < this._surface.width - 1; x++) {
+        for (let y = 2; y < this._surface.depth - 2; y++) {
+            for (let x = 2; x < this._surface.width - 2; x++) {
                 let centre = this._surface.at(x, y);
+                if (!isFlat(centre.shape)) {
+                    continue;
+                }
                 let roundUpHeight = centre.height + (this._terraceSpacing / 2);
                 if (roundUpHeight != (centre.terrace + 1) * this._terraceSpacing) {
                     continue;
@@ -302,8 +308,13 @@ export class TerrainBuilder {
                 for (let i in coordOffsets) {
                     let offset = coordOffsets[i];
                     let neighbour = this._surface.at(centre.x + offset.x, centre.y + offset.y);
-                    if (neighbour.terrace == centre.terrace + 1) {
+                    let nextNeighbour = this._surface.at(neighbour.x + offset.x, neighbour.y + offset.y);
+                    if (!neighbour.fixed && !nextNeighbour.fixed &&
+                        neighbour.terrace == centre.terrace + 1 &&
+                        neighbour.terrace == nextNeighbour.terrace) {
                         neighbour.shape = ramps[i];
+                        neighbour.fixed = true;
+                        nextNeighbour.fixed = true;
                     }
                 }
             }
