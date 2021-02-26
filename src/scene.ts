@@ -200,12 +200,12 @@ class SceneLevel {
   }
 
   buildGraph(graph: SceneGraph): void {
-    console.log("buildGraph of size:", this._nodes.length);
 
     // TODO: Should be able to form a transistive reduction using ordered
     // pairs...
     // this._nodes.sort((a, b) => graph.drawOrder(a.id, b.id));
     // transistive closure
+    let startTime = Date.now();
     for (let i = 0; i < this._nodes.length; i++) {
       let nodeI = this._nodes[i];
       for (let j = 0; j < this._nodes.length; j++) {
@@ -221,9 +221,11 @@ class SceneLevel {
         }
       }
     }
+    let endTime = Date.now();
+    console.log("building graph of size:", this._nodes.length);
+    console.log("time elasped (ms):", endTime - startTime);
 
-    for (let i in this._nodes) {
-      const node = this._nodes[i];
+    for (let node of this._nodes) {
       if (node.preds.length == 0) {
         this._roots.push(node.id);
         //console.log("root id:", node.id);
@@ -233,15 +235,15 @@ class SceneLevel {
     //console.log("num scene roots:", this._roots.length);
     this._discovered.clear();
     this._topologicalOrder.length = 0;
+    startTime = Date.now();
     for (let i in this._roots) {
       if (this._discovered.has(this._roots[i])) {
         continue;
       }
       this.topologicalSort(graph, graph.getNode(this._roots[i]));
     }
-    //for (let i = this.order.length - 1; i >= 0; i--) {
-      //console.log("-", this.order[i].id);
-    //}
+    endTime = Date.now();
+    console.log("time elasped for graph sort (ms):", endTime - startTime);
   }
 
   topologicalSort(graph: SceneGraph, node: SceneNode): void {
@@ -500,7 +502,6 @@ export class IsometricRenderer extends SceneGraph {
   }
 
   getDrawCoord(location: Point3D): Point2D {
-    console.error('wtf');
     return IsometricRenderer.getDrawCoord(location);
   }
 

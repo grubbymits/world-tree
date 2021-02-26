@@ -1,40 +1,65 @@
 import * as WT from "../../dist/world-tree.js";
 
 export class Robot extends WT.Actor {
-  static sheet = new WT.SpriteSheet("../../../res/img/robot");
-  static directions = [ WT.Direction.North,
+  static sheet = new WT.SpriteSheet("../../../res/img/robot-2-1");
+  static directions = [ WT.Direction.West,
+                        WT.Direction.North,
                         WT.Direction.East,
-                        WT.Direction.South,
-                        WT.Direction.West ];
+                        WT.Direction.South ];
   static sprites = new Array();
-  static spriteWidth = 96;
-  static spriteHeight = 158;
-  static relativeDims = new WT.Dimensions(2, 2, 3);
-  static dims = new WT.IsometricPhysicalDimensions(this.spriteWidth, Robot.relativeDims);
+  static spriteWidth = 85;
+  static spriteHeight = 113;
+  static dims =
+    WT.TwoByOneIsometricRenderer.getDimensions(this.spriteWidth, this.spriteHeight);
 
   static initGraphics() {
+    this._staticGraphics = new Map();
+    this._movementSprites = new Array();
+    for (let x in this.directions) {
+      let direction = this.directions[x];
+      let sprite = new WT.Sprite(this.sheet, x * this.spriteWidth, 0,
+                                 this.spriteWidth, this.spriteHeight);
+      let graphic = new WT.StaticGraphicComponent(sprite.id);
+      this._staticGraphics.set(direction, graphic);
+    }
     for (let x in this.directions) {
       let direction = this.directions[x];
       let animationFrames = new Array();
-      for (let y = 0; y < 8; y++) {
+      for (let y = 1; y < 8; y++) {
         animationFrames.push(new WT.Sprite(this.sheet, x * this.spriteWidth,
                                            y * this.spriteHeight,
                                            this.spriteWidth, this.spriteHeight));
       }
-      this.sprites.push(animationFrames);
+      this._movementSprites.push(animationFrames);
     }
-    this.graphic = new WT.StaticGraphicComponent(this.sprites[0][0].id);
   }
 
   constructor(context, position) {
-    super(context, position, Robot.dims, Robot.graphic, /*debug*/ true);
+    let movementGraphics = new Map();
     for (let x in Robot.directions) {
       let direction = Robot.directions[x];
-      let sprites = Robot.sprites[x];
+      let sprites = Robot._movementSprites[x];
       let graphic = new WT.LoopGraphicComponent(sprites, 166);
-      this.addDirectionalGraphic(direction, graphic);
+      movementGraphics.set(direction, graphic);
     }
-    this._drawGeometry = true;
+    let graphics = new WT.DirectionalGraphicComponent(Robot._staticGraphics,
+                                                      movementGraphics);
+    super(context, position, Robot.dims, graphics);
+    console.log("creating robot of dimensions:", Robot.dims);
+    
+    this.direction = WT.Direction.South;
+    graphics.direction = WT.Direction.South;
+    let robot = this;
+
+    this.addEventListener(WT.EntityEvent.FaceDirection, function() {
+      graphics.direction = robot.direction;
+    });
+    this.addEventListener(WT.EntityEvent.Moving, function() {
+      graphics.stationary = false;
+    });
+    this.addEventListener(WT.EntityEvent.EndMove, function() {
+      graphics.stationary = true;
+    });
   }
 }
 
@@ -53,7 +78,6 @@ export class RobotController extends WT.Controller {
 
     this._actors.push(this.robot);
     let bounds = this._context.bounds;
-    let spatialInfo = this._context.spatial;
     let robot = this.robot;
 
     let moveRandomDirection = function() {
@@ -69,11 +93,11 @@ export class RobotController extends WT.Controller {
         dy = 1;
       }
       let moveVector = new WT.Vector3D(dx, dy, dz);
-      robot.action = new WT.MoveForwardsDirection(robot, moveVector, bounds, spatialInfo);
+      robot.action = new WT.MoveForwardsDirection(robot, moveVector, bounds);
     };
 
     // Choose another direction when it can't move anymore.
-    robot.addEventListener(WT.EntityEvent.ActionComplete, moveRandomDirection);
+    robot.addEventListener(WT.EntityEvent.EndMove, moveRandomDirection);
     // Initialise movement.
     moveRandomDirection();
   }

@@ -10,10 +10,8 @@
   </div>
   <script type="module">
     import * as WT from "../../dist/world-tree.js";
-    const spriteWidth = 256;
-    const spriteHeight = 248;
-    const relativeDims = new WT.Dimensions(3, 3, 2);
-    const physicalDims = new WT.IsometricPhysicalDimensions(spriteWidth, relativeDims);
+    const spriteWidth = 322;
+    const spriteHeight = 270;
 
     let sheet = new WT.SpriteSheet("../../../res/img/basic-dungeon");
     WT.Terrain.addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Flat,
@@ -23,27 +21,22 @@
     const cellsX = 5;
     const cellsY = 5;
     const terraces = 1;
-    /*
-    let heightMap = [ [ 1, 1, 1, 1, 1 ],
-                      [ 1, 0, 0, 0, 1 ],
-                      [ 1, 0, 0, 0, 1 ],
-                      [ 1, 0, 0, 0, 1 ],
-                      [ 1, 1, 1, 1, 1 ] ];
-    */
     let heightMap = [ [ 1, 1, 0, 0, 1 ],
                       [ 1, 0, 0, 0, 1 ],
                       [ 1, 0, 1, 0, 1 ],
                       [ 1, 0, 0, 0, 1 ],
                       [ 1, 0, 0, 0, 1 ] ];
 
-    const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
-                                        physicalDims.depth * cellsY,
-                                        physicalDims.height * (1 + terraces));
-    
     window.onload = (event) => {
       console.log("window loaded");
+      const physicalDims =
+        WT.TwoByOneIsometricRenderer.getDimensions(spriteWidth, spriteHeight);
+      const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
+                                          physicalDims.depth * cellsY,
+                                          physicalDims.height * (1 + terraces));
       let canvas = document.getElementById("demoCanvas");
-      let context = new WT.Context(canvas, worldDims);
+      let context = new WT.Context(canvas, worldDims,
+                                   WT.Perspective.TwoByOneIsometric);
     
       const hasWater = false;
       const defaultFloor = WT.TerrainType.Rock;

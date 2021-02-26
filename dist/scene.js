@@ -172,7 +172,7 @@ class SceneLevel {
         }
     }
     buildGraph(graph) {
-        console.log("buildGraph of size:", this._nodes.length);
+        let startTime = Date.now();
         for (let i = 0; i < this._nodes.length; i++) {
             let nodeI = this._nodes[i];
             for (let j = 0; j < this._nodes.length; j++) {
@@ -190,20 +190,25 @@ class SceneLevel {
                 }
             }
         }
-        for (let i in this._nodes) {
-            const node = this._nodes[i];
+        let endTime = Date.now();
+        console.log("building graph of size:", this._nodes.length);
+        console.log("time elasped (ms):", endTime - startTime);
+        for (let node of this._nodes) {
             if (node.preds.length == 0) {
                 this._roots.push(node.id);
             }
         }
         this._discovered.clear();
         this._topologicalOrder.length = 0;
+        startTime = Date.now();
         for (let i in this._roots) {
             if (this._discovered.has(this._roots[i])) {
                 continue;
             }
             this.topologicalSort(graph, graph.getNode(this._roots[i]));
         }
+        endTime = Date.now();
+        console.log("time elasped for graph sort (ms):", endTime - startTime);
     }
     topologicalSort(graph, node) {
         this._discovered.add(node.id);
@@ -402,7 +407,6 @@ export class IsometricRenderer extends SceneGraph {
         return new Point2D(dx, dy);
     }
     getDrawCoord(location) {
-        console.error('wtf');
         return IsometricRenderer.getDrawCoord(location);
     }
     drawOrder(firstId, secondId) {

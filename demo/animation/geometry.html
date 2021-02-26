@@ -8,13 +8,14 @@
   <div>
     <canvas id="demoCanvas" oncontextmenu="return false;" width="1600" height="900">
   </div>
-  <script type="module" src"robot.js"></script>
+  <script type="module" src="robot.js"></script>
+  <script type="module" src="../../dist/world-tree.js"></script>
   <script type="module">
     import * as WT from "../../dist/world-tree.js";
     import { Robot, RobotController } from "./robot.js"
 
-    const spriteWidth = 256;
-    const spriteHeight = 248;
+    const spriteWidth = 322;
+    const spriteHeight = 270;
 
     let sheet = new WT.SpriteSheet("../../../res/img/basic-dungeon");
     WT.Terrain.addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Flat,
@@ -30,36 +31,25 @@
     const cellsY = 9;
     const terraces = 1;
     let heightMap = [ [ 2, 2, 2, 2, 2, 2, 2, 2, 2 ],
+                      [ 2, 2, 1, 1, 1, 2, 1, 1, 2 ],
+                      [ 2, 1, 1, 1, 1, 2, 1, 1, 2 ],
                       [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
-                      [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
+                      [ 2, 1, 1, 2, 1, 1, 1, 2, 2 ],
+                      [ 2, 1, 2, 1, 1, 1, 1, 1, 2 ],
+                      [ 2, 1, 1, 1, 2, 1, 1, 1, 2 ],
+                      [ 2, 2, 1, 1, 1, 1, 2, 1, 2 ],
                       [ 2, 2, 2, 2, 2, 2, 2, 2, 2] ];
-    /*
-    let heightMap = [ [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-                      [ 1, 1, 1, 1, 1, 1, 1, 1, 1] ];
-    */
 
-    const relativeDims = new WT.Dimensions(3, 3, 2);
-    const physicalDims = new WT.IsometricPhysicalDimensions(spriteWidth, relativeDims);
-    const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
-                                        physicalDims.depth * cellsY,
-                                        physicalDims.height * (1 + terraces));
-    
     window.onload = (event) => {
       console.log("window loaded");
       let canvas = document.getElementById("demoCanvas");
-      let context = new WT.Context(canvas, worldDims);
+      const physicalDims =
+        WT.TwoByOneIsometricRenderer.getDimensions(spriteWidth, spriteHeight);
+      const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
+                                          physicalDims.depth * cellsY,
+                                          physicalDims.height * (1 + terraces));
+      let context = new WT.Context(canvas, worldDims,
+                                   WT.Perspective.TwoByOneIsometric);
     
       const hasWater = false;
       const waterLine = 0;
@@ -82,6 +72,7 @@
       let camera = new WT.TrackerCamera(context.scene,
                                         canvas.width, canvas.height,
                                         robotController.robot);
+      var actorDebugger = new WT.ActorDebug(robotController.robot, camera, false);
 
       var update = function update() {
         if (document.hasFocus()) {
