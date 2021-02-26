@@ -240,6 +240,7 @@ export class TerrainBuilder {
             }
             maxHeight += minHeight;
         }
+        console.assert(_numTerraces != 0);
         this._terraceSpacing = maxHeight / _numTerraces;
         console.log("Terrain builder", "- with a ceiling of:", maxHeight, "\n", "- ", _numTerraces, "terraces\n", "- ", this._terraceSpacing, "terrace spacing");
         console.log("Using default floor", getTypeName(this._defaultFloor));
@@ -287,15 +288,19 @@ export class TerrainBuilder {
     }
     setFeatures() { }
     setShapes() {
-        const coordOffsets = [new Point2D(0, -1),
-            new Point2D(1, 0),
+        const coordOffsets = [
             new Point2D(0, 1),
-            new Point2D(-1, 0)];
-        const ramps = [TerrainShape.RampUpNorth,
-            TerrainShape.RampUpEast,
+            new Point2D(-1, 0),
+            new Point2D(0, -1),
+            new Point2D(1, 0)
+        ];
+        const ramps = [
             TerrainShape.RampUpSouth,
-            TerrainShape.RampUpWest];
-        for (let y = 2; y < this._surface.depth - 2; y++) {
+            TerrainShape.RampUpWest,
+            TerrainShape.RampUpNorth,
+            TerrainShape.RampUpEast
+        ];
+        for (let y = this._surface.depth - 3; y > 1; y--) {
             for (let x = 2; x < this._surface.width - 2; x++) {
                 let centre = this._surface.at(x, y);
                 if (!isFlat(centre.shape)) {
@@ -465,65 +470,6 @@ export class TerrainBuilder {
 export class OpenTerrainBuilder extends TerrainBuilder {
     constructor(width, depth, heightMap, numTerraces, hasWater, defaultFloor, defaultWall, physicalDims) {
         super(width, depth, heightMap, numTerraces, hasWater, defaultFloor, defaultWall, physicalDims);
-    }
-    setShapes() {
-        console.log("adding ramps");
-        const filterDepth = 3;
-        const coordOffsets = [new Point2D(0, -1),
-            new Point2D(1, 0),
-            new Point2D(0, 1),
-            new Point2D(-1, 0)];
-        const diagOffsets = [[new Point2D(-1, -1), new Point2D(1, -1)],
-            [new Point2D(1, -1), new Point2D(1, 1)],
-            [new Point2D(-1, 1), new Point2D(1, 1)],
-            [new Point2D(-1, -1), new Point2D(-1, 1)]];
-        const ramps = [TerrainShape.RampUpNorth,
-            TerrainShape.RampUpEast,
-            TerrainShape.RampUpSouth,
-            TerrainShape.RampUpWest];
-        const direction = ["north", "east", "south", "west"];
-        const filterCoeffs = [0.15, 0.1];
-        for (let y = filterDepth; y < this._surface.depth - filterDepth; y++) {
-            for (let x = filterDepth; x < this._surface.width - filterDepth; x++) {
-                let centre = this._surface.at(x, y);
-                if (!isFlat(centre.shape) || centre.biome == Biome.Water) {
-                    continue;
-                }
-                for (let i in coordOffsets) {
-                    let offset = coordOffsets[i];
-                    let neighbour = this._surface.at(x + offset.x, y + offset.y);
-                    if (!isFlat(neighbour.shape)) {
-                        continue;
-                    }
-                    if (centre.terrace == neighbour.terrace) {
-                        continue;
-                    }
-                    let skip = false;
-                    for (let diagNeighbourOffsets of diagOffsets[i]) {
-                        let diagNeighbour = this._surface.at(x + diagNeighbourOffsets.x, y + diagNeighbourOffsets.y);
-                        skip = skip || !isFlat(diagNeighbour.shape) ||
-                            diagNeighbour.terrace != neighbour.terrace;
-                    }
-                    if (skip)
-                        continue;
-                    let result = centre.terrace * 0.45 + neighbour.terrace * 0.3;
-                    let next = neighbour;
-                    for (let d = 0; d < filterDepth - 1; d++) {
-                        next = this._surface.at(next.x + offset.x, next.y + offset.y);
-                        result += next.terrace * filterCoeffs[d];
-                    }
-                    result = Math.round(result);
-                    if (result > centre.terrace) {
-                        centre.shape = ramps[i];
-                        centre.terrace = result;
-                        if (centre.biome == Biome.Beach) {
-                            centre.biome = neighbour.biome;
-                        }
-                        break;
-                    }
-                }
-            }
-        }
     }
     addRain(towards, water, waterLine) {
         console.log("adding rain towards", getDirectionName(towards));

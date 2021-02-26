@@ -371,20 +371,24 @@ export class TerrainBuilder {
   setFeatures(): void { }
 
   setShapes(): void {
-    const coordOffsets: Array<Point2D> = [ new Point2D(0, -1),
-                                           new Point2D(1, 0),
-                                           new Point2D(0, 1),
-                                           new Point2D(-1, 0) ];
+    const coordOffsets: Array<Point2D> = [
+      new Point2D(0, 1),
+      new Point2D(-1, 0),
+      new Point2D(0, -1),
+      new Point2D(1, 0)
+    ];
 
-    const ramps: Array<TerrainShape> = [ TerrainShape.RampUpNorth,
-                                         TerrainShape.RampUpEast,
-                                         TerrainShape.RampUpSouth,
-                                         TerrainShape.RampUpWest ];
+    const ramps: Array<TerrainShape> = [ 
+      TerrainShape.RampUpSouth,
+      TerrainShape.RampUpWest,
+      TerrainShape.RampUpNorth,
+      TerrainShape.RampUpEast
+    ];
 
     // Find locations that have heights that sit exactly between two terraces
     // and then find their adjacent locations that are higher terraces. Set
     // those locations to be ramps.
-    for (let y = 2; y < this._surface.depth - 2; y++) {
+    for (let y = this._surface.depth - 3; y > 1 ;y--) {
       for (let x = 2; x < this._surface.width - 2; x++) {
         let centre: TerrainAttributes = this._surface.at(x, y);
         if (!isFlat(centre.shape)) {
@@ -580,7 +584,8 @@ export class OpenTerrainBuilder extends TerrainBuilder {
     super(width, depth, heightMap, numTerraces, hasWater,
           defaultFloor, defaultWall, physicalDims);
   }
-  
+
+  /*  
   setShapes(): void {
     console.log("adding ramps");
     const filterDepth: number = 3;
@@ -657,6 +662,7 @@ export class OpenTerrainBuilder extends TerrainBuilder {
       }
     }
   }
+  */
 
   addRain(towards: Direction, water: number, waterLine: number): void {
     console.log("adding rain towards", getDirectionName(towards));
