@@ -33,15 +33,15 @@ class SceneNode {
 
   overlapX(other: SceneNode): boolean {
     return (this.entity.bounds.minX >= other.entity.bounds.minX &&
-            this.entity.bounds.minX <= other.entity.bounds.maxX) ||
-           (this.entity.bounds.maxX >= other.entity.bounds.minX &&
+            this.entity.bounds.minX < other.entity.bounds.maxX) ||
+           (this.entity.bounds.maxX > other.entity.bounds.minX &&
             this.entity.bounds.maxX <= other.entity.bounds.maxX);
   }
 
   overlapY(other: SceneNode): boolean {
     return (this.entity.bounds.minY >= other.entity.bounds.minY &&
-            this.entity.bounds.minY <= other.entity.bounds.maxY) ||
-           (this.entity.bounds.maxY >= other.entity.bounds.minY &&
+            this.entity.bounds.minY < other.entity.bounds.maxY) ||
+           (this.entity.bounds.maxY > other.entity.bounds.minY &&
             this.entity.bounds.maxY <= other.entity.bounds.maxY);
   }
 
@@ -454,19 +454,19 @@ export class IsometricPhysicalDimensions extends Dimensions {
   private static readonly _oneOverSqrt3: number = 1 / Math.sqrt(3);
 
   static physicalWidth(spriteWidth: number): number {
-    return Math.floor(spriteWidth * this._oneOverSqrt3);
+    return Math.round(spriteWidth * this._oneOverSqrt3);
   }
 
   static physicalDepth(physicalWidth: number,
                        relativeDims: Dimensions) {
     let depthRatio: number = relativeDims.depth / relativeDims.width;
-    return Math.floor(physicalWidth * depthRatio);
+    return Math.round(physicalWidth * depthRatio);
   }
 
   static physicalHeight(physicalWidth: number,
                         relativeDims: Dimensions): number {
     let heightRatio: number = relativeDims.height / relativeDims.width;
-    return Math.floor(physicalWidth * heightRatio);
+    return Math.round(physicalWidth * heightRatio);
   }
 
   constructor(spriteWidth: number,
@@ -496,8 +496,8 @@ export class IsometricRenderer extends SceneGraph {
 
     // Tiles are placed overlapping each other by half.
     // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
-    const dx = Math.floor(this._halfSqrt3 * (loc.x + loc.y));
-    const dy = Math.floor((0.5 * (loc.y - loc.x)) - loc.z);
+    const dx = Math.round(this._halfSqrt3 * (loc.x + loc.y));
+    const dy = Math.round((0.5 * (loc.y - loc.x)) - loc.z);
     return new Point2D(dx, dy);
   }
 
@@ -568,7 +568,9 @@ export class TwoByOneIsometricRenderer extends SceneGraph {
     const width = oneUnit * this._magicRatio;
     const depth = twoUnits * Math.sin(Math.atan(0.5));
     const height = (spriteHeight - twoUnits) * this._magicRatio;
-    return new Dimensions(width, depth, height);
+    return new Dimensions(Math.round(width),
+                          Math.round(depth),
+                          Math.round(height));
   }
 
   getDrawCoord(location: Point3D): Point2D {
@@ -583,11 +585,11 @@ export class TwoByOneIsometricRenderer extends SceneGraph {
     // - greater x
 
     if (first.overlapX(second)) {
-      return first.entity.bounds.minY <= second.entity.bounds.minY ?
+      return first.entity.bounds.minY < second.entity.bounds.minY ?
         RenderOrder.Before : RenderOrder.After;
     }
     if (first.overlapY(second)) {
-      return first.entity.bounds.minX >= second.entity.bounds.minX ?
+      return first.entity.bounds.minX > second.entity.bounds.minX ?
         RenderOrder.Before : RenderOrder.After;
     }
     if (!first.overlapZ(second)) {

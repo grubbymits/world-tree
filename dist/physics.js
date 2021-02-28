@@ -158,9 +158,9 @@ export class BoundingCuboid {
     get dimensions() { return this._dimensions; }
     set centre(centre) {
         this._centre = centre;
-        let width = Math.floor(this.width / 2);
-        let depth = Math.floor(this.depth / 2);
-        let height = Math.floor(this.height / 2);
+        let width = this.width / 2;
+        let depth = this.depth / 2;
+        let height = this.height / 2;
         let x = centre.x - width;
         let y = centre.y - depth;
         let z = centre.z - height;
@@ -224,9 +224,9 @@ export class BoundingCuboid {
             new Dimensions(maxX - minX, maxY - minY, maxZ - minZ);
         let min = new Point3D(minX, minY, minZ);
         let max = new Point3D(maxX, maxY, maxZ);
-        let width = Math.floor((max.x - min.x) / 2);
-        let depth = Math.floor((max.y - min.y) / 2);
-        let height = Math.floor((max.z - min.z) / 2);
+        let width = (max.x - min.x) / 2;
+        let depth = (max.y - min.y) / 2;
+        let height = (max.z - min.z) / 2;
         this._centre = new Point3D(min.x + width, min.y + depth, min.z + height);
         this._minLocation = min;
         this._maxLocation = max;

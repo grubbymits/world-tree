@@ -23,14 +23,14 @@ class SceneNode {
     static get graph() { return this._graph; }
     overlapX(other) {
         return (this.entity.bounds.minX >= other.entity.bounds.minX &&
-            this.entity.bounds.minX <= other.entity.bounds.maxX) ||
-            (this.entity.bounds.maxX >= other.entity.bounds.minX &&
+            this.entity.bounds.minX < other.entity.bounds.maxX) ||
+            (this.entity.bounds.maxX > other.entity.bounds.minX &&
                 this.entity.bounds.maxX <= other.entity.bounds.maxX);
     }
     overlapY(other) {
         return (this.entity.bounds.minY >= other.entity.bounds.minY &&
-            this.entity.bounds.minY <= other.entity.bounds.maxY) ||
-            (this.entity.bounds.maxY >= other.entity.bounds.minY &&
+            this.entity.bounds.minY < other.entity.bounds.maxY) ||
+            (this.entity.bounds.maxY > other.entity.bounds.minY &&
                 this.entity.bounds.maxY <= other.entity.bounds.maxY);
     }
     overlapZ(other) {
@@ -385,15 +385,15 @@ export class IsometricPhysicalDimensions extends Dimensions {
         super(width, depth, height);
     }
     static physicalWidth(spriteWidth) {
-        return Math.floor(spriteWidth * this._oneOverSqrt3);
+        return (spriteWidth * this._oneOverSqrt3);
     }
     static physicalDepth(physicalWidth, relativeDims) {
         let depthRatio = relativeDims.depth / relativeDims.width;
-        return Math.floor(physicalWidth * depthRatio);
+        return (physicalWidth * depthRatio);
     }
     static physicalHeight(physicalWidth, relativeDims) {
         let heightRatio = relativeDims.height / relativeDims.width;
-        return Math.floor(physicalWidth * heightRatio);
+        return (physicalWidth * heightRatio);
     }
 }
 IsometricPhysicalDimensions._oneOverSqrt3 = 1 / Math.sqrt(3);
@@ -402,8 +402,8 @@ export class IsometricRenderer extends SceneGraph {
         super(canvas);
     }
     static getDrawCoord(loc) {
-        const dx = Math.floor(this._halfSqrt3 * (loc.x + loc.y));
-        const dy = Math.floor((0.5 * (loc.y - loc.x)) - loc.z);
+        const dx = Math.round(this._halfSqrt3 * (loc.x + loc.y));
+        const dy = Math.round((0.5 * (loc.y - loc.x)) - loc.z);
         return new Point2D(dx, dy);
     }
     getDrawCoord(location) {
@@ -449,7 +449,7 @@ export class TwoByOneIsometricRenderer extends SceneGraph {
         const width = oneUnit * this._magicRatio;
         const depth = twoUnits * Math.sin(Math.atan(0.5));
         const height = (spriteHeight - twoUnits) * this._magicRatio;
-        return new Dimensions(width, depth, height);
+        return new Dimensions(Math.round(width), Math.round(depth), Math.round(height));
     }
     getDrawCoord(location) {
         return TwoByOneIsometricRenderer.getDrawCoord(location);
@@ -458,11 +458,11 @@ export class TwoByOneIsometricRenderer extends SceneGraph {
         const first = this._nodes.get(firstId);
         const second = this._nodes.get(secondId);
         if (first.overlapX(second)) {
-            return first.entity.bounds.minY <= second.entity.bounds.minY ?
+            return first.entity.bounds.minY < second.entity.bounds.minY ?
                 RenderOrder.Before : RenderOrder.After;
         }
         if (first.overlapY(second)) {
-            return first.entity.bounds.minX >= second.entity.bounds.minX ?
+            return first.entity.bounds.minX > second.entity.bounds.minX ?
                 RenderOrder.Before : RenderOrder.After;
         }
         if (!first.overlapZ(second)) {

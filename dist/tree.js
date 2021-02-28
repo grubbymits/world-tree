@@ -56,17 +56,17 @@ class OctNode {
     }
     split() {
         this._children = new Array();
-        const width = Math.floor(this._bounds.width / 2);
-        const depth = Math.floor(this._bounds.depth / 2);
-        const height = Math.floor(this._bounds.height / 2);
+        const width = (this._bounds.width / 2);
+        const depth = (this._bounds.depth / 2);
+        const height = (this._bounds.height / 2);
         const dimensions = new Dimensions(width, depth, height);
         let offset = [-0.5, 0.5];
         for (let z = 0; z < 2; z++) {
             for (let y = 0; y < 2; y++) {
                 for (let x = 0; x < 2; x++) {
-                    let offsetX = Math.floor(offset[x] * dimensions.width);
-                    let offsetY = Math.floor(offset[y] * dimensions.depth);
-                    let offsetZ = Math.floor(offset[z] * dimensions.height);
+                    let offsetX = (offset[x] * dimensions.width);
+                    let offsetY = (offset[y] * dimensions.depth);
+                    let offsetZ = (offset[z] * dimensions.height);
                     let centre = new Point3D(this.centre.x + offsetX, this.centre.y + offsetY, this.centre.z + offsetZ);
                     let bounds = new BoundingCuboid(centre, dimensions);
                     this._children.push(new OctNode(bounds));
@@ -130,9 +130,9 @@ OctNode.MaxEntities = 9;
 export class Octree {
     constructor(dimensions) {
         this._numEntities = 0;
-        let x = Math.floor(dimensions.width / 2);
-        let y = Math.floor(dimensions.depth / 2);
-        let z = Math.floor(dimensions.height / 2);
+        let x = (dimensions.width / 2);
+        let y = (dimensions.depth / 2);
+        let z = (dimensions.height / 2);
         let centre = new Point3D(x, y, z);
         this._worldBounds = new BoundingCuboid(centre, dimensions);
         console.log("creating space of dimensions (WxDxH):", this._worldBounds.width, this._worldBounds.depth, this._worldBounds.height);
