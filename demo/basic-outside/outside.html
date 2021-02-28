@@ -14,7 +14,7 @@
     const spriteHeight = 270;
 
     // Sprite sheet layout
-    // flat: rock, grass/rock, dry grass/sand, wet grass/sand, sand, water
+    // flat: rock, grass/rock, dry grass/sand, wet grass/sand, muddy grass/sand, sand, water
     // ramps: (south, west, east, north)
     //  - rock
     //  - grass/rock
@@ -25,9 +25,9 @@
     WT.Terrain.addGraphic(WT.TerrainType.DryGrass, WT.TerrainShape.Flat,
                           sheet, spriteWidth * 2, 0, spriteWidth, spriteHeight);
     WT.Terrain.addGraphic(WT.TerrainType.Sand, WT.TerrainShape.Flat,
-                          sheet, spriteWidth * 4, 0, spriteWidth, spriteHeight);
-    WT.Terrain.addGraphic(WT.TerrainType.Water, WT.TerrainShape.Flat,
                           sheet, spriteWidth * 5, 0, spriteWidth, spriteHeight);
+    WT.Terrain.addGraphic(WT.TerrainType.Water, WT.TerrainShape.Flat,
+                          sheet, spriteWidth * 6, 0, spriteWidth, spriteHeight);
 
     const tileType = WT.TerrainType.DryGrass;
     const rampOffsetY = 3 * spriteHeight;
