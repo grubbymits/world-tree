@@ -9,6 +9,7 @@ export class Rain {
   private static _surface: Surface;
   private static _waterLevel: number;
   private static _moistureGrid: Array<Float32Array>;
+  private static _totalRainDropped: number = 0;
 
   static init(waterLevel: number, surface: Surface) {
     this._waterLevel = waterLevel;
@@ -22,6 +23,7 @@ export class Rain {
   static get clouds(): Array<Rain> { return this._clouds; }
 
   static get totalClouds(): number { return this._totalClouds; }
+  static get totalRain(): number { return this._totalRainDropped; }
 
   static get moistureGrid(): Array<Float32Array> { return this._moistureGrid; }
 
@@ -40,6 +42,7 @@ export class Rain {
   dropMoisture(moisture: number): boolean {
     Rain.moistureGrid[this._y][this._x] += moisture;
     this._moisture -= moisture;
+    Rain._totalRainDropped += moisture;
     return this._moisture <= 0;
   }
 

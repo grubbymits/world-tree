@@ -17,6 +17,7 @@ export class Rain {
     }
     static get clouds() { return this._clouds; }
     static get totalClouds() { return this._totalClouds; }
+    static get totalRain() { return this._totalRainDropped; }
     static get moistureGrid() { return this._moistureGrid; }
     static add(x, y, moisture, direction) {
         this._clouds.push(new Rain(x, y, moisture, direction));
@@ -26,6 +27,7 @@ export class Rain {
     dropMoisture(moisture) {
         Rain.moistureGrid[this._y][this._x] += moisture;
         this._moisture -= moisture;
+        Rain._totalRainDropped += moisture;
         return this._moisture <= 0;
     }
     update() {
@@ -84,3 +86,4 @@ export class Rain {
 Rain.rain = 0.5;
 Rain._clouds = Array();
 Rain._totalClouds = 0;
+Rain._totalRainDropped = 0;

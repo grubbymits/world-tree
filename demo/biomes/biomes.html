@@ -2,11 +2,11 @@
 <html>
 <head>
   <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-  <title>Small Island Demo</title>
+  <title>Island Biome Demo</title>
 </head>
 <body>
   <div>
-    <canvas id="demoCanvas" oncontextmenu="return false;" width="1280" height="720">
+    <canvas id="demoCanvas" oncontextmenu="return false;" width="1440" height="900">
   </div>
   <script type="module">
     import * as WT from "../../dist/world-tree.js";
@@ -14,7 +14,7 @@
     const spriteHeight = 270;
 
     // Sprite sheet layout
-    // flat: rock, grass/rock, grass/sand, sand, water
+    // flat: rock, grass/rock, dry grass/sand, wet grass/sand, sand, water
     // ramps: (south, west, east, north)
     //  - rock
     //  - grass/rock
@@ -24,20 +24,25 @@
                           sheet, 0, 0, spriteWidth, spriteHeight);
     WT.Terrain.addGraphic(WT.TerrainType.DryGrass, WT.TerrainShape.Flat,
                           sheet, spriteWidth * 2, 0, spriteWidth, spriteHeight);
-    WT.Terrain.addGraphic(WT.TerrainType.Sand, WT.TerrainShape.Flat,
+    WT.Terrain.addGraphic(WT.TerrainType.WetGrass, WT.TerrainShape.Flat,
                           sheet, spriteWidth * 3, 0, spriteWidth, spriteHeight);
-    WT.Terrain.addGraphic(WT.TerrainType.Water, WT.TerrainShape.Flat,
+    WT.Terrain.addGraphic(WT.TerrainType.Sand, WT.TerrainShape.Flat,
                           sheet, spriteWidth * 4, 0, spriteWidth, spriteHeight);
+    WT.Terrain.addGraphic(WT.TerrainType.Water, WT.TerrainShape.Flat,
+                          sheet, spriteWidth * 5, 0, spriteWidth, spriteHeight);
 
-    const tileType = WT.TerrainType.DryGrass;
-    const rampOffsetY = 3 * spriteHeight;
     const rampShapes = [ WT.TerrainShape.RampUpSouth,
                          WT.TerrainShape.RampUpWest,
                          WT.TerrainShape.RampUpEast,
                          WT.TerrainShape.RampUpNorth ];
     for (let i in rampShapes) {
-      WT.Terrain.addGraphic(tileType, rampShapes[i], sheet,
-                            i * spriteWidth, rampOffsetY,
+      WT.Terrain.addGraphic(WT.TerrainType.DryGrass,
+                            rampShapes[i], sheet,
+                            i * spriteWidth, 3 * spriteHeight,
+                            spriteWidth, spriteHeight);
+      WT.Terrain.addGraphic(WT.TerrainType.WetGrass,
+                            rampShapes[i], sheet,
+                            i * spriteWidth, 4 * spriteHeight,
                             spriteWidth, spriteHeight);
     }
 
@@ -68,11 +73,11 @@
                                    WT.Perspective.TwoByOneIsometric);
     
       const hasWater = true;
-      const water = 3;
+      const water = 30;
       const dryLimit = 0.2;
-      const treeLimit = 0.7;
+      const treeLimit = 4;
       const wetLimit = 1;
-      const waterLine = 0.2;
+      const waterLine = 0;
       const defaultFloor = WT.TerrainType.DryGrass;
       const defaultWall = WT.TerrainType.DryGrass;
       // Use the height map to construct a terrain.

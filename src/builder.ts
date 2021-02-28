@@ -678,6 +678,7 @@ export class OpenTerrainBuilder extends TerrainBuilder {
     }
 
     console.log("total clouds added:", Rain.totalClouds);
+    console.log("total moisture added:", Rain.totalRain);
     let blurredMoisture = gaussianBlur(Rain.moistureGrid, this._surface.width,
                                        this._surface.depth);
    
@@ -699,6 +700,12 @@ export class OpenTerrainBuilder extends TerrainBuilder {
                 "- dryLimit:", dryLimit, "\n",
                 "- treeLimit:", treeLimit, "\n");
 
+    let numWater = 0;
+    let numSand = 0;
+    let numDryGrass = 0;
+    let numWetGrass = 0;
+    let numRock = 0;
+    let numMud = 0;
     for (let y = 0; y < this._surface.depth; y++) {
       for (let x = 0; x < this._surface.width; x++) {
         let surface = this._surface.at(x, y);
@@ -708,23 +715,33 @@ export class OpenTerrainBuilder extends TerrainBuilder {
         if (surface.height <= waterLine) {
           biome = Biome.Water;
           terrain = TerrainType.Water;
+          numWater++;
         } else if (surface.terrace < 1) {
           biome = Biome.Beach;
           terrain = TerrainType.Sand;
+          numSand++;
         } else if (surface.height > treeLimit) {
-          biome = surface.moisture > dryLimit ?
-            Biome.Grassland : Biome.Tundra
-          terrain = surface.moisture > dryLimit ?
-            TerrainType.DryGrass : TerrainType.Rock;
+          if (surface.moisture > dryLimit) {
+            biome = Biome.Grassland;
+            terrain = TerrainType.DryGrass;
+            numDryGrass++;
+          } else {
+            biome = Biome.Tundra;
+            terrain = TerrainType.Rock;
+            numRock++;
+          }
         } else if (surface.moisture < dryLimit) {
           biome = Biome.Desert;
           terrain = TerrainType.Rock;
+          numRock++;
         } else if (surface.moisture > wetLimit) {
           biome = Biome.Marshland;
           terrain = TerrainType.WetGrass;
+          numWetGrass++;
         } else {
           biome = Biome.Woodland;
           terrain = TerrainType.Mud;
+          numMud++;
         }
         // Only change the type if it's supported, otherwise we'll just
         // fallback to the default which is set in the constructor.
@@ -735,6 +752,13 @@ export class OpenTerrainBuilder extends TerrainBuilder {
         surface.biome = biome;
       }
     }
+    console.log("terrain type stats:");
+    console.log("water tiles:", numWater);
+    console.log("sand tiles:", numSand);
+    console.log("rock tiles:", numRock);
+    console.log("mud tiles:", numMud);
+    console.log("dry grass tiles:", numDryGrass);
+    console.log("wet grass tiles:", numWetGrass);
   }
 
   setFeatures(): void {
