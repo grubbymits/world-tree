@@ -54,7 +54,7 @@
                       [ 0, 1, 2, 3, 3, 2, 2, 2, 2, 1, 0 ],
                       [ 0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0 ],
                       [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 ],
-                      [ 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0] ];
+                      [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ];
 
     window.onload = (event) => {
       console.log("window loaded");
@@ -83,7 +83,7 @@
       builder.addRain(WT.Direction.North, water, waterLine);
       builder.setBiomes(waterLine, wetLimit, dryLimit, treeLimit);
       builder.setShapes();
-      context.map = builder.generateMap(context);
+      builder.generateMap(context);
       let camera = new WT.MouseCamera(context.scene, canvas,
                                       canvas.width, canvas.height);
     

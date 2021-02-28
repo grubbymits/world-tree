@@ -60,7 +60,7 @@
                                           terraces, hasWater,
                                           defaultFloor, defaultWall,
                                           physicalDims);
-      context.map = builder.generateMap(context);
+      builder.generateMap(context);
 
       Robot.initGraphics();
       let robotController = new RobotController(context);

@@ -260,13 +260,14 @@ export class TerrainBuilder {
     }
     generateMap(context) {
         this.setEdges();
-        let worldTerrain = new SquareGrid(context, this._surface.width, this._surface.depth);
+        context.map =
+            new SquareGrid(context, this._surface.width, this._surface.depth);
         console.log("adding surface terrain entities");
         for (let y = 0; y < this._surface.depth; y++) {
             for (let x = 0; x < this._surface.width; x++) {
                 let surface = this._surface.at(x, y);
                 console.assert(surface.terrace <= this._numTerraces && surface.terrace >= 0, "terrace out-of-range", surface.terrace);
-                worldTerrain.addRaisedTerrain(x, y, surface.terrace, surface.type, surface.shape, surface.features);
+                context.map.addRaisedTerrain(x, y, surface.terrace, surface.type, surface.shape, surface.features);
             }
         }
         console.log("adding subterranean entities");
@@ -274,17 +275,16 @@ export class TerrainBuilder {
             for (let x = 0; x < this._surface.width; x++) {
                 let z = this._surface.at(x, y).terrace;
                 let zStop = z - this.calcRelativeHeight(x, y);
-                let terrain = worldTerrain.getTerrain(x, y, z);
+                let terrain = context.map.getTerrain(x, y, z);
                 if (terrain == null) {
                     console.error("didn't find terrain in map at", x, y, z);
                 }
                 while (z > zStop) {
                     z--;
-                    worldTerrain.addRaisedTerrain(x, y, z, terrain.type, TerrainShape.Flat, TerrainFeature.None);
+                    context.map.addRaisedTerrain(x, y, z, terrain.type, TerrainShape.Flat, TerrainFeature.None);
                 }
             }
         }
-        return worldTerrain;
     }
     setFeatures() { }
     setShapes() {

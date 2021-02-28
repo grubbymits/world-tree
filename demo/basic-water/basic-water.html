@@ -58,7 +58,7 @@
                                           defaultFloor, defaultWall,
                                           physicalDims);
       builder.setBiomes(waterLine, 0, 0, 0);
-      context.map = builder.generateMap(context);
+      builder.generateMap(context);
       let camera = new WT.MouseCamera(context.scene, canvas,
                                       canvas.width, canvas.height);
     

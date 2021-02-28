@@ -22,14 +22,14 @@
     let sheet = new WT.SpriteSheet("../../../res/img/basic-outside");
     WT.Terrain.addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Flat,
                           sheet, 0, 0, spriteWidth, spriteHeight);
-    WT.Terrain.addGraphic(WT.TerrainType.Grass, WT.TerrainShape.Flat,
+    WT.Terrain.addGraphic(WT.TerrainType.DryGrass, WT.TerrainShape.Flat,
                           sheet, spriteWidth * 2, 0, spriteWidth, spriteHeight);
     WT.Terrain.addGraphic(WT.TerrainType.Sand, WT.TerrainShape.Flat,
                           sheet, spriteWidth * 3, 0, spriteWidth, spriteHeight);
     WT.Terrain.addGraphic(WT.TerrainType.Water, WT.TerrainShape.Flat,
                           sheet, spriteWidth * 4, 0, spriteWidth, spriteHeight);
 
-    const tileType = WT.TerrainType.Grass;
+    const tileType = WT.TerrainType.DryGrass;
     const rampOffsetY = 3 * spriteHeight;
     const rampShapes = [ WT.TerrainShape.RampUpSouth,
                          WT.TerrainShape.RampUpWest,
@@ -65,17 +65,17 @@
                                    WT.Perspective.TwoByOneIsometric);
     
       const hasWater = true;
-      const waterLine = 0;
-      const defaultFloor = WT.TerrainType.Grass;
-      const defaultWall = WT.TerrainType.Grass;
+      const defaultFloor = WT.TerrainType.DryGrass;
+      const defaultWall = WT.TerrainType.DryGrass;
       // Use the height map to construct a terrain.
       let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,
                                           terraces, hasWater,
                                           defaultFloor, defaultWall,
                                           physicalDims);
-      builder.setShapes();
+      const waterLine = 0;
       builder.setBiomes(waterLine, 0, 0, 0);
-      context.map = builder.generateMap(context);
+      builder.setShapes();
+      builder.generateMap(context);
       let camera = new WT.MouseCamera(context.scene, canvas,
                                       canvas.width, canvas.height);
     

@@ -25,6 +25,7 @@ export class Context {
     get scene() { return this._scene; }
     get bounds() { return this._octree.bounds; }
     get spatial() { return this._octree; }
+    get map() { return this._worldMap; }
     set map(map) {
         this._worldMap = map;
     }

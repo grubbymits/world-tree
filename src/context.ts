@@ -44,6 +44,7 @@ export class Context {
   get scene(): SceneGraph { return this._scene; }
   get bounds(): BoundingCuboid { return this._octree.bounds; }
   get spatial(): Octree { return this._octree; }
+  get map(): SquareGrid { return this._worldMap; }
 
   set map(map: SquareGrid) {
     this._worldMap = map;
