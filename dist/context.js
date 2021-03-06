@@ -1,7 +1,7 @@
 import { EntityEvent } from "./events.js";
 import { SceneRenderer, Perspective, TrueIsometric, TwoByOneIsometric } from "./scene.js";
 import { Octree } from "./tree.js";
-import { CollisionDetector } from "./physics.js";
+import { CollisionDetector, Gravity } from "./physics.js";
 export class Context {
     constructor(worldDims) {
         this._entities = new Array();
@@ -13,6 +13,7 @@ export class Context {
     get bounds() { return this._octree.bounds; }
     get spatial() { return this._octree; }
     get map() { return this._worldMap; }
+    get controllers() { return this._controllers; }
     set map(map) {
         this._worldMap = map;
     }
@@ -56,6 +57,7 @@ export class Context {
             camera.update();
             controller.update();
         }
+        Gravity.update();
         this._scene.render(camera);
     }
 }

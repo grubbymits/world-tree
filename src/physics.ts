@@ -9,6 +9,7 @@ import { Point2D,
          IntersectInfo } from "./geometry.js"
 import { Octree } from "./tree.js"
 import { EntityEvent } from "./events.js"
+import { Context } from "./context.js"
 
 export enum Direction {
   North,
@@ -285,8 +286,10 @@ export class BoundingCuboid {
 
 export class CollisionInfo {
   constructor(private readonly _collidedEntity: PhysicalEntity,
+              private readonly _blocking: boolean,
               private readonly _intersectInfo: IntersectInfo) { }
   get entity(): PhysicalEntity { return this._collidedEntity; }
+  get blocking(): boolean { return this._blocking; }
   get intersectInfo(): IntersectInfo { return this._intersectInfo; }
 }
 
@@ -331,7 +334,8 @@ export class CollisionDetector {
     return this._missInfo.get(actor)!;
   }
 
-  static detectInArea(actor: Actor, path: Vector3D, area: BoundingCuboid): boolean {
+  static detectInArea(actor: Actor, path: Vector3D, maxAngle: Vector3D,
+                      area: BoundingCuboid): CollisionInfo|null {
     const bounds = actor.bounds;
     const widthVec3D = new Vector3D(bounds.width, 0, 0);
     const depthVec3D = new Vector3D(0, bounds.depth, 0);
@@ -360,20 +364,62 @@ export class CollisionDetector {
         const endPoint = beginPoint.add(path);
 
         if (geometry.obstructs(beginPoint, endPoint)) {
-          this._collisionInfo.set(actor,
-            new CollisionInfo(entity, geometry.intersectInfo!));
+          const blocking = geometry.obstructs(beginPoint, endPoint.add(maxAngle));
+          const collision =
+            new CollisionInfo(entity, blocking, geometry.intersectInfo!);
+          this._collisionInfo.set(actor, collision);
           actor.postEvent(EntityEvent.Collision);
-          return true;
+          return collision;
         } else {
           misses.push(entity);
           actor.postEvent(EntityEvent.NoCollision);
         }
       }
-      if (actor.bounds.intersects(entity.bounds)) {
+      if (actor.bounds.intersects(entity.bounds) && maxAngle.zero) {
         console.error("actor intersects entity but hasn't collided!");
       }
     }
     this.addMissInfo(actor, misses);
-    return false;
+    return null;
+  }
+}
+
+export class Gravity {
+  private static _enabled: boolean = false;
+  private static _force: number = 0;
+  private static _context: Context;
+  private static _zero: Vector3D = new Vector3D(0, 0, 0);
+
+  static init(force: number, context: Context) {
+    this._force = force;
+    this._context = context;
+    this._enabled = true;
+  }
+
+  static update(): void {
+    if (!this._enabled) {
+      return;
+    }
+
+    for (let controller of this._context.controllers) {
+      for (let actor of controller.actors) {
+        const relativeEffect = actor.lift - this._force;
+        if (relativeEffect >= 0) {
+          continue;
+        }
+        const path = new Vector3D(0, 0, relativeEffect)
+        let bounds = actor.bounds;
+        // Create a bounds to contain the current location and the destination.
+        let area = new BoundingCuboid(bounds.bottomCentre.add(path), bounds.dimensions);
+        area.insert(bounds);
+        const collision =
+          CollisionDetector.detectInArea(actor, path, this._zero, area);
+        if (collision == null) {
+          console.log("applying gravity");
+          actor.updatePosition(path);
+          actor.postEvent(EntityEvent.Moving);
+        }
+      }
+    }
   }
 }

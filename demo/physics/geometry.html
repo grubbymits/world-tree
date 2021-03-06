@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+  <title>Gravity Demo</title>
+</head>
+<body>
+  <div>
+    <canvas id="demoCanvas" oncontextmenu="return false;" width="1600" height="900">
+  </div>
+  <script type="module" src="robot.js"></script>
+  <script type="module" src="../../dist/world-tree.js"></script>
+  <script type="module">
+    import * as WT from "../../dist/world-tree.js";
+    import { Robot, RobotController } from "./robot.js"
+
+    const spriteWidth = 322;
+    const spriteHeight = 270;
+
+    let sheet = new WT.SpriteSheet("../../../res/img/basic-dungeon");
+    WT.Terrain.addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Flat,
+                          sheet, 0, 0, spriteWidth, spriteHeight);
+    WT.Terrain.addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Wall,
+                          sheet, spriteWidth, 0, spriteWidth, spriteHeight);
+    WT.Terrain.addGraphic(WT.TerrainType.Sand, WT.TerrainShape.Flat,
+                          sheet, spriteWidth * 2, 0, spriteWidth, spriteHeight);
+
+    WT.Terrain.addGraphic(WT.TerrainType.Sand, WT.TerrainShape.RampUpSouth,
+                          sheet, 0, spriteHeight, spriteWidth, spriteHeight);
+    WT.Terrain.addGraphic(WT.TerrainType.Sand, WT.TerrainShape.RampUpWest,
+                          sheet, spriteWidth, spriteHeight, spriteWidth, spriteHeight);
+    WT.Terrain.addGraphic(WT.TerrainType.Sand, WT.TerrainShape.RampUpEast,
+                          sheet, spriteWidth * 2, spriteHeight, spriteWidth, spriteHeight);
+    WT.Terrain.addGraphic(WT.TerrainType.Sand, WT.TerrainShape.RampUpNorth,
+                          sheet, spriteWidth * 3, spriteHeight, spriteWidth, spriteHeight);
+
+    // 9x9 area with a wall around the edge and some raised sections in the
+    // middle too.
+    const cellsX = 9;
+    const cellsY = 9;
+    const terraces = 2;
+    let heightMap = [ [ 2, 4, 4, 4, 4, 4, 4, 4, 4 ],
+                      [ 2, 1, 1, 1, 4, 1, 1, 1, 4 ],
+                      [ 2, 1, 1, 1, 1, 1, 1, 1, 4 ],
+                      [ 2, 1, 1, 3, 3, 3, 1, 4, 4 ],
+                      [ 2, 2, 1, 3, 3, 3, 1, 1, 4 ],
+                      [ 2, 1, 1, 3, 3, 3, 1, 1, 4 ],
+                      [ 2, 1, 1, 1, 1, 1, 1, 1, 4 ],
+                      [ 2, 1, 1, 1, 2, 1, 1, 1, 4 ],
+                      [ 2, 2, 2, 2, 2, 2, 2, 2, 4] ];
+
+    window.onload = (event) => {
+      console.log("window loaded");
+      let canvas = document.getElementById("demoCanvas");
+      const physicalDims =
+        WT.TwoByOneIsometric.getDimensions(spriteWidth, spriteHeight);
+      const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
+                                          physicalDims.depth * cellsY,
+                                          physicalDims.height * (1 + terraces));
+      let context = new WT.Context(worldDims);
+      context.addRenderer(canvas, WT.Perspective.TwoByOneIsometric);
+      WT.Gravity.init(5, context);
+    
+      const hasWater = false;
+      const waterLine = 0;
+      const defaultFloor = WT.TerrainType.Sand;
+      const defaultWall = WT.TerrainType.Rock;
+      // Use the height map to construct a terrain.
+      let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,
+                                          terraces, hasWater,
+                                          defaultFloor, defaultWall,
+                                          physicalDims);
+      builder.setShapes();
+      builder.generateMap(context);
+
+      Robot.initGraphics();
+      let robotController = new RobotController(context);
+      context.addController(robotController);
+      robotController.add(new WT.Point3D(physicalDims.width * 2,
+                                         physicalDims.depth * 2,
+                                         physicalDims.height * 2));
+      let camera = new WT.TrackerCamera(context.scene,
+                                        canvas.width, canvas.height,
+                                        robotController.robot);
+      var actorDebugger = new WT.ActorDebug(robotController.robot, camera, true);
+
+      var update = function update() {
+        if (document.hasFocus()) {
+          context.update(camera);
+        }
+        window.requestAnimationFrame(update);
+      }
+      context.update(camera);
+      window.requestAnimationFrame(update);
+    }
+  </script>
+</body>
+</html>

@@ -240,11 +240,13 @@ export class BoundingCuboid {
     }
 }
 export class CollisionInfo {
-    constructor(_collidedEntity, _intersectInfo) {
+    constructor(_collidedEntity, _blocking, _intersectInfo) {
         this._collidedEntity = _collidedEntity;
+        this._blocking = _blocking;
         this._intersectInfo = _intersectInfo;
     }
     get entity() { return this._collidedEntity; }
+    get blocking() { return this._blocking; }
     get intersectInfo() { return this._intersectInfo; }
 }
 export class CollisionDetector {
@@ -276,7 +278,7 @@ export class CollisionDetector {
         console.assert(this.hasMissInfo(actor));
         return this._missInfo.get(actor);
     }
-    static detectInArea(actor, path, area) {
+    static detectInArea(actor, path, maxAngle, area) {
         const bounds = actor.bounds;
         const widthVec3D = new Vector3D(bounds.width, 0, 0);
         const depthVec3D = new Vector3D(0, bounds.depth, 0);
@@ -301,20 +303,55 @@ export class CollisionDetector {
             for (const beginPoint of beginPoints) {
                 const endPoint = beginPoint.add(path);
                 if (geometry.obstructs(beginPoint, endPoint)) {
-                    this._collisionInfo.set(actor, new CollisionInfo(entity, geometry.intersectInfo));
+                    const blocking = geometry.obstructs(beginPoint, endPoint.add(maxAngle));
+                    const collision = new CollisionInfo(entity, blocking, geometry.intersectInfo);
+                    this._collisionInfo.set(actor, collision);
                     actor.postEvent(EntityEvent.Collision);
-                    return true;
+                    return collision;
                 }
                 else {
                     misses.push(entity);
                     actor.postEvent(EntityEvent.NoCollision);
                 }
             }
-            if (actor.bounds.intersects(entity.bounds)) {
+            if (actor.bounds.intersects(entity.bounds) && maxAngle.zero) {
                 console.error("actor intersects entity but hasn't collided!");
             }
         }
         this.addMissInfo(actor, misses);
-        return false;
+        return null;
     }
 }
+export class Gravity {
+    static init(force, context) {
+        this._force = force;
+        this._context = context;
+        this._enabled = true;
+    }
+    static update() {
+        if (!this._enabled) {
+            return;
+        }
+        for (let controller of this._context.controllers) {
+            for (let actor of controller.actors) {
+                const relativeEffect = actor.lift - this._force;
+                if (relativeEffect >= 0) {
+                    continue;
+                }
+                const path = new Vector3D(0, 0, relativeEffect);
+                let bounds = actor.bounds;
+                let area = new BoundingCuboid(bounds.bottomCentre.add(path), bounds.dimensions);
+                area.insert(bounds);
+                const collision = CollisionDetector.detectInArea(actor, path, this._zero, area);
+                if (collision == null) {
+                    console.log("applying gravity");
+                    actor.updatePosition(path);
+                    actor.postEvent(EntityEvent.Moving);
+                }
+            }
+        }
+    }
+}
+Gravity._enabled = false;
+Gravity._force = 0;
+Gravity._zero = new Vector3D(0, 0, 0);

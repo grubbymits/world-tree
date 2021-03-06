@@ -84,7 +84,7 @@ export class PhysicalEntity {
 
 export class Actor extends PhysicalEntity {
   protected readonly _canSwim: boolean = false;
-  protected readonly _canFly: boolean = false;
+  protected readonly _lift: number = 0;
   protected _direction: Direction;
   protected _action: Action|null;
 
@@ -108,6 +108,7 @@ export class Actor extends PhysicalEntity {
     this._handler.post(event);
   }
 
+  get lift(): number { return this._lift; }
   get direction(): Direction { return this._direction; }
 
   set direction(direction: Direction) {

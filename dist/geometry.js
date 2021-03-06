@@ -124,22 +124,28 @@ export class Vector3D {
     get zero() {
         return this.x === 0 && this.y === 0 && this.z === 0;
     }
+    add(other) {
+        const x = this.x + other.x;
+        const y = this.y + other.y;
+        const z = this.z + other.z;
+        return new Vector3D(x, y, z);
+    }
     dot(other) {
-        let x = this.x * other.x;
-        let y = this.y * other.y;
-        let z = this.z * other.z;
+        const x = this.x * other.x;
+        const y = this.y * other.y;
+        const z = this.z * other.z;
         return x + y + z;
     }
     cross(other) {
-        let x = this.y * other.z - this.z * other.y;
-        let y = this.z * other.x - this.x * other.z;
-        let z = this.x * other.y - this.y * other.x;
+        const x = this.y * other.z - this.z * other.y;
+        const y = this.z * other.x - this.x * other.z;
+        const z = this.x * other.y - this.y * other.x;
         return new Vector3D(x, y, z);
     }
     absMin(other) {
-        let x = Math.abs(this.x) < Math.abs(other.x) ? this.x : other.x;
-        let y = Math.abs(this.y) < Math.abs(other.y) ? this.y : other.y;
-        let z = Math.abs(this.z) < Math.abs(other.z) ? this.z : other.z;
+        const x = Math.abs(this.x) < Math.abs(other.x) ? this.x : other.x;
+        const y = Math.abs(this.y) < Math.abs(other.y) ? this.y : other.y;
+        const z = Math.abs(this.z) < Math.abs(other.z) ? this.z : other.z;
         return new Vector3D(x, y, z);
     }
 }

@@ -59,7 +59,7 @@ export class Actor extends PhysicalEntity {
     constructor(context, location, dimensions) {
         super(context, location, dimensions);
         this._canSwim = false;
-        this._canFly = false;
+        this._lift = 0;
         context.addActor(this);
     }
     update() {
@@ -72,6 +72,7 @@ export class Actor extends PhysicalEntity {
     postEvent(event) {
         this._handler.post(event);
     }
+    get lift() { return this._lift; }
     get direction() { return this._direction; }
     set direction(direction) {
         this._direction = direction;

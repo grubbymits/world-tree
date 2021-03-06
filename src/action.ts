@@ -3,7 +3,8 @@ import { EntityEvent } from "./events.js"
 import { Direction,
          getDirectionName,
          BoundingCuboid,
-         CollisionDetector } from "./physics.js"
+         CollisionDetector,
+         CollisionInfo } from "./physics.js"
 import { Point3D,
          Vector3D,
          Geometry } from "./geometry.js"
@@ -23,13 +24,13 @@ class MoveAction extends Action {
     super(actor);
   }
 
-  canMove(from: Point3D, to: Point3D): boolean {
+  obstructed(from: Point3D, to: Point3D, maxAngle: Vector3D): CollisionInfo|null {
     let bounds = this._actor.bounds;
     // Create a bounds to contain the current location and the destination.
     let path: Vector3D = to.vec(from);
     let area = new BoundingCuboid(to, bounds.dimensions);
     area.insert(bounds);
-    return !CollisionDetector.detectInArea(this._actor, path, area);
+    return CollisionDetector.detectInArea(this._actor, path, maxAngle, area);
   }
 
   perform(): boolean { return true; }
@@ -38,6 +39,7 @@ class MoveAction extends Action {
 export class MoveDirection extends MoveAction {
   constructor(actor: Actor,
               private readonly _d: Vector3D,
+              private readonly _maxAngle: Vector3D,
               private _bounds: BoundingCuboid) {
     super(actor);
   }
@@ -45,13 +47,20 @@ export class MoveDirection extends MoveAction {
   perform(): boolean {
     const currentPos = this.actor.bounds.bottomCentre;
     const nextPos = currentPos.add(this._d);
-    if (this.canMove(currentPos, nextPos)) {
+    const obstruction = this.obstructed(currentPos, nextPos, this._maxAngle);
+    if (obstruction == null) {
       this.actor.updatePosition(this._d);
       this.actor.postEvent(EntityEvent.Moving);
       return false;
     }
-    this.actor.postEvent(EntityEvent.EndMove);
-    return true;
+    if (obstruction.blocking) {
+      this.actor.postEvent(EntityEvent.EndMove);
+      return true;
+    }
+    console.log("adjusting movement with max angle");
+    this.actor.updatePosition(this._d.add(this._maxAngle));
+    this.actor.postEvent(EntityEvent.Moving);
+    return false;
   }
 }
 
@@ -61,8 +70,9 @@ export class MoveForwardsDirection extends MoveDirection {
 
   constructor(actor: Actor,
               d: Vector3D,
+              maxAngle: Vector3D,
               bounds: BoundingCuboid) {
-    super(actor, d, bounds);
+    super(actor, d, maxAngle, bounds);
 
     if (d.y < 0 && d.y < d.x) {
       this._direction = Direction.North;
@@ -270,7 +280,7 @@ export class Navigate extends Action {
       let currentLocation: Point3D = current.terrain.surfaceLocation;
       let bounds: BoundingCuboid = actor.bounds;
       for (let next of neighbours) {
-        if (!this.canMove(currentLocation, next.surfaceLocation)) {
+        if (!this.obstructed(currentLocation, next.surfaceLocation)) {
           continue;
         }
         let newCost = costSoFar.get(current.terrain.id)! +
