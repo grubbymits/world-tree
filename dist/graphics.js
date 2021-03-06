@@ -110,6 +110,8 @@ export class AnimatedGraphicComponent extends GraphicComponent {
         return this._spriteIds[this._spriteIds.length - 1];
     }
     get currentSpriteId() {
+        console.assert(this._currentSpriteIdx >= 0);
+        console.assert(this._currentSpriteIdx < this._spriteIds.length);
         return this._spriteIds[this._currentSpriteIdx];
     }
 }
@@ -124,19 +126,17 @@ export class OssilateGraphicComponent extends AnimatedGraphicComponent {
         if (this._nextUpdate > Date.now()) {
             return this.currentSpriteId;
         }
-        if (this._increase) {
-            if (this._currentSpriteId != this.lastId) {
-                this._currentSpriteIdx++;
-            }
-            else {
-                this._increase = false;
-            }
+        if (this._currentSpriteIdx == this._spriteIds.length - 1) {
+            this._increase = false;
         }
-        else if (this._currentSpriteIdx != this.firstId) {
-            this._currentSpriteIdx--;
+        else if (this._currentSpriteIdx == 0) {
+            this._increase = true;
+        }
+        if (this._increase) {
+            this._currentSpriteIdx++;
         }
         else {
-            this._increase = true;
+            this._currentSpriteIdx--;
         }
         this._nextUpdate = Date.now() + this._interval;
         return this.currentSpriteId;

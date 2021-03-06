@@ -81,7 +81,7 @@ class OctNode {
     //console.log("splitting into 8x (WxDxH):", width, depth, height);
 
     // half the dimensions again to get the distances to/from the centre.
-    let offset = [-0.5, 0.5];
+    const offset = [-0.5, 0.5];
 
     // Create eight children.
     for (let z = 0; z < 2; z++) {
@@ -101,7 +101,7 @@ class OctNode {
       }
     }
 
-    let insertIntoChild = function(child: OctNode, entity: Entity) {
+    const insertIntoChild = function(child: OctNode, entity: Entity) {
       if (child.containsLocation(entity.bounds.centre)) {
         return child.insert(entity);
       }

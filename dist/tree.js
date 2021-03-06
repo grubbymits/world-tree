@@ -60,7 +60,7 @@ class OctNode {
         const depth = (this._bounds.depth / 2);
         const height = (this._bounds.height / 2);
         const dimensions = new Dimensions(width, depth, height);
-        let offset = [-0.5, 0.5];
+        const offset = [-0.5, 0.5];
         for (let z = 0; z < 2; z++) {
             for (let y = 0; y < 2; y++) {
                 for (let x = 0; x < 2; x++) {
@@ -73,7 +73,7 @@ class OctNode {
                 }
             }
         }
-        let insertIntoChild = function (child, entity) {
+        const insertIntoChild = function (child, entity) {
             if (child.containsLocation(entity.bounds.centre)) {
                 return child.insert(entity);
             }

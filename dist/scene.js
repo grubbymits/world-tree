@@ -385,15 +385,15 @@ export class IsometricPhysicalDimensions extends Dimensions {
         super(width, depth, height);
     }
     static physicalWidth(spriteWidth) {
-        return (spriteWidth * this._oneOverSqrt3);
+        return Math.round(spriteWidth * this._oneOverSqrt3);
     }
     static physicalDepth(physicalWidth, relativeDims) {
         let depthRatio = relativeDims.depth / relativeDims.width;
-        return (physicalWidth * depthRatio);
+        return Math.round(physicalWidth * depthRatio);
     }
     static physicalHeight(physicalWidth, relativeDims) {
         let heightRatio = relativeDims.height / relativeDims.width;
-        return (physicalWidth * heightRatio);
+        return Math.round(physicalWidth * heightRatio);
     }
 }
 IsometricPhysicalDimensions._oneOverSqrt3 = 1 / Math.sqrt(3);

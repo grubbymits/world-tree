@@ -252,11 +252,11 @@ export class BoundingCuboid {
 
     this._dimensions =
       new Dimensions(maxX - minX, maxY - minY, maxZ - minZ);
-    let min = new Point3D(minX, minY, minZ);
-    let max = new Point3D(maxX, maxY, maxZ);
-    let width = max.x - min.x / 2;
-    let depth = max.y - min.y / 2;
-    let height = max.z - min.z / 2;
+    const min = new Point3D(minX, minY, minZ);
+    const max = new Point3D(maxX, maxY, maxZ);
+    const width = (max.x - min.x) / 2;
+    const depth = (max.y - min.y) / 2;
+    const height = (max.z - min.z) / 2;
     this._centre = new Point3D(min.x + width,
                                 min.y + depth,
                                 min.z + height);
