@@ -79,6 +79,7 @@ export class RobotController extends WT.Controller {
     this._actors.push(this.robot);
     let bounds = this._context.bounds;
     let robot = this.robot;
+    const maxAngle = new WT.Vector3D(0, 0, 0);
 
     let moveRandomDirection = function() {
       let dx = Math.round(Math.random() * 2) - 1;
@@ -93,7 +94,7 @@ export class RobotController extends WT.Controller {
         dy = 1;
       }
       let moveVector = new WT.Vector3D(dx, dy, dz);
-      robot.action = new WT.MoveForwardsDirection(robot, moveVector, bounds);
+      robot.action = new WT.MoveForwardsDirection(robot, moveVector, maxAngle, bounds);
     };
 
     // Choose another direction when it can't move anymore.

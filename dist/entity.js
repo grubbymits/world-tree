@@ -70,7 +70,7 @@ export class Actor extends EventableEntity {
     constructor(context, location, dimensions, graphicComponent) {
         super(context, location, dimensions, graphicComponent);
         this._canSwim = false;
-        this._canFly = false;
+        this._lift = 0;
         context.addActor(this);
     }
     update() {
@@ -83,6 +83,7 @@ export class Actor extends EventableEntity {
     postEvent(event) {
         this._handler.post(event);
     }
+    get lift() { return this._lift; }
     get direction() { return this._direction; }
     set direction(direction) {
         this._direction = direction;

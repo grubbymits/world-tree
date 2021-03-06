@@ -532,7 +532,7 @@ export class TerrainBuilder {
 
         // And if that fails, fallback to the base flat tile.
         if (!Terrain.isSupportedShape(centre.type, shapeType)) {
-          console.log("unsupported shape for",
+          console.log("Defaulting to flat terrain. Unsupported shape for",
                       getTypeName(centre.type), getShapeName(shapeType));
           shapeType = TerrainShape.Flat;
         }

@@ -440,7 +440,7 @@ export class TerrainBuilder {
                     }
                 }
                 if (!Terrain.isSupportedShape(centre.type, shapeType)) {
-                    console.log("unsupported shape for", getTypeName(centre.type), getShapeName(shapeType));
+                    console.log("Defaulting to flat terrain. Unsupported shape for", getTypeName(centre.type), getShapeName(shapeType));
                     shapeType = TerrainShape.Flat;
                 }
                 centre.shape = shapeType;

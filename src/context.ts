@@ -13,7 +13,8 @@ import { Controller } from "./controller.js"
 import { Octree } from "./tree.js"
 import { Dimensions,
          BoundingCuboid,
-         CollisionDetector } from "./physics.js"
+         CollisionDetector,
+         Gravity } from "./physics.js"
 
 export class Context {
   private _scene: SceneGraph;
@@ -45,6 +46,7 @@ export class Context {
   get bounds(): BoundingCuboid { return this._octree.bounds; }
   get spatial(): Octree { return this._octree; }
   get map(): SquareGrid { return this._worldMap; }
+  get controllers(): Array<Controller> { return this._controllers; }
 
   set map(map: SquareGrid) {
     this._worldMap = map;
@@ -79,6 +81,7 @@ export class Context {
       camera.update();
       controller.update();
     }
+    Gravity.update();
     this._scene.render(camera);
   }
 }
