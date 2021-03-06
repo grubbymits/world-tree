@@ -286,7 +286,6 @@ export class TerrainBuilder {
             }
         }
     }
-    setFeatures() { }
     setShapes() {
         const coordOffsets = [
             new Point2D(0, 1),
@@ -300,6 +299,7 @@ export class TerrainBuilder {
             TerrainShape.RampUpNorth,
             TerrainShape.RampUpEast
         ];
+        let totalRamps = 0;
         for (let y = this._surface.depth - 3; y > 1; y--) {
             for (let x = 2; x < this._surface.width - 2; x++) {
                 let centre = this._surface.at(x, y);
@@ -320,24 +320,12 @@ export class TerrainBuilder {
                         neighbour.shape = ramps[i];
                         neighbour.fixed = true;
                         nextNeighbour.fixed = true;
+                        totalRamps++;
                     }
                 }
             }
         }
-    }
-    setBiomes(waterLine, wetLimit, dryLimit, treeLimit) {
-        console.log("setBiomes with\n", "- waterLine:", waterLine, "\n", "- wetLimit:", wetLimit, "\n", "- dryLimit:", dryLimit, "\n", "- treeLimit:", treeLimit, "\n");
-        if (this._hasWater) {
-            for (let y = 0; y < this._surface.depth; y++) {
-                for (let x = 0; x < this._surface.width; x++) {
-                    let surface = this._surface.at(x, y);
-                    if (surface.height <= waterLine) {
-                        surface.biome = Biome.Water;
-                        surface.type = TerrainType.Water;
-                    }
-                }
-            }
-        }
+        console.log("number of ramp tiles added:", totalRamps);
     }
     setEdges() {
         for (let y = 0; y < this._surface.depth; y++) {
@@ -443,6 +431,14 @@ export class TerrainBuilder {
                         console.log("Trying default wall shape and type", getTypeName(this._defaultWall));
                     }
                 }
+                if (!isFlat(shapeType) && !Terrain.isSupportedShape(centre.type, shapeType)) {
+                    if (Terrain.isSupportedShape(this._defaultFloor, shapeType)) {
+                        centre.type = this._defaultFloor;
+                    }
+                    else if (Terrain.isSupportedShape(this._defaultWall, shapeType)) {
+                        centre.type = this._defaultWall;
+                    }
+                }
                 if (!Terrain.isSupportedShape(centre.type, shapeType)) {
                     console.log("unsupported shape for", getTypeName(centre.type), getShapeName(shapeType));
                     shapeType = TerrainShape.Flat;
@@ -465,11 +461,6 @@ export class TerrainBuilder {
         }
         console.assert(relativeHeight <= this._numTerraces, "impossible relative height:", relativeHeight, "\ncentre:", centre);
         return relativeHeight;
-    }
-}
-export class OpenTerrainBuilder extends TerrainBuilder {
-    constructor(width, depth, heightMap, numTerraces, hasWater, defaultFloor, defaultWall, physicalDims) {
-        super(width, depth, heightMap, numTerraces, hasWater, defaultFloor, defaultWall, physicalDims);
     }
     addRain(towards, water, waterLine) {
         console.log("adding rain towards", getDirectionName(towards));

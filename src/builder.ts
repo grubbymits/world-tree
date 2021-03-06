@@ -367,8 +367,6 @@ export class TerrainBuilder {
     }
   }
 
-  setFeatures(): void { }
-
   setShapes(): void {
     const coordOffsets: Array<Point2D> = [
       new Point2D(0, 1),
@@ -387,6 +385,7 @@ export class TerrainBuilder {
     // Find locations that have heights that sit exactly between two terraces
     // and then find their adjacent locations that are higher terraces. Set
     // those locations to be ramps.
+    let totalRamps = 0;
     for (let y = this._surface.depth - 3; y > 1 ;y--) {
       for (let x = 2; x < this._surface.width - 2; x++) {
         let centre: TerrainAttributes = this._surface.at(x, y);
@@ -411,30 +410,12 @@ export class TerrainBuilder {
             neighbour.shape = ramps[i];
             neighbour.fixed = true;
             nextNeighbour.fixed = true;
+            totalRamps++;
           }
         }
       }
     }
-  }
-
-  setBiomes(waterLine: number, wetLimit: number, dryLimit: number,
-            treeLimit: number): void {
-    console.log("setBiomes with\n",
-                "- waterLine:", waterLine, "\n",
-                "- wetLimit:", wetLimit, "\n",
-                "- dryLimit:", dryLimit, "\n",
-                "- treeLimit:", treeLimit, "\n");
-    if (this._hasWater) {
-      for (let y = 0; y < this._surface.depth; y++) {
-        for (let x = 0; x < this._surface.width; x++) {
-          let surface = this._surface.at(x, y);
-          if (surface.height <= waterLine) {
-            surface.biome = Biome.Water;
-            surface.type = TerrainType.Water;
-          }
-        }
-      }
-    }
+    console.log("number of ramp tiles added:", totalRamps);
   }
 
   setEdges(): void {
@@ -539,6 +520,16 @@ export class TerrainBuilder {
           }
         }
 
+        // If we have a unsupported shape, such as a ramp, check whether we have
+        // the ramp shape for a default terrain type.
+        if (!isFlat(shapeType) && !Terrain.isSupportedShape(centre.type, shapeType)) {
+          if (Terrain.isSupportedShape(this._defaultFloor, shapeType)) {
+            centre.type = this._defaultFloor;
+          } else if (Terrain.isSupportedShape(this._defaultWall, shapeType)) {
+            centre.type = this._defaultWall;
+          }
+        }
+
         // And if that fails, fallback to the base flat tile.
         if (!Terrain.isSupportedShape(centre.type, shapeType)) {
           console.log("unsupported shape for",
@@ -569,99 +560,6 @@ export class TerrainBuilder {
                    "\ncentre:", centre);
     return relativeHeight;
   }
-}
-
-export class OpenTerrainBuilder extends TerrainBuilder {
-  constructor(width: number,
-              depth: number,
-              heightMap: Array<Array<number>>,
-              numTerraces: number,
-              hasWater: boolean,
-              defaultFloor: TerrainType,
-              defaultWall: TerrainType,
-              physicalDims: Dimensions) {
-    super(width, depth, heightMap, numTerraces, hasWater,
-          defaultFloor, defaultWall, physicalDims);
-  }
-
-  /*  
-  setShapes(): void {
-    console.log("adding ramps");
-    const filterDepth: number = 3;
-    const coordOffsets: Array<Point2D> = [ new Point2D(0, -1),
-                                           new Point2D(1, 0),
-                                           new Point2D(0, 1),
-                                           new Point2D(-1, 0) ];
-
-    const diagOffsets: Array<Array<Point2D>> =
-      [ [ new Point2D(-1, -1),  new Point2D(1, -1)],
-        [ new Point2D(1, -1),   new Point2D(1, 1) ],
-        [ new Point2D(-1, 1),   new Point2D(1, 1) ],
-        [ new Point2D(-1, -1),  new Point2D(-1, 1)]];
-
-    const ramps: Array<TerrainShape> = [ TerrainShape.RampUpNorth,
-                                         TerrainShape.RampUpEast,
-                                         TerrainShape.RampUpSouth,
-                                         TerrainShape.RampUpWest ];
-
-    const direction = [ "north", "east", "south", "west" ];
-    const filterCoeffs: Array<number> = [ 0.15, 0.1 ];
-
-    for (let y = filterDepth; y < this._surface.depth - filterDepth; y++) {
-      for (let x = filterDepth; x < this._surface.width - filterDepth; x++) {
-        let centre: TerrainAttributes = this._surface.at(x, y);
-        if (!isFlat(centre.shape) || centre.biome == Biome.Water) {
-          continue;
-        }
-
-        for (let i in coordOffsets) {
-          let offset: Point2D = coordOffsets[i];
-          let neighbour: TerrainAttributes =
-            this._surface.at(x + offset.x, y + offset.y);
-
-          // Don't ramp to ramp!
-          if (!isFlat(neighbour.shape)) {
-            continue;
-          }
-
-          if (centre.terrace == neighbour.terrace) {
-            continue;
-          }
-
-          // Check that the tile we're ramping to is flanked by two
-          // other tiles that are flat and of the same terrace.
-          let skip: boolean = false;
-          for (let diagNeighbourOffsets of diagOffsets[i]) {
-            let diagNeighbour: TerrainAttributes = 
-              this._surface.at(x + diagNeighbourOffsets.x,
-                               y + diagNeighbourOffsets.y);
-            skip = skip || !isFlat(diagNeighbour.shape) ||
-                   diagNeighbour.terrace != neighbour.terrace;
-          }
-          if (skip)
-            continue;
-
-          let result: number = centre.terrace * 0.45 + neighbour.terrace * 0.3;
-          let next: TerrainAttributes = neighbour;
-          for (let d = 0; d < filterDepth - 1; d++) {
-            next = this._surface.at(next.x + offset.x, next.y + offset.y);
-            result += next.terrace * filterCoeffs[d];
-          }
-
-          result = Math.round(result);
-          if (result > centre.terrace) {
-            centre.shape = ramps[i];
-            centre.terrace = result;
-            if (centre.biome == Biome.Beach) {
-              centre.biome = neighbour.biome;
-            }
-            break;
-          }
-        }
-      }
-    }
-  }
-  */
 
   addRain(towards: Direction, water: number, waterLine: number): void {
     console.log("adding rain towards", getDirectionName(towards));

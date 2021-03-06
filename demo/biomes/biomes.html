@@ -103,10 +103,10 @@
       const defaultFloor = WT.TerrainType.DryGrass;
       const defaultWall = WT.TerrainType.DryGrass;
       // Use the height map to construct a terrain.
-      let builder = new WT.OpenTerrainBuilder(cellsX, cellsY, heightMap,
-                                              terraces, hasWater,
-                                              defaultFloor, defaultWall,
-                                              physicalDims);
+      let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,
+                                          terraces, hasWater,
+                                          defaultFloor, defaultWall,
+                                          physicalDims);
       builder.addRain(WT.Direction.North, water, waterLine);
       builder.setBiomes(waterLine, wetLimit, dryLimit, treeLimit);
       // build ramps
