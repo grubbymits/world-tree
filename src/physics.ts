@@ -230,6 +230,7 @@ export class BoundingCuboid {
         other.maxLocation.z < this.minLocation.z)
       return false;
 
+    console.log("bounds intersect at centres:", this.centre, other.centre);
     return true;
   }
 
@@ -353,7 +354,7 @@ export class CollisionDetector {
     ];
 
     let misses: Array<PhysicalEntity> = new Array<PhysicalEntity>();
-    let entities: Array<PhysicalEntity> = this._spatialInfo.getEntities(area);
+    const entities: Array<PhysicalEntity> = this._spatialInfo.getEntities(area);
 
     for (let entity of entities) {
       if (entity.id == actor.id) {
@@ -364,7 +365,8 @@ export class CollisionDetector {
         const endPoint = beginPoint.add(path);
 
         if (geometry.obstructs(beginPoint, endPoint)) {
-          const blocking = geometry.obstructs(beginPoint, endPoint.add(maxAngle));
+          const blocking =
+            maxAngle.zero || geometry.obstructs(beginPoint, endPoint.add(maxAngle));
           const collision =
             new CollisionInfo(entity, blocking, geometry.intersectInfo!);
           this._collisionInfo.set(actor, collision);
@@ -388,7 +390,7 @@ export class Gravity {
   private static _enabled: boolean = false;
   private static _force: number = 0;
   private static _context: Context;
-  private static _zero: Vector3D = new Vector3D(0, 0, 0);
+  private static readonly _zero: Vector3D = new Vector3D(0, 0, 0);
 
   static init(force: number, context: Context) {
     this._force = force;
@@ -410,7 +412,7 @@ export class Gravity {
         const path = new Vector3D(0, 0, relativeEffect)
         let bounds = actor.bounds;
         // Create a bounds to contain the current location and the destination.
-        let area = new BoundingCuboid(bounds.bottomCentre.add(path), bounds.dimensions);
+        let area = new BoundingCuboid(bounds.centre.add(path), bounds.dimensions);
         area.insert(bounds);
         const collision =
           CollisionDetector.detectInArea(actor, path, this._zero, area);
