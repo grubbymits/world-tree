@@ -32,9 +32,9 @@ export class Entity {
     this._id = Entity._ids;
     Entity._ids++;
     this._graphicComponents.push(graphicComponent);
-    let centre = new Point3D(minLocation.x + Math.floor(dimensions.width / 2),
-                             minLocation.y + Math.floor(dimensions.depth / 2),
-                             minLocation.z + Math.floor(dimensions.height / 2));
+    let centre = new Point3D(minLocation.x + (dimensions.width / 2),
+                             minLocation.y + (dimensions.depth / 2),
+                             minLocation.z + (dimensions.height / 2));
     const bounds = new BoundingCuboid(centre, dimensions);
     this._geometry = new CuboidGeometry(bounds);
     this._context.addEntity(this);

@@ -84,6 +84,12 @@ export class Point3D {
     add(vector) {
         return new Point3D(this.x + vector.x, this.y + vector.y, this.z + vector.z);
     }
+    mul(v) {
+        return new Point3D(this.x * v.x, this.y * v.y, this.z * v.z);
+    }
+    addScalar(v) {
+        return new Point3D(this.x + v, this.y + v, this.z + v);
+    }
     sub(vector) {
         return new Point3D(this.x - vector.x, this.y - vector.y, this.z - vector.z);
     }
@@ -129,6 +135,9 @@ export class Vector3D {
         const z = this.x * other.y - this.y * other.x;
         return new Vector3D(x, y, z);
     }
+    norm() {
+        return Math.sqrt(this.dot(this));
+    }
     absMin(other) {
         const x = Math.abs(this.x) < Math.abs(other.x) ? this.x : other.x;
         const y = Math.abs(this.y) < Math.abs(other.y) ? this.y : other.y;
@@ -149,6 +158,14 @@ export class Vertex3D {
     get v() { return this._v; }
     transform(d) {
         this._point = this.point.add(d);
+    }
+    distance(p) {
+        const sn = -this.normal.dot(p.vec(this.point));
+        const sd = this.normal.dot(this.normal);
+        const sb = sn / sd;
+        const closest = p.addScalar(sb).mul(this.normal);
+        const d = p.vec(closest).norm();
+        return d;
     }
     intersects(begin, end) {
         const u = end.vec(begin);
@@ -279,7 +296,7 @@ export class CuboidGeometry extends Geometry {
         let v5 = new Vertex3D(p[7], p[4], p[3]);
         this._faces.push(new QuadFace3D(v4, v5));
         let v6 = new Vertex3D(p[1], p[5], p[7]);
-        let v7 = new Vertex3D(p[7], p[6], p[5]);
+        let v7 = new Vertex3D(p[7], p[1], p[6]);
         this._faces.push(new QuadFace3D(v6, v7));
         let v8 = new Vertex3D(p[0], p[3], p[4]);
         let v9 = new Vertex3D(p[4], p[2], p[0]);

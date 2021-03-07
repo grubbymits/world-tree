@@ -99,6 +99,16 @@ export class Point3D {
                        this.z + vector.z);
   }
 
+  mul(v: Vector3D): Point3D {
+    return new Point3D(this.x * v.x,
+                       this.y * v.y,
+                       this.z * v.z);
+  }
+
+  addScalar(v: number): Point3D {
+    return new Point3D(this.x + v, this.y + v, this.z + v);
+  }
+
   sub(vector: Vector3D): Point3D {
     return new Point3D(this.x - vector.x,
                        this.y - vector.y,
@@ -155,6 +165,10 @@ export class Vector3D {
     return new Vector3D(x, y, z);
   }
 
+  norm(): number {
+    return Math.sqrt(this.dot(this));
+  }
+
   absMin(other: Vector3D): Vector3D {
     const x = Math.abs(this.x) < Math.abs(other.x) ? this.x : other.x;
     const y = Math.abs(this.y) < Math.abs(other.y) ? this.y : other.y;
@@ -184,12 +198,23 @@ export class Vertex3D {
     this._point = this.point.add(d);
   }
 
+  // http://www.geomalgorithms.com/a04-_planes.html#Distance-Point-to-Plane
+  distance(p: Point3D): number {
+    const sn: number = -this.normal.dot(p.vec(this.point));
+    const sd: number = this.normal.dot(this.normal);
+    const sb: number = sn / sd;
+    const closest: Point3D = p.addScalar(sb).mul(this.normal);
+    const d: number = p.vec(closest).norm();
+    return d;
+  }
+
   // https://www.geomalgorithms.com/a05-_intersect-1.html 
   intersects(begin: Point3D, end: Point3D): boolean {
     // Use the vertex to represent a plane and calculate whether the segment
     // (begin, end) intersects that plane.
     const u: Vector3D = end.vec(begin);
     const D: number = this.normal.dot(u);
+    // Check whether the line is (almost) parallel to the plane.
     if (Math.abs(D) < 0.01) {
       return false;
     }
@@ -364,7 +389,7 @@ export class CuboidGeometry extends Geometry {
 
     // top
     let v6 = new Vertex3D(p[1], p[5], p[7]);
-    let v7 = new Vertex3D(p[7], p[6], p[5]);
+    let v7 = new Vertex3D(p[7], p[1], p[6]);
     this._faces.push(new QuadFace3D(v6, v7));
 
     // bottom

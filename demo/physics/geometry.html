@@ -38,6 +38,7 @@
     // middle too.
     const cellsX = 9;
     const cellsY = 9;
+    /*
     const terraces = 2;
     let heightMap = [ [ 2, 4, 4, 4, 4, 4, 4, 4, 4 ],
                       [ 2, 1, 1, 1, 4, 1, 1, 1, 4 ],
@@ -47,7 +48,17 @@
                       [ 2, 1, 1, 3, 3, 3, 1, 1, 4 ],
                       [ 2, 1, 1, 1, 1, 1, 1, 1, 4 ],
                       [ 2, 1, 1, 1, 2, 1, 1, 1, 4 ],
-                      [ 2, 2, 2, 2, 2, 2, 2, 2, 4] ];
+                      [ 2, 2, 2, 2, 2, 2, 2, 2, 4] ];*/
+    const terraces = 1;
+    let heightMap = [ [ 2, 2, 2, 2, 2, 2, 2, 2, 2 ],
+                      [ 2, 0, 0, 0, 0, 0, 0, 0, 2 ],
+                      [ 0, 0, 0, 0, 0, 0, 0, 0, 2 ],
+                      [ 0, 0, 0, 0, 0, 0, 0, 0, 2 ],
+                      [ 0, 0, 0, 0, 0, 0, 0, 0, 2 ],
+                      [ 0, 0, 0, 0, 0, 0, 0, 0, 2 ],
+                      [ 2, 0, 0, 0, 0, 0, 0, 0, 2 ],
+                      [ 2, 0, 0, 0, 0, 0, 0, 0, 2 ],
+                      [ 2, 2, 2, 2, 2, 2, 2, 2, 2] ];
 
     window.onload = (event) => {
       console.log("window loaded");
@@ -82,7 +93,7 @@
       let camera = new WT.TrackerCamera(context.scene,
                                         canvas.width, canvas.height,
                                         robotController.robot);
-      var actorDebugger = new WT.ActorDebug(robotController.robot, camera, true);
+      var actorDebugger = new WT.ActorDebug(robotController.robot, camera, false);
 
       var update = function update() {
         if (document.hasFocus()) {

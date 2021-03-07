@@ -202,6 +202,7 @@ export class BoundingCuboid {
         if (other.minLocation.z > this.maxLocation.z ||
             other.maxLocation.z < this.minLocation.z)
             return false;
+        console.log("bounds intersect at centres:", this.centre, other.centre);
         return true;
     }
     insert(other) {
@@ -294,7 +295,7 @@ export class CollisionDetector {
             bounds.maxLocation
         ];
         let misses = new Array();
-        let entities = this._spatialInfo.getEntities(area);
+        const entities = this._spatialInfo.getEntities(area);
         for (let entity of entities) {
             if (entity.id == actor.id) {
                 continue;
@@ -303,7 +304,7 @@ export class CollisionDetector {
             for (const beginPoint of beginPoints) {
                 const endPoint = beginPoint.add(path);
                 if (geometry.obstructs(beginPoint, endPoint)) {
-                    const blocking = geometry.obstructs(beginPoint, endPoint.add(maxAngle));
+                    const blocking = maxAngle.zero || geometry.obstructs(beginPoint, endPoint.add(maxAngle));
                     const collision = new CollisionInfo(entity, blocking, geometry.intersectInfo);
                     this._collisionInfo.set(actor, collision);
                     actor.postEvent(EntityEvent.Collision);
@@ -340,7 +341,7 @@ export class Gravity {
                 }
                 const path = new Vector3D(0, 0, relativeEffect);
                 let bounds = actor.bounds;
-                let area = new BoundingCuboid(bounds.bottomCentre.add(path), bounds.dimensions);
+                let area = new BoundingCuboid(bounds.centre.add(path), bounds.dimensions);
                 area.insert(bounds);
                 const collision = CollisionDetector.detectInArea(actor, path, this._zero, area);
                 if (collision == null) {
