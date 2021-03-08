@@ -68,6 +68,16 @@
       WT.Terrain.addFeatureGraphics(feature, waves);
     }
 
+    // Add graphical features: Grass.
+    const grassSheet = new WT.SpriteSheet("../../../res/img/grass");
+    let grassSprites = new Array();
+    for (let x = 0; x < 4; x++) {
+      grassSprites.push(new WT.Sprite(grassSheet, x * spriteWidth, 0,
+                                      spriteWidth, 176));
+    }
+    WT.Terrain.addFeatureGraphics(WT.TerrainFeature.WetGrass,
+      new WT.OssilateGraphicComponent(grassSprites, 333));
+
     const cellsX = 11;
     const cellsY = 11;
     const terraces = 3;
