@@ -230,7 +230,6 @@ export class BoundingCuboid {
         other.maxLocation.z < this.minLocation.z)
       return false;
 
-    console.log("bounds intersect at centres:", this.centre, other.centre);
     return true;
   }
 
@@ -252,6 +251,7 @@ export class BoundingCuboid {
     let maxZ = other.maxLocation.z > this.maxLocation.z ?
       other.maxLocation.z : this.maxLocation.z;
 
+    console.assert(minX >= 0 && minY >= 0 && minZ >= 0);
     this._dimensions =
       new Dimensions(maxX - minX, maxY - minY, maxZ - minZ);
     const min = new Point3D(minX, minY, minZ);
@@ -378,7 +378,7 @@ export class CollisionDetector {
         }
       }
       if (actor.bounds.intersects(entity.bounds) && maxAngle.zero) {
-        console.error("actor intersects entity but hasn't collided!");
+        console.log("actor intersects entity but hasn't collided!");
       }
     }
     this.addMissInfo(actor, misses);
@@ -417,7 +417,6 @@ export class Gravity {
         const collision =
           CollisionDetector.detectInArea(actor, path, this._zero, area);
         if (collision == null) {
-          console.log("applying gravity");
           actor.updatePosition(path);
           actor.postEvent(EntityEvent.Moving);
         }
