@@ -33,17 +33,18 @@
     WT.Terrain.addGraphic(WT.TerrainType.Water, WT.TerrainShape.Flat,
                           sheet, spriteWidth * 6, 0, spriteWidth, spriteHeight);
 
-    const rampShapes = [ WT.TerrainShape.RampUpSouth,
-                         WT.TerrainShape.RampUpWest,
-                         WT.TerrainShape.RampUpEast,
-                         WT.TerrainShape.RampUpNorth ];
-    for (let i in rampShapes) {
+    const terrainShapes = [ WT.TerrainShape.RampUpSouth,
+                            WT.TerrainShape.RampUpWest,
+                            WT.TerrainShape.RampUpEast,
+                            WT.TerrainShape.RampUpNorth,
+                            WT.TerrainShape.Wall ];
+    for (let i in terrainShapes) {
       WT.Terrain.addGraphic(WT.TerrainType.DryGrass,
-                            rampShapes[i], sheet,
+                            terrainShapes[i], sheet,
                             i * spriteWidth, 3 * spriteHeight,
                             spriteWidth, spriteHeight);
       WT.Terrain.addGraphic(WT.TerrainType.WetGrass,
-                            rampShapes[i], sheet,
+                            terrainShapes[i], sheet,
                             i * spriteWidth, 4 * spriteHeight,
                             spriteWidth, spriteHeight);
     }
