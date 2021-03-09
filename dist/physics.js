@@ -345,9 +345,6 @@ export class Gravity {
                 area.insert(bounds);
                 const collision = CollisionDetector.detectInArea(actor, path, this._zero, area);
                 if (collision == null) {
-                    console.log("applying gravity");
-                    console.log("no floor within:");
-                    area.dump();
                     actor.updatePosition(path);
                     actor.postEvent(EntityEvent.Moving);
                 }
