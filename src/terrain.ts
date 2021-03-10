@@ -8,7 +8,9 @@ import { SpriteSheet,
 import { Context } from "./context.js"
 import { Point3D,
          Geometry,
-         CuboidGeometry } from "./geometry.js"
+         CuboidGeometry,
+         RampUpWestGeometry,
+         RampUpEastGeometry } from "./geometry.js"
 
 export enum TerrainShape {
   Flat,
@@ -326,6 +328,14 @@ export class Terrain extends Entity {
       this._tanTheta = Math.tan(theta);
     } else {
       this._tanTheta = 0;
+    }
+
+    if (this._shape == TerrainShape.RampUpWest) {
+      this._geometry = new RampUpWestGeometry(this.geometry.bounds);
+      console.log("adding ramp up west geometry");
+    } else if (this._shape == TerrainShape.RampUpEast) {
+      this._geometry = new RampUpWestGeometry(this.geometry.bounds);
+      console.log("adding ramp up east geometry");
     }
 
     let x = this.bounds.centre.x;
