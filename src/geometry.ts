@@ -333,10 +333,20 @@ export class IntersectInfo {
 export class Geometry {
   protected _faces: Array<Face3D> = new Array<Face3D>();
   protected _intersectInfo: IntersectInfo | null;
+  protected readonly _widthVec3D: Vector3D;
+  protected readonly _depthVec3D: Vector3D;
+  protected readonly _heightVec3D: Vector3D;
 
-  constructor(protected _bounds: BoundingCuboid) { }
+  constructor(protected _bounds: BoundingCuboid) {
+    this._widthVec3D = new Vector3D(_bounds.width, 0, 0);
+    this._depthVec3D = new Vector3D(0, _bounds.depth, 0);
+    this._heightVec3D = new Vector3D(0, 0, _bounds.height);
+  }
 
   get bounds(): BoundingCuboid { return this._bounds; }
+  get widthVec3D(): Vector3D { return this._widthVec3D; }
+  get depthVec3D(): Vector3D { return this._depthVec3D; }
+  get heightVec3D(): Vector3D { return this._heightVec3D; }
   get intersectInfo(): IntersectInfo | null { return this._intersectInfo; }
 
   transform(d: Vector3D): void {
@@ -366,9 +376,6 @@ export class NoGeometry extends Geometry {
 export class CuboidGeometry extends Geometry {
   constructor(bounds: BoundingCuboid) {
     super(bounds);
-    const widthVec3D = new Vector3D(bounds.width, 0, 0);
-    const depthVec3D = new Vector3D(0, bounds.depth, 0);
-    const heightVec3D = new Vector3D(0, 0, bounds.height);
 
     //  1  ________ 5
     //    |\       \
@@ -380,14 +387,14 @@ export class CuboidGeometry extends Geometry {
     //       \|______|
     //       2        4
     const p: Array<Point3D> = [
-      this.bounds.minLocation,                    // 0 
-      this.bounds.minLocation.add(heightVec3D),   // 1
-      this.bounds.minLocation.add(depthVec3D),    // 2
-      this.bounds.minLocation.add(widthVec3D),    // 3
-      this.bounds.maxLocation.sub(heightVec3D),   // 4
-      this.bounds.maxLocation.sub(depthVec3D),    // 5
-      this.bounds.maxLocation.sub(widthVec3D),    // 6
-      this.bounds.maxLocation                     // 7
+      this.bounds.minLocation,                         // 0 
+      this.bounds.minLocation.add(this.heightVec3D),   // 1
+      this.bounds.minLocation.add(this.depthVec3D),    // 2
+      this.bounds.minLocation.add(this.widthVec3D),    // 3
+      this.bounds.maxLocation.sub(this.heightVec3D),   // 4
+      this.bounds.maxLocation.sub(this.depthVec3D),    // 5
+      this.bounds.maxLocation.sub(this.widthVec3D),    // 6
+      this.bounds.maxLocation                          // 7
     ];
 
     // left
@@ -422,12 +429,53 @@ export class CuboidGeometry extends Geometry {
   }
 }
 
-export class RampGeometry extends Geometry {
+export class RampUpWestGeometry extends Geometry {
   constructor(bounds: BoundingCuboid) {
-    const widthVec3D = new Vector3D(bounds.width, 0, 0);
-    const depthVec3D = new Vector3D(0, bounds.depth, 0);
-    const heightVec3D = new Vector3D(0, 0, bounds.height);
+    super(bounds);
+    //     4
+    //     /\
+    //    /  \
+    // 5 /    \
+    //  |\     \
+    //  | \     \ 2
+    //  |  \    /
+    //  |   \  /
+    //  |____\/
+    //  1     3
+    const p: Array<Point3D> = [
+      this.bounds.minLocation,                       // 0
+      this.bounds.minLocation.add(this.depthVec3D),  // 1
+      this.bounds.minLocation.add(this.widthVec3D),  // 2
+      this.bounds.maxLocation.sub(this.heightVec3D), // 3
+      this.bounds.minLocation.sub(this.heightVec3D), // 4
+      this.bounds.maxLocation.sub(this.widthVec3D)   // 5
+    ];
 
+    // left
+    const v0 = new Vertex3D(p[0], p[1], p[5]);
+    const v1 = new Vertex3D(p[5], p[4], p[0]);
+    this._faces.push(new QuadFace3D(v0, v1));
+
+    // front
+    this._faces.push(new TriangleFace3D(new Vertex3D(p[1], p[5], p[3])));
+
+    // right
+    const v2 = new Vertex3D(p[2], p[3], p[5]);
+    const v3 = new Vertex3D(p[5], p[4], p[2]);
+    this._faces.push(new QuadFace3D(v2, v3));
+
+    // bottom
+    const v4 = new Vertex3D(p[0], p[2], p[3]);
+    const v5 = new Vertex3D(p[3], p[1], p[0]);
+
+    // back
+    this._faces.push(new TriangleFace3D(new Vertex3D(p[0], p[2], p[4])));
+  }
+}
+
+export class RampUpEastGeometry extends Geometry {
+  constructor(bounds: BoundingCuboid) {
+    super(bounds);
     //         4
     //        / \
     //       /   \
@@ -438,28 +486,32 @@ export class RampGeometry extends Geometry {
     //       \/____|
     //       1      3
     const p: Array<Point3D> = [
-      this.bounds.minLocation,                    // 0 
-      this.bounds.minLocation.add(depthVec3D),    // 1
-      this.bounds.minLocation.add(widthVec3D),    // 2
-      this.bounds.maxLocation.sub(heightVec3D),   // 3
-      this.bounds.maxLocation.sub(depthVec3D),    // 4
-      this.bounds.maxLocation                     // 5
+      this.bounds.minLocation,                      // 0 
+      this.bounds.minLocation.add(this.depthVec3D), // 1
+      this.bounds.minLocation.add(this.widthVec3D), // 2
+      this.bounds.maxLocation.sub(this.heightVec3D),// 3
+      this.bounds.maxLocation.sub(this.depthVec3D), // 4
+      this.bounds.maxLocation                       // 5
     ];
 
     // left
     const v0 = new Vertex3D(p[0], p[1], p[5]);
     const v1 = new Vertex3D(p[5], p[4], p[0]);
     this._faces.push(new QuadFace3D(v0, v1));
+
     // front
-    this._faces.push(new TrianlgeFace3D(new Vertex3D(p[1], p[5], p[3])));
+    this._faces.push(new TriangleFace3D(new Vertex3D(p[1], p[5], p[3])));
+
     // right
     const v2 = new Vertex3D(p[2], p[3], p[5]);
     const v3 = new Vertex3D(p[5], p[4], p[2]);
     this._faces.push(new QuadFace3D(v2, v3));
+
     // bottom
     const v4 = new Vertex3D(p[0], p[2], p[3]);
     const v5 = new Vertex3D(p[3], p[1], p[0]);
     this._faces.push(new QuadFace3D(v4, v5));
+
     // back
     this._faces.push(new TriangleFace3D(new Vertex3D(p[0], p[2], p[4])));
   }
