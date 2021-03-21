@@ -8,7 +8,7 @@ import { Point2D,
          Geometry,
          CuboidGeometry } from "./geometry.js"
 import { GraphicComponent } from "./graphics.js"
-import { Context } from "./context.js"
+import { ContextImpl } from "./context.js"
 import { Action } from "./action.js"
 import { EntityEvent,
          EventHandler } from "./events.js"
@@ -18,14 +18,13 @@ export class Entity {
 
   private readonly _id: number;
 
-  protected _hasMoved: boolean = false;
   protected _graphicComponents: Array<GraphicComponent> =
     new Array<GraphicComponent>();
   protected _visible: boolean = true;
   protected _geometry: Geometry;
   protected _drawGeometry: boolean = false;
 
-  constructor(protected _context: Context,
+  constructor(protected _context: ContextImpl,
               minLocation: Point3D,
               dimensions: Dimensions,
               graphicComponent: GraphicComponent) {
@@ -40,7 +39,7 @@ export class Entity {
     this._context.addEntity(this);
   }
 
-  get context(): Context { return this._context; }  
+  get context(): ContextImpl { return this._context; }  
   get geometry(): Geometry { return this._geometry; }
   get bounds(): BoundingCuboid { return this._geometry.bounds; }
   get dimensions(): Dimensions { return this.bounds.dimensions; }
@@ -52,7 +51,6 @@ export class Entity {
   get height(): number { return this.bounds.height; }
   get centre(): Point3D { return this.bounds.centre; }
   get id(): number { return this._id; }
-  get hasMoved(): boolean { return this._hasMoved; }
   get visible(): boolean { return this._visible; }
   get graphics(): Array<GraphicComponent> {
     return this._graphicComponents;
@@ -77,17 +75,12 @@ export class Entity {
     }
     return this.z + this.height;
   }
-
-  updatePosition(d: Vector3D): void {
-    this.bounds.update(d);
-    this.geometry.transform(d);
-  }
 }
 
 export class EventableEntity extends Entity {
   protected _handler = new EventHandler<EntityEvent>();
 
-  constructor(context: Context,
+  constructor(context: ContextImpl,
               location: Point3D,
               dimensions: Dimensions,
               graphicComponent: GraphicComponent) {
@@ -102,21 +95,46 @@ export class EventableEntity extends Entity {
     this._handler.removeEventListener(event, callback);
   }
 
+  postEvent(event: EntityEvent): void {
+    this._handler.post(event);
+  }
+
   update(): void { this._handler.service(); }
 }
 
-export class Actor extends EventableEntity {
-  protected readonly _canSwim: boolean = false;
+export class MovableEntity extends EventableEntity {
   protected readonly _lift: number = 0;
+  protected readonly _canSwim: boolean = false;
   protected _direction: Direction;
-  protected _action: Action|null;
 
-  constructor(context: Context,
+  constructor(context: ContextImpl,
               location: Point3D,
               dimensions: Dimensions,
               graphicComponent: GraphicComponent) {
     super(context, location, dimensions, graphicComponent);
-    context.addActor(this);
+    context.addMovableEntity(this);
+  }
+
+  updatePosition(d: Vector3D): void {
+    this.bounds.update(d);
+    this.geometry.transform(d);
+  }
+
+  get lift(): number { return this._lift; }
+  get direction(): Direction { return this._direction; }
+  set direction(direction: Direction) {
+    this._direction = direction;
+  }
+}
+
+export class Actor extends MovableEntity {
+  protected _action: Action|null;
+
+  constructor(context: ContextImpl,
+              location: Point3D,
+              dimensions: Dimensions,
+              graphicComponent: GraphicComponent) {
+    super(context, location, dimensions, graphicComponent);
   }
 
   update(): void {
@@ -128,16 +146,6 @@ export class Actor extends EventableEntity {
     }
   }
 
-  postEvent(event: EntityEvent): void {
-    this._handler.post(event);
-  }
-
-  get lift(): number { return this._lift; }
-  get direction(): Direction { return this._direction; }
-
-  set direction(direction: Direction) {
-    this._direction = direction;
-  }
   set action(action: Action) {
     this._action = action;
   }

@@ -4,7 +4,6 @@ import { EventHandler } from "./events.js";
 export class Entity {
     constructor(_context, minLocation, dimensions, graphicComponent) {
         this._context = _context;
-        this._hasMoved = false;
         this._graphicComponents = new Array();
         this._visible = true;
         this._drawGeometry = false;
@@ -28,7 +27,6 @@ export class Entity {
     get height() { return this.bounds.height; }
     get centre() { return this.bounds.centre; }
     get id() { return this._id; }
-    get hasMoved() { return this._hasMoved; }
     get visible() { return this._visible; }
     get graphics() {
         return this._graphicComponents;
@@ -47,10 +45,6 @@ export class Entity {
         }
         return this.z + this.height;
     }
-    updatePosition(d) {
-        this.bounds.update(d);
-        this.geometry.transform(d);
-    }
 }
 Entity._ids = 0;
 export class EventableEntity extends Entity {
@@ -64,14 +58,31 @@ export class EventableEntity extends Entity {
     removeEventListener(event, callback) {
         this._handler.removeEventListener(event, callback);
     }
+    postEvent(event) {
+        this._handler.post(event);
+    }
     update() { this._handler.service(); }
 }
-export class Actor extends EventableEntity {
+export class MovableEntity extends EventableEntity {
     constructor(context, location, dimensions, graphicComponent) {
         super(context, location, dimensions, graphicComponent);
-        this._canSwim = false;
         this._lift = 0;
-        context.addActor(this);
+        this._canSwim = false;
+        context.addMovableEntity(this);
+    }
+    updatePosition(d) {
+        this.bounds.update(d);
+        this.geometry.transform(d);
+    }
+    get lift() { return this._lift; }
+    get direction() { return this._direction; }
+    set direction(direction) {
+        this._direction = direction;
+    }
+}
+export class Actor extends MovableEntity {
+    constructor(context, location, dimensions, graphicComponent) {
+        super(context, location, dimensions, graphicComponent);
     }
     update() {
         this._handler.service();
@@ -79,14 +90,6 @@ export class Actor extends EventableEntity {
             console.log("completed action");
             this._action = null;
         }
-    }
-    postEvent(event) {
-        this._handler.post(event);
-    }
-    get lift() { return this._lift; }
-    get direction() { return this._direction; }
-    set direction(direction) {
-        this._direction = direction;
     }
     set action(action) {
         this._action = action;

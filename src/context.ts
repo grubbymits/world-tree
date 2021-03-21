@@ -1,9 +1,7 @@
 import { Entity,
-         EventableEntity,
+         MovableEntity,
          Actor } from "./entity.js"
 import { EntityEvent } from "./events.js"
-import { Terrain, TerrainShape, TerrainType } from "./terrain.js"
-import { SquareGrid } from "./map.js"
 import { SceneGraph,
          Perspective,
          IsometricRenderer,
@@ -16,12 +14,23 @@ import { Dimensions,
          CollisionDetector,
          Gravity } from "./physics.js"
 
-export class Context {
+export interface Context {
+  //readonly scene: SceneGraph;
+  //readonly bounds: BoundingCuboid;
+  //readonly spatial: Octree;
+  //readonly controllers: Array<Controller>;
+
+  update(camera: Camera): void;
+  addController(controller: Controller): void;
+}
+
+/** @internal */
+export class ContextImpl implements Context {
   private _scene: SceneGraph;
-  private _entities : Array<Entity> = new Array<Entity>();
+  private _entities: Array<Entity> = new Array<Entity>();
+  private _objects: Array<MovableEntity> = new Array<MovableEntity>();
   private _controllers: Array<Controller> = new Array<Controller>();
-  private _octree : Octree;
-  private _worldMap: SquareGrid;
+  private _octree: Octree;
 
   constructor(canvas: HTMLCanvasElement, worldDims: Dimensions,
               perspective: Perspective) {
@@ -45,12 +54,7 @@ export class Context {
   get scene(): SceneGraph { return this._scene; }
   get bounds(): BoundingCuboid { return this._octree.bounds; }
   get spatial(): Octree { return this._octree; }
-  get map(): SquareGrid { return this._worldMap; }
   get controllers(): Array<Controller> { return this._controllers; }
-
-  set map(map: SquareGrid) {
-    this._worldMap = map;
-  }
 
   verify(): void {
     console.log("context contains num entities:", this._entities.length);
@@ -67,12 +71,13 @@ export class Context {
     this._scene.insertEntity(entity);
   }
 
-  addActor(actor: Actor): void {
+  addMovableEntity(entity: MovableEntity): void {
+    this._objects.push(entity);
     let spatialGraph = this._octree;
     let scene = this._scene;
-    actor.addEventListener(EntityEvent.Moving, function() {
-      spatialGraph.update(actor);
-      scene.updateEntity(actor);
+    entity.addEventListener(EntityEvent.Moving, function() {
+      spatialGraph.update(entity);
+      scene.updateEntity(entity);
     });
   }
 
@@ -81,7 +86,13 @@ export class Context {
       camera.update();
       controller.update();
     }
-    Gravity.update();
+    Gravity.update(this._objects);
     this._scene.render(camera);
   }
+}
+
+export function createContext(canvas: HTMLCanvasElement,
+                              worldDims: Dimensions,
+                              perspective: Perspective): Context {
+  return new ContextImpl(canvas, worldDims, perspective);
 }

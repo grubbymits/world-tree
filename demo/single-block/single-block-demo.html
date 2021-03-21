@@ -35,8 +35,8 @@
                                           physicalDims.depth * cellsY,
                                           physicalDims.height * (1 + terraces));
       let canvas = document.getElementById("demoCanvas");
-      let context = new WT.Context(canvas, worldDims,
-                                   WT.Perspective.TwoByOneIsometric);
+      let context = WT.createContext(canvas, worldDims,
+                                     WT.Perspective.TwoByOneIsometric);
     
       const hasWater = false;
       const defaultFloor = WT.TerrainType.Rock;

@@ -256,31 +256,31 @@ export class CollisionDetector {
         this._collisionInfo = new Map();
         this._missInfo = new Map();
     }
-    static hasCollideInfo(actor) {
-        return this._collisionInfo.has(actor);
+    static hasCollideInfo(movable) {
+        return this._collisionInfo.has(movable);
     }
-    static getCollideInfo(actor) {
-        console.assert(this.hasCollideInfo(actor));
-        return this._collisionInfo.get(actor);
+    static getCollideInfo(movable) {
+        console.assert(this.hasCollideInfo(movable));
+        return this._collisionInfo.get(movable);
     }
-    static removeInfo(actor) {
-        this._collisionInfo.delete(actor);
+    static removeInfo(movable) {
+        this._collisionInfo.delete(movable);
     }
-    static removeMissInfo(actor) {
-        this._missInfo.delete(actor);
+    static removeMissInfo(movable) {
+        this._missInfo.delete(movable);
     }
-    static addMissInfo(actor, entities) {
-        this._missInfo.set(actor, entities);
+    static addMissInfo(movable, entities) {
+        this._missInfo.set(movable, entities);
     }
-    static hasMissInfo(actor) {
-        return this._missInfo.has(actor);
+    static hasMissInfo(movable) {
+        return this._missInfo.has(movable);
     }
-    static getMissInfo(actor) {
-        console.assert(this.hasMissInfo(actor));
-        return this._missInfo.get(actor);
+    static getMissInfo(movable) {
+        console.assert(this.hasMissInfo(movable));
+        return this._missInfo.get(movable);
     }
-    static detectInArea(actor, path, maxAngle, area) {
-        const bounds = actor.bounds;
+    static detectInArea(movable, path, maxAngle, area) {
+        const bounds = movable.bounds;
         const widthVec3D = new Vector3D(bounds.width, 0, 0);
         const depthVec3D = new Vector3D(0, bounds.depth, 0);
         const heightVec3D = new Vector3D(0, 0, bounds.height);
@@ -297,7 +297,7 @@ export class CollisionDetector {
         let misses = new Array();
         const entities = this._spatialInfo.getEntities(area);
         for (let entity of entities) {
-            if (entity.id == actor.id) {
+            if (entity.id == movable.id) {
                 continue;
             }
             const geometry = entity.geometry;
@@ -306,20 +306,20 @@ export class CollisionDetector {
                 if (geometry.obstructs(beginPoint, endPoint)) {
                     const blocking = maxAngle.zero || geometry.obstructs(beginPoint, endPoint.add(maxAngle));
                     const collision = new CollisionInfo(entity, blocking, geometry.intersectInfo);
-                    this._collisionInfo.set(actor, collision);
-                    actor.postEvent(EntityEvent.Collision);
+                    this._collisionInfo.set(movable, collision);
+                    movable.postEvent(EntityEvent.Collision);
                     return collision;
                 }
                 else {
                     misses.push(entity);
-                    actor.postEvent(EntityEvent.NoCollision);
+                    movable.postEvent(EntityEvent.NoCollision);
                 }
             }
-            if (actor.bounds.intersects(entity.bounds) && maxAngle.zero) {
-                console.log("actor intersects entity but hasn't collided!");
+            if (movable.bounds.intersects(entity.bounds) && maxAngle.zero) {
+                console.log("movable entity intersects entity but hasn't collided!");
             }
         }
-        this.addMissInfo(actor, misses);
+        this.addMissInfo(movable, misses);
         return null;
     }
 }
@@ -329,25 +329,23 @@ export class Gravity {
         this._context = context;
         this._enabled = true;
     }
-    static update() {
+    static update(entities) {
         if (!this._enabled) {
             return;
         }
-        for (let controller of this._context.controllers) {
-            for (let actor of controller.actors) {
-                const relativeEffect = actor.lift - this._force;
-                if (relativeEffect >= 0) {
-                    continue;
-                }
-                const path = new Vector3D(0, 0, relativeEffect);
-                let bounds = actor.bounds;
-                let area = new BoundingCuboid(bounds.centre.add(path), bounds.dimensions);
-                area.insert(bounds);
-                const collision = CollisionDetector.detectInArea(actor, path, this._zero, area);
-                if (collision == null) {
-                    actor.updatePosition(path);
-                    actor.postEvent(EntityEvent.Moving);
-                }
+        for (let movable of entities) {
+            const relativeEffect = movable.lift - this._force;
+            if (relativeEffect >= 0) {
+                continue;
+            }
+            const path = new Vector3D(0, 0, relativeEffect);
+            let bounds = movable.bounds;
+            let area = new BoundingCuboid(bounds.centre.add(path), bounds.dimensions);
+            area.insert(bounds);
+            const collision = CollisionDetector.detectInArea(movable, path, this._zero, area);
+            if (collision == null) {
+                movable.updatePosition(path);
+                movable.postEvent(EntityEvent.Moving);
             }
         }
     }

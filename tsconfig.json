@@ -9,5 +9,6 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "strictPropertyInitialization": false,
+    "stripInternal": true,
   },
 }
