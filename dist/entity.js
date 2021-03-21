@@ -52,15 +52,33 @@ export class PhysicalEntity {
     removeEventListener(event, callback) {
         this._handler.removeEventListener(event, callback);
     }
+    postEvent(event) {
+        this._handler.post(event);
+    }
     update() { this._handler.service(); }
 }
 PhysicalEntity._ids = 0;
-export class Actor extends PhysicalEntity {
+export class MovableEntity extends PhysicalEntity {
     constructor(context, location, dimensions) {
         super(context, location, dimensions);
-        this._canSwim = false;
         this._lift = 0;
-        context.addActor(this);
+        this._canSwim = false;
+        context.addMovableEntity(this);
+    }
+    updatePosition(d) {
+        this.bounds.update(d);
+        this.geometry.transform(d);
+    }
+    get lift() { return this._lift; }
+    get direction() { return this._direction; }
+    set direction(direction) {
+        this._direction = direction;
+    }
+}
+export class Actor extends MovableEntity {
+    constructor(context, location, dimensions) {
+        super(context, location, dimensions);
+        context.addMovableEntity(this);
     }
     update() {
         this._handler.service();
@@ -69,20 +87,17 @@ export class Actor extends PhysicalEntity {
             this._action = null;
         }
     }
-    postEvent(event) {
-        this._handler.post(event);
-    }
-    get lift() { return this._lift; }
-    get direction() { return this._direction; }
-    set direction(direction) {
-        this._direction = direction;
-    }
     set action(action) {
         this._action = action;
     }
 }
 export function createGraphicalEntity(context, location, dimensions, graphicComponent) {
     let entity = new PhysicalEntity(context, location, dimensions);
+    entity.addGraphic(graphicComponent);
+    return entity;
+}
+export function createGraphicalMovableEntity(context, location, dimensions, graphicComponent) {
+    let entity = new MovableEntity(context, location, dimensions);
     entity.addGraphic(graphicComponent);
     return entity;
 }

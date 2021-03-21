@@ -1,5 +1,5 @@
 import { PhysicalEntity,
-         Actor } from "./entity.js"
+         MovableEntity } from "./entity.js"
 import { TerrainType, TerrainShape, Terrain } from "./terrain.js"
 import { SquareGrid } from "./map.js"
 import { Point2D,
@@ -9,7 +9,7 @@ import { Point2D,
          IntersectInfo } from "./geometry.js"
 import { Octree } from "./tree.js"
 import { EntityEvent } from "./events.js"
-import { Context } from "./context.js"
+import { ContextImpl } from "./context.js"
 
 export enum Direction {
   North,
@@ -295,8 +295,8 @@ export class CollisionInfo {
 }
 
 export class CollisionDetector {
-  private static _collisionInfo: Map<Actor, CollisionInfo>;
-  private static _missInfo: Map<Actor, Array<PhysicalEntity>>;
+  private static _collisionInfo: Map<MovableEntity, CollisionInfo>;
+  private static _missInfo: Map<MovableEntity, Array<PhysicalEntity>>;
   private static _spatialInfo: Octree;
 
   static init(spatialInfo: Octree): void {
@@ -305,39 +305,39 @@ export class CollisionDetector {
     this._missInfo = new Map();
   }
 
-  static hasCollideInfo(actor: Actor): boolean {
-    return this._collisionInfo.has(actor);
+  static hasCollideInfo(movable: MovableEntity): boolean {
+    return this._collisionInfo.has(movable);
   }
 
-  static getCollideInfo(actor: Actor): CollisionInfo {
-    console.assert(this.hasCollideInfo(actor));
-    return this._collisionInfo.get(actor)!;
+  static getCollideInfo(movable: MovableEntity): CollisionInfo {
+    console.assert(this.hasCollideInfo(movable));
+    return this._collisionInfo.get(movable)!;
   }
 
-  static removeInfo(actor: Actor): void {
-    this._collisionInfo.delete(actor);
+  static removeInfo(movable: MovableEntity): void {
+    this._collisionInfo.delete(movable);
   }
   
-  static removeMissInfo(actor: Actor): void {
-    this._missInfo.delete(actor);
+  static removeMissInfo(movable: MovableEntity): void {
+    this._missInfo.delete(movable);
   }
 
-  static addMissInfo(actor: Actor, entities: Array<PhysicalEntity>): void {
+  static addMissInfo(actor: MovableEntity, entities: Array<PhysicalEntity>): void {
     this._missInfo.set(actor, entities);
   }
 
-  static hasMissInfo(actor: Actor): boolean {
-    return this._missInfo.has(actor);
+  static hasMissInfo(movable: MovableEntity): boolean {
+    return this._missInfo.has(movable);
   }
 
-  static getMissInfo(actor: Actor): Array<PhysicalEntity> {
-    console.assert(this.hasMissInfo(actor));
-    return this._missInfo.get(actor)!;
+  static getMissInfo(movable: MovableEntity): Array<PhysicalEntity> {
+    console.assert(this.hasMissInfo(movable));
+    return this._missInfo.get(movable)!;
   }
 
-  static detectInArea(actor: Actor, path: Vector3D, maxAngle: Vector3D,
+  static detectInArea(movable: MovableEntity, path: Vector3D, maxAngle: Vector3D,
                       area: BoundingCuboid): CollisionInfo|null {
-    const bounds = actor.bounds;
+    const bounds = movable.bounds;
     const widthVec3D = new Vector3D(bounds.width, 0, 0);
     const depthVec3D = new Vector3D(0, bounds.depth, 0);
     const heightVec3D = new Vector3D(0, 0, bounds.height);
@@ -357,7 +357,7 @@ export class CollisionDetector {
     const entities: Array<PhysicalEntity> = this._spatialInfo.getEntities(area);
 
     for (let entity of entities) {
-      if (entity.id == actor.id) {
+      if (entity.id == movable.id) {
         continue;
       }
       const geometry: Geometry = entity.geometry;
@@ -369,19 +369,19 @@ export class CollisionDetector {
             maxAngle.zero || geometry.obstructs(beginPoint, endPoint.add(maxAngle));
           const collision =
             new CollisionInfo(entity, blocking, geometry.intersectInfo!);
-          this._collisionInfo.set(actor, collision);
-          actor.postEvent(EntityEvent.Collision);
+          this._collisionInfo.set(movable, collision);
+          movable.postEvent(EntityEvent.Collision);
           return collision;
         } else {
           misses.push(entity);
-          actor.postEvent(EntityEvent.NoCollision);
+          movable.postEvent(EntityEvent.NoCollision);
         }
       }
-      if (actor.bounds.intersects(entity.bounds) && maxAngle.zero) {
-        console.log("actor intersects entity but hasn't collided!");
+      if (movable.bounds.intersects(entity.bounds) && maxAngle.zero) {
+        console.log("movable entity intersects entity but hasn't collided!");
       }
     }
-    this.addMissInfo(actor, misses);
+    this.addMissInfo(movable, misses);
     return null;
   }
 }
@@ -389,37 +389,35 @@ export class CollisionDetector {
 export class Gravity {
   private static _enabled: boolean = false;
   private static _force: number = 0;
-  private static _context: Context;
+  private static _context: ContextImpl;
   private static readonly _zero: Vector3D = new Vector3D(0, 0, 0);
 
-  static init(force: number, context: Context) {
+  static init(force: number, context: ContextImpl) {
     this._force = force;
     this._context = context;
     this._enabled = true;
   }
 
-  static update(): void {
+  static update(entities: Array<MovableEntity>): void {
     if (!this._enabled) {
       return;
     }
 
-    for (let controller of this._context.controllers) {
-      for (let actor of controller.actors) {
-        const relativeEffect = actor.lift - this._force;
-        if (relativeEffect >= 0) {
-          continue;
-        }
-        const path = new Vector3D(0, 0, relativeEffect)
-        let bounds = actor.bounds;
-        // Create a bounds to contain the current location and the destination.
-        let area = new BoundingCuboid(bounds.centre.add(path), bounds.dimensions);
-        area.insert(bounds);
-        const collision =
-          CollisionDetector.detectInArea(actor, path, this._zero, area);
-        if (collision == null) {
-          actor.updatePosition(path);
-          actor.postEvent(EntityEvent.Moving);
-        }
+    for (let movable of entities) {
+      const relativeEffect = movable.lift - this._force;
+      if (relativeEffect >= 0) {
+        continue;
+      }
+      const path = new Vector3D(0, 0, relativeEffect)
+      let bounds = movable.bounds;
+      // Create a bounds to contain the current location and the destination.
+      let area = new BoundingCuboid(bounds.centre.add(path), bounds.dimensions);
+      area.insert(bounds);
+      const collision =
+        CollisionDetector.detectInArea(movable, path, this._zero, area);
+      if (collision == null) {
+        movable.updatePosition(path);
+        movable.postEvent(EntityEvent.Moving);
       }
     }
   }

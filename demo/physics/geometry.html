@@ -68,8 +68,8 @@
       const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
                                           physicalDims.depth * cellsY,
                                           physicalDims.height * (1 + terraces));
-      let context = new WT.Context(worldDims);
-      context.addRenderer(canvas, WT.Perspective.TwoByOneIsometric);
+      let context = WT.createContext(canvas, worldDims,
+                                     WT.Perspective.TwoByOneIsometric);
       WT.Gravity.init(5, context);
     
       const hasWater = false;

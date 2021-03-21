@@ -8,7 +8,7 @@ import { Point2D,
          Geometry,
          CuboidGeometry } from "./geometry.js"
 import { GraphicComponent } from "./graphics.js"
-import { Context } from "./context.js"
+import { ContextImpl } from "./context.js"
 import { Action } from "./action.js"
 import { EntityEvent,
          EventHandler } from "./events.js"
@@ -25,7 +25,7 @@ export class PhysicalEntity {
   protected _graphicComponents: Array<GraphicComponent> =
     new Array<GraphicComponent>();
 
-  constructor(protected _context: Context,
+  constructor(protected _context: ContextImpl,
               minLocation: Point3D,
               dimensions: Dimensions) {
     this._id = PhysicalEntity._ids;
@@ -39,7 +39,7 @@ export class PhysicalEntity {
   }
 
   set visible(visible: boolean) { this._visible = visible; }
-  get context(): Context { return this._context; }  
+  get context(): ContextImpl { return this._context; }  
   get geometry(): Geometry { return this._geometry; }
   get bounds(): BoundingCuboid { return this._geometry.bounds; }
   get dimensions(): Dimensions { return this.bounds.dimensions; }
@@ -79,20 +79,45 @@ export class PhysicalEntity {
     this._handler.removeEventListener(event, callback);
   }
 
+  postEvent(event: EntityEvent): void {
+    this._handler.post(event);
+  }
+
   update(): void { this._handler.service(); }
 }
 
-export class Actor extends PhysicalEntity {
-  protected readonly _canSwim: boolean = false;
+export class MovableEntity extends PhysicalEntity {
   protected readonly _lift: number = 0;
+  protected readonly _canSwim: boolean = false;
   protected _direction: Direction;
-  protected _action: Action|null;
 
-  constructor(context: Context,
+  constructor(context: ContextImpl,
               location: Point3D,
               dimensions: Dimensions) {
     super(context, location, dimensions);
-    context.addActor(this);
+    context.addMovableEntity(this);
+  }
+
+  updatePosition(d: Vector3D): void {
+    this.bounds.update(d);
+    this.geometry.transform(d);
+  }
+
+  get lift(): number { return this._lift; }
+  get direction(): Direction { return this._direction; }
+  set direction(direction: Direction) {
+    this._direction = direction;
+  }
+}
+
+export class Actor extends MovableEntity {
+  protected _action: Action|null;
+
+  constructor(context: ContextImpl,
+              location: Point3D,
+              dimensions: Dimensions) {
+    super(context, location, dimensions);
+    context.addMovableEntity(this);
   }
 
   update(): void {
@@ -104,22 +129,12 @@ export class Actor extends PhysicalEntity {
     }
   }
 
-  postEvent(event: EntityEvent): void {
-    this._handler.post(event);
-  }
-
-  get lift(): number { return this._lift; }
-  get direction(): Direction { return this._direction; }
-
-  set direction(direction: Direction) {
-    this._direction = direction;
-  }
   set action(action: Action) {
     this._action = action;
   }
 }
 
-export function createGraphicalEntity(context: Context,
+export function createGraphicalEntity(context: ContextImpl,
                                       location: Point3D,
                                       dimensions: Dimensions,
                                       graphicComponent: GraphicComponent) {
@@ -128,7 +143,16 @@ export function createGraphicalEntity(context: Context,
   return entity;
 }
 
-export function createGraphicalActor(context: Context,
+export function createGraphicalMovableEntity(context: ContextImpl,
+                                             location: Point3D,
+                                             dimensions: Dimensions,
+                                             graphicComponent: GraphicComponent) {
+  let entity = new MovableEntity(context, location, dimensions);
+  entity.addGraphic(graphicComponent);
+  return entity;
+}
+
+export function createGraphicalActor(context: ContextImpl,
                                      location: Point3D,
                                      dimensions: Dimensions,
                                      graphicComponent: GraphicComponent) {

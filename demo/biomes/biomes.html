@@ -76,6 +76,14 @@
       grassSprites.push(new WT.Sprite(grassSheet, x * spriteWidth, 0,
                                       spriteWidth, 176));
     }
+    WT.Terrain.addFeatureGraphics(WT.TerrainFeature.DryGrass,
+      new WT.OssilateGraphicComponent(grassSprites, 333));
+
+    grassSprites = [];
+    for (let x = 0; x < 4; x++) {
+      grassSprites.push(new WT.Sprite(grassSheet, x * spriteWidth, 163,
+                                      spriteWidth, 176));
+    }
     WT.Terrain.addFeatureGraphics(WT.TerrainFeature.WetGrass,
       new WT.OssilateGraphicComponent(grassSprites, 333));
 
@@ -102,8 +110,8 @@
                                           physicalDims.depth * cellsY,
                                           physicalDims.height * (1 + terraces));
       let canvas = document.getElementById("demoCanvas");
-      let context = new WT.Context(worldDims);
-      context.addRenderer(canvas, WT.Perspective.TwoByOneIsometric);
+      let context = new WT.createContext(canvas, worldDims,
+                                         WT.Perspective.TwoByOneIsometric);
     
       const hasWater = true;
       const water = 30;
@@ -122,7 +130,7 @@
       builder.setBiomes(waterLine, wetLimit, dryLimit, treeLimit);
       // build ramps
       builder.setShapes();
-      // add waves
+      // add waves and grass
       builder.setFeatures();
       builder.generateMap(context);
       let camera = new WT.MouseCamera(context.scene, canvas,

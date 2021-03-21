@@ -1,4 +1,4 @@
-import { Context } from "./context.js"
+import { ContextImpl } from "./context.js"
 import { PhysicalEntity,
          Actor } from "./entity.js"
 import { EntityEvent } from "./events.js"
@@ -21,7 +21,7 @@ export class ActorDebug {
   }
 
   private debugCollision(actor: Actor, camera: Camera): void {
-    const context: Context = actor.context;
+    const context: ContextImpl = actor.context;
 
     actor.addEventListener(EntityEvent.Moving, function() {
       if (!CollisionDetector.hasMissInfo(actor)) {
