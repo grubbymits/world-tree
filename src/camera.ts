@@ -18,8 +18,8 @@ export class Camera {
   constructor(protected _scene: SceneGraph,
               protected readonly _width: number,
               protected readonly _height: number) {
-    this._x = 0;//Math.floor(_width / 2);
-    this._y = 0;//Math.floor(_height / 2);
+    this._x = 0;
+    this._y = 0;
     this._upperX = _width;
     this._upperY = _height;
     console.log("initialising camera at (x,y):", this._x, this._y);
@@ -72,8 +72,6 @@ export class Camera {
       console.log("undefined camera surface location");
       return;
     }
-    //console.log("updating camera to centre on (x,y,z):",
-      //          newLocation.x, newLocation.y, newLocation.z);
     let newPoint: Point2D = this._scene.getDrawCoord(newLocation);
     this.x = newPoint.x;
     this.y = newPoint.y;

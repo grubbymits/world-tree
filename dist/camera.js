@@ -8,8 +8,8 @@ export class Camera {
         this._lowerX = 0;
         this._lowerY = 0;
         this._handler = new EventHandler();
-        this._x = 0;
-        this._y = 0;
+        this._x = Math.floor(_width / 2);
+        this._y = Math.floor(_height / 2);
         this._upperX = _width;
         this._upperY = _height;
         console.log("initialising camera at (x,y):", this._x, this._y);

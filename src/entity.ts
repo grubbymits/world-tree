@@ -140,8 +140,6 @@ export class Actor extends MovableEntity {
   update(): void {
     this._handler.service();
     if (this._action != undefined && this._action.perform()) {
-      console.log("completed action");
-      //this.postEvent(EntityEvent.ActionComplete);
       this._action = null;
     }
   }

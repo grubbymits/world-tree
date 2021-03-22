@@ -346,6 +346,7 @@ export class Gravity {
             if (collision == null) {
                 movable.updatePosition(path);
                 movable.postEvent(EntityEvent.Moving);
+                console.log("applying gravity");
             }
         }
     }

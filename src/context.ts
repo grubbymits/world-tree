@@ -15,11 +15,6 @@ import { Dimensions,
          Gravity } from "./physics.js"
 
 export interface Context {
-  //readonly scene: SceneGraph;
-  //readonly bounds: BoundingCuboid;
-  //readonly spatial: Octree;
-  //readonly controllers: Array<Controller>;
-
   update(camera: Camera): void;
   addController(controller: Controller): void;
 }
