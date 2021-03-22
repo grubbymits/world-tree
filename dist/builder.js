@@ -13,7 +13,7 @@ export var Biome;
     Biome[Biome["Tundra"] = 5] = "Tundra";
     Biome[Biome["Desert"] = 6] = "Desert";
 })(Biome || (Biome = {}));
-function getBiomeName(biome) {
+export function getBiomeName(biome) {
     switch (biome) {
         default:
             console.error("unhandled biome type:", biome);
@@ -128,7 +128,7 @@ function gaussianBlur(grid, width, depth) {
     }
     return result;
 }
-export class TerrainAttributes {
+class TerrainAttributes {
     constructor(_x, _y, _height) {
         this._x = _x;
         this._y = _y;
@@ -258,7 +258,19 @@ export class TerrainBuilder {
             }
         }
     }
+    terrainTypeAt(x, y) {
+        console.assert(x >= 0 && x < this._surface.width &&
+            y >= 0 && y < this._surface.depth);
+        return this._surface.at(x, y).type;
+    }
+    biomeAt(x, y) {
+        console.assert(x >= 0 && x < this._surface.width &&
+            y >= 0 && y < this._surface.depth);
+        return this._surface.at(x, y).biome;
+    }
     generateMap(context) {
+        this.setShapes();
+        this.setFeatures();
         this.setEdges();
         let map = new SquareGrid(context, this._surface.width, this._surface.depth);
         console.log("adding surface terrain entities");

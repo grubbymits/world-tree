@@ -12,26 +12,23 @@
     import * as WT from "../../dist/world-tree.js";
     const spriteWidth = 322;
     const spriteHeight = 270;
-
     // Sprite sheet layout
-    // flat: rock, grass/rock, dry grass/sand, wet grass/sand, muddy grass/sand, water
+    // flat: rock, dry grass/sand, wet grass/sand, muddy grass/sand, water
     // ramps: (south, west, east, north)
     //  - rock
     //  - grass/rock
     //  - grass/sand
-    let sheet = new WT.SpriteSheet("../../../res/img/basic-outside");
-    WT.Terrain.addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Flat,
-                          sheet, 0, 0, spriteWidth, spriteHeight);
-    WT.Terrain.addGraphic(WT.TerrainType.DryGrass, WT.TerrainShape.Flat,
-                          sheet, spriteWidth * 2, 0, spriteWidth, spriteHeight);
-    WT.Terrain.addGraphic(WT.TerrainType.WetGrass, WT.TerrainShape.Flat,
-                          sheet, spriteWidth * 3, 0, spriteWidth, spriteHeight);
-    WT.Terrain.addGraphic(WT.TerrainType.Mud, WT.TerrainShape.Flat,
-                          sheet, spriteWidth * 4, 0, spriteWidth, spriteHeight);
-    WT.Terrain.addGraphic(WT.TerrainType.Sand, WT.TerrainShape.Flat,
-                          sheet, spriteWidth * 5, 0, spriteWidth, spriteHeight);
-    WT.Terrain.addGraphic(WT.TerrainType.Water, WT.TerrainShape.Flat,
-                          sheet, spriteWidth * 6, 0, spriteWidth, spriteHeight);
+    const terrainSheet = new WT.SpriteSheet("../../../res/img/basic-outside");
+    const terrainTypes = [ WT.TerrainType.Rock,
+                           WT.TerrainType.DryGrass,
+                           WT.TerrainType.WetGrass,
+                           WT.TerrainType.Mud,
+                           WT.TerrainType.Sand,
+                           WT.TerrainType.Water ];
+    for (let x in terrainTypes) {
+      WT.Terrain.addGraphic(terrainTypes[x], WT.TerrainShape.Flat, terrainSheet,
+                            spriteWidth * x, 0, spriteWidth, spriteHeight);
+    }
 
     const terrainShapes = [ WT.TerrainShape.RampUpSouth,
                             WT.TerrainShape.RampUpWest,
@@ -40,12 +37,12 @@
                             WT.TerrainShape.Wall ];
     for (let i in terrainShapes) {
       WT.Terrain.addGraphic(WT.TerrainType.DryGrass,
-                            terrainShapes[i], sheet,
-                            i * spriteWidth, 3 * spriteHeight,
+                            terrainShapes[i], terrainSheet,
+                            i * spriteWidth, 1 * spriteHeight,
                             spriteWidth, spriteHeight);
       WT.Terrain.addGraphic(WT.TerrainType.WetGrass,
-                            terrainShapes[i], sheet,
-                            i * spriteWidth, 4 * spriteHeight,
+                            terrainShapes[i], terrainSheet,
+                            i * spriteWidth, 2 * spriteHeight,
                             spriteWidth, spriteHeight);
     }
 
@@ -128,10 +125,6 @@
                                           physicalDims);
       builder.addRain(WT.Direction.North, water, waterLine);
       builder.setBiomes(waterLine, wetLimit, dryLimit, treeLimit);
-      // build ramps
-      builder.setShapes();
-      // add waves and grass
-      builder.setFeatures();
       builder.generateMap(context);
       let camera = new WT.MouseCamera(context.scene, canvas,
                                       canvas.width, canvas.height);

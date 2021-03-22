@@ -26,7 +26,7 @@ export enum Biome {
   Desert,
 }
 
-function getBiomeName(biome: Biome): string {
+export function getBiomeName(biome: Biome): string {
   switch (biome) {
   default:
     console.error("unhandled biome type:", biome);
@@ -165,7 +165,7 @@ function gaussianBlur(grid: Array<Float32Array>, width: number,
 }
 
 
-export class TerrainAttributes {
+class TerrainAttributes {
   private _moisture: number;
   private _terrace: number;
   private _biome: Biome;
@@ -206,6 +206,7 @@ export class TerrainAttributes {
   set fixed(f: boolean) { this._fixed = f; }
 }
 
+/** @internal */
 export class Surface {
   private _surface: Array<Array<TerrainAttributes>>;
 
@@ -328,7 +329,21 @@ export class TerrainBuilder {
     }
   }
 
+  terrainTypeAt(x: number, y: number): TerrainType {
+    console.assert(x >= 0 && x < this._surface.width &&
+                   y >= 0 && y < this._surface.depth);
+    return this._surface.at(x, y).type;
+  }
+
+  biomeAt(x: number, y: number): Biome {
+    console.assert(x >= 0 && x < this._surface.width &&
+                   y >= 0 && y < this._surface.depth);
+    return this._surface.at(x, y).biome;
+  }
+
   generateMap(context: ContextImpl): void {
+    this.setShapes();
+    this.setFeatures();
     this.setEdges();
 
     let map =
