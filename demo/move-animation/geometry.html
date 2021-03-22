@@ -64,7 +64,6 @@
 
       Robot.initGraphics();
       let robotController = new RobotController(context);
-      context.addController(robotController);
       // place a robot in the middle of the map.
       robotController.add(new WT.Point3D(Math.floor(worldDims.width / 2),
                                          Math.floor(worldDims.depth / 2),
@@ -72,7 +71,7 @@
       let camera = new WT.TrackerCamera(context.scene,
                                         canvas.width, canvas.height,
                                         robotController.robot);
-      var actorDebugger = new WT.ActorDebug(robotController.robot, camera, false);
+      var actorDebugger = new WT.MovableEntityDebug(robotController.robot, camera, false);
 
       var update = function update() {
         if (document.hasFocus()) {

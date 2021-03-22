@@ -7,7 +7,6 @@ import { SceneGraph,
          TrueIsometric,
          TwoByOneIsometric } from "./scene.js"
 import { Camera } from "./camera.js"
-import { Controller } from "./controller.js"
 import { Octree } from "./tree.js"
 import { Dimensions,
          BoundingCuboid,
@@ -19,11 +18,16 @@ export interface Context {
   addController(controller: Controller): void;
 }
 
+export interface Controller {
+  update(): void;
+}
+
 /** @internal */
 export class ContextImpl implements Context {
   private _scene: SceneRenderer;
   private _entities: Array<PhysicalEntity> = new Array<PhysicalEntity>();
-  private _objects: Array<MovableEntity> = new Array<MovableEntity>();
+  private _updateables: Array<PhysicalEntity> = new Array<PhysicalEntity>();
+  private _movables: Array<MovableEntity> = new Array<MovableEntity>();
   private _controllers: Array<Controller> = new Array<Controller>();
   private _octree: Octree;
 
@@ -69,8 +73,12 @@ export class ContextImpl implements Context {
     }
   }
 
+  addUpdateableEntity(entity: PhysicalEntity): void {
+    this._updateables.push(entity);
+  }
+
   addMovableEntity(entity: MovableEntity): void {
-    this._objects.push(entity);
+    this._movables.push(entity);
     let spatialGraph = this._octree;
     let scene = this._scene;
     entity.addEventListener(EntityEvent.Moving, function() {
@@ -80,12 +88,18 @@ export class ContextImpl implements Context {
   }
 
   update(camera: Camera): void {
-    for (let controller of this._controllers) {
-      camera.update();
-      controller.update();
-    }
-    Gravity.update(this._objects);
+    camera.update();
     this._scene.render(camera);
+
+    Gravity.update(this._movables);
+
+    this._updateables.forEach(entity => {
+      entity.update();
+    });
+
+    this._controllers.forEach(controller => {
+      controller.update()
+    });
   }
 }
 

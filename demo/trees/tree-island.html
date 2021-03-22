@@ -92,7 +92,7 @@
                         [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 ],
                         [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ];
 
-    const addTrees = function(totalTrees, terrainDims, context, builder) {
+    const addTrees = function(totalTrees, terrainDims, context, builder, camera) {
       const treeSheet = new WT.SpriteSheet("../../../res/img/trees");
       const treeSpriteWidth = 114;
       const treeSpriteHeight = 172;
@@ -100,8 +100,8 @@
         WT.generateStaticGraphics(treeSheet, treeSpriteWidth, treeSpriteHeight,
                                   0, 0, 6, 1);
       const treeDims =
-          WT.TwoByOneIsometricRenderer.getDimensions(treeSpriteWidth,
-                                                     treeSpriteHeight);
+          WT.TwoByOneIsometric.getDimensions(treeSpriteWidth,
+                                             treeSpriteHeight);
       console.log("tree dimensions (WxDxH):",
                   treeDims.width, treeDims.depth, treeDims.height);
       let inserted = 0;
@@ -109,8 +109,8 @@
       while (inserted < totalTrees) {
         // Choose a random spot on the map and check whether it seems wet
         // enough to support a tree.
-        const x = Math.floor(Math.random() * Math.floor(cellsX));
-        const y = Math.floor(Math.random() * Math.floor(cellsY));
+        const x = Math.floor(Math.random() * cellsX);
+        const y = Math.floor(Math.random() * cellsY);
         const biome = builder.biomeAt(x, y);
         if (biome != WT.Biome.Woodland) {
           continue;
@@ -124,8 +124,14 @@
           insertedAt.set(y, new Set());
           insertedAt.get(y).add(x);
         }
-        const location = new WT.Point3D(x * terrainDims.width,
-                                        y * terrainDims.depth,
+
+        const centreX = Math.floor((x * terrainDims.width) +
+                                   (terrainDims.width / 2) -
+                                   (treeDims.width / 2));
+        const centreY = Math.floor((y * terrainDims.depth) +
+                                   (terrainDims.depth / 2) -
+                                   (treeDims.depth / 2));
+        const location = new WT.Point3D(centreX, centreY,
                                         (1 + terraces) * terrainDims.height);
         console.log("placing tree in biome:", WT.getBiomeName(biome),
                     "at (x,y):", x, y);
@@ -133,6 +139,7 @@
         const idx = Math.floor(Math.random() * Math.floor(treeGraphics.length));
         const graphic = treeGraphics[idx];
         const tree = new WT.MovableEntity(context, location, treeDims, graphic);
+        console.log("created tree with id:", tree.id);
         inserted++;
       }
     };
@@ -140,7 +147,7 @@
     window.onload = (event) => {
       console.log("window loaded");
       const terrainDims =
-        WT.TwoByOneIsometricRenderer.getDimensions(spriteWidth, spriteHeight);
+        WT.TwoByOneIsometric.getDimensions(spriteWidth, spriteHeight);
       const worldDims = new WT.Dimensions(terrainDims.width * cellsX,
                                           terrainDims.depth * cellsY,
                                           terrainDims.height * 2 * terraces);
@@ -164,6 +171,7 @@
                                           terrainDims);
       builder.addRain(WT.Direction.North, water, waterLine);
       builder.setBiomes(waterLine, wetLimit, dryLimit, treeLimit);
+      builder.setShapes();
       builder.generateMap(context);
       addTrees(5, terrainDims, context, builder);
       let camera = new WT.MouseCamera(context.scene, canvas,

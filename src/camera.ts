@@ -1,7 +1,7 @@
 import { EventHandler,
          EntityEvent,
          InputEvent } from "./events.js"
-import { Actor } from "./entity.js"
+import { MovableEntity } from "./entity.js"
 import { Point2D, Point3D } from "./geometry.js"
 import { SceneRenderer } from "./scene.js"
 
@@ -88,10 +88,9 @@ export class MouseCamera extends Camera {
               height: number) {
     super(scene, width, height);
 
-    var camera = this;
     canvas.addEventListener('mousedown', e => {
       if (e.button == 0) {
-        camera.location = scene.getLocationAt(e.clientX, e.clientY, this);
+        this.location = scene.getLocationAt(e.clientX, e.clientY, this);
       }
     });
   }
@@ -101,12 +100,12 @@ export class TrackerCamera extends Camera {
   constructor(scene: SceneRenderer,
               width: number,
               height: number,
-              actor: Actor) {
+              movable: MovableEntity) {
     super(scene, width, height);
 
     var camera = this;
-    actor.addEventListener(EntityEvent.Moving, function() {
-      camera.location = actor.centre;
+    movable.addEventListener(EntityEvent.Moving, function() {
+      camera.location = movable.centre;
     });
   }
 }

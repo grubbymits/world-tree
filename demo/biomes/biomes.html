@@ -125,6 +125,7 @@
                                           physicalDims);
       builder.addRain(WT.Direction.North, water, waterLine);
       builder.setBiomes(waterLine, wetLimit, dryLimit, treeLimit);
+      builder.setShapes();
       builder.generateMap(context);
       let camera = new WT.MouseCamera(context.scene, canvas,
                                       canvas.width, canvas.height);

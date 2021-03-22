@@ -342,7 +342,6 @@ export class TerrainBuilder {
   }
 
   generateMap(context: ContextImpl): void {
-    this.setShapes();
     this.setFeatures();
     this.setEdges();
 

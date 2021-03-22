@@ -101,6 +101,7 @@ export class MovableEntity extends PhysicalEntity {
   updatePosition(d: Vector3D): void {
     this.bounds.update(d);
     this.geometry.transform(d);
+    this.postEvent(EntityEvent.Moving);
   }
 
   get lift(): number { return this._lift; }
@@ -121,7 +122,7 @@ export class Actor extends MovableEntity {
   }
 
   update(): void {
-    this._handler.service();
+    super.update();
     if (this._action != undefined && this._action.perform()) {
       this._action = null;
     }

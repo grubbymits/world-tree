@@ -65,20 +65,19 @@ export class Camera {
 export class MouseCamera extends Camera {
     constructor(scene, canvas, width, height) {
         super(scene, width, height);
-        var camera = this;
         canvas.addEventListener('mousedown', e => {
             if (e.button == 0) {
-                camera.location = scene.getLocationAt(e.clientX, e.clientY, this);
+                this.location = scene.getLocationAt(e.clientX, e.clientY, this);
             }
         });
     }
 }
 export class TrackerCamera extends Camera {
-    constructor(scene, width, height, actor) {
+    constructor(scene, width, height, movable) {
         super(scene, width, height);
         var camera = this;
-        actor.addEventListener(EntityEvent.Moving, function () {
-            camera.location = actor.centre;
+        movable.addEventListener(EntityEvent.Moving, function () {
+            camera.location = movable.centre;
         });
     }
 }

@@ -5,7 +5,8 @@ import { CollisionDetector, Gravity } from "./physics.js";
 export class ContextImpl {
     constructor(worldDims) {
         this._entities = new Array();
-        this._objects = new Array();
+        this._updateables = new Array();
+        this._movables = new Array();
         this._controllers = new Array();
         this._octree = new Octree(worldDims);
         CollisionDetector.init(this._octree);
@@ -41,8 +42,11 @@ export class ContextImpl {
             this._scene.insertEntity(entity);
         }
     }
+    addUpdateableEntity(entity) {
+        this._updateables.push(entity);
+    }
     addMovableEntity(entity) {
-        this._objects.push(entity);
+        this._movables.push(entity);
         let spatialGraph = this._octree;
         let scene = this._scene;
         entity.addEventListener(EntityEvent.Moving, function () {
@@ -51,12 +55,15 @@ export class ContextImpl {
         });
     }
     update(camera) {
-        for (let controller of this._controllers) {
-            camera.update();
-            controller.update();
-        }
-        Gravity.update(this._objects);
+        camera.update();
         this._scene.render(camera);
+        Gravity.update(this._movables);
+        this._updateables.forEach(entity => {
+            entity.update();
+        });
+        this._controllers.forEach(controller => {
+            controller.update();
+        });
     }
 }
 export function createContext(canvas, worldDims, perspective) {

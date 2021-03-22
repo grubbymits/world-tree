@@ -34,7 +34,6 @@ export class MoveDirection extends MoveAction {
         const obstruction = this.obstructed(currentPos, nextPos, this._maxAngle);
         if (obstruction == null) {
             this.actor.updatePosition(this._d);
-            this.actor.postEvent(EntityEvent.Moving);
             return false;
         }
         if (obstruction.blocking) {
@@ -43,7 +42,6 @@ export class MoveDirection extends MoveAction {
         }
         console.log("adjusting movement with max angle");
         this.actor.updatePosition(this._d.add(this._maxAngle));
-        this.actor.postEvent(EntityEvent.Moving);
         return false;
     }
 }
