@@ -316,17 +316,22 @@ export class SceneGraph {
         if (this._levels.length != 0) {
             this.insertIntoLevel(node);
         }
+        else {
+            console.log("not inserting into level entity with id", entity.id);
+        }
     }
     updateEntity(entity) {
         console.assert(this._nodes.has(entity.id));
         let node = this._nodes.get(entity.id);
         this.setDrawCoords(node);
+        console.assert(node.level != null, "node with id:", entity.id, "isn't assigned a level!");
         let level = node.level;
         if (level.inrange(node.entity)) {
             level.update(node, this);
         }
         else {
             level.remove(node);
+            console.log("changing scene level of entity:", entity.id);
             this.insertIntoLevel(node);
         }
     }

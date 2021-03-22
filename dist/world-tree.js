@@ -6,7 +6,6 @@ export * from "./builder.js";
 export * from "./context.js";
 export * from "./physics.js";
 export * from "./entity.js";
-export * from "./controller.js";
 export * from "./camera.js";
 export * from "./action.js";
 export * from "./events.js";

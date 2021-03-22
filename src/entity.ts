@@ -85,6 +85,7 @@ export class EventableEntity extends Entity {
               dimensions: Dimensions,
               graphicComponent: GraphicComponent) {
     super(context, location, dimensions, graphicComponent);
+    context.addEventableEntity(this);
   }
 
   addEventListener(event: EntityEvent, callback: Function): void {
@@ -118,6 +119,7 @@ export class MovableEntity extends EventableEntity {
   updatePosition(d: Vector3D): void {
     this.bounds.update(d);
     this.geometry.transform(d);
+    this.postEvent(EntityEvent.Moving);
   }
 
   get lift(): number { return this._lift; }
@@ -138,7 +140,7 @@ export class Actor extends MovableEntity {
   }
 
   update(): void {
-    this._handler.service();
+    super.update();
     if (this._action != undefined && this._action.perform()) {
       this._action = null;
     }

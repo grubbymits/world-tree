@@ -333,22 +333,19 @@ export class Gravity {
         if (!this._enabled) {
             return;
         }
-        for (let movable of entities) {
+        entities.forEach(movable => {
             const relativeEffect = movable.lift - this._force;
-            if (relativeEffect >= 0) {
-                continue;
+            if (relativeEffect < 0) {
+                const path = new Vector3D(0, 0, relativeEffect);
+                let bounds = movable.bounds;
+                let area = new BoundingCuboid(bounds.centre.add(path), bounds.dimensions);
+                area.insert(bounds);
+                const collision = CollisionDetector.detectInArea(movable, path, this._zero, area);
+                if (collision == null) {
+                    movable.updatePosition(path);
+                }
             }
-            const path = new Vector3D(0, 0, relativeEffect);
-            let bounds = movable.bounds;
-            let area = new BoundingCuboid(bounds.centre.add(path), bounds.dimensions);
-            area.insert(bounds);
-            const collision = CollisionDetector.detectInArea(movable, path, this._zero, area);
-            if (collision == null) {
-                movable.updatePosition(path);
-                movable.postEvent(EntityEvent.Moving);
-                console.log("applying gravity");
-            }
-        }
+        });
     }
 }
 Gravity._enabled = false;

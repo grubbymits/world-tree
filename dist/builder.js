@@ -269,7 +269,6 @@ export class TerrainBuilder {
         return this._surface.at(x, y).biome;
     }
     generateMap(context) {
-        this.setShapes();
         this.setFeatures();
         this.setEdges();
         let map = new SquareGrid(context, this._surface.width, this._surface.depth);

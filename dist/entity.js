@@ -1,6 +1,6 @@
 import { BoundingCuboid } from "./physics.js";
 import { Point3D, CuboidGeometry } from "./geometry.js";
-import { EventHandler } from "./events.js";
+import { EntityEvent, EventHandler } from "./events.js";
 export class Entity {
     constructor(_context, minLocation, dimensions, graphicComponent) {
         this._context = _context;
@@ -51,6 +51,7 @@ export class EventableEntity extends Entity {
     constructor(context, location, dimensions, graphicComponent) {
         super(context, location, dimensions, graphicComponent);
         this._handler = new EventHandler();
+        context.addEventableEntity(this);
     }
     addEventListener(event, callback) {
         this._handler.addEventListener(event, callback);
@@ -73,6 +74,7 @@ export class MovableEntity extends EventableEntity {
     updatePosition(d) {
         this.bounds.update(d);
         this.geometry.transform(d);
+        this.postEvent(EntityEvent.Moving);
     }
     get lift() { return this._lift; }
     get direction() { return this._direction; }
@@ -85,7 +87,7 @@ export class Actor extends MovableEntity {
         super(context, location, dimensions, graphicComponent);
     }
     update() {
-        this._handler.service();
+        super.update();
         if (this._action != undefined && this._action.perform()) {
             this._action = null;
         }

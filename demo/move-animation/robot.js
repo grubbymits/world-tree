@@ -63,9 +63,8 @@ export class Robot extends WT.Actor {
   }
 }
 
-export class RobotController extends WT.Controller {
+export class RobotController {
   constructor(context) {
-    super();
     this._context = context;
   }
 
@@ -76,7 +75,6 @@ export class RobotController extends WT.Controller {
     this._robot = new Robot(this._context, position);
     console.log("min location:", this.robot.bounds.minLocation);
 
-    this._actors.push(this.robot);
     let bounds = this._context.bounds;
     let robot = this.robot;
     const maxAngle = new WT.Vector3D(0, 0, 0);
