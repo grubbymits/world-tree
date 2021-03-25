@@ -95,10 +95,10 @@
     const addTrees = function(totalTrees, terrainDims, context, builder, camera) {
       const treeSheet = new WT.SpriteSheet("../../../res/img/trees");
       const treeSpriteWidth = 114;
-      const treeSpriteHeight = 172;
+      const treeSpriteHeight = 171;
       const treeGraphics =
         WT.generateStaticGraphics(treeSheet, treeSpriteWidth, treeSpriteHeight,
-                                  0, 0, 6, 1);
+                                  0, 0, 8, 3);
       const treeDims =
           WT.TwoByOneIsometricRenderer.getDimensions(treeSpriteWidth,
                                                      treeSpriteHeight);
@@ -173,7 +173,8 @@
       builder.setBiomes(waterLine, wetLimit, dryLimit, treeLimit);
       builder.setShapes();
       builder.generateMap(context);
-      addTrees(5, terrainDims, context, builder);
+      addTrees(10, terrainDims, context, builder);
+
       let camera = new WT.MouseCamera(context.scene, canvas,
                                       canvas.width, canvas.height);
     
