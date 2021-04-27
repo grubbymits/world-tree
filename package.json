@@ -1,0 +1,6 @@
+"dependencies": {
+  "module": "typescript"
+}
+"scripts:" {
+  "start": "./node_modules/typescript/bin/tsc"
+}
