@@ -1,6 +1,9 @@
-"dependencies": {
-  "module": "typescript"
-}
-"scripts:" {
-  "start": "./node_modules/typescript/bin/tsc"
+{
+  "name": "world-tree",
+  "devDependencies": {
+    "typescript": "^4.2.4",
+  },
+  "scripts": {
+    "build": "tsc --project .",
+  },
 }
