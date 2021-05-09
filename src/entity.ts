@@ -13,31 +13,31 @@ import { Action } from "./action.js"
 import { EntityEvent,
          EventHandler } from "./events.js"
 
-export class Entity {
+export class PhysicalEntity {
   private static _ids: number = 0;
 
-  private readonly _id: number;
-
-  protected _hasMoved: boolean = false;
-  protected _graphicComponents: Array<GraphicComponent> =
-    new Array<GraphicComponent>();
+  protected readonly _id: number;
   protected _visible: boolean = true;
+  protected _drawable: boolean = false;
   protected _geometry: Geometry;
   protected _drawGeometry: boolean = false;
 
   constructor(protected _context: Context,
               minLocation: Point3D,
-              dimensions: Dimensions,
-              graphicComponent: GraphicComponent) {
-    this._id = Entity._ids;
-    Entity._ids++;
-    this._graphicComponents.push(graphicComponent);
-    let centre = new Point3D(minLocation.x + Math.floor(dimensions.width / 2),
-                             minLocation.y + Math.floor(dimensions.depth / 2),
-                             minLocation.z + Math.floor(dimensions.height / 2));
+              dimensions: Dimensions) {
+    this._id = PhysicalEntity._ids;
+    PhysicalEntity._ids++;
+    const centre = new Point3D(minLocation.x + Math.floor(dimensions.width / 2),
+                               minLocation.y + Math.floor(dimensions.depth / 2),
+                               minLocation.z + Math.floor(dimensions.height / 2));
     const bounds = new BoundingCuboid(centre, dimensions);
     this._geometry = new CuboidGeometry(bounds);
     this._context.addEntity(this);
+  }
+
+  updatePosition(d: Vector3D): void {
+    this.bounds.update(d);
+    this.geometry.transform(d);
   }
 
   get context(): Context { return this._context; }  
@@ -52,17 +52,33 @@ export class Entity {
   get height(): number { return this.bounds.height; }
   get centre(): Point3D { return this.bounds.centre; }
   get id(): number { return this._id; }
-  get hasMoved(): boolean { return this._hasMoved; }
   get visible(): boolean { return this._visible; }
+  get drawable(): boolean { return this._drawable; }
+  get drawGeometry(): boolean { return this._drawGeometry; }
+
+  set visible(visible: boolean) { this._visible = visible; }
+}
+
+export class GraphicalEntity extends PhysicalEntity {
+
+  protected _graphicComponents: Array<GraphicComponent> =
+    new Array<GraphicComponent>();
+
+  constructor(context: Context,
+              minLocation: Point3D,
+              dimensions: Dimensions,
+              graphicComponent: GraphicComponent) {
+    super(context, minLocation, dimensions);
+    this._graphicComponents.push(graphicComponent);
+    this._drawable = true;
+  }
+
   get graphics(): Array<GraphicComponent> {
     return this._graphicComponents;
   }
   get graphic(): GraphicComponent {
     return this._graphicComponents[0];
   }
-  get drawGeometry(): boolean { return this._drawGeometry; }
-
-  set visible(visible: boolean) { this._visible = visible; }
 
   addGraphic(graphic: GraphicComponent): void {
     this._graphicComponents.push(graphic);
@@ -77,14 +93,9 @@ export class Entity {
     }
     return this.z + this.height;
   }
-
-  updatePosition(d: Vector3D): void {
-    this.bounds.update(d);
-    this.geometry.transform(d);
-  }
 }
 
-export class EventableEntity extends Entity {
+export class EventableEntity extends GraphicalEntity {
   protected _handler = new EventHandler<EntityEvent>();
 
   constructor(context: Context,

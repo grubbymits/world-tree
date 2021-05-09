@@ -1,4 +1,4 @@
-import { Entity,
+import { PhysicalEntity,
          EventableEntity,
          Actor } from "./entity.js"
 import { EntityEvent } from "./events.js"
@@ -17,26 +17,12 @@ import { Dimensions,
 
 export class Context {
   private _scene: SceneGraph;
-  private _entities : Array<Entity> = new Array<Entity>();
+  private _entities : Array<PhysicalEntity> = new Array<PhysicalEntity>();
   private _controllers: Array<Controller> = new Array<Controller>();
   private _octree : Octree;
   private _worldMap: SquareGrid;
 
-  constructor(canvas: HTMLCanvasElement, worldDims: Dimensions,
-              perspective: Perspective) {
-    switch (perspective) {
-    default:
-      console.error("unhandled perspective");
-      break;
-    case Perspective.TrueIsometric:
-      console.log("true isometric");
-      this._scene = new IsometricRenderer(canvas);
-      break;
-    case Perspective.TwoByOneIsometric:
-      console.log("2:1 isometric");
-      this._scene = new TwoByOneIsometricRenderer(canvas);
-      break;
-    }
+  constructor(worldDims: Dimensions) {
     this._octree = new Octree(worldDims);
     CollisionDetector.init(this._octree);
   }
@@ -55,11 +41,28 @@ export class Context {
     this._octree.verify(this._entities);
   }
 
+  addSceneGraph(canvas: HTMLCanvasElement, 
+                perspective: Perspective): void {
+    switch (perspective) {
+    default:
+      console.error("unhandled perspective");
+      break;
+    case Perspective.TrueIsometric:
+      console.log("true isometric");
+      this._scene = new IsometricRenderer(canvas);
+      break;
+    case Perspective.TwoByOneIsometric:
+      console.log("2:1 isometric");
+      this._scene = new TwoByOneIsometricRenderer(canvas);
+      break;
+    }
+  }
+
   addController(controller: Controller): void {
     this._controllers.push(controller);
   }
 
-  addEntity(entity: Entity): void {
+  addEntity(entity: PhysicalEntity): void {
     this._entities.push(entity);
     this._octree.insert(entity);
     this._scene.insertEntity(entity);

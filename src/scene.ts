@@ -1,4 +1,5 @@
-import { Entity } from "./entity.js"
+import { PhysicalEntity,
+         GraphicalEntity } from "./entity.js"
 import { Camera } from "./camera.js"
 import { Point2D,
          Point3D,
@@ -27,7 +28,7 @@ class SceneNode {
   static set graph(g: SceneGraph) { this._graph = g; }
   static get graph(): SceneGraph { return this._graph; }
 
-  constructor(private readonly _entity: Entity) {
+  constructor(private readonly _entity: PhysicalEntity) {
     SceneNode.graph.setDrawCoords(this);
   }
 
@@ -101,7 +102,7 @@ class SceneNode {
     this.baseSegments.forEach(segment => outline.push(segment));
     return outline;
   }
-  get entity(): Entity { return this._entity; }
+  get entity(): PhysicalEntity { return this._entity; }
   get preds(): Array<number> { return this._preds; }
   get succs(): Array<number> { return this._succs; }
   get level(): SceneLevel|null { return this._level; }
@@ -133,7 +134,7 @@ class SceneLevel {
   get roots(): Array<number> { return this._roots; }
   get order(): Array<SceneNode> { return this._topologicalOrder; }
 
-  inrange(entity: Entity): boolean {
+  inrange(entity: PhysicalEntity): boolean {
     return entity.bounds.minZ >= this._minZ && entity.bounds.minZ < this._maxZ;
   }
 
@@ -280,7 +281,7 @@ export abstract class SceneGraph {
   }
 
   setDrawCoords(node: SceneNode): void {
-    const entity: Entity = node.entity;
+    const entity: PhysicalEntity = node.entity;
     const min: Point3D = entity.bounds.minLocation;
     const max: Point3D = entity.bounds.maxLocation;
     const width = entity.bounds.width;
@@ -341,10 +342,10 @@ export abstract class SceneGraph {
     }
 
     const renderNode = function(node: SceneNode) {
-      const entity: Entity = node.entity;
-      if (!entity.visible) {
+      if (!node.entity.visible || !node.entity.drawable) {
         return;
       }
+      const entity = <GraphicalEntity>node.entity;
       const width = entity.graphics[0].width;
       const height = entity.graphics[0].height; 
       if (camera.isOnScreen(node.drawCoord, width, height)) {
@@ -368,7 +369,7 @@ export abstract class SceneGraph {
     this._handler.service();
   }
 
-  insertEntity(entity: Entity): void {
+  insertEntity(entity: PhysicalEntity): void {
     let node = new SceneNode(entity);
     this._nodes.set(node.id, node);
 
@@ -380,7 +381,7 @@ export abstract class SceneGraph {
     }
   }
 
-  updateEntity(entity: Entity): void {
+  updateEntity(entity: PhysicalEntity): void {
     console.assert(this._nodes.has(entity.id));
     let node: SceneNode = this._nodes.get(entity.id)!;
     this.setDrawCoords(node);
@@ -406,23 +407,26 @@ export abstract class SceneGraph {
   }
 
   getLocationAt(x: number, y: number, camera: Camera): Point3D | null {
-    let entity: Entity|null = this.getEntityDrawnAt(x, y, camera);
+    let entity: PhysicalEntity|null = this.getEntityDrawnAt(x, y, camera);
     if (entity != null) {
       return entity.bounds.minLocation;
     }
     return null;
   }
 
-  getEntityDrawnAt(x: number, y: number, camera: Camera): Entity | null {
+  getEntityDrawnAt(x: number, y: number, camera: Camera): GraphicalEntity | null {
     for (let i = this._levels.length - 1; i >= 0; i--) {
       const level: SceneLevel = this._levels[i];
       for (let j = 0; j < level.nodes.length; j++) {
         const node: SceneNode = level.nodes[j];
-        const entity: Entity = node.entity;
-        if (!entity.visible ||
-            !camera.isOnScreen(node.drawCoord, entity.width, entity.depth)) {
+        if (!node.entity.visible || !node.entity.drawable) {
           continue;
         }
+        const entity = <GraphicalEntity>node.entity;
+        if (!camera.isOnScreen(node.drawCoord, entity.width, entity.depth)) {
+          continue;
+        }
+
         let onScreenCoord: Point2D = camera.getDrawCoord(node.drawCoord);
         let graphic: GraphicComponent = entity.graphic;
         // Check whether inbounds of the sprite.
@@ -573,17 +577,7 @@ export class TwoByOneIsometricRenderer extends SceneGraph {
                           Math.round(height));
   }
 
-  getDrawCoord(location: Point3D): Point2D {
-    return TwoByOneIsometricRenderer.getDrawCoord(location);
-  }
-
-  drawOrder(firstId: number, secondId: number): RenderOrder {
-    const first: SceneNode = this._nodes.get(firstId)!;
-    const second: SceneNode = this._nodes.get(secondId)!;
-    // priority ordering:
-    // - smaller y
-    // - greater x
-
+  static drawOrder(first: SceneNode, second: SceneNode): RenderOrder {
     if (first.overlapX(second)) {
       return first.entity.bounds.minY < second.entity.bounds.minY ?
         RenderOrder.Before : RenderOrder.After;
@@ -602,5 +596,18 @@ export class TwoByOneIsometricRenderer extends SceneGraph {
       return RenderOrder.After;
     }
     return RenderOrder.Any;
+  }
+
+  getDrawCoord(location: Point3D): Point2D {
+    return TwoByOneIsometricRenderer.getDrawCoord(location);
+  }
+
+  drawOrder(firstId: number, secondId: number): RenderOrder {
+    const first: SceneNode = this._nodes.get(firstId)!;
+    const second: SceneNode = this._nodes.get(secondId)!;
+    // priority ordering:
+    // - smaller y
+    // - greater x
+    return TwoByOneIsometricRenderer.drawOrder(first, second);
   }
 }

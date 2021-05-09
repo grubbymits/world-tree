@@ -1,6 +1,5 @@
 import { SceneGraph } from "./scene.js"
-import { Entity,
-         Actor } from "./entity.js"
+import { Actor } from "./entity.js"
 import { Camera } from "./camera.js"
 
 export class Controller {

@@ -3,22 +3,9 @@ import { Perspective, IsometricRenderer, TwoByOneIsometricRenderer } from "./sce
 import { Octree } from "./tree.js";
 import { CollisionDetector } from "./physics.js";
 export class Context {
-    constructor(canvas, worldDims, perspective) {
+    constructor(worldDims) {
         this._entities = new Array();
         this._controllers = new Array();
-        switch (perspective) {
-            default:
-                console.error("unhandled perspective");
-                break;
-            case Perspective.TrueIsometric:
-                console.log("true isometric");
-                this._scene = new IsometricRenderer(canvas);
-                break;
-            case Perspective.TwoByOneIsometric:
-                console.log("2:1 isometric");
-                this._scene = new TwoByOneIsometricRenderer(canvas);
-                break;
-        }
         this._octree = new Octree(worldDims);
         CollisionDetector.init(this._octree);
     }
@@ -32,6 +19,21 @@ export class Context {
     verify() {
         console.log("context contains num entities:", this._entities.length);
         this._octree.verify(this._entities);
+    }
+    addSceneGraph(canvas, perspective) {
+        switch (perspective) {
+            default:
+                console.error("unhandled perspective");
+                break;
+            case Perspective.TrueIsometric:
+                console.log("true isometric");
+                this._scene = new IsometricRenderer(canvas);
+                break;
+            case Perspective.TwoByOneIsometric:
+                console.log("2:1 isometric");
+                this._scene = new TwoByOneIsometricRenderer(canvas);
+                break;
+        }
     }
     addController(controller) {
         this._controllers.push(controller);

@@ -286,10 +286,10 @@ export class SceneGraph {
             this._levels.forEach((level) => level.buildGraph(this));
         }
         const renderNode = function (node) {
-            const entity = node.entity;
-            if (!entity.visible) {
+            if (!node.entity.visible || !node.entity.drawable) {
                 return;
             }
+            const entity = node.entity;
             const width = entity.graphics[0].width;
             const height = entity.graphics[0].height;
             if (camera.isOnScreen(node.drawCoord, width, height)) {
@@ -352,9 +352,11 @@ export class SceneGraph {
             const level = this._levels[i];
             for (let j = 0; j < level.nodes.length; j++) {
                 const node = level.nodes[j];
+                if (!node.entity.visible || !node.entity.drawable) {
+                    continue;
+                }
                 const entity = node.entity;
-                if (!entity.visible ||
-                    !camera.isOnScreen(node.drawCoord, entity.width, entity.depth)) {
+                if (!camera.isOnScreen(node.drawCoord, entity.width, entity.depth)) {
                     continue;
                 }
                 let onScreenCoord = camera.getDrawCoord(node.drawCoord);
@@ -451,12 +453,7 @@ export class TwoByOneIsometricRenderer extends SceneGraph {
         const height = (spriteHeight - twoUnits) * this._magicRatio;
         return new Dimensions(Math.round(width), Math.round(depth), Math.round(height));
     }
-    getDrawCoord(location) {
-        return TwoByOneIsometricRenderer.getDrawCoord(location);
-    }
-    drawOrder(firstId, secondId) {
-        const first = this._nodes.get(firstId);
-        const second = this._nodes.get(secondId);
+    static drawOrder(first, second) {
         if (first.overlapX(second)) {
             return first.entity.bounds.minY < second.entity.bounds.minY ?
                 RenderOrder.Before : RenderOrder.After;
@@ -475,6 +472,14 @@ export class TwoByOneIsometricRenderer extends SceneGraph {
             return RenderOrder.After;
         }
         return RenderOrder.Any;
+    }
+    getDrawCoord(location) {
+        return TwoByOneIsometricRenderer.getDrawCoord(location);
+    }
+    drawOrder(firstId, secondId) {
+        const first = this._nodes.get(firstId);
+        const second = this._nodes.get(secondId);
+        return TwoByOneIsometricRenderer.drawOrder(first, second);
     }
 }
 TwoByOneIsometricRenderer._magicRatio = Math.cos(Math.atan(0.5));

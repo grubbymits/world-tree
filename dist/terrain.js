@@ -1,5 +1,5 @@
 import { Direction } from "./physics.js";
-import { Entity } from "./entity.js";
+import { GraphicalEntity } from "./entity.js";
 import { Sprite, StaticGraphicComponent } from "./graphics.js";
 import { Point3D } from "./geometry.js";
 export var TerrainShape;
@@ -210,7 +210,7 @@ export function isRampUp(shape, direction) {
     }
     return false;
 }
-export class Terrain extends Entity {
+export class Terrain extends GraphicalEntity {
     constructor(context, _gridX, _gridY, _gridZ, dimensions, _type, _shape, features) {
         super(context, new Point3D(_gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height), dimensions, Terrain.graphics(_type, _shape));
         this._gridX = _gridX;

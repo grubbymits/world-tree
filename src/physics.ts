@@ -1,4 +1,4 @@
-import { Entity,
+import { PhysicalEntity,
          Actor } from "./entity.js"
 import { TerrainType, TerrainShape, Terrain } from "./terrain.js"
 import { SquareGrid } from "./map.js"
@@ -284,15 +284,15 @@ export class BoundingCuboid {
 }
 
 export class CollisionInfo {
-  constructor(private readonly _collidedEntity: Entity,
+  constructor(private readonly _collidedEntity: PhysicalEntity,
               private readonly _intersectInfo: IntersectInfo) { }
-  get entity(): Entity { return this._collidedEntity; }
+  get entity(): PhysicalEntity { return this._collidedEntity; }
   get intersectInfo(): IntersectInfo { return this._intersectInfo; }
 }
 
 export class CollisionDetector {
   private static _collisionInfo: Map<Actor, CollisionInfo>;
-  private static _missInfo: Map<Actor, Array<Entity>>;
+  private static _missInfo: Map<Actor, Array<PhysicalEntity>>;
   private static _spatialInfo: Octree;
 
   static init(spatialInfo: Octree): void {
@@ -318,7 +318,7 @@ export class CollisionDetector {
     this._missInfo.delete(actor);
   }
 
-  static addMissInfo(actor: Actor, entities: Array<Entity>): void {
+  static addMissInfo(actor: Actor, entities: Array<PhysicalEntity>): void {
     this._missInfo.set(actor, entities);
   }
 
@@ -326,7 +326,7 @@ export class CollisionDetector {
     return this._missInfo.has(actor);
   }
 
-  static getMissInfo(actor: Actor): Array<Entity> {
+  static getMissInfo(actor: Actor): Array<PhysicalEntity> {
     console.assert(this.hasMissInfo(actor));
     return this._missInfo.get(actor)!;
   }
@@ -348,8 +348,8 @@ export class CollisionDetector {
       bounds.maxLocation
     ];
 
-    let misses: Array<Entity> = new Array<Entity>();
-    let entities: Array<Entity> = this._spatialInfo.getEntities(area);
+    let misses: Array<PhysicalEntity> = new Array<PhysicalEntity>();
+    let entities: Array<PhysicalEntity> = this._spatialInfo.getEntities(area);
 
     for (let entity of entities) {
       if (entity.id == actor.id) {

@@ -1,5 +1,4 @@
-import { Entity,
-         Actor } from "./entity.js"
+import { Actor } from "./entity.js"
 import { EntityEvent } from "./events.js"
 import { Direction,
          getDirectionName,

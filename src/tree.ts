@@ -1,6 +1,6 @@
 import { Dimensions,
          BoundingCuboid } from "./physics.js"
-import { Entity } from "./entity.js"
+import { PhysicalEntity } from "./entity.js"
 import { Point3D } from "./geometry.js"
 
 // TODO Templates/Generics..?
@@ -10,10 +10,10 @@ class OctNode {
   static readonly MaxEntities: number = 9;
 
   private _children: Array<OctNode> = new Array<OctNode>();
-  private _entities: Array<Entity> = new Array<Entity>();
+  private _entities: Array<PhysicalEntity> = new Array<PhysicalEntity>();
 
   get children(): Array<OctNode> { return this._children; }
-  get entities(): Array<Entity> { return this._entities; }
+  get entities(): Array<PhysicalEntity> { return this._entities; }
   get bounds(): BoundingCuboid { return this._bounds; }
   get centre(): Point3D { return this._bounds.centre; }
   get width(): number { return this._bounds.width; }
@@ -32,7 +32,7 @@ class OctNode {
 
   constructor(private _bounds: BoundingCuboid) { }
 
-  insert(entity: Entity): boolean {
+  insert(entity: PhysicalEntity): boolean {
     let inserted: boolean = false;
     if (this._children.length == 0) {
       // For a leaf node, insert it into the entity list and check that we're
@@ -101,7 +101,7 @@ class OctNode {
       }
     }
 
-    const insertIntoChild = function(child: OctNode, entity: Entity) {
+    const insertIntoChild = function(child: OctNode, entity: PhysicalEntity) {
       if (child.containsLocation(entity.bounds.centre)) {
         return child.insert(entity);
       }
@@ -134,11 +134,11 @@ class OctNode {
     return this._bounds.contains(location);
   }
 
-  containsEntity(entity: Entity): boolean {
+  containsEntity(entity: PhysicalEntity): boolean {
     return this._entities.indexOf(entity) != -1;
   }
 
-  recursivelyContainsEntity(entity: Entity): boolean {
+  recursivelyContainsEntity(entity: PhysicalEntity): boolean {
     if (this.containsEntity(entity)) {
       return true;
     }
@@ -150,7 +150,7 @@ class OctNode {
     return false;
   }
 
-  recursiveRemoveEntity(entity: Entity): boolean {
+  recursiveRemoveEntity(entity: PhysicalEntity): boolean {
     const idx = this._entities.indexOf(entity);
     if (idx != -1) {
       this._entities.splice(idx, 1);
@@ -185,13 +185,15 @@ export class Octree {
 
   get bounds(): BoundingCuboid { return this._root.bounds; }
 
-  insert(entity: Entity): void {
+  insert(entity: PhysicalEntity): void {
     let inserted = this._root.insert(entity);
     console.assert(inserted, "failed to insert");
     this._numEntities++;
   }
 
-  findEntitiesInArea(root: OctNode, area: BoundingCuboid, entities: Array<Entity>) {
+  findEntitiesInArea(root: OctNode,
+                     area: BoundingCuboid,
+                     entities: Array<PhysicalEntity>) {
     for (let child of root.children) {
       if (!child.bounds.intersects(area)) {
         continue;
@@ -204,20 +206,20 @@ export class Octree {
     }
   }
 
-  getEntities(area: BoundingCuboid): Array<Entity> {
-    let entities = new Array<Entity>();
+  getEntities(area: BoundingCuboid): Array<PhysicalEntity> {
+    let entities = new Array<PhysicalEntity>();
     this.findEntitiesInArea(this._root, area, entities);
     return entities;
   }
 
-  update(entity: Entity): void {
+  update(entity: PhysicalEntity): void {
     const removed: boolean = this._root.recursiveRemoveEntity(entity);
     console.assert(removed);
     this._numEntities--;
     this.insert(entity);
   }
 
-  verify(entities: Array<Entity>): boolean {
+  verify(entities: Array<PhysicalEntity>): boolean {
     console.log("spatial graph should have num entities:", this._numEntities);
     console.log("counted: ", this._root.recursiveCountNumEntities);
     for (let entity of entities) {

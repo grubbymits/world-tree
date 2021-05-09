@@ -1,6 +1,6 @@
 import { Direction,
          Dimensions } from "./physics.js"
-import { Entity } from "./entity.js"
+import { GraphicalEntity } from "./entity.js"
 import { SpriteSheet,
          Sprite,
          GraphicComponent,
@@ -225,7 +225,7 @@ export function isRampUp(shape: TerrainShape, direction: Direction): boolean {
   return false;
 }
 
-export class Terrain extends Entity {
+export class Terrain extends GraphicalEntity {
   private static _dimensions: Dimensions;
   private static _featureGraphics = new Map<TerrainFeature, GraphicComponent>();
   private static _terrainGraphics =

@@ -1,5 +1,5 @@
 import { Context } from "./context.js"
-import { Entity,
+import { PhysicalEntity,
          Actor } from "./entity.js"
 import { EntityEvent } from "./events.js"
 import { CollisionDetector,
@@ -27,7 +27,7 @@ export class ActorDebug {
       if (!CollisionDetector.hasMissInfo(actor)) {
         return;
       }
-      let missedEntities: Array<Entity> = CollisionDetector.getMissInfo(actor);
+      let missedEntities: Array<PhysicalEntity> = CollisionDetector.getMissInfo(actor);
       let scene: SceneGraph = context.scene;
       const start = Date.now();
 
@@ -59,7 +59,7 @@ export class ActorDebug {
 
       const collisionInfo: CollisionInfo = CollisionDetector.getCollideInfo(actor);
       const intersectInfo: IntersectInfo = collisionInfo.intersectInfo;
-      const collidedEntity: Entity = collisionInfo.entity;
+      const collidedEntity: PhysicalEntity = collisionInfo.entity;
       const collidedFace: Face3D = intersectInfo.face 
       let scene = context.scene;
       const start = Date.now();

@@ -9,5 +9,28 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "strictPropertyInitialization": false,
+    "skipLibCheck": true
   },
+  "files": [
+    "src/action.ts",
+    "src/builder.ts",
+    "src/camera.ts",
+    "src/context.ts",
+    "src/controller.ts",
+    "src/debug.ts",
+    "src/entity.ts",
+    "src/events.ts",
+    "src/geometry.ts",
+    "src/graphics.ts",
+    "src/map.ts",
+    "src/physics.ts",
+    "src/plant.ts",
+    "src/scene.ts",
+    "src/sound.ts",
+    "src/terrain.ts",
+    "src/tree.ts",
+    "src/weather.ts",
+    "src/world-tree.ts"
+  ],
+  "excludeDirectories": [ "node_modules" ]
 }
