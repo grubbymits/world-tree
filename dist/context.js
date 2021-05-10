@@ -26,11 +26,9 @@ export class Context {
                 console.error("unhandled perspective");
                 break;
             case Perspective.TrueIsometric:
-                console.log("true isometric");
                 this._scene = new SceneRenderer(canvas, new TrueIsometric());
                 break;
             case Perspective.TwoByOneIsometric:
-                console.log("2:1 isometric");
                 this._scene = new SceneRenderer(canvas, new TwoByOneIsometric());
                 break;
         }
@@ -43,9 +41,6 @@ export class Context {
         this._octree.insert(entity);
         if (this._scene != undefined) {
             this._scene.insertEntity(entity);
-        }
-        else {
-            console.log("context has no scene");
         }
     }
     addActor(actor) {

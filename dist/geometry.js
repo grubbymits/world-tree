@@ -1,4 +1,4 @@
-var Orientation;
+export var Orientation;
 (function (Orientation) {
     Orientation[Orientation["Colinear"] = 0] = "Colinear";
     Orientation[Orientation["Clockwise"] = 1] = "Clockwise";

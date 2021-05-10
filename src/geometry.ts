@@ -1,6 +1,6 @@
 import { BoundingCuboid } from "./physics.js"
 
-enum Orientation {
+export enum Orientation {
   Colinear,
   Clockwise,
   CounterClockwise,

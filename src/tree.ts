@@ -176,10 +176,6 @@ export class Octree {
     let z = (dimensions.height / 2);
     let centre = new Point3D(x, y, z);
     this._worldBounds = new BoundingCuboid(centre, dimensions);
-    console.log("creating space of dimensions (WxDxH):",
-                this._worldBounds.width,
-                this._worldBounds.depth,
-                this._worldBounds.height);
     this._root = new OctNode(this._worldBounds);
   }
 
