@@ -9,28 +9,22 @@ import { Sprite,
 import { Dimensions } from "./physics.js"
 import { TimedEventHandler } from "./events.js"
 
-enum RenderOrder {
+export enum RenderOrder {
   Before = -1,
   Any = 0,
   After = 1,
 }
 
-class SceneNode {
-  private _preds : Array<number> = new Array<number>();
-  private _succs : Array<number> = new Array<number>();
+export class SceneNode {
+  private _preds : Array<SceneNode> = new Array<SceneNode>();
+  private _succs : Array<SceneNode> = new Array<SceneNode>();
   private _level : SceneLevel|null;
   private _topOutlineSegments: Array<Segment2D> = new Array<Segment2D>();
   private _sideOutlineSegments: Array<Segment2D> = new Array<Segment2D>();
   private _baseOutlineSegments: Array<Segment2D> = new Array<Segment2D>();
-  private _drawCoord: Point2D = new Point2D(0, 0);
 
-  private static _graph: SceneGraph;
-  static set graph(g: SceneGraph) { this._graph = g; }
-  static get graph(): SceneGraph { return this._graph; }
-
-  constructor(private readonly _entity: PhysicalEntity) {
-    SceneNode.graph.setDrawCoords(this);
-  }
+  constructor(private readonly _entity: PhysicalEntity,
+              private _drawCoord: Point2D) { }
 
   overlapX(other: SceneNode): boolean {
     return (this.entity.bounds.minX >= other.entity.bounds.minX &&
@@ -69,23 +63,23 @@ class SceneNode {
     return false;
   }
 
-  addPred(predId: number) {
-    let idx = this._preds.indexOf(predId);
+  addPred(pred: SceneNode) {
+    let idx = this._preds.indexOf(pred);
     if (idx != -1) return;
-    this._preds.push(predId);
+    this._preds.push(pred);
   }
-  addSucc(succId: number) {
-    let idx = this._succs.indexOf(succId);
+  addSucc(succ: SceneNode) {
+    let idx = this._succs.indexOf(succ);
     if (idx != -1) return;
-    this._succs.push(succId);
+    this._succs.push(succ);
   }
-  removePred(predId: number) {
-    let idx = this._preds.indexOf(predId);
+  removePred(pred: SceneNode) {
+    let idx = this._preds.indexOf(pred);
     if (idx == -1) return;
     this._preds.splice(idx, 1);
   }
-  removeSucc(succId: number) {
-    let idx = this._succs.indexOf(succId);
+  removeSucc(succ: SceneNode) {
+    let idx = this._succs.indexOf(succ);
     if (idx == -1) return;
     this._succs.splice(idx, 1);
   }
@@ -103,8 +97,8 @@ class SceneNode {
     return outline;
   }
   get entity(): PhysicalEntity { return this._entity; }
-  get preds(): Array<number> { return this._preds; }
-  get succs(): Array<number> { return this._succs; }
+  get preds(): Array<SceneNode> { return this._preds; }
+  get succs(): Array<SceneNode> { return this._succs; }
   get level(): SceneLevel|null { return this._level; }
   get minZ(): number { return this._entity.bounds.minZ; }
   get maxZ(): number { return this._entity.bounds.maxZ; }
@@ -117,8 +111,8 @@ type NodeCompare = (firstId: number, secondId: number) => RenderOrder;
 
 class SceneLevel {
   private _nodes: Array<SceneNode> = new Array<SceneNode>();
-  private _roots: Array<number> = new Array<number>();
-  private _discovered: Set<number> = new Set<number>();
+  private _roots: Array<SceneNode> = new Array<SceneNode>();
+  private _discovered: Set<SceneNode> = new Set<SceneNode>();
   private _topologicalOrder: Array<SceneNode> = new Array<SceneNode>();
   private readonly _minZ: number;
   private readonly _maxZ: number;
@@ -131,7 +125,7 @@ class SceneLevel {
   }
 
   get nodes(): Array<SceneNode> { return this._nodes; }
-  get roots(): Array<number> { return this._roots; }
+  get roots(): Array<SceneNode> { return this._roots; }
   get order(): Array<SceneNode> { return this._topologicalOrder; }
 
   inrange(entity: PhysicalEntity): boolean {
@@ -149,25 +143,24 @@ class SceneLevel {
     console.assert(idx != -1);
     this._nodes.splice(idx, 1);
 
-    idx = this._roots.indexOf(node.id);
+    idx = this._roots.indexOf(node);
     if (idx != -1) {
       this._roots.splice(idx, 1);
     }
   }
 
   update(node: SceneNode, graph: SceneGraph): void {
-
-    node.preds.forEach((predId) => {
-      if (graph.drawOrder(predId, node.id) != RenderOrder.Before) {
-        graph.nodes.get(predId)!.removeSucc(node.id);
-        node.removePred(predId);
+    node.preds.forEach((pred) => {
+      if (graph.drawOrder(pred, node) != RenderOrder.Before) {
+        pred.removeSucc(node);
+        node.removePred(pred);
       }
     });
 
-    node.succs.forEach((succId) => {
-      if (graph.drawOrder(succId, node.id) != RenderOrder.After) {
-        node.removeSucc(succId);
-        graph.nodes.get(succId)!.removePred(node.id);
+    node.succs.forEach((succ) => {
+      if (graph.drawOrder(succ, node) != RenderOrder.After) {
+        node.removeSucc(succ);
+        succ.removePred(node);
       }
     });
 
@@ -176,18 +169,18 @@ class SceneLevel {
       if (existing.id == node.id) {
         continue;
       }
-      const order = graph.drawOrder(node.id, existing.id);
+      const order = graph.drawOrder(node, existing);
       if (RenderOrder.Before == order) {
-        node.addSucc(existing.id);
-        existing.addPred(node.id);
+        node.addSucc(existing);
+        existing.addPred(node);
       } else if (RenderOrder.After == order) {
-        existing.addSucc(node.id);
-        node.addPred(existing.id);
+        existing.addSucc(node);
+        node.addPred(existing);
       }
     }
 
-    if (node.isRoot && this._roots.indexOf(node.id) == -1) {
-      this._roots.push(node.id);
+    if (node.isRoot && this._roots.indexOf(node) == -1) {
+      this._roots.push(node);
       //console.log("num roots:", this._roots.length);
     }
     this._discovered.clear();
@@ -196,7 +189,7 @@ class SceneLevel {
       if (this._discovered.has(this._roots[i])) {
         continue;
       }
-      this.topologicalSort(graph, graph.getNode(this._roots[i]));
+      this.topologicalSort(graph, this._roots[i]);
     }
   }
 
@@ -212,13 +205,13 @@ class SceneLevel {
       for (let j = 0; j < this._nodes.length; j++) {
         if (i == j) continue;
         let nodeJ = this._nodes[j];
-        const order = graph.drawOrder(nodeI.id, nodeJ.id);
+        const order = graph.drawOrder(nodeI, nodeJ);
         if (RenderOrder.Before == order) {
-          nodeI.addSucc(nodeJ.id);
-          nodeJ.addPred(nodeI.id);
+          nodeI.addSucc(nodeJ);
+          nodeJ.addPred(nodeI);
         } else if (RenderOrder.After == order) {
-          nodeJ.addSucc(nodeI.id);
-          nodeI.addPred(nodeJ.id);
+          nodeJ.addSucc(nodeI);
+          nodeI.addPred(nodeJ);
         }
       }
     }
@@ -228,7 +221,7 @@ class SceneLevel {
 
     for (let node of this._nodes) {
       if (node.preds.length == 0) {
-        this._roots.push(node.id);
+        this._roots.push(node);
         //console.log("root id:", node.id);
       }
     }
@@ -241,44 +234,30 @@ class SceneLevel {
       if (this._discovered.has(this._roots[i])) {
         continue;
       }
-      this.topologicalSort(graph, graph.getNode(this._roots[i]));
+      this.topologicalSort(graph, this._roots[i]);
     }
     endTime = Date.now();
     console.log("time elasped for graph sort (ms):", endTime - startTime);
   }
 
   topologicalSort(graph: SceneGraph, node: SceneNode): void {
-    this._discovered.add(node.id);
-    for (let succId of node.succs) {
-      if (this._discovered.has(succId))
+    this._discovered.add(node);
+    for (let succ of node.succs) {
+      if (this._discovered.has(succ))
         continue;
-      this.topologicalSort(graph, graph.getNode(succId));
+      this.topologicalSort(graph, succ);
     }
     this._topologicalOrder.push(node);
   }
 }
 
 export abstract class SceneGraph {
-  protected readonly _width: number;
-  protected readonly _height: number;
-  protected _ctx: CanvasRenderingContext2D;
   protected _levels: Array<SceneLevel> = new Array<SceneLevel>();
-  protected _nodes: Map<number, SceneNode> = new Map<number, SceneNode>();
-  protected _handler = new TimedEventHandler();
-
-  constructor(protected _canvas: HTMLCanvasElement) {
-    this._width = _canvas.width;
-    this._height = _canvas.height;
-    this._ctx = this._canvas.getContext("2d", { alpha: false })!;
-    SceneNode.graph = this;
-  }
 
   abstract getDrawCoord(location: Point3D): Point2D;
-  abstract drawOrder(firstId: number, secondId: number): RenderOrder;
+  abstract drawOrder(first: SceneNode, second: SceneNode): RenderOrder;
 
-  addTimedEvent(callback: Function): void {
-    this._handler.add(callback);
-  }
+  constructor() { }
 
   setDrawCoords(node: SceneNode): void {
     const entity: PhysicalEntity = node.entity;
@@ -313,79 +292,21 @@ export abstract class SceneGraph {
     node.drawCoord = adjustedCoord;
   }
 
-  get ctx(): CanvasRenderingContext2D { return this._ctx; }
-  get nodes(): Map<number, SceneNode> { return this._nodes; }
+  get levels(): Array<SceneLevel> { return this._levels; }
+  get initialised(): boolean { return this.levels.length != 0; }
 
-  getNode(id: number): SceneNode {
-    console.assert(this._nodes.has(id));
-    return this._nodes.get(id)!;
-  }
-
-  render(camera: Camera): void {
-    // Is this the first run? If so, organise the nodes into a level structure.
-    if (this._levels.length == 0) {
-      let nodeList = new Array<SceneNode>();
-      for (let node of this._nodes.values()) {
-        nodeList.push(node);
-      }
-      console.log("first render...");
-      console.log("inserted nodes into list:", nodeList.length);
-      nodeList.sort((a, b) => {
-                      if (a.minZ < b.minZ)
-                        return RenderOrder.Before;
-                      if (a.minZ > b.minZ)
-                        return RenderOrder.After;
-                      return RenderOrder.Any;
-                    });
-      nodeList.forEach((node) => this.insertIntoLevel(node));
-      this._levels.forEach((level) => level.buildGraph(this));
-    }
-
-    const renderNode = function(node: SceneNode) {
-      if (!node.entity.visible || !node.entity.drawable) {
-        return;
-      }
-      const entity = <GraphicalEntity>node.entity;
-      const width = entity.graphics[0].width;
-      const height = entity.graphics[0].height; 
-      if (camera.isOnScreen(node.drawCoord, width, height)) {
-        const coord = camera.getDrawCoord(node.drawCoord);
-        entity.graphics.forEach((component) => {
-          const spriteId: number = component.update();
-          Sprite.sprites[spriteId].draw(coord, ctx);
-        });
-      }
-    };
-
-    let ctx = this._ctx;
-    ctx.clearRect(0, 0, this._width, this._height);
-    this._levels.forEach((level) => {
-      for (let i = level.order.length - 1; i >= 0; i--) {
-        const node: SceneNode = level.order[i];
-        renderNode(node);
-      }
-    });
-
-    this._handler.service();
-  }
-
-  insertEntity(entity: PhysicalEntity): void {
-    let node = new SceneNode(entity);
-    this._nodes.set(node.id, node);
-
+  insertNode(node: SceneNode): void {
+    this.setDrawCoords(node);
     // If we haven't initialised levels yet (its done in the first call to
     // render), just store the entity for then.
     // Otherwise, find the level that it belongs in, or create a new level.
-    if (this._levels.length != 0) {
+    if (this.initialised) {
       this.insertIntoLevel(node);
     }
   }
 
-  updateEntity(entity: PhysicalEntity): void {
-    console.assert(this._nodes.has(entity.id));
-    let node: SceneNode = this._nodes.get(entity.id)!;
+  updateNode(node: SceneNode): void {
     this.setDrawCoords(node);
-
     let level: SceneLevel = node.level!;
     if (level.inrange(node.entity)) {
       level.update(node, this);
@@ -406,6 +327,51 @@ export abstract class SceneGraph {
     this._levels.push(new SceneLevel(node));
   }
 
+  buildLevels(): void {
+    this._levels.forEach((level) => level.buildGraph(this));
+  }
+}
+
+export class SceneRenderer {
+  protected readonly _width: number;
+  protected readonly _height: number;
+  protected _ctx: CanvasRenderingContext2D;
+  protected _handler = new TimedEventHandler();
+  protected _nodes: Map<number, SceneNode> = new Map<number, SceneNode>();
+
+  constructor(private _canvas: HTMLCanvasElement,
+              private _graph: SceneGraph) {
+    this._width = _canvas.width;
+    this._height = _canvas.height;
+    this._ctx = this._canvas.getContext("2d", { alpha: false })!;
+  }
+
+  get ctx(): CanvasRenderingContext2D { return this._ctx; }
+  get graph(): SceneGraph { return this._graph; }
+  get nodes(): Map<number, SceneNode> { return this._nodes; }
+
+  getNode(id: number): SceneNode {
+    console.assert(this.nodes.has(id));
+    return this.nodes.get(id)!;
+  }
+
+  addTimedEvent(callback: Function): void {
+    this._handler.add(callback);
+  }
+
+  insertEntity(entity: PhysicalEntity): void {
+    let node =
+      new SceneNode(entity, this.graph.getDrawCoord(entity.bounds.minLocation));
+    this.nodes.set(node.id, node);
+    this.graph.insertNode(node);
+  }
+
+  updateEntity(entity: PhysicalEntity): void {
+    console.assert(this._nodes.has(entity.id));
+    let node: SceneNode = this._nodes.get(entity.id)!;
+    this.graph.updateNode(node);
+  }
+
   getLocationAt(x: number, y: number, camera: Camera): Point3D | null {
     let entity: PhysicalEntity|null = this.getEntityDrawnAt(x, y, camera);
     if (entity != null) {
@@ -415,8 +381,8 @@ export abstract class SceneGraph {
   }
 
   getEntityDrawnAt(x: number, y: number, camera: Camera): GraphicalEntity | null {
-    for (let i = this._levels.length - 1; i >= 0; i--) {
-      const level: SceneLevel = this._levels[i];
+    for (let i = this.graph.levels.length - 1; i >= 0; i--) {
+      const level: SceneLevel = this.graph.levels[i];
       for (let j = 0; j < level.nodes.length; j++) {
         const node: SceneNode = level.nodes[j];
         if (!node.entity.visible || !node.entity.drawable) {
@@ -442,6 +408,54 @@ export abstract class SceneGraph {
       }
     }
     return null;
+  }
+
+  renderNode(node: SceneNode, camera: Camera): void {
+    if (!node.entity.visible || !node.entity.drawable) {
+      return;
+    }
+    // Only graphical entities are drawable.
+    const entity = <GraphicalEntity>node.entity;
+    const width = entity.graphics[0].width;
+    const height = entity.graphics[0].height; 
+    if (camera.isOnScreen(node.drawCoord, width, height)) {
+      const coord = camera.getDrawCoord(node.drawCoord);
+      entity.graphics.forEach((component) => {
+        const spriteId: number = component.update();
+        Sprite.sprites[spriteId].draw(coord, this.ctx);
+      });
+    }
+  };
+
+  render(camera: Camera): void {
+    // Is this the first run? If so, organise the nodes into a level structure.
+    if (!this.graph.initialised) {
+      let nodeList = new Array<SceneNode>();
+      for (let node of this._nodes.values()) {
+        nodeList.push(node);
+      }
+      console.log("first render...");
+      console.log("inserted nodes into list:", nodeList.length);
+      nodeList.sort((a, b) => {
+                      if (a.minZ < b.minZ)
+                        return RenderOrder.Before;
+                      if (a.minZ > b.minZ)
+                        return RenderOrder.After;
+                      return RenderOrder.Any;
+                    });
+      nodeList.forEach((node) => this.graph.insertIntoLevel(node));
+      this.graph.buildLevels();
+    }
+
+    this.ctx.clearRect(0, 0, this._width, this._height);
+    this.graph.levels.forEach((level) => {
+      for (let i = level.order.length - 1; i >= 0; i--) {
+        const node: SceneNode = level.order[i];
+        this.renderNode(node, camera);
+      }
+    });
+
+    this._handler.service();
   }
 }
 
@@ -482,10 +496,8 @@ export class IsometricPhysicalDimensions extends Dimensions {
   }
 }
 
-export class IsometricRenderer extends SceneGraph {
-  constructor(canvas: HTMLCanvasElement) {
-    super(canvas);
-  }
+export class TrueIsometric extends SceneGraph {
+  constructor() { super(); }
 
   protected static readonly _sqrt3 = Math.sqrt(3);
   protected static readonly _halfSqrt3 = Math.sqrt(3) * 0.5;
@@ -506,12 +518,10 @@ export class IsometricRenderer extends SceneGraph {
   }
 
   getDrawCoord(location: Point3D): Point2D {
-    return IsometricRenderer.getDrawCoord(location);
+    return TrueIsometric.getDrawCoord(location);
   }
 
-  drawOrder(firstId: number, secondId: number): RenderOrder {
-    const first: SceneNode = this._nodes.get(firstId)!;
-    const second: SceneNode = this._nodes.get(secondId)!;
+  drawOrder(first: SceneNode, second: SceneNode): RenderOrder {
     // priority ordering:
     // - smaller y
     // - greater x
@@ -543,10 +553,8 @@ export class IsometricRenderer extends SceneGraph {
 // - sides equal length = sqrt(5)
 // - the short diagonal is length = 2,
 // - the long diagonal is length = 4.
-export class TwoByOneIsometricRenderer extends SceneGraph {
-  constructor(canvas: HTMLCanvasElement) {
-    super(canvas);
-  }
+export class TwoByOneIsometric extends SceneGraph {
+  constructor() { super(); }
 
   private static readonly _magicRatio: number = 
     Math.cos(Math.atan(0.5));
@@ -599,15 +607,13 @@ export class TwoByOneIsometricRenderer extends SceneGraph {
   }
 
   getDrawCoord(location: Point3D): Point2D {
-    return TwoByOneIsometricRenderer.getDrawCoord(location);
+    return TwoByOneIsometric.getDrawCoord(location);
   }
 
-  drawOrder(firstId: number, secondId: number): RenderOrder {
-    const first: SceneNode = this._nodes.get(firstId)!;
-    const second: SceneNode = this._nodes.get(secondId)!;
+  drawOrder(first: SceneNode, second: SceneNode): RenderOrder {
     // priority ordering:
     // - smaller y
     // - greater x
-    return TwoByOneIsometricRenderer.drawOrder(first, second);
+    return TwoByOneIsometric.drawOrder(first, second);
   }
 }

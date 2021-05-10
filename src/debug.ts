@@ -9,7 +9,7 @@ import { Point2D,
          Face3D,
          IntersectInfo } from "./geometry.js"
 import { Camera } from "./camera.js"
-import { SceneGraph } from "./scene.js"
+import { SceneRenderer } from "./scene.js"
 
 export class ActorDebug {
   constructor(actor: Actor,
@@ -28,7 +28,7 @@ export class ActorDebug {
         return;
       }
       let missedEntities: Array<PhysicalEntity> = CollisionDetector.getMissInfo(actor);
-      let scene: SceneGraph = context.scene;
+      let scene: SceneRenderer = context.scene;
       const start = Date.now();
 
       scene.addTimedEvent(function() {
@@ -93,11 +93,11 @@ export class ActorDebug {
         for (let vertex of collidedFace.vertices()) {
           scene.ctx.beginPath();
           let p0: Point2D =
-            camera.getDrawCoord(scene.getDrawCoord(vertex.point));
+            camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point));
           let p1: Point2D =
-            camera.getDrawCoord(scene.getDrawCoord(vertex.point.add(vertex.u)));
+            camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point.add(vertex.u)));
           let p2: Point2D =
-            camera.getDrawCoord(scene.getDrawCoord(vertex.point.add(vertex.v)));
+            camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point.add(vertex.v)));
           scene.ctx.beginPath();
           scene.ctx.moveTo(p0.x, p0.y);
           scene.ctx.lineTo(p1.x, p1.y);

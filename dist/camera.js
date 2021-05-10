@@ -55,7 +55,7 @@ export class Camera {
             console.log("undefined camera surface location");
             return;
         }
-        let newPoint = this._scene.getDrawCoord(newLocation);
+        let newPoint = this._scene.graph.getDrawCoord(newLocation);
         this.x = newPoint.x;
         this.y = newPoint.y;
         this._handler.post(InputEvent.CameraMove);

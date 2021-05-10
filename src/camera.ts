@@ -3,7 +3,7 @@ import { EventHandler,
          InputEvent } from "./events.js"
 import { Actor } from "./entity.js"
 import { Point2D, Point3D } from "./geometry.js"
-import { SceneGraph } from "./scene.js"
+import { SceneRenderer } from "./scene.js"
 
 export class Camera {
   protected _x: number;
@@ -15,7 +15,7 @@ export class Camera {
   protected _handler = new EventHandler<InputEvent>();
   protected _surfaceLocation : Point3D|null;
 
-  constructor(protected _scene: SceneGraph,
+  constructor(protected _scene: SceneRenderer,
               protected readonly _width: number,
               protected readonly _height: number) {
     this._x = 0;//Math.floor(_width / 2);
@@ -74,7 +74,7 @@ export class Camera {
     }
     //console.log("updating camera to centre on (x,y,z):",
       //          newLocation.x, newLocation.y, newLocation.z);
-    let newPoint: Point2D = this._scene.getDrawCoord(newLocation);
+    let newPoint: Point2D = this._scene.graph.getDrawCoord(newLocation);
     this.x = newPoint.x;
     this.y = newPoint.y;
     this._handler.post(InputEvent.CameraMove);
@@ -84,7 +84,7 @@ export class Camera {
 
 export class MouseCamera extends Camera {
 
-  constructor(scene: SceneGraph,
+  constructor(scene: SceneRenderer,
               canvas: HTMLCanvasElement,
               width: number,
               height: number) {
@@ -100,7 +100,7 @@ export class MouseCamera extends Camera {
 }
 
 export class TrackerCamera extends Camera {
-  constructor(scene: SceneGraph,
+  constructor(scene: SceneRenderer,
               width: number,
               height: number,
               actor: Actor) {

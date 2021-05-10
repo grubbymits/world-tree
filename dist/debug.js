@@ -65,9 +65,9 @@ export class ActorDebug {
                 scene.ctx.fillStyle = "Red";
                 for (let vertex of collidedFace.vertices()) {
                     scene.ctx.beginPath();
-                    let p0 = camera.getDrawCoord(scene.getDrawCoord(vertex.point));
-                    let p1 = camera.getDrawCoord(scene.getDrawCoord(vertex.point.add(vertex.u)));
-                    let p2 = camera.getDrawCoord(scene.getDrawCoord(vertex.point.add(vertex.v)));
+                    let p0 = camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point));
+                    let p1 = camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point.add(vertex.u)));
+                    let p2 = camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point.add(vertex.v)));
                     scene.ctx.beginPath();
                     scene.ctx.moveTo(p0.x, p0.y);
                     scene.ctx.lineTo(p1.x, p1.y);

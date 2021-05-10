@@ -5,9 +5,10 @@ import { EntityEvent } from "./events.js"
 import { Terrain, TerrainShape, TerrainType } from "./terrain.js"
 import { SquareGrid } from "./map.js"
 import { SceneGraph,
+         SceneRenderer,
          Perspective,
-         IsometricRenderer,
-         TwoByOneIsometricRenderer } from "./scene.js"
+         TrueIsometric,
+         TwoByOneIsometric } from "./scene.js"
 import { Camera } from "./camera.js"
 import { Controller } from "./controller.js"
 import { Octree } from "./tree.js"
@@ -16,7 +17,7 @@ import { Dimensions,
          CollisionDetector } from "./physics.js"
 
 export class Context {
-  private _scene: SceneGraph;
+  private _scene: SceneRenderer;
   private _entities : Array<PhysicalEntity> = new Array<PhysicalEntity>();
   private _controllers: Array<Controller> = new Array<Controller>();
   private _octree : Octree;
@@ -27,7 +28,7 @@ export class Context {
     CollisionDetector.init(this._octree);
   }
 
-  get scene(): SceneGraph { return this._scene; }
+  get scene(): SceneRenderer { return this._scene; }
   get bounds(): BoundingCuboid { return this._octree.bounds; }
   get spatial(): Octree { return this._octree; }
   get map(): SquareGrid { return this._worldMap; }
@@ -41,19 +42,19 @@ export class Context {
     this._octree.verify(this._entities);
   }
 
-  addSceneGraph(canvas: HTMLCanvasElement, 
-                perspective: Perspective): void {
+  addRenderer(canvas: HTMLCanvasElement, 
+              perspective: Perspective): void {
     switch (perspective) {
     default:
       console.error("unhandled perspective");
       break;
     case Perspective.TrueIsometric:
       console.log("true isometric");
-      this._scene = new IsometricRenderer(canvas);
+      this._scene = new SceneRenderer(canvas, new TrueIsometric());
       break;
     case Perspective.TwoByOneIsometric:
       console.log("2:1 isometric");
-      this._scene = new TwoByOneIsometricRenderer(canvas);
+      this._scene = new SceneRenderer(canvas, new TwoByOneIsometric());
       break;
     }
   }
@@ -65,7 +66,11 @@ export class Context {
   addEntity(entity: PhysicalEntity): void {
     this._entities.push(entity);
     this._octree.insert(entity);
-    this._scene.insertEntity(entity);
+    if (this._scene != undefined) {
+      this._scene.insertEntity(entity);
+    } else {
+      console.log("context has no scene");
+    }
   }
 
   addActor(actor: Actor): void {

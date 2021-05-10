@@ -1,5 +1,5 @@
 import { EntityEvent } from "./events.js";
-import { Perspective, IsometricRenderer, TwoByOneIsometricRenderer } from "./scene.js";
+import { SceneRenderer, Perspective, TrueIsometric, TwoByOneIsometric } from "./scene.js";
 import { Octree } from "./tree.js";
 import { CollisionDetector } from "./physics.js";
 export class Context {
@@ -20,18 +20,18 @@ export class Context {
         console.log("context contains num entities:", this._entities.length);
         this._octree.verify(this._entities);
     }
-    addSceneGraph(canvas, perspective) {
+    addRenderer(canvas, perspective) {
         switch (perspective) {
             default:
                 console.error("unhandled perspective");
                 break;
             case Perspective.TrueIsometric:
                 console.log("true isometric");
-                this._scene = new IsometricRenderer(canvas);
+                this._scene = new SceneRenderer(canvas, new TrueIsometric());
                 break;
             case Perspective.TwoByOneIsometric:
                 console.log("2:1 isometric");
-                this._scene = new TwoByOneIsometricRenderer(canvas);
+                this._scene = new SceneRenderer(canvas, new TwoByOneIsometric());
                 break;
         }
     }
@@ -41,7 +41,12 @@ export class Context {
     addEntity(entity) {
         this._entities.push(entity);
         this._octree.insert(entity);
-        this._scene.insertEntity(entity);
+        if (this._scene != undefined) {
+            this._scene.insertEntity(entity);
+        }
+        else {
+            console.log("context has no scene");
+        }
     }
     addActor(actor) {
         let spatialGraph = this._octree;
