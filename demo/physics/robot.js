@@ -64,43 +64,31 @@ export class Robot extends WT.Actor {
   }
 }
 
-export class RobotController extends WT.Controller {
-  constructor(context) {
-    super();
-    this._context = context;
-  }
+export function addRobot(context, position) {
+  console.log("adding robot at:", position);
+  let robot = new Robot(context, position);
+  let bounds = context.bounds;
+  const maxAngle = new WT.Vector3D(0, 0, 0);
 
-  get robot() { return this._robot; }
+  let moveRandomDirection = function() {
+    let dx = Math.round(Math.random() * 2) - 1;
+    let dy = 0;
+    let dz = 0;
+    // Move along either the x or y axis.
+    // Choose values between: -1, 0, 1
+    if (dx == 0) {
+      dy = Math.round(Math.random() * 2) - 1;
+    }
+    if (dx == 0 && dy == 0) {
+      dy = 1;
+    }
+    let moveVector = new WT.Vector3D(dx, dy, dz);
+    robot.action = new WT.MoveForwardsDirection(robot, moveVector, maxAngle, bounds);
+  };
 
-  add(position) {
-    console.log("adding robot at:", position);
-    this._robot = new Robot(this._context, position);
-    console.log("min location:", this.robot.bounds.minLocation);
-
-    this._actors.push(this.robot);
-    let bounds = this._context.bounds;
-    let robot = this.robot;
-    const maxAngle = new WT.Vector3D(0, 0, 0);
-
-    let moveRandomDirection = function() {
-      let dx = Math.round(Math.random() * 2) - 1;
-      let dy = 0;
-      let dz = 0;
-      // Move along either the x or y axis.
-      // Choose values between: -1, 0, 1
-      if (dx == 0) {
-        dy = Math.round(Math.random() * 2) - 1;
-      }
-      if (dx == 0 && dy == 0) {
-        dy = 1;
-      }
-      let moveVector = new WT.Vector3D(dx, dy, dz);
-      robot.action = new WT.MoveForwardsDirection(robot, moveVector, maxAngle, bounds);
-    };
-
-    // Choose another direction when it can't move anymore.
-    robot.addEventListener(WT.EntityEvent.EndMove, moveRandomDirection);
-    // Initialise movement.
-    moveRandomDirection();
-  }
+  // Choose another direction when it can't move anymore.
+  robot.addEventListener(WT.EntityEvent.EndMove, moveRandomDirection);
+  // Initialise movement.
+  moveRandomDirection();
+  return robot;
 }

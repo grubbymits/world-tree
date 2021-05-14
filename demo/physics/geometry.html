@@ -12,7 +12,7 @@
   <script type="module" src="../../dist/world-tree.js"></script>
   <script type="module">
     import * as WT from "../../dist/world-tree.js";
-    import { Robot, RobotController } from "./robot.js"
+    import { Robot, addRobot } from "./robot.js"
 
     const spriteWidth = 322;
     const spriteHeight = 270;
@@ -85,15 +85,13 @@
       builder.generateMap(context);
 
       Robot.initGraphics();
-      let robotController = new RobotController(context);
-      context.addController(robotController);
-      robotController.add(new WT.Point3D(physicalDims.width * 2,
-                                         physicalDims.depth * 2,
-                                         physicalDims.height * 2));
+      const robot = addRobot(context, new WT.Point3D(physicalDims.width * 2,
+                                                     physicalDims.depth * 2,
+                                                     physicalDims.height * 2));
       let camera = new WT.TrackerCamera(context.scene,
                                         canvas.width, canvas.height,
-                                        robotController.robot);
-      var actorDebugger = new WT.ActorDebug(robotController.robot, camera, true);
+                                        robot);
+      var actorDebugger = new WT.MovableEntityDebug(robot, camera, true);
 
       var update = function update() {
         if (document.hasFocus()) {

@@ -79,7 +79,7 @@ export class MovableEntity extends PhysicalEntity {
 export class Actor extends MovableEntity {
     constructor(context, location, dimensions) {
         super(context, location, dimensions);
-        context.addMovableEntity(this);
+        context.addUpdateableEntity(this);
     }
     update() {
         super.update();

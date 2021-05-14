@@ -118,7 +118,7 @@ export class Actor extends MovableEntity {
               location: Point3D,
               dimensions: Dimensions) {
     super(context, location, dimensions);
-    context.addMovableEntity(this);
+    context.addUpdateableEntity(this);
   }
 
   update(): void {
