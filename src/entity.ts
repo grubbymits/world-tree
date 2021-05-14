@@ -21,6 +21,9 @@ export class PhysicalEntity {
   protected _drawable: boolean = false;
   protected _geometry: Geometry;
   protected _drawGeometry: boolean = false;
+  protected _handler = new EventHandler<EntityEvent>();
+  protected _graphicComponents: Array<GraphicComponent> =
+    new Array<GraphicComponent>();
 
   constructor(protected _context: Context,
               minLocation: Point3D,
@@ -35,11 +38,7 @@ export class PhysicalEntity {
     this._context.addEntity(this);
   }
 
-  updatePosition(d: Vector3D): void {
-    this.bounds.update(d);
-    this.geometry.transform(d);
-  }
-
+  set visible(visible: boolean) { this._visible = visible; }
   get context(): Context { return this._context; }  
   get geometry(): Geometry { return this._geometry; }
   get bounds(): BoundingCuboid { return this._geometry.bounds; }
@@ -55,24 +54,6 @@ export class PhysicalEntity {
   get visible(): boolean { return this._visible; }
   get drawable(): boolean { return this._drawable; }
   get drawGeometry(): boolean { return this._drawGeometry; }
-
-  set visible(visible: boolean) { this._visible = visible; }
-}
-
-export class GraphicalEntity extends PhysicalEntity {
-
-  protected _graphicComponents: Array<GraphicComponent> =
-    new Array<GraphicComponent>();
-
-  constructor(context: Context,
-              minLocation: Point3D,
-              dimensions: Dimensions,
-              graphicComponent: GraphicComponent) {
-    super(context, minLocation, dimensions);
-    this._graphicComponents.push(graphicComponent);
-    this._drawable = true;
-  }
-
   get graphics(): Array<GraphicComponent> {
     return this._graphicComponents;
   }
@@ -81,28 +62,13 @@ export class GraphicalEntity extends PhysicalEntity {
   }
 
   addGraphic(graphic: GraphicComponent): void {
+    this._drawable = true;
     this._graphicComponents.push(graphic);
   }
 
-  heightAt(location: Point3D): number|null {
-    // Given a world location, does this terrain define what the minimum z
-    // coordinate?
-    // If the locations is outside of the bounding cuboid, just return null.
-    if (!this.bounds.contains(location)) {
-      return null;
-    }
-    return this.z + this.height;
-  }
-}
-
-export class EventableEntity extends GraphicalEntity {
-  protected _handler = new EventHandler<EntityEvent>();
-
-  constructor(context: Context,
-              location: Point3D,
-              dimensions: Dimensions,
-              graphicComponent: GraphicComponent) {
-    super(context, location, dimensions, graphicComponent);
+  updatePosition(d: Vector3D): void {
+    this.bounds.update(d);
+    this.geometry.transform(d);
   }
 
   addEventListener(event: EntityEvent, callback: Function): void {
@@ -116,7 +82,7 @@ export class EventableEntity extends GraphicalEntity {
   update(): void { this._handler.service(); }
 }
 
-export class Actor extends EventableEntity {
+export class Actor extends PhysicalEntity {
   protected readonly _canSwim: boolean = false;
   protected readonly _canFly: boolean = false;
   protected _direction: Direction;
@@ -124,9 +90,8 @@ export class Actor extends EventableEntity {
 
   constructor(context: Context,
               location: Point3D,
-              dimensions: Dimensions,
-              graphicComponent: GraphicComponent) {
-    super(context, location, dimensions, graphicComponent);
+              dimensions: Dimensions) {
+    super(context, location, dimensions);
     context.addActor(this);
   }
 
@@ -153,3 +118,20 @@ export class Actor extends EventableEntity {
   }
 }
 
+export function createGraphicalEntity(context: Context,
+                                      location: Point3D,
+                                      dimensions: Dimensions,
+                                      graphicComponent: GraphicComponent) {
+  let entity = new PhysicalEntity(context, location, dimensions);
+  entity.addGraphic(graphicComponent);
+  return entity;
+}
+
+export function createGraphicalActor(context: Context,
+                                     location: Point3D,
+                                     dimensions: Dimensions,
+                                     graphicComponent: GraphicComponent) {
+  let actor = new Actor(context, location, dimensions);
+  actor.addGraphic(graphicComponent);
+  return actor;
+}

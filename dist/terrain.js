@@ -1,5 +1,5 @@
 import { Direction } from "./physics.js";
-import { GraphicalEntity } from "./entity.js";
+import { PhysicalEntity } from "./entity.js";
 import { Sprite, StaticGraphicComponent } from "./graphics.js";
 import { Point3D } from "./geometry.js";
 export var TerrainShape;
@@ -210,14 +210,15 @@ export function isRampUp(shape, direction) {
     }
     return false;
 }
-export class Terrain extends GraphicalEntity {
+export class Terrain extends PhysicalEntity {
     constructor(context, _gridX, _gridY, _gridZ, dimensions, _type, _shape, features) {
-        super(context, new Point3D(_gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height), dimensions, Terrain.graphics(_type, _shape));
+        super(context, new Point3D(_gridX * dimensions.width, _gridY * dimensions.depth, _gridZ * dimensions.height), dimensions);
         this._gridX = _gridX;
         this._gridY = _gridY;
         this._gridZ = _gridZ;
         this._type = _type;
         this._shape = _shape;
+        this.addGraphic(Terrain.graphics(_type, _shape));
         if (!isFlat(_shape)) {
             let theta = Math.atan(this.height / this.depth) * 180 / Math.PI;
             this._tanTheta = Math.tan(theta);

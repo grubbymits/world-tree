@@ -41,10 +41,29 @@ export class Segment2D {
     return p.x <= Math.max(this.p0.x, this.p1.x) &&
            p.x >= Math.min(this.p0.x, this.p1.x) &&
            p.y <= Math.max(this.p0.y, this.p1.y) &&
-           p.y >= Math.max(this.p0.y, this.p1.y);
+           p.y >= Math.min(this.p0.y, this.p1.y);
+  }
+
+  on(p: Point2D): boolean {
+    const dxc = p.x - this.p0.x;
+    const dyc = p.y - this.p0.y;
+    const dxl = this.p1.x - this.p0.x;
+    const dyl = this.p1.y - this.p0.y;
+    return (dxc * dyl - dyc * dxl) == 0;
   }
 
   intersects(other: Segment2D): boolean {
+    // Only consider an intersection which crosses properly.
+    if (this.on(other.p0)) {
+      //console.log("segment of", this.p0, this.p1);
+      //console.log("contains p0:", other.p0);
+      return false;
+    }
+    if (this.on(other.p1)) {
+      //console.log("segment of", this.p0, this.p1);
+      //console.log("contains p1:", other.p1);
+      return false;
+    }
     // https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
 
     const o1 = Point2D.orientation(this.p0, this.p1, other.p0);
@@ -55,7 +74,6 @@ export class Segment2D {
     if (o1 != o2 && o3 != o4) {
       return true;
     }
-
     if (o1 == Orientation.Colinear && this.contains(other.p0)) {
       return true;
     }
@@ -111,10 +129,10 @@ export class Point3D {
                         this.z - other.z);
   }
 
-  isNearlySameAs(other: Point3D): boolean {
-    return Math.floor(this.x) == Math.floor(other.x) &&
-           Math.floor(this.y) == Math.floor(other.y) &&
-           Math.floor(this.z) == Math.floor(other.z);
+  isSameAsRounded(other: Point3D): boolean {
+    return Math.round(this.x) == Math.round(other.x) &&
+           Math.round(this.y) == Math.round(other.y) &&
+           Math.round(this.z) == Math.round(other.z);
   }
 
   isSameAs(other: Point3D): boolean {

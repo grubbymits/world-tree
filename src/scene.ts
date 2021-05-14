@@ -1,5 +1,4 @@
-import { PhysicalEntity,
-         GraphicalEntity } from "./entity.js"
+import { PhysicalEntity } from "./entity.js"
 import { Camera } from "./camera.js"
 import { Point2D,
          Point3D,
@@ -380,15 +379,15 @@ export class SceneRenderer {
     return null;
   }
 
-  getEntityDrawnAt(x: number, y: number, camera: Camera): GraphicalEntity | null {
+  getEntityDrawnAt(x: number, y: number, camera: Camera): PhysicalEntity | null {
     for (let i = this.graph.levels.length - 1; i >= 0; i--) {
       const level: SceneLevel = this.graph.levels[i];
       for (let j = 0; j < level.nodes.length; j++) {
         const node: SceneNode = level.nodes[j];
-        if (!node.entity.visible || !node.entity.drawable) {
+        const entity: PhysicalEntity = node.entity;
+        if (!entity.visible || !entity.drawable) {
           continue;
         }
-        const entity = <GraphicalEntity>node.entity;
         if (!camera.isOnScreen(node.drawCoord, entity.width, entity.depth)) {
           continue;
         }
@@ -411,11 +410,10 @@ export class SceneRenderer {
   }
 
   renderNode(node: SceneNode, camera: Camera): void {
-    if (!node.entity.visible || !node.entity.drawable) {
+    const entity: PhysicalEntity = node.entity;
+    if (!entity.visible || !entity.drawable) {
       return;
     }
-    // Only graphical entities are drawable.
-    const entity = <GraphicalEntity>node.entity;
     const width = entity.graphics[0].width;
     const height = entity.graphics[0].height; 
     if (camera.isOnScreen(node.drawCoord, width, height)) {

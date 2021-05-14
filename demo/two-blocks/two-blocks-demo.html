@@ -32,13 +32,13 @@
     window.onload = (event) => {
       console.log("window loaded");
       const physicalDims =
-        WT.TwoByOneIsometricRenderer.getDimensions(spriteWidth, spriteHeight);
+        WT.TwoByOneIsometric.getDimensions(spriteWidth, spriteHeight);
       const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
                                           physicalDims.depth * cellsY,
                                           physicalDims.height * (1 + terraces));
       let canvas = document.getElementById("demoCanvas");
-      let context = new WT.Context(canvas, worldDims,
-                                   WT.Perspective.TwoByOneIsometric);
+      let context = new WT.Context(worldDims);
+      context.addRenderer(canvas, WT.Perspective.TwoByOneIsometric);
     
       const hasWater = false;
       const defaultFloor = WT.TerrainType.Rock;

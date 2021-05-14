@@ -141,7 +141,7 @@ export class MoveDestination extends MoveAction {
         let minD = maxD.absMin(this._d);
         this.actor.updatePosition(minD);
         this.actor.postEvent(EntityEvent.Moving);
-        return bounds.minLocation.isNearlySameAs(this.destination);
+        return bounds.minLocation.isSameAsRounded(this.destination);
     }
 }
 export class Navigate extends Action {
@@ -165,7 +165,7 @@ export class Navigate extends Action {
         if (!finishedStep) {
             return false;
         }
-        if (!this._currentStep.destination.isNearlySameAs(this._actor.bounds.minLocation)) {
+        if (!this._currentStep.destination.isSameAsRounded(this._actor.bounds.minLocation)) {
             this._waypoints = this.findPath();
             if (this._waypoints.length != 0) {
                 this._index = 0;

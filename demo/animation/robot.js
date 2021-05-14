@@ -10,7 +10,7 @@ export class Robot extends WT.Actor {
   static spriteWidth = 85;
   static spriteHeight = 113;
   static dims =
-    WT.TwoByOneIsometricRenderer.getDimensions(this.spriteWidth, this.spriteHeight);
+    WT.TwoByOneIsometric.getDimensions(this.spriteWidth, this.spriteHeight);
 
   static initGraphics() {
     this._staticGraphics = new Map();
@@ -44,7 +44,8 @@ export class Robot extends WT.Actor {
     }
     let graphics = new WT.DirectionalGraphicComponent(Robot._staticGraphics,
                                                       movementGraphics);
-    super(context, position, Robot.dims, graphics);
+    super(context, position, Robot.dims);
+    this.addGraphic(graphics);
     console.log("creating robot of dimensions:", Robot.dims);
     
     this.direction = WT.Direction.South;

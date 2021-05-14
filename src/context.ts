@@ -1,5 +1,4 @@
 import { PhysicalEntity,
-         EventableEntity,
          Actor } from "./entity.js"
 import { EntityEvent } from "./events.js"
 import { Terrain, TerrainShape, TerrainType } from "./terrain.js"

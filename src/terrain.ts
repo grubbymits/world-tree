@@ -1,6 +1,6 @@
 import { Direction,
          Dimensions } from "./physics.js"
-import { GraphicalEntity } from "./entity.js"
+import { PhysicalEntity } from "./entity.js"
 import { SpriteSheet,
          Sprite,
          GraphicComponent,
@@ -225,7 +225,7 @@ export function isRampUp(shape: TerrainShape, direction: Direction): boolean {
   return false;
 }
 
-export class Terrain extends GraphicalEntity {
+export class Terrain extends PhysicalEntity {
   private static _dimensions: Dimensions;
   private static _featureGraphics = new Map<TerrainFeature, GraphicComponent>();
   private static _terrainGraphics =
@@ -318,7 +318,8 @@ export class Terrain extends GraphicalEntity {
           new Point3D(_gridX * dimensions.width,
                       _gridY * dimensions.depth,
                       _gridZ * dimensions.height),
-          dimensions, Terrain.graphics(_type, _shape));
+          dimensions);
+    this.addGraphic(Terrain.graphics(_type, _shape));
 
     // Pre-calculate the angle of the ramp.
     if (!isFlat(_shape)) {

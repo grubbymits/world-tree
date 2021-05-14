@@ -323,10 +323,10 @@ export class SceneRenderer {
             const level = this.graph.levels[i];
             for (let j = 0; j < level.nodes.length; j++) {
                 const node = level.nodes[j];
-                if (!node.entity.visible || !node.entity.drawable) {
+                const entity = node.entity;
+                if (!entity.visible || !entity.drawable) {
                     continue;
                 }
-                const entity = node.entity;
                 if (!camera.isOnScreen(node.drawCoord, entity.width, entity.depth)) {
                     continue;
                 }
@@ -345,10 +345,10 @@ export class SceneRenderer {
         return null;
     }
     renderNode(node, camera) {
-        if (!node.entity.visible || !node.entity.drawable) {
+        const entity = node.entity;
+        if (!entity.visible || !entity.drawable) {
             return;
         }
-        const entity = node.entity;
         const width = entity.graphics[0].width;
         const height = entity.graphics[0].height;
         if (camera.isOnScreen(node.drawCoord, width, height)) {

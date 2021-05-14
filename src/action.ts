@@ -170,7 +170,7 @@ export class MoveDestination extends MoveAction {
     let minD: Vector3D = maxD.absMin(this._d);
     this.actor.updatePosition(minD);
     this.actor.postEvent(EntityEvent.Moving);
-    return bounds.minLocation.isNearlySameAs(this.destination);
+    return bounds.minLocation.isSameAsRounded(this.destination);
   }
 }
 /*
@@ -215,7 +215,7 @@ export class Navigate extends Action {
 
     // If the step is reporting that it's done, check whether it completed or
     // failed. If it failed, try to recompute the path.
-    if (!this._currentStep.destination.isNearlySameAs(
+    if (!this._currentStep.destination.isSameAsRounded(
         this._actor.bounds.minLocation)) {
       this._waypoints = this.findPath();
       if (this._waypoints.length != 0) {
