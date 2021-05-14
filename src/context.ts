@@ -110,3 +110,7 @@ export function createContext(canvas: HTMLCanvasElement,
   context.addRenderer(canvas, perspective);
   return context;
 }
+
+export function createTestContext(worldDims: Dimensions): Context {
+  return new ContextImpl(worldDims);
+}

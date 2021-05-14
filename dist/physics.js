@@ -220,7 +220,6 @@ export class BoundingCuboid {
             other.maxLocation.y : this.maxLocation.y;
         let maxZ = other.maxLocation.z > this.maxLocation.z ?
             other.maxLocation.z : this.maxLocation.z;
-        console.assert(minX >= 0 && minY >= 0 && minZ >= 0);
         this._dimensions =
             new Dimensions(maxX - minX, maxY - minY, maxZ - minZ);
         const min = new Point3D(minX, minY, minZ);

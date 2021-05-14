@@ -71,3 +71,6 @@ export function createContext(canvas, worldDims, perspective) {
     context.addRenderer(canvas, perspective);
     return context;
 }
+export function createTestContext(worldDims) {
+    return new ContextImpl(worldDims);
+}
