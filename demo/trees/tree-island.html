@@ -138,7 +138,7 @@
         console.log("physical coord (x,y,z):", location.x, location.y, location.z);
         const idx = Math.floor(Math.random() * Math.floor(treeGraphics.length));
         const graphic = treeGraphics[idx];
-        const tree = new WT.MovableEntity(context, location, treeDims, graphic);
+        const tree = new WT.createGraphicalMovableEntity(context, location, treeDims, graphic);
         console.log("created tree with id:", tree.id);
         inserted++;
       }
