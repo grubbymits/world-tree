@@ -81,7 +81,6 @@ export class RobotController {
     const maxAngle = new WT.Vector3D(0, 0, 0);
 
     let moveRandomDirection = function() {
-      console.log("choose random direction");
       let dx = Math.round(Math.random() * 2) - 1;
       let dy = 0;
       let dz = 0;

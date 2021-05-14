@@ -35,6 +35,7 @@ export class Robot extends WT.Actor {
   }
 
   constructor(context, position) {
+    super(context, position, Robot.dims);
     let movementGraphics = new Map();
     for (let x in Robot.directions) {
       let direction = Robot.directions[x];
@@ -44,7 +45,6 @@ export class Robot extends WT.Actor {
     }
     let graphics = new WT.DirectionalGraphicComponent(Robot._staticGraphics,
                                                       movementGraphics);
-    super(context, position, Robot.dims);
     this.addGraphic(graphics);
     console.log("creating robot of dimensions:", Robot.dims);
     

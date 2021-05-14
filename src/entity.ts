@@ -17,6 +17,7 @@ export class PhysicalEntity {
   private static _ids: number = 0;
 
   protected readonly _id: number;
+
   protected _visible: boolean = true;
   protected _drawable: boolean = false;
   protected _geometry: Geometry;

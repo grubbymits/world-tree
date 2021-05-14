@@ -43,7 +43,6 @@ export class ContextImpl {
         }
     }
     addUpdateableEntity(entity) {
-        console.log("added updateable entity");
         this._updateables.push(entity);
     }
     addMovableEntity(entity) {
