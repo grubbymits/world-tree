@@ -12,21 +12,19 @@
     import * as WT from "../../dist/world-tree.js";
     const spriteWidth = 322;
     const spriteHeight = 270;
-
-    let sheet = new WT.SpriteSheet("../../../res/img/basic-dungeon");
-    WT.Terrain.addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Flat,
-                          sheet, 0, 0, spriteWidth, spriteHeight);
-    WT.Terrain.addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Wall,
-                          sheet, spriteWidth, 0, spriteWidth, spriteHeight);
-    WT.Terrain.addGraphic(WT.TerrainType.Sand, WT.TerrainShape.Flat,
-                          sheet, spriteWidth * 2, 0, spriteWidth, spriteHeight);
-    WT.Terrain.addGraphic(WT.TerrainType.Water, WT.TerrainShape.Flat,
-                          sheet, spriteWidth * 3, 0, spriteWidth, spriteHeight);
+    const sheet = new WT.SpriteSheet("../../../res/img/basic-dungeon");
+    function addGraphic(type, shape, offsetX, offsetY) {
+      WT.Terrain.addGraphic(type, shape, sheet, offsetX, offsetY, spriteWidth, spriteHeight);
+    }
+    addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Flat, 0, 0);
+    addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Wall, spriteWidth, 0);
+    addGraphic(WT.TerrainType.Sand, WT.TerrainShape.Flat, spriteWidth * 2, 0);
+    addGraphic(WT.TerrainType.Water, WT.TerrainShape.Flat, spriteWidth * 3, 0);
 
     // 9x9 area with a wall around the edge and some water in the middle
     const cellsX = 9;
     const cellsY = 9;
-    const terraces = 1;
+    const numTerraces = 1;
     let heightMap = [ [ 2, 2, 2, 2, 2, 2, 2, 2, 2 ],
                       [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
                       [ 2, 1, 0, 0, 1, 1, 1, 1, 2 ],
@@ -43,21 +41,19 @@
         WT.TwoByOneIsometric.getDimensions(spriteWidth, spriteHeight);
       const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
                                           physicalDims.depth * cellsY,
-                                          physicalDims.height * (1 + terraces));
+                                          physicalDims.height * (1 + numTerraces));
       let canvas = document.getElementById("demoCanvas");
       let context = new WT.Context(worldDims);
       context.addRenderer(canvas, WT.Perspective.TwoByOneIsometric);
     
-      const hasWater = true;
-      const waterLine = 0;
-      const defaultFloor = WT.TerrainType.Sand;
-      const defaultWall = WT.TerrainType.Rock;
+      let config = new WT.TerrainBuilderConfig(numTerraces,
+                                               WT.TerrainType.Sand,
+                                               WT.TerrainType.Rock);
+      config.hasWater = true;
+      config.waterLine = 0;
       // Use the height map to construct a terrain.
       let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,
-                                          terraces, hasWater,
-                                          defaultFloor, defaultWall,
-                                          physicalDims);
-      builder.setBiomes(waterLine, 0, 0, 0);
+                                          config, physicalDims);
       builder.generateMap(context);
       let camera = new WT.MouseCamera(context.scene, canvas,
                                       canvas.width, canvas.height);

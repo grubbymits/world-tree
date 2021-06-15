@@ -208,12 +208,47 @@ export class Surface {
         return neighbours;
     }
 }
-export class TerrainBuilder {
-    constructor(width, depth, heightMap, _numTerraces, _hasWater, _defaultFloor, _defaultWall, physicalDims) {
+export class TerrainBuilderConfig {
+    constructor(_numTerraces, _defaultFloor, _defaultWall) {
         this._numTerraces = _numTerraces;
-        this._hasWater = _hasWater;
         this._defaultFloor = _defaultFloor;
         this._defaultWall = _defaultWall;
+        this._waterLine = 0;
+        this._wetLimit = 0;
+        this._dryLimit = 0;
+        this._treeLimit = 0;
+        this._hasWater = false;
+        this._hasRamps = false;
+        this._hasBiomes = false;
+        this._rainfall = 0;
+        this._rainDirection = Direction.North;
+        console.assert(_numTerraces > 0);
+    }
+    set waterLine(level) { this._waterLine = level; }
+    set wetLimit(level) { this._wetLimit = level; }
+    set rainfall(level) { this._rainfall = level; }
+    set rainDirection(direction) { this._rainDirection = direction; }
+    set dryLimit(level) { this._dryLimit = level; }
+    set treeLimit(level) { this._treeLimit = level; }
+    set hasWater(enable) { this._hasWater = enable; }
+    set hasRamps(enable) { this._hasRamps = enable; }
+    set hasBiomes(enable) { this._hasBiomes = enable; }
+    get numTerraces() { return this._numTerraces; }
+    get hasWater() { return this._hasWater; }
+    get floor() { return this._defaultFloor; }
+    get wall() { return this._defaultWall; }
+    get waterLine() { return this._waterLine; }
+    get wetLimit() { return this._wetLimit; }
+    get dryLimit() { return this._dryLimit; }
+    get treeLimit() { return this._treeLimit; }
+    get ramps() { return this._hasRamps; }
+    get biomes() { return this._hasBiomes; }
+    get rainfall() { return this._rainfall; }
+    get rainDirection() { return this._rainDirection; }
+}
+export class TerrainBuilder {
+    constructor(width, depth, heightMap, _config, physicalDims) {
+        this._config = _config;
         Terrain.init(physicalDims);
         let minHeight = 0;
         let maxHeight = 0;
@@ -240,11 +275,10 @@ export class TerrainBuilder {
             }
             maxHeight += minHeight;
         }
-        console.assert(_numTerraces != 0);
-        this._terraceSpacing = maxHeight / _numTerraces;
-        console.log("Terrain builder", "- with a ceiling of:", maxHeight, "\n", "- ", _numTerraces, "terraces\n", "- ", this._terraceSpacing, "terrace spacing");
-        console.log("Using default floor", getTypeName(this._defaultFloor));
-        console.log("Using default wall", getTypeName(this._defaultWall));
+        this._terraceSpacing = maxHeight / this.config.numTerraces;
+        console.log("Terrain builder", "- with a ceiling of:", maxHeight, "\n", "- ", this.config.numTerraces, "terraces\n", "- ", this._terraceSpacing, "terrace spacing");
+        console.log("Using default floor", getTypeName(this.config.floor));
+        console.log("Using default wall", getTypeName(this.config.wall));
         this._surface = new Surface(width, depth);
         this._surface.init(heightMap);
         console.log("calculating terraces");
@@ -253,12 +287,23 @@ export class TerrainBuilder {
                 let surface = this._surface.at(x, y);
                 surface.terrace = Math.floor(surface.height / this._terraceSpacing);
                 surface.shape = TerrainShape.Flat;
-                surface.type = this._defaultFloor;
-                console.assert(surface.terrace <= this._numTerraces && surface.terrace >= 0, "terrace out of range:", surface.terrace);
+                surface.type = this.config.floor;
+                console.assert(surface.terrace <= this.config.numTerraces && surface.terrace >= 0, "terrace out of range:", surface.terrace);
             }
         }
     }
+    get config() { return this._config; }
     generateMap(context) {
+        if (this.config.ramps) {
+            this.setShapes();
+        }
+        if (this.config.rainfall > 0) {
+            this.addRain(this.config.rainDirection, this.config.rainfall, this.config.waterLine);
+        }
+        if (this.config.biomes || this.config.hasWater) {
+            this.setBiomes();
+        }
+        this.setFeatures();
         this.setEdges();
         context.map =
             new SquareGrid(context, this._surface.width, this._surface.depth);
@@ -266,7 +311,7 @@ export class TerrainBuilder {
         for (let y = 0; y < this._surface.depth; y++) {
             for (let x = 0; x < this._surface.width; x++) {
                 let surface = this._surface.at(x, y);
-                console.assert(surface.terrace <= this._numTerraces && surface.terrace >= 0, "terrace out-of-range", surface.terrace);
+                console.assert(surface.terrace <= this.config.numTerraces && surface.terrace >= 0, "terrace out-of-range", surface.terrace);
                 context.map.addRaisedTerrain(x, y, surface.terrace, surface.type, surface.shape, surface.features);
             }
         }
@@ -426,17 +471,17 @@ export class TerrainBuilder {
                 }
                 if (isFlat(shapeType) && isEdge(shapeType)) {
                     if (!Terrain.isSupportedShape(centre.type, shapeType)) {
-                        centre.type = this._defaultWall;
+                        centre.type = this.config.wall;
                         shapeType = TerrainShape.Wall;
-                        console.log("Trying default wall shape and type", getTypeName(this._defaultWall));
+                        console.log("Trying default wall shape and type", getTypeName(this.config.wall));
                     }
                 }
                 if (!isFlat(shapeType) && !Terrain.isSupportedShape(centre.type, shapeType)) {
-                    if (Terrain.isSupportedShape(this._defaultFloor, shapeType)) {
-                        centre.type = this._defaultFloor;
+                    if (Terrain.isSupportedShape(this.config.floor, shapeType)) {
+                        centre.type = this.config.floor;
                     }
-                    else if (Terrain.isSupportedShape(this._defaultWall, shapeType)) {
-                        centre.type = this._defaultWall;
+                    else if (Terrain.isSupportedShape(this.config.wall, shapeType)) {
+                        centre.type = this.config.wall;
                     }
                 }
                 if (!Terrain.isSupportedShape(centre.type, shapeType)) {
@@ -459,7 +504,7 @@ export class TerrainBuilder {
                 }
             }
         }
-        console.assert(relativeHeight <= this._numTerraces, "impossible relative height:", relativeHeight, "\ncentre:", centre);
+        console.assert(relativeHeight <= this.config.numTerraces, "impossible relative height:", relativeHeight, "\ncentre:", centre);
         return relativeHeight;
     }
     addRain(towards, water, waterLine) {
@@ -483,8 +528,8 @@ export class TerrainBuilder {
             }
         }
     }
-    setBiomes(waterLine, wetLimit, dryLimit, treeLimit) {
-        console.log("setBiomes with\n", "- waterLine:", waterLine, "\n", "- wetLimit:", wetLimit, "\n", "- dryLimit:", dryLimit, "\n", "- treeLimit:", treeLimit, "\n");
+    setBiomes() {
+        console.log("setBiomes with\n", "- waterLine:", this.config.waterLine, "\n", "- wetLimit:", this.config.wetLimit, "\n", "- dryLimit:", this.config.dryLimit, "\n", "- treeLimit:", this.config.treeLimit, "\n");
         let numWater = 0;
         let numSand = 0;
         let numDryGrass = 0;
@@ -496,7 +541,7 @@ export class TerrainBuilder {
                 let surface = this._surface.at(x, y);
                 let biome = Biome.Water;
                 let terrain = TerrainType.Water;
-                if (surface.height <= waterLine) {
+                if (surface.height <= this.config.waterLine) {
                     biome = Biome.Water;
                     terrain = TerrainType.Water;
                     numWater++;
@@ -506,8 +551,8 @@ export class TerrainBuilder {
                     terrain = TerrainType.Sand;
                     numSand++;
                 }
-                else if (surface.height > treeLimit) {
-                    if (surface.moisture > dryLimit) {
+                else if (surface.height > this.config.treeLimit) {
+                    if (surface.moisture > this.config.dryLimit) {
                         biome = Biome.Grassland;
                         terrain = TerrainType.DryGrass;
                         numDryGrass++;
@@ -518,12 +563,12 @@ export class TerrainBuilder {
                         numRock++;
                     }
                 }
-                else if (surface.moisture < dryLimit) {
+                else if (surface.moisture < this.config.dryLimit) {
                     biome = Biome.Desert;
                     terrain = TerrainType.Rock;
                     numRock++;
                 }
-                else if (surface.moisture > wetLimit) {
+                else if (surface.moisture > this.config.wetLimit) {
                     biome = Biome.Marshland;
                     terrain = TerrainType.WetGrass;
                     numWetGrass++;
@@ -535,6 +580,9 @@ export class TerrainBuilder {
                 }
                 if (Terrain.isSupportedType(terrain)) {
                     surface.type = terrain;
+                }
+                else {
+                    console.log("unsupported biome terrain type:", getTypeName(terrain));
                 }
                 surface.biome = biome;
             }

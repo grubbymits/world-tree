@@ -22,7 +22,7 @@
     // 5x5 area with a wall around the edge.
     const cellsX = 5;
     const cellsY = 5;
-    const terraces = 1;
+    const numTerraces = 1;
     let heightMap = [ [ 1, 1, 0, 1, 1 ],
                       [ 1, 0, 0, 0, 1 ],
                       [ 1, 0, 0, 0, 1 ],
@@ -35,19 +35,17 @@
         WT.TwoByOneIsometric.getDimensions(spriteWidth, spriteHeight);
       const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
                                           physicalDims.depth * cellsY,
-                                          physicalDims.height * (1 + terraces));
+                                          physicalDims.height * (1 + numTerraces));
       let canvas = document.getElementById("demoCanvas");
       let context = new WT.Context(worldDims);
       context.addRenderer(canvas, WT.Perspective.TwoByOneIsometric);
     
-      const hasWater = false;
-      const defaultFloor = WT.TerrainType.Rock;
-      const defaultWall = WT.TerrainType.Rock;
+      const config = new WT.TerrainBuilderConfig(numTerraces,
+                                                 WT.TerrainType.Rock,
+                                                 WT.TerrainType.Rock);
       // Use the height map to construct a terrain.
       let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,
-                                          terraces, hasWater,
-                                          defaultFloor, defaultWall,
-                                          physicalDims);
+                                          config, physicalDims);
       builder.generateMap(context);
       let camera = new WT.MouseCamera(context.scene, canvas,
                                       canvas.width, canvas.height);

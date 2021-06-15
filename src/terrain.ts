@@ -266,7 +266,6 @@ export class Terrain extends PhysicalEntity {
     this._featureGraphics.set(feature, graphics);
   }
 
-
   static isSupportedFeature(feature: TerrainFeature): boolean {
     return this._featureGraphics.has(feature);
   }

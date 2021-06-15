@@ -10,8 +10,6 @@
   </div>
   <script type="module">
     import * as WT from "../../dist/world-tree.js";
-    const spriteWidth = 322;
-    const spriteHeight = 270;
 
     // Sprite sheet layout
     // flat: rock, grass/rock, dry grass/sand, wet grass/sand, muddy grass/sand, sand, water
@@ -19,30 +17,30 @@
     //  - rock
     //  - grass/rock
     //  - grass/sand
-    let sheet = new WT.SpriteSheet("../../../res/img/basic-outside");
-    WT.Terrain.addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Flat,
-                          sheet, 0, 0, spriteWidth, spriteHeight);
-    WT.Terrain.addGraphic(WT.TerrainType.DryGrass, WT.TerrainShape.Flat,
-                          sheet, spriteWidth * 2, 0, spriteWidth, spriteHeight);
-    WT.Terrain.addGraphic(WT.TerrainType.Sand, WT.TerrainShape.Flat,
-                          sheet, spriteWidth * 5, 0, spriteWidth, spriteHeight);
-    WT.Terrain.addGraphic(WT.TerrainType.Water, WT.TerrainShape.Flat,
-                          sheet, spriteWidth * 6, 0, spriteWidth, spriteHeight);
+    const sheet = new WT.SpriteSheet("../../../res/img/basic-outside");
+    const spriteWidth = 322;
+    const spriteHeight = 270;
+    function addGraphic(type, shape, offsetX, offsetY) {
+      WT.Terrain.addGraphic(type, shape, sheet, offsetX, offsetY, spriteWidth, spriteHeight);
+    }
 
-    const tileType = WT.TerrainType.DryGrass;
+    addGraphic(WT.TerrainType.Rock, WT.TerrainShape.Flat, 0, 0);
+    addGraphic(WT.TerrainType.DryGrass, WT.TerrainShape.Flat, spriteWidth * 2, 0);
+    addGraphic(WT.TerrainType.Sand, WT.TerrainShape.Flat, spriteWidth * 5, 0);
+    addGraphic(WT.TerrainType.Water, WT.TerrainShape.Flat, spriteWidth * 6, 0);
+
     const rampOffsetY = 3 * spriteHeight;
     const rampShapes = [ WT.TerrainShape.RampUpSouth,
                          WT.TerrainShape.RampUpWest,
                          WT.TerrainShape.RampUpEast,
                          WT.TerrainShape.RampUpNorth ];
     for (let i in rampShapes) {
-      WT.Terrain.addGraphic(tileType, rampShapes[i], sheet, i * spriteWidth, rampOffsetY,
-                            spriteWidth, spriteHeight);
+      addGraphic(WT.TerrainType.DryGrass, rampShapes[i], i * spriteWidth, rampOffsetY);
     }
 
     const cellsX = 9;
     const cellsY = 9;
-    const terraces = 1;
+    const numTerraces = 1;
     let heightMap = [ [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
                       [ 0, 1, 1, 1, 1, 1, 1, 1, 0 ],
                       [ 0, 1, 1, 1, 1, 1, 1, 1, 0 ],
@@ -59,23 +57,21 @@
         WT.TwoByOneIsometric.getDimensions(spriteWidth, spriteHeight);
       const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
                                           physicalDims.depth * cellsY,
-                                          physicalDims.height * (1 + terraces));
+                                          physicalDims.height * (1 + numTerraces));
       let canvas = document.getElementById("demoCanvas");
       let context = new WT.Context(worldDims);
       context.addRenderer(canvas,
                           WT.Perspective.TwoByOneIsometric);
     
-      const hasWater = true;
-      const defaultFloor = WT.TerrainType.DryGrass;
-      const defaultWall = WT.TerrainType.DryGrass;
+      let config = new WT.TerrainBuilderConfig(numTerraces,
+                                               WT.TerrainType.DryGrass,
+                                               WT.TerrainType.DryGrass);
+      config.hasWater = true;
+      config.hasBiomes = true;
+      config.hasRamps = true;
       // Use the height map to construct a terrain.
       let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,
-                                          terraces, hasWater,
-                                          defaultFloor, defaultWall,
-                                          physicalDims);
-      const waterLine = 0;
-      builder.setBiomes(waterLine, 0, 0, 0);
-      builder.setShapes();
+                                          config, physicalDims);
       builder.generateMap(context);
       let camera = new WT.MouseCamera(context.scene, canvas,
                                       canvas.width, canvas.height);

@@ -29,7 +29,7 @@
     // middle too.
     const cellsX = 9;
     const cellsY = 9;
-    const terraces = 1;
+    const numTerraces = 1;
     let heightMap = [ [ 2, 2, 2, 2, 2, 2, 2, 2, 2 ],
                       [ 2, 2, 1, 1, 1, 2, 1, 1, 2 ],
                       [ 2, 1, 1, 1, 1, 2, 1, 1, 2 ],
@@ -47,19 +47,17 @@
         WT.TwoByOneIsometric.getDimensions(spriteWidth, spriteHeight);
       const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
                                           physicalDims.depth * cellsY,
-                                          physicalDims.height * (1 + terraces));
+                                          physicalDims.height * (1 + numTerraces));
       let context = new WT.Context(worldDims);
       context.addRenderer(canvas, WT.Perspective.TwoByOneIsometric);
     
-      const hasWater = false;
-      const waterLine = 0;
-      const defaultFloor = WT.TerrainType.Sand;
-      const defaultWall = WT.TerrainType.Rock;
+      const config = new WT.TerrainBuilderConfig(numTerraces,
+                                                 WT.TerrainType.Sand,
+                                                 WT.TerrainType.Rock);
+
       // Use the height map to construct a terrain.
       let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,
-                                          terraces, hasWater,
-                                          defaultFloor, defaultWall,
-                                          physicalDims);
+                                          config, physicalDims);
       builder.generateMap(context);
 
       Robot.initGraphics();
