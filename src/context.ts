@@ -54,6 +54,7 @@ export class Context {
       this._scene = new SceneRenderer(canvas, new TwoByOneIsometric());
       break;
     }
+    this._entities.forEach(entity => this._scene.insertEntity(entity));
   }
 
   addController(controller: Controller): void {

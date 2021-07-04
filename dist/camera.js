@@ -68,7 +68,7 @@ export class MouseCamera extends Camera {
         var camera = this;
         canvas.addEventListener('mousedown', e => {
             if (e.button == 0) {
-                camera.location = scene.getLocationAt(e.clientX, e.clientY, this);
+                camera.location = scene.getLocationAt(e.offsetX, e.offsetY, this);
             }
         });
     }

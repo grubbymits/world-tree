@@ -200,6 +200,32 @@ export class LoopGraphicComponent extends AnimatedGraphicComponent {
 }
 
 export class DirectionalGraphicComponent extends GraphicComponent {
+  protected _direction: Direction;
+
+  constructor(protected _staticGraphics: Map<Direction, GraphicComponent>) {
+    super(0);
+  }
+
+  get direction(): Direction { return this._direction; }
+  set direction(direction: Direction) {
+    if (!this._staticGraphics.has(direction)) {
+      console.log("graphic direction unsupported");
+    }
+    this._direction = direction;
+  } 
+
+  update(): number {
+    if (this._staticGraphics.has(this.direction)) {
+      const component: GraphicComponent = this._staticGraphics.get(this.direction)!;
+      const spriteId = component.update();
+      return spriteId;
+    }
+    console.error("unhandled stationary graphic:", getDirectionName(this.direction));
+    return 0;
+  }
+}
+
+export class AnimatedDirectionalGraphicComponent extends GraphicComponent {
   protected _stationary: boolean = true;
   protected _direction: Direction;
 
