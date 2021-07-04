@@ -1,5 +1,5 @@
 import { EntityEvent } from "./events.js";
-import { Direction, BoundingCuboid, CollisionDetector } from "./physics.js";
+import { BoundingCuboid, CollisionDetector } from "./physics.js";
 import { Vector3D } from "./geometry.js";
 export class Action {
     constructor(_actor) {
@@ -43,32 +43,6 @@ export class MoveDirection extends MoveAction {
         console.log("adjusting movement with max angle");
         this.actor.updatePosition(this._d.add(this._maxAngle));
         return false;
-    }
-}
-export class MoveForwardsDirection extends MoveDirection {
-    constructor(actor, d, maxAngle, bounds) {
-        super(actor, d, maxAngle, bounds);
-        if (d.y < 0 && d.y < d.x) {
-            this._direction = Direction.North;
-        }
-        else if (d.x > d.y && d.x > 0) {
-            this._direction = Direction.East;
-        }
-        else if (d.y > 0 && d.y > d.x) {
-            this._direction = Direction.South;
-        }
-        else if (d.x < 0 && d.x < d.y) {
-            this._direction = Direction.West;
-        }
-        else {
-            console.log("Unhandled direction to face");
-            console.log("dx:", d.x, "dy:", d.y);
-        }
-    }
-    perform() {
-        this.actor.postEvent(EntityEvent.FaceDirection);
-        this.actor.direction = this._direction;
-        return super.perform();
     }
 }
 export class MoveDestination extends MoveAction {

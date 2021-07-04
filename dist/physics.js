@@ -101,6 +101,19 @@ export function getDirection(from, to) {
     console.assert(xDiff > 0 && yDiff > 0, "unhandled direction", xDiff, yDiff);
     return Direction.SouthEast;
 }
+export function getDirectionFromVector(d) {
+    if (d.y < 0 && d.y < d.x) {
+        return Direction.North;
+    }
+    else if (d.x > d.y && d.x > 0) {
+        return Direction.East;
+    }
+    else if (d.y > 0 && d.y > d.x) {
+        return Direction.South;
+    }
+    console.assert(d.x < 0 && d.x < d.y);
+    return Direction.West;
+}
 export function getOppositeDirection(direction) {
     switch (direction) {
         default:

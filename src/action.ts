@@ -62,38 +62,6 @@ export class MoveDirection extends MoveAction {
   }
 }
 
-export class MoveForwardsDirection extends MoveDirection {
-  private _direction: Direction;
-  private _event: EntityEvent;
-
-  constructor(actor: Actor,
-              d: Vector3D,
-              maxAngle: Vector3D,
-              bounds: BoundingCuboid) {
-    super(actor, d, maxAngle, bounds);
-
-    if (d.y < 0 && d.y < d.x) {
-      this._direction = Direction.North;
-    } else if (d.x > d.y && d.x > 0) {
-      this._direction = Direction.East;
-    } else if (d.y > 0 && d.y > d.x) {
-      this._direction = Direction.South;
-    } else if (d.x < 0 && d.x < d.y) {
-      this._direction = Direction.West;
-    } else {
-      console.log("Unhandled direction to face");
-      console.log("dx:", d.x, "dy:", d.y);
-    }
-  }
-
-  perform(): boolean {
-    // TODO: Geometry updates as the actor is spinning on its axis.
-    this.actor.postEvent(EntityEvent.FaceDirection);
-    this.actor.direction = this._direction;
-    return super.perform();
-  }
-}
-
 export class MoveDestination extends MoveAction {
   private _d: Vector3D;
 

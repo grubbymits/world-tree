@@ -109,6 +109,7 @@ export class MovableEntity extends PhysicalEntity {
   get direction(): Direction { return this._direction; }
   set direction(direction: Direction) {
     this._direction = direction;
+    this.postEvent(EntityEvent.FaceDirection);
   }
 }
 

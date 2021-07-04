@@ -74,6 +74,7 @@ export class MovableEntity extends PhysicalEntity {
     get direction() { return this._direction; }
     set direction(direction) {
         this._direction = direction;
+        this.postEvent(EntityEvent.FaceDirection);
     }
 }
 export class Actor extends MovableEntity {
