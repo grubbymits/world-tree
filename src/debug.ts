@@ -1,6 +1,6 @@
-import { Context } from "./context.js"
+import { ContextImpl } from "./context.js"
 import { PhysicalEntity,
-         Actor } from "./entity.js"
+         MovableEntity } from "./entity.js"
 import { EntityEvent } from "./events.js"
 import { CollisionDetector,
          CollisionInfo } from "./physics.js"
@@ -11,28 +11,28 @@ import { Point2D,
 import { Camera } from "./camera.js"
 import { SceneRenderer } from "./scene.js"
 
-export class ActorDebug {
-  constructor(actor: Actor,
+export class MovableEntityDebug {
+  constructor(movable: MovableEntity,
               camera: Camera,
               debugCollision: boolean) {
     if (debugCollision) {
-      this.debugCollision(actor, camera);
+      this.debugCollision(movable, camera);
     }
   }
 
-  private debugCollision(actor: Actor, camera: Camera): void {
-    const context: Context = actor.context;
+  private debugCollision(movable: MovableEntity, camera: Camera): void {
+    const context: ContextImpl = movable.context;
 
-    actor.addEventListener(EntityEvent.Moving, function() {
-      if (!CollisionDetector.hasMissInfo(actor)) {
+    movable.addEventListener(EntityEvent.Moving, function() {
+      if (!CollisionDetector.hasMissInfo(movable)) {
         return;
       }
-      let missedEntities: Array<PhysicalEntity> = CollisionDetector.getMissInfo(actor);
+      let missedEntities: Array<PhysicalEntity> = CollisionDetector.getMissInfo(movable);
       let scene: SceneRenderer = context.scene;
       const start = Date.now();
 
       scene.addTimedEvent(function() {
-        // outline the actor in green
+        // outline the movable in green
         scene.ctx.strokeStyle = "Green";
         for (let entity of missedEntities) {
           for (const segment of scene.getNode(entity.id).allSegments) {
@@ -49,15 +49,15 @@ export class ActorDebug {
       });
     });
 
-    actor.addEventListener(EntityEvent.Collision, function() {
+    movable.addEventListener(EntityEvent.Collision, function() {
       console.log("collision detected");
 
-      if (!CollisionDetector.hasCollideInfo(actor)) {
+      if (!CollisionDetector.hasCollideInfo(movable)) {
         console.log("but no info available");
         return;
       }
 
-      const collisionInfo: CollisionInfo = CollisionDetector.getCollideInfo(actor);
+      const collisionInfo: CollisionInfo = CollisionDetector.getCollideInfo(movable);
       const intersectInfo: IntersectInfo = collisionInfo.intersectInfo;
       const collidedEntity: PhysicalEntity = collisionInfo.entity;
       const collidedFace: Face3D = intersectInfo.face 
@@ -65,9 +65,9 @@ export class ActorDebug {
       const start = Date.now();
 
       scene.addTimedEvent(function() {
-        // outline the actor in green
+        // outline the movable in green
         scene.ctx.strokeStyle = "Green";
-        for (const segment of scene.getNode(actor.id).allSegments) {
+        for (const segment of scene.getNode(movable.id).allSegments) {
           scene.ctx.beginPath();
           let drawP0 = camera.getDrawCoord(segment.p0);
           let drawP1 = camera.getDrawCoord(segment.p1);
@@ -111,7 +111,7 @@ export class ActorDebug {
         return Date.now() > start + 1000;
       });
 
-      CollisionDetector.removeInfo(actor);
+      CollisionDetector.removeInfo(movable);
     });
   }
 }

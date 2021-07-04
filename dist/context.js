@@ -1,10 +1,12 @@
 import { EntityEvent } from "./events.js";
 import { SceneRenderer, Perspective, TrueIsometric, TwoByOneIsometric } from "./scene.js";
 import { Octree } from "./tree.js";
-import { CollisionDetector } from "./physics.js";
-export class Context {
+import { CollisionDetector, Gravity } from "./physics.js";
+export class ContextImpl {
     constructor(worldDims) {
         this._entities = new Array();
+        this._updateables = new Array();
+        this._movables = new Array();
         this._controllers = new Array();
         this._octree = new Octree(worldDims);
         CollisionDetector.init(this._octree);
@@ -12,10 +14,7 @@ export class Context {
     get scene() { return this._scene; }
     get bounds() { return this._octree.bounds; }
     get spatial() { return this._octree; }
-    get map() { return this._worldMap; }
-    set map(map) {
-        this._worldMap = map;
-    }
+    get controllers() { return this._controllers; }
     verify() {
         console.log("context contains num entities:", this._entities.length);
         this._octree.verify(this._entities);
@@ -44,19 +43,35 @@ export class Context {
             this._scene.insertEntity(entity);
         }
     }
-    addActor(actor) {
+    addUpdateableEntity(entity) {
+        this._updateables.push(entity);
+    }
+    addMovableEntity(entity) {
+        this._movables.push(entity);
         let spatialGraph = this._octree;
         let scene = this._scene;
-        actor.addEventListener(EntityEvent.Moving, function () {
-            spatialGraph.update(actor);
-            scene.updateEntity(actor);
+        entity.addEventListener(EntityEvent.Moving, function () {
+            spatialGraph.update(entity);
+            scene.updateEntity(entity);
         });
     }
     update(camera) {
-        for (let controller of this._controllers) {
-            camera.update();
-            controller.update();
-        }
+        camera.update();
         this._scene.render(camera);
+        Gravity.update(this._movables);
+        this._updateables.forEach(entity => {
+            entity.update();
+        });
+        this._controllers.forEach(controller => {
+            controller.update();
+        });
     }
+}
+export function createContext(canvas, worldDims, perspective) {
+    let context = new ContextImpl(worldDims);
+    context.addRenderer(canvas, perspective);
+    return context;
+}
+export function createTestContext(worldDims) {
+    return new ContextImpl(worldDims);
 }

@@ -9,14 +9,14 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "strictPropertyInitialization": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "stripInternal": true
   },
   "files": [
     "src/action.ts",
     "src/builder.ts",
     "src/camera.ts",
     "src/context.ts",
-    "src/controller.ts",
     "src/debug.ts",
     "src/entity.ts",
     "src/events.ts",

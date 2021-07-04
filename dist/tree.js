@@ -126,7 +126,7 @@ class OctNode {
         return false;
     }
 }
-OctNode.MaxEntities = 9;
+OctNode.MaxEntities = 30;
 export class Octree {
     constructor(dimensions) {
         this._numEntities = 0;
@@ -144,14 +144,14 @@ export class Octree {
         this._numEntities++;
     }
     findEntitiesInArea(root, area, entities) {
-        for (let child of root.children) {
-            if (!child.bounds.intersects(area)) {
-                continue;
-            }
-            if (child.entities.length != 0) {
-                child.entities.forEach(entity => entities.push(entity));
-            }
-            else {
+        if (root.entities.length != 0) {
+            root.entities.forEach(entity => entities.push(entity));
+        }
+        else {
+            for (let child of root.children) {
+                if (!child.bounds.intersects(area)) {
+                    continue;
+                }
                 this.findEntitiesInArea(child, area, entities);
             }
         }

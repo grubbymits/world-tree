@@ -37,6 +37,7 @@ export class SpriteSheet {
   get image(): HTMLImageElement { return this._image;  }
   get width(): number { return this._image.width; }
   get height(): number { return this._image.height; }
+  get name(): string { return this._image.src; }
   get canvas(): HTMLCanvasElement { return this._canvas; }
   set canvas(c: HTMLCanvasElement) { this._canvas = c; }
 
@@ -69,8 +70,8 @@ export class Sprite {
     this._spriteOffset = new Point2D(offsetX, offsetY);
     this._sheet = _sheet;
     Sprite.add(this);
-
-    let sprite: Sprite = this;
+    console.log("creating sprite from", _sheet.name,
+                "(W x H):", _width, _height);
   }
 
   draw(coord: Point2D, ctx: CanvasRenderingContext2D): void {
@@ -90,6 +91,20 @@ export class Sprite {
   get id(): number { return this._id; }
   get width(): number { return this._width; }
   get height(): number { return this._height; }
+}
+
+export function generateSprites(sheet: SpriteSheet, width: number, height: number,
+                                xBegin: number, yBegin: number,
+                                columns: number, rows: number): Array<Sprite> {
+  var sprites = new Array<Sprite>();
+  const xEnd = xBegin + columns;
+  const yEnd = yBegin + rows;
+  for (let y = yBegin; y < yEnd; y++) {
+    for (let x = xBegin; x < xEnd; x++) {
+      sprites.push(new Sprite(sheet, x * width, y * height, width, height));
+    }
+  }
+  return sprites;
 }
 
 export abstract class GraphicComponent {
@@ -120,6 +135,23 @@ export class StaticGraphicComponent extends GraphicComponent {
   update(): number {
     return this._currentSpriteId;
   }
+}
+
+export function generateStaticGraphics(
+  sheet: SpriteSheet, width: number, height: number,
+  xBegin: number, yBegin: number,
+  columns: number, rows: number): Array<StaticGraphicComponent> {
+
+  var graphics = new Array<StaticGraphicComponent>();
+  const xEnd = xBegin + columns;
+  const yEnd = yBegin + rows;
+  for (let y = yBegin; y < yEnd; y++) {
+    for (let x = xBegin; x < xEnd; x++) {
+      const sprite = new Sprite(sheet, x * width, y * height, width, height);
+      graphics.push(new StaticGraphicComponent(sprite.id));
+    }
+  }
+  return graphics;
 }
 
 export class AnimatedGraphicComponent extends GraphicComponent {

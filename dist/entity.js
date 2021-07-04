@@ -1,6 +1,6 @@
 import { BoundingCuboid } from "./physics.js";
 import { Point3D, CuboidGeometry } from "./geometry.js";
-import { EventHandler } from "./events.js";
+import { EntityEvent, EventHandler } from "./events.js";
 export class PhysicalEntity {
     constructor(_context, minLocation, dimensions) {
         this._context = _context;
@@ -52,29 +52,40 @@ export class PhysicalEntity {
     removeEventListener(event, callback) {
         this._handler.removeEventListener(event, callback);
     }
-    update() { this._handler.service(); }
-}
-PhysicalEntity._ids = 0;
-export class Actor extends PhysicalEntity {
-    constructor(context, location, dimensions) {
-        super(context, location, dimensions);
-        this._canSwim = false;
-        this._canFly = false;
-        context.addActor(this);
-    }
-    update() {
-        this._handler.service();
-        if (this._action != undefined && this._action.perform()) {
-            console.log("completed action");
-            this._action = null;
-        }
-    }
     postEvent(event) {
         this._handler.post(event);
     }
+    update() { this._handler.service(); }
+}
+PhysicalEntity._ids = 0;
+export class MovableEntity extends PhysicalEntity {
+    constructor(context, location, dimensions) {
+        super(context, location, dimensions);
+        this._lift = 0;
+        this._canSwim = false;
+        context.addMovableEntity(this);
+    }
+    updatePosition(d) {
+        this.bounds.update(d);
+        this.geometry.transform(d);
+        this.postEvent(EntityEvent.Moving);
+    }
+    get lift() { return this._lift; }
     get direction() { return this._direction; }
     set direction(direction) {
         this._direction = direction;
+    }
+}
+export class Actor extends MovableEntity {
+    constructor(context, location, dimensions) {
+        super(context, location, dimensions);
+        context.addUpdateableEntity(this);
+    }
+    update() {
+        super.update();
+        if (this._action != undefined && this._action.perform()) {
+            this._action = null;
+        }
     }
     set action(action) {
         this._action = action;
@@ -82,6 +93,11 @@ export class Actor extends PhysicalEntity {
 }
 export function createGraphicalEntity(context, location, dimensions, graphicComponent) {
     let entity = new PhysicalEntity(context, location, dimensions);
+    entity.addGraphic(graphicComponent);
+    return entity;
+}
+export function createGraphicalMovableEntity(context, location, dimensions, graphicComponent) {
+    let entity = new MovableEntity(context, location, dimensions);
     entity.addGraphic(graphicComponent);
     return entity;
 }

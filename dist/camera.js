@@ -55,7 +55,7 @@ export class Camera {
             console.log("undefined camera surface location");
             return;
         }
-        let newPoint = this._scene.graph.getDrawCoord(newLocation);
+        const newPoint = this._scene.graph.getDrawCoord(newLocation);
         this.x = newPoint.x;
         this.y = newPoint.y;
         this._handler.post(InputEvent.CameraMove);
@@ -65,20 +65,19 @@ export class Camera {
 export class MouseCamera extends Camera {
     constructor(scene, canvas, width, height) {
         super(scene, width, height);
-        var camera = this;
         canvas.addEventListener('mousedown', e => {
             if (e.button == 0) {
-                camera.location = scene.getLocationAt(e.offsetX, e.offsetY, this);
+                this.location = scene.getLocationAt(e.offsetX, e.offsetY, this);
             }
         });
     }
 }
 export class TrackerCamera extends Camera {
-    constructor(scene, width, height, actor) {
+    constructor(scene, width, height, movable) {
         super(scene, width, height);
         var camera = this;
-        actor.addEventListener(EntityEvent.Moving, function () {
-            camera.location = actor.centre;
+        movable.addEventListener(EntityEvent.Moving, function () {
+            camera.location = movable.centre;
         });
     }
 }

@@ -14,7 +14,7 @@ import { Dimensions,
          getDirection,
          getDirectionName } from "./physics.js"
 import { Point2D } from "./geometry.js"
-import { Context } from "./context.js"
+import { ContextImpl } from "./context.js"
 
 export enum Biome {
   Water,
@@ -26,7 +26,7 @@ export enum Biome {
   Desert,
 }
 
-function getBiomeName(biome: Biome): string {
+export function getBiomeName(biome: Biome): string {
   switch (biome) {
   default:
     console.error("unhandled biome type:", biome);
@@ -165,7 +165,7 @@ function gaussianBlur(grid: Array<Float32Array>, width: number,
 }
 
 
-export class TerrainAttributes {
+class TerrainAttributes {
   private _moisture: number;
   private _terrace: number;
   private _biome: Biome;
@@ -206,6 +206,7 @@ export class TerrainAttributes {
   set fixed(f: boolean) { this._fixed = f; }
 }
 
+/** @internal */
 export class Surface {
   private _surface: Array<Array<TerrainAttributes>>;
 
@@ -367,7 +368,19 @@ export class TerrainBuilder {
 
   get config(): TerrainBuilderConfig { return this._config; }
 
-  generateMap(context: Context): void {
+  terrainTypeAt(x: number, y: number): TerrainType {
+    console.assert(x >= 0 && x < this._surface.width &&
+                   y >= 0 && y < this._surface.depth);
+    return this._surface.at(x, y).type;
+  }
+
+  biomeAt(x: number, y: number): Biome {
+    console.assert(x >= 0 && x < this._surface.width &&
+                   y >= 0 && y < this._surface.depth);
+    return this._surface.at(x, y).biome;
+  }
+
+  generateMap(context: ContextImpl): void {
     if (this.config.ramps) {
       this.setShapes();
     }
@@ -377,10 +390,8 @@ export class TerrainBuilder {
     if (this.config.biomes || this.config.hasWater) {
       this.setBiomes();
     }
-    this.setFeatures();
-    this.setEdges();
 
-    context.map =
+    let map =
       new SquareGrid(context, this._surface.width, this._surface.depth);
 
     console.log("adding surface terrain entities"); 
@@ -390,9 +401,9 @@ export class TerrainBuilder {
         // Add terrain objects that will be visible.
         console.assert(surface.terrace <= this.config.numTerraces && surface.terrace >= 0,
                        "terrace out-of-range", surface.terrace);
-        context.map.addRaisedTerrain(x, y, surface.terrace,
-                                     surface.type, surface.shape,
-                                     surface.features);
+        map.addRaisedTerrain(x, y, surface.terrace,
+                             surface.type, surface.shape,
+                             surface.features);
       }
     }
 
@@ -402,15 +413,15 @@ export class TerrainBuilder {
       for (let x = 0; x < this._surface.width; x++) {
         let z = this._surface.at(x, y).terrace;
         let zStop = z - this.calcRelativeHeight(x, y);
-        let terrain = context.map.getTerrain(x, y, z)!;
+        let terrain = map.getTerrain(x, y, z)!;
         if (terrain == null) {
           console.error("didn't find terrain in map at", x, y, z);
         }
         while (z > zStop) {
           z--;
-          context.map.addRaisedTerrain(x, y, z, terrain.type,
-                                       TerrainShape.Flat,
-                                       TerrainFeature.None);
+          map.addRaisedTerrain(x, y, z, terrain.type,
+                               TerrainShape.Flat,
+                               TerrainFeature.None);
         }
       }
     }
@@ -581,7 +592,7 @@ export class TerrainBuilder {
 
         // And if that fails, fallback to the base flat tile.
         if (!Terrain.isSupportedShape(centre.type, shapeType)) {
-          console.log("unsupported shape for",
+          console.log("Defaulting to flat terrain. Unsupported shape for",
                       getTypeName(centre.type), getShapeName(shapeType));
           shapeType = TerrainShape.Flat;
         }

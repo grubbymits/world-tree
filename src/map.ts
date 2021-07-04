@@ -10,7 +10,7 @@ import { Terrain,
          isFlat,
          isRampUp } from "./terrain.js"
 import { GraphicComponent } from "./graphics.js"
-import { Context } from "./context.js"
+import { ContextImpl } from "./context.js"
 
 export class SquareGrid {
   private readonly _neighbourOffsets: Array<Point2D> =
@@ -21,7 +21,7 @@ export class SquareGrid {
   private _raisedTerrain: Map<number, Map<number, Array<Terrain>>>;
   private _allTerrain: Map<number, Terrain>;
 
-  constructor(private readonly _context: Context,
+  constructor(private readonly _context: ContextImpl,
               private readonly _width: number,
               private readonly _height: number) {
     this._raisedTerrain = new Map();

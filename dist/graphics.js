@@ -27,6 +27,7 @@ export class SpriteSheet {
     get image() { return this._image; }
     get width() { return this._image.width; }
     get height() { return this._image.height; }
+    get name() { return this._image.src; }
     get canvas() { return this._canvas; }
     set canvas(c) { this._canvas = c; }
     isTransparentAt(x, y) {
@@ -44,7 +45,7 @@ export class Sprite {
         this._spriteOffset = new Point2D(offsetX, offsetY);
         this._sheet = _sheet;
         Sprite.add(this);
-        let sprite = this;
+        console.log("creating sprite from", _sheet.name, "(W x H):", _width, _height);
     }
     static add(sprite) {
         this._sprites.push(sprite);
@@ -65,6 +66,17 @@ export class Sprite {
     get height() { return this._height; }
 }
 Sprite._sprites = new Array();
+export function generateSprites(sheet, width, height, xBegin, yBegin, columns, rows) {
+    var sprites = new Array();
+    const xEnd = xBegin + columns;
+    const yEnd = yBegin + rows;
+    for (let y = yBegin; y < yEnd; y++) {
+        for (let x = xBegin; x < xEnd; x++) {
+            sprites.push(new Sprite(sheet, x * width, y * height, width, height));
+        }
+    }
+    return sprites;
+}
 export class GraphicComponent {
     constructor(_currentSpriteId) {
         this._currentSpriteId = _currentSpriteId;
@@ -89,6 +101,18 @@ export class StaticGraphicComponent extends GraphicComponent {
     update() {
         return this._currentSpriteId;
     }
+}
+export function generateStaticGraphics(sheet, width, height, xBegin, yBegin, columns, rows) {
+    var graphics = new Array();
+    const xEnd = xBegin + columns;
+    const yEnd = yBegin + rows;
+    for (let y = yBegin; y < yEnd; y++) {
+        for (let x = xBegin; x < xEnd; x++) {
+            const sprite = new Sprite(sheet, x * width, y * height, width, height);
+            graphics.push(new StaticGraphicComponent(sprite.id));
+        }
+    }
+    return graphics;
 }
 export class AnimatedGraphicComponent extends GraphicComponent {
     constructor(sprites, _interval) {

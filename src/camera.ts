@@ -1,7 +1,7 @@
 import { EventHandler,
          EntityEvent,
          InputEvent } from "./events.js"
-import { Actor } from "./entity.js"
+import { MovableEntity } from "./entity.js"
 import { Point2D, Point3D } from "./geometry.js"
 import { SceneRenderer } from "./scene.js"
 
@@ -18,8 +18,8 @@ export class Camera {
   constructor(protected _scene: SceneRenderer,
               protected readonly _width: number,
               protected readonly _height: number) {
-    this._x = 0;//Math.floor(_width / 2);
-    this._y = 0;//Math.floor(_height / 2);
+    this._x = 0;
+    this._y = 0;
     this._upperX = _width;
     this._upperY = _height;
     console.log("initialising camera at (x,y):", this._x, this._y);
@@ -72,9 +72,7 @@ export class Camera {
       console.log("undefined camera surface location");
       return;
     }
-    //console.log("updating camera to centre on (x,y,z):",
-      //          newLocation.x, newLocation.y, newLocation.z);
-    let newPoint: Point2D = this._scene.graph.getDrawCoord(newLocation);
+    const newPoint: Point2D = this._scene.graph.getDrawCoord(newLocation);
     this.x = newPoint.x;
     this.y = newPoint.y;
     this._handler.post(InputEvent.CameraMove);
@@ -90,10 +88,9 @@ export class MouseCamera extends Camera {
               height: number) {
     super(scene, width, height);
 
-    var camera = this;
     canvas.addEventListener('mousedown', e => {
       if (e.button == 0) {
-        camera.location = scene.getLocationAt(e.offsetX, e.offsetY, this);
+        this.location = scene.getLocationAt(e.offsetX, e.offsetY, this);
       }
     });
   }
@@ -103,12 +100,12 @@ export class TrackerCamera extends Camera {
   constructor(scene: SceneRenderer,
               width: number,
               height: number,
-              actor: Actor) {
+              movable: MovableEntity) {
     super(scene, width, height);
 
     var camera = this;
-    actor.addEventListener(EntityEvent.Moving, function() {
-      camera.location = actor.centre;
+    movable.addEventListener(EntityEvent.Moving, function() {
+      camera.location = movable.centre;
     });
   }
 }

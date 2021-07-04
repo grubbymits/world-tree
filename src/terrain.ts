@@ -5,10 +5,12 @@ import { SpriteSheet,
          Sprite,
          GraphicComponent,
          StaticGraphicComponent } from "./graphics.js"
-import { Context } from "./context.js"
+import { ContextImpl } from "./context.js"
 import { Point3D,
          Geometry,
-         CuboidGeometry } from "./geometry.js"
+         CuboidGeometry,
+         RampUpWestGeometry,
+         RampUpEastGeometry } from "./geometry.js"
 
 export enum TerrainShape {
   Flat,
@@ -295,7 +297,7 @@ export class Terrain extends PhysicalEntity {
                         Math.floor(loc.z / this.height));
   }
   
-  static create(context: Context,
+  static create(context: ContextImpl,
                 x: number, y: number, z: number,
                 type: TerrainType, shape: TerrainShape,
                 feature: TerrainFeature) : Terrain {
@@ -305,7 +307,7 @@ export class Terrain extends PhysicalEntity {
   private readonly _tanTheta: number;
   private readonly _surfaceLocation: Point3D;
 
-  constructor(context: Context,
+  constructor(context: ContextImpl,
               private readonly _gridX: number,
               private readonly _gridY: number,
               private readonly _gridZ: number,
@@ -326,6 +328,14 @@ export class Terrain extends PhysicalEntity {
       this._tanTheta = Math.tan(theta);
     } else {
       this._tanTheta = 0;
+    }
+
+    if (this._shape == TerrainShape.RampUpWest) {
+      this._geometry = new RampUpWestGeometry(this.geometry.bounds);
+      console.log("adding ramp up west geometry");
+    } else if (this._shape == TerrainShape.RampUpEast) {
+      this._geometry = new RampUpWestGeometry(this.geometry.bounds);
+      console.log("adding ramp up east geometry");
     }
 
     let x = this.bounds.centre.x;

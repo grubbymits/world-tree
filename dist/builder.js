@@ -13,7 +13,7 @@ export var Biome;
     Biome[Biome["Tundra"] = 5] = "Tundra";
     Biome[Biome["Desert"] = 6] = "Desert";
 })(Biome || (Biome = {}));
-function getBiomeName(biome) {
+export function getBiomeName(biome) {
     switch (biome) {
         default:
             console.error("unhandled biome type:", biome);
@@ -128,7 +128,7 @@ function gaussianBlur(grid, width, depth) {
     }
     return result;
 }
-export class TerrainAttributes {
+class TerrainAttributes {
     constructor(_x, _y, _height) {
         this._x = _x;
         this._y = _y;
@@ -293,6 +293,16 @@ export class TerrainBuilder {
         }
     }
     get config() { return this._config; }
+    terrainTypeAt(x, y) {
+        console.assert(x >= 0 && x < this._surface.width &&
+            y >= 0 && y < this._surface.depth);
+        return this._surface.at(x, y).type;
+    }
+    biomeAt(x, y) {
+        console.assert(x >= 0 && x < this._surface.width &&
+            y >= 0 && y < this._surface.depth);
+        return this._surface.at(x, y).biome;
+    }
     generateMap(context) {
         if (this.config.ramps) {
             this.setShapes();
@@ -303,16 +313,13 @@ export class TerrainBuilder {
         if (this.config.biomes || this.config.hasWater) {
             this.setBiomes();
         }
-        this.setFeatures();
-        this.setEdges();
-        context.map =
-            new SquareGrid(context, this._surface.width, this._surface.depth);
+        let map = new SquareGrid(context, this._surface.width, this._surface.depth);
         console.log("adding surface terrain entities");
         for (let y = 0; y < this._surface.depth; y++) {
             for (let x = 0; x < this._surface.width; x++) {
                 let surface = this._surface.at(x, y);
                 console.assert(surface.terrace <= this.config.numTerraces && surface.terrace >= 0, "terrace out-of-range", surface.terrace);
-                context.map.addRaisedTerrain(x, y, surface.terrace, surface.type, surface.shape, surface.features);
+                map.addRaisedTerrain(x, y, surface.terrace, surface.type, surface.shape, surface.features);
             }
         }
         console.log("adding subterranean entities");
@@ -320,13 +327,13 @@ export class TerrainBuilder {
             for (let x = 0; x < this._surface.width; x++) {
                 let z = this._surface.at(x, y).terrace;
                 let zStop = z - this.calcRelativeHeight(x, y);
-                let terrain = context.map.getTerrain(x, y, z);
+                let terrain = map.getTerrain(x, y, z);
                 if (terrain == null) {
                     console.error("didn't find terrain in map at", x, y, z);
                 }
                 while (z > zStop) {
                     z--;
-                    context.map.addRaisedTerrain(x, y, z, terrain.type, TerrainShape.Flat, TerrainFeature.None);
+                    map.addRaisedTerrain(x, y, z, terrain.type, TerrainShape.Flat, TerrainFeature.None);
                 }
             }
         }
@@ -485,7 +492,7 @@ export class TerrainBuilder {
                     }
                 }
                 if (!Terrain.isSupportedShape(centre.type, shapeType)) {
-                    console.log("unsupported shape for", getTypeName(centre.type), getShapeName(shapeType));
+                    console.log("Defaulting to flat terrain. Unsupported shape for", getTypeName(centre.type), getShapeName(shapeType));
                     shapeType = TerrainShape.Flat;
                 }
                 centre.shape = shapeType;

@@ -1,18 +1,18 @@
 import { EntityEvent } from "./events.js";
 import { CollisionDetector } from "./physics.js";
-export class ActorDebug {
-    constructor(actor, camera, debugCollision) {
+export class MovableEntityDebug {
+    constructor(movable, camera, debugCollision) {
         if (debugCollision) {
-            this.debugCollision(actor, camera);
+            this.debugCollision(movable, camera);
         }
     }
-    debugCollision(actor, camera) {
-        const context = actor.context;
-        actor.addEventListener(EntityEvent.Moving, function () {
-            if (!CollisionDetector.hasMissInfo(actor)) {
+    debugCollision(movable, camera) {
+        const context = movable.context;
+        movable.addEventListener(EntityEvent.Moving, function () {
+            if (!CollisionDetector.hasMissInfo(movable)) {
                 return;
             }
-            let missedEntities = CollisionDetector.getMissInfo(actor);
+            let missedEntities = CollisionDetector.getMissInfo(movable);
             let scene = context.scene;
             const start = Date.now();
             scene.addTimedEvent(function () {
@@ -30,13 +30,13 @@ export class ActorDebug {
                 return Date.now() > start + 1000;
             });
         });
-        actor.addEventListener(EntityEvent.Collision, function () {
+        movable.addEventListener(EntityEvent.Collision, function () {
             console.log("collision detected");
-            if (!CollisionDetector.hasCollideInfo(actor)) {
+            if (!CollisionDetector.hasCollideInfo(movable)) {
                 console.log("but no info available");
                 return;
             }
-            const collisionInfo = CollisionDetector.getCollideInfo(actor);
+            const collisionInfo = CollisionDetector.getCollideInfo(movable);
             const intersectInfo = collisionInfo.intersectInfo;
             const collidedEntity = collisionInfo.entity;
             const collidedFace = intersectInfo.face;
@@ -44,7 +44,7 @@ export class ActorDebug {
             const start = Date.now();
             scene.addTimedEvent(function () {
                 scene.ctx.strokeStyle = "Green";
-                for (const segment of scene.getNode(actor.id).allSegments) {
+                for (const segment of scene.getNode(movable.id).allSegments) {
                     scene.ctx.beginPath();
                     let drawP0 = camera.getDrawCoord(segment.p0);
                     let drawP1 = camera.getDrawCoord(segment.p1);
@@ -78,7 +78,7 @@ export class ActorDebug {
                 }
                 return Date.now() > start + 1000;
             });
-            CollisionDetector.removeInfo(actor);
+            CollisionDetector.removeInfo(movable);
         });
     }
 }

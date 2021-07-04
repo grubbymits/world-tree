@@ -7,7 +7,7 @@ import { Point3D } from "./geometry.js"
 
 class OctNode {
   // 3x3x3 rounded up to a nice number.
-  static readonly MaxEntities: number = 9;
+  static readonly MaxEntities: number = 30;
 
   private _children: Array<OctNode> = new Array<OctNode>();
   private _entities: Array<PhysicalEntity> = new Array<PhysicalEntity>();
@@ -190,13 +190,13 @@ export class Octree {
   findEntitiesInArea(root: OctNode,
                      area: BoundingCuboid,
                      entities: Array<PhysicalEntity>) {
-    for (let child of root.children) {
-      if (!child.bounds.intersects(area)) {
-        continue;
-      }
-      if (child.entities.length != 0) {
-        child.entities.forEach(entity => entities.push(entity));
-      } else {
+    if (root.entities.length != 0) {
+      root.entities.forEach(entity => entities.push(entity));
+    } else {
+      for (let child of root.children) {
+        if (!child.bounds.intersects(area)) {
+          continue;
+        }
         this.findEntitiesInArea(child, area, entities);
       }
     }

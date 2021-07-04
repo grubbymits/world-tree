@@ -117,6 +117,16 @@ export class Point3D {
                        this.z + vector.z);
   }
 
+  mul(v: Vector3D): Point3D {
+    return new Point3D(this.x * v.x,
+                       this.y * v.y,
+                       this.z * v.z);
+  }
+
+  addScalar(v: number): Point3D {
+    return new Point3D(this.x + v, this.y + v, this.z + v);
+  }
+
   sub(vector: Vector3D): Point3D {
     return new Point3D(this.x - vector.x,
                        this.y - vector.y,
@@ -152,24 +162,35 @@ export class Vector3D {
     return this.x === 0 && this.y === 0 && this.z === 0;
   }
 
+  add(other: Vector3D): Vector3D {
+    const x = this.x + other.x;
+    const y = this.y + other.y;
+    const z = this.z + other.z;
+    return new Vector3D(x, y, z);
+  }
+
   dot(other: Vector3D): number {
-    let x = this.x * other.x;
-    let y = this.y * other.y;
-    let z = this.z * other.z;
+    const x = this.x * other.x;
+    const y = this.y * other.y;
+    const z = this.z * other.z;
     return x + y + z;
   }
 
   cross(other: Vector3D): Vector3D {
-    let x = this.y * other.z - this.z * other.y;
-    let y = this.z * other.x - this.x * other.z;
-    let z = this.x * other.y - this.y * other.x;
+    const x = this.y * other.z - this.z * other.y;
+    const y = this.z * other.x - this.x * other.z;
+    const z = this.x * other.y - this.y * other.x;
     return new Vector3D(x, y, z);
   }
 
+  norm(): number {
+    return Math.sqrt(this.dot(this));
+  }
+
   absMin(other: Vector3D): Vector3D {
-    let x = Math.abs(this.x) < Math.abs(other.x) ? this.x : other.x;
-    let y = Math.abs(this.y) < Math.abs(other.y) ? this.y : other.y;
-    let z = Math.abs(this.z) < Math.abs(other.z) ? this.z : other.z;
+    const x = Math.abs(this.x) < Math.abs(other.x) ? this.x : other.x;
+    const y = Math.abs(this.y) < Math.abs(other.y) ? this.y : other.y;
+    const z = Math.abs(this.z) < Math.abs(other.z) ? this.z : other.z;
     return new Vector3D(x, y, z);
   }
 }
@@ -195,12 +216,23 @@ export class Vertex3D {
     this._point = this.point.add(d);
   }
 
+  // http://www.geomalgorithms.com/a04-_planes.html#Distance-Point-to-Plane
+  distance(p: Point3D): number {
+    const sn: number = -this.normal.dot(p.vec(this.point));
+    const sd: number = this.normal.dot(this.normal);
+    const sb: number = sn / sd;
+    const closest: Point3D = p.addScalar(sb).mul(this.normal);
+    const d: number = p.vec(closest).norm();
+    return d;
+  }
+
   // https://www.geomalgorithms.com/a05-_intersect-1.html 
   intersects(begin: Point3D, end: Point3D): boolean {
     // Use the vertex to represent a plane and calculate whether the segment
     // (begin, end) intersects that plane.
     const u: Vector3D = end.vec(begin);
     const D: number = this.normal.dot(u);
+    // Check whether the line is (almost) parallel to the plane.
     if (Math.abs(D) < 0.01) {
       return false;
     }
@@ -301,10 +333,20 @@ export class IntersectInfo {
 export class Geometry {
   protected _faces: Array<Face3D> = new Array<Face3D>();
   protected _intersectInfo: IntersectInfo | null;
+  protected readonly _widthVec3D: Vector3D;
+  protected readonly _depthVec3D: Vector3D;
+  protected readonly _heightVec3D: Vector3D;
 
-  constructor(protected _bounds: BoundingCuboid) { }
+  constructor(protected _bounds: BoundingCuboid) {
+    this._widthVec3D = new Vector3D(_bounds.width, 0, 0);
+    this._depthVec3D = new Vector3D(0, _bounds.depth, 0);
+    this._heightVec3D = new Vector3D(0, 0, _bounds.height);
+  }
 
   get bounds(): BoundingCuboid { return this._bounds; }
+  get widthVec3D(): Vector3D { return this._widthVec3D; }
+  get depthVec3D(): Vector3D { return this._depthVec3D; }
+  get heightVec3D(): Vector3D { return this._heightVec3D; }
   get intersectInfo(): IntersectInfo | null { return this._intersectInfo; }
 
   transform(d: Vector3D): void {
@@ -334,9 +376,6 @@ export class NoGeometry extends Geometry {
 export class CuboidGeometry extends Geometry {
   constructor(bounds: BoundingCuboid) {
     super(bounds);
-    const widthVec3D = new Vector3D(bounds.width, 0, 0);
-    const depthVec3D = new Vector3D(0, bounds.depth, 0);
-    const heightVec3D = new Vector3D(0, 0, bounds.height);
 
     //  1  ________ 5
     //    |\       \
@@ -348,14 +387,14 @@ export class CuboidGeometry extends Geometry {
     //       \|______|
     //       2        4
     const p: Array<Point3D> = [
-      this.bounds.minLocation,                    // 0 
-      this.bounds.minLocation.add(heightVec3D),   // 1
-      this.bounds.minLocation.add(depthVec3D),    // 2
-      this.bounds.minLocation.add(widthVec3D),    // 3
-      this.bounds.maxLocation.sub(heightVec3D),   // 4
-      this.bounds.maxLocation.sub(depthVec3D),    // 5
-      this.bounds.maxLocation.sub(widthVec3D),    // 6
-      this.bounds.maxLocation                     // 7
+      this.bounds.minLocation,                         // 0 
+      this.bounds.minLocation.add(this.heightVec3D),   // 1
+      this.bounds.minLocation.add(this.depthVec3D),    // 2
+      this.bounds.minLocation.add(this.widthVec3D),    // 3
+      this.bounds.maxLocation.sub(this.heightVec3D),   // 4
+      this.bounds.maxLocation.sub(this.depthVec3D),    // 5
+      this.bounds.maxLocation.sub(this.widthVec3D),    // 6
+      this.bounds.maxLocation                          // 7
     ];
 
     // left
@@ -375,7 +414,7 @@ export class CuboidGeometry extends Geometry {
 
     // top
     let v6 = new Vertex3D(p[1], p[5], p[7]);
-    let v7 = new Vertex3D(p[7], p[6], p[5]);
+    let v7 = new Vertex3D(p[7], p[1], p[6]);
     this._faces.push(new QuadFace3D(v6, v7));
 
     // bottom
@@ -387,5 +426,93 @@ export class CuboidGeometry extends Geometry {
     let v10 = new Vertex3D(p[0], p[1], p[5]);
     let v11 = new Vertex3D(p[5], p[3], p[0]);
     this._faces.push(new QuadFace3D(v10, v11));
+  }
+}
+
+export class RampUpWestGeometry extends Geometry {
+  constructor(bounds: BoundingCuboid) {
+    super(bounds);
+    //     4
+    //     /\
+    //    /  \
+    // 5 /    \
+    //  |\     \
+    //  | \     \ 2
+    //  |  \    /
+    //  |   \  /
+    //  |____\/
+    //  1     3
+    const p: Array<Point3D> = [
+      this.bounds.minLocation,                       // 0
+      this.bounds.minLocation.add(this.depthVec3D),  // 1
+      this.bounds.minLocation.add(this.widthVec3D),  // 2
+      this.bounds.maxLocation.sub(this.heightVec3D), // 3
+      this.bounds.minLocation.sub(this.heightVec3D), // 4
+      this.bounds.maxLocation.sub(this.widthVec3D)   // 5
+    ];
+
+    // left
+    const v0 = new Vertex3D(p[0], p[1], p[5]);
+    const v1 = new Vertex3D(p[5], p[4], p[0]);
+    this._faces.push(new QuadFace3D(v0, v1));
+
+    // front
+    this._faces.push(new TriangleFace3D(new Vertex3D(p[1], p[5], p[3])));
+
+    // right
+    const v2 = new Vertex3D(p[2], p[3], p[5]);
+    const v3 = new Vertex3D(p[5], p[4], p[2]);
+    this._faces.push(new QuadFace3D(v2, v3));
+
+    // bottom
+    const v4 = new Vertex3D(p[0], p[2], p[3]);
+    const v5 = new Vertex3D(p[3], p[1], p[0]);
+
+    // back
+    this._faces.push(new TriangleFace3D(new Vertex3D(p[0], p[2], p[4])));
+  }
+}
+
+export class RampUpEastGeometry extends Geometry {
+  constructor(bounds: BoundingCuboid) {
+    super(bounds);
+    //         4
+    //        / \
+    //       /   \
+    //      /     \ 5
+    //   0 /     / |
+    //     \    /  |
+    //      \  /   |
+    //       \/____|
+    //       1      3
+    const p: Array<Point3D> = [
+      this.bounds.minLocation,                      // 0 
+      this.bounds.minLocation.add(this.depthVec3D), // 1
+      this.bounds.minLocation.add(this.widthVec3D), // 2
+      this.bounds.maxLocation.sub(this.heightVec3D),// 3
+      this.bounds.maxLocation.sub(this.depthVec3D), // 4
+      this.bounds.maxLocation                       // 5
+    ];
+
+    // left
+    const v0 = new Vertex3D(p[0], p[1], p[5]);
+    const v1 = new Vertex3D(p[5], p[4], p[0]);
+    this._faces.push(new QuadFace3D(v0, v1));
+
+    // front
+    this._faces.push(new TriangleFace3D(new Vertex3D(p[1], p[5], p[3])));
+
+    // right
+    const v2 = new Vertex3D(p[2], p[3], p[5]);
+    const v3 = new Vertex3D(p[5], p[4], p[2]);
+    this._faces.push(new QuadFace3D(v2, v3));
+
+    // bottom
+    const v4 = new Vertex3D(p[0], p[2], p[3]);
+    const v5 = new Vertex3D(p[3], p[1], p[0]);
+    this._faces.push(new QuadFace3D(v4, v5));
+
+    // back
+    this._faces.push(new TriangleFace3D(new Vertex3D(p[0], p[2], p[4])));
   }
 }

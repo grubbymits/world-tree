@@ -1,26 +1,35 @@
 import { PhysicalEntity,
-         Actor } from "./entity.js"
+         MovableEntity } from "./entity.js"
 import { EntityEvent } from "./events.js"
-import { Terrain, TerrainShape, TerrainType } from "./terrain.js"
-import { SquareGrid } from "./map.js"
 import { SceneGraph,
          SceneRenderer,
          Perspective,
          TrueIsometric,
          TwoByOneIsometric } from "./scene.js"
 import { Camera } from "./camera.js"
-import { Controller } from "./controller.js"
 import { Octree } from "./tree.js"
 import { Dimensions,
          BoundingCuboid,
-         CollisionDetector } from "./physics.js"
+         CollisionDetector,
+         Gravity } from "./physics.js"
 
-export class Context {
+export interface Context {
+  update(camera: Camera): void;
+  addController(controller: Controller): void;
+}
+
+export interface Controller {
+  update(): void;
+}
+
+/** @internal */
+export class ContextImpl implements Context {
   private _scene: SceneRenderer;
-  private _entities : Array<PhysicalEntity> = new Array<PhysicalEntity>();
+  private _entities: Array<PhysicalEntity> = new Array<PhysicalEntity>();
+  private _updateables: Array<PhysicalEntity> = new Array<PhysicalEntity>();
+  private _movables: Array<MovableEntity> = new Array<MovableEntity>();
   private _controllers: Array<Controller> = new Array<Controller>();
-  private _octree : Octree;
-  private _worldMap: SquareGrid;
+  private _octree: Octree;
 
   constructor(worldDims: Dimensions) {
     this._octree = new Octree(worldDims);
@@ -30,11 +39,7 @@ export class Context {
   get scene(): SceneRenderer { return this._scene; }
   get bounds(): BoundingCuboid { return this._octree.bounds; }
   get spatial(): Octree { return this._octree; }
-  get map(): SquareGrid { return this._worldMap; }
-
-  set map(map: SquareGrid) {
-    this._worldMap = map;
-  }
+  get controllers(): Array<Controller> { return this._controllers; }
 
   verify(): void {
     console.log("context contains num entities:", this._entities.length);
@@ -69,20 +74,44 @@ export class Context {
     }
   }
 
-  addActor(actor: Actor): void {
+  addUpdateableEntity(entity: PhysicalEntity): void {
+    this._updateables.push(entity);
+  }
+
+  addMovableEntity(entity: MovableEntity): void {
+    this._movables.push(entity);
     let spatialGraph = this._octree;
     let scene = this._scene;
-    actor.addEventListener(EntityEvent.Moving, function() {
-      spatialGraph.update(actor);
-      scene.updateEntity(actor);
+    entity.addEventListener(EntityEvent.Moving, function() {
+      spatialGraph.update(entity);
+      scene.updateEntity(entity);
     });
   }
 
   update(camera: Camera): void {
-    for (let controller of this._controllers) {
-      camera.update();
-      controller.update();
-    }
+    camera.update();
     this._scene.render(camera);
+
+    Gravity.update(this._movables);
+
+    this._updateables.forEach(entity => {
+      entity.update();
+    });
+
+    this._controllers.forEach(controller => {
+      controller.update()
+    });
   }
+}
+
+export function createContext(canvas: HTMLCanvasElement,
+                              worldDims: Dimensions,
+                              perspective: Perspective): Context {
+  let context = new ContextImpl(worldDims);
+  context.addRenderer(canvas, perspective);
+  return context;
+}
+
+export function createTestContext(worldDims: Dimensions): Context {
+  return new ContextImpl(worldDims);
 }
