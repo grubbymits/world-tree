@@ -293,10 +293,21 @@ export class TerrainBuilder {
         }
     }
     get config() { return this._config; }
+    get terraceSpacing() { return this._terraceSpacing; }
+    hasFeature(x, y, feature) {
+        console.assert(x >= 0 && x < this._surface.width &&
+            y >= 0 && y < this._surface.depth);
+        return (this._surface.at(x, y).features & feature) != 0;
+    }
     terrainTypeAt(x, y) {
         console.assert(x >= 0 && x < this._surface.width &&
             y >= 0 && y < this._surface.depth);
         return this._surface.at(x, y).type;
+    }
+    terrainShapeAt(x, y) {
+        console.assert(x >= 0 && x < this._surface.width &&
+            y >= 0 && y < this._surface.depth);
+        return this._surface.at(x, y).shape;
     }
     biomeAt(x, y) {
         console.assert(x >= 0 && x < this._surface.width &&
@@ -313,6 +324,8 @@ export class TerrainBuilder {
         if (this.config.biomes || this.config.hasWater) {
             this.setBiomes();
         }
+        this.setEdges();
+        this.setFeatures();
         let map = new SquareGrid(context, this._surface.width, this._surface.depth);
         console.log("adding surface terrain entities");
         for (let y = 0; y < this._surface.depth; y++) {

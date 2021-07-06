@@ -13,30 +13,30 @@ import { Point3D,
          RampUpEastGeometry } from "./geometry.js"
 
 export enum TerrainShape {
-  Flat,
-  Wall,
-  FlatWest,
-  FlatEast,
-  FlatNorthWest,
-  FlatNorth,
-  FlatNorthEast,
-  FlatSouthWest,
-  FlatSouth,
-  FlatSouthEast,
-  FlatNorthOut,
-  FlatEastOut,
-  FlatWestOut,
-  FlatSouthOut,
-  FlatAloneOut,
-  RampUpSouthEdge,
-  RampUpWestEdge,
-  RampUpEastEdge,
-  RampUpNorthEdge,
-  RampUpSouth,
-  RampUpWest,
-  RampUpEast,
-  RampUpNorth,
-  Max,
+  Flat,             // 0
+  Wall,             // 1
+  FlatWest,         // 2
+  FlatEast,         // 3
+  FlatNorthWest,    // 4
+  FlatNorth,        // 5
+  FlatNorthEast,    // 6
+  FlatSouthWest,    // 7
+  FlatSouth,        // 8
+  FlatSouthEast,    // 9
+  FlatNorthOut,     // 10
+  FlatEastOut,      // 11
+  FlatWestOut,      // 12
+  FlatSouthOut,     // 13
+  FlatAloneOut,     // 14
+  RampUpSouthEdge,  // 15
+  RampUpWestEdge,   // 16
+  RampUpEastEdge,   // 17
+  RampUpNorthEdge,  // 18
+  RampUpSouth,      // 19
+  RampUpWest,       // 20
+  RampUpEast,       // 21
+  RampUpNorth,      // 22
+  Max,              // 23
 }
 
 export enum TerrainType {
