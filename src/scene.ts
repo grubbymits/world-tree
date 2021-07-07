@@ -62,20 +62,10 @@ export class SceneNode {
     return false;
   }
 
-  addPred(pred: SceneNode) {
-    let idx = this._preds.indexOf(pred);
-    if (idx != -1) return;
-    this._preds.push(pred);
-  }
   addSucc(succ: SceneNode) {
     let idx = this._succs.indexOf(succ);
     if (idx != -1) return;
     this._succs.push(succ);
-  }
-  removePred(pred: SceneNode) {
-    let idx = this._preds.indexOf(pred);
-    if (idx == -1) return;
-    this._preds.splice(idx, 1);
   }
   removeSucc(succ: SceneNode) {
     let idx = this._succs.indexOf(succ);
@@ -96,7 +86,6 @@ export class SceneNode {
     return outline;
   }
   get entity(): PhysicalEntity { return this._entity; }
-  get preds(): Array<SceneNode> { return this._preds; }
   get succs(): Array<SceneNode> { return this._succs; }
   get level(): SceneLevel|null { return this._level; }
   get minZ(): number { return this._entity.bounds.minZ; }
@@ -110,7 +99,6 @@ type NodeCompare = (firstId: number, secondId: number) => RenderOrder;
 
 class SceneLevel {
   private _nodes: Array<SceneNode> = new Array<SceneNode>();
-  private _roots: Array<SceneNode> = new Array<SceneNode>();
   private _discovered: Set<SceneNode> = new Set<SceneNode>();
   private _topologicalOrder: Array<SceneNode> = new Array<SceneNode>();
   private readonly _minZ: number;
@@ -124,7 +112,6 @@ class SceneLevel {
   }
 
   get nodes(): Array<SceneNode> { return this._nodes; }
-  get roots(): Array<SceneNode> { return this._roots; }
   get order(): Array<SceneNode> { return this._topologicalOrder; }
 
   inrange(entity: PhysicalEntity): boolean {
@@ -141,25 +128,12 @@ class SceneLevel {
     let idx = this._nodes.indexOf(node);
     console.assert(idx != -1);
     this._nodes.splice(idx, 1);
-
-    idx = this._roots.indexOf(node);
-    if (idx != -1) {
-      this._roots.splice(idx, 1);
-    }
   }
 
   update(node: SceneNode, graph: SceneGraph): void {
-    node.preds.forEach((pred) => {
-      if (graph.drawOrder(pred, node) != RenderOrder.Before) {
-        pred.removeSucc(node);
-        node.removePred(pred);
-      }
-    });
-
     node.succs.forEach((succ) => {
       if (graph.drawOrder(succ, node) != RenderOrder.After) {
         node.removeSucc(succ);
-        succ.removePred(node);
       }
     });
 
@@ -171,69 +145,59 @@ class SceneLevel {
       const order = graph.drawOrder(node, existing);
       if (RenderOrder.Before == order) {
         node.addSucc(existing);
-        existing.addPred(node);
       } else if (RenderOrder.After == order) {
         existing.addSucc(node);
-        node.addPred(existing);
+      } else {
+        existing.removeSucc(node);
       }
     }
 
-    if (node.isRoot && this._roots.indexOf(node) == -1) {
-      this._roots.push(node);
-      //console.log("num roots:", this._roots.length);
-    }
     this._discovered.clear();
     this._topologicalOrder.length = 0;
-    for (let i in this._roots) {
-      if (this._discovered.has(this._roots[i])) {
+    for (let i in this._nodes) {
+      if (this._discovered.has(this._nodes[i])) {
         continue;
       }
-      this.topologicalSort(graph, this._roots[i]);
+      this.topologicalSort(graph, this._nodes[i]);
     }
   }
 
   buildGraph(graph: SceneGraph): void {
 
-    // TODO: Should be able to form a transistive reduction using ordered
-    // pairs...
-    // this._nodes.sort((a, b) => graph.drawOrder(a.id, b.id));
-    // transistive closure
+    // https://en.wikipedia.org/wiki/Transitive_reduction
+    // In the mathematical theory of binary relations, any relation R on a set X may
+    // be thought of as a directed graph that has the set X as its vertex set and
+    // that has an arc xy for every ordered pair of elements that are related in R.
+    // In particular, this method lets partially ordered sets be reinterpreted as
+    // directed acyclic graphs, in which there is an arc xy in the graph whenever
+    // there is an order relation x < y between the given pair of elements of the
+    // partial order.
     let startTime = Date.now();
-    for (let i = 0; i < this._nodes.length; i++) {
+    this._nodes.sort((a, b) => graph.drawOrder(a, b));
+    for (let i = 0; i < this._nodes.length - 1; i++) {
       let nodeI = this._nodes[i];
-      for (let j = 0; j < this._nodes.length; j++) {
-        if (i == j) continue;
-        let nodeJ = this._nodes[j];
-        const order = graph.drawOrder(nodeI, nodeJ);
-        if (RenderOrder.Before == order) {
-          nodeI.addSucc(nodeJ);
-          nodeJ.addPred(nodeI);
-        } else if (RenderOrder.After == order) {
-          nodeJ.addSucc(nodeI);
-          nodeI.addPred(nodeJ);
-        }
+      let nodeJ = this._nodes[i+1];
+      const order = graph.drawOrder(nodeI, nodeJ);
+      if (RenderOrder.Before == order) {
+        nodeI.addSucc(nodeJ);
+      } else if (RenderOrder.After == order) {
+        nodeJ.addSucc(nodeI);
       }
     }
     let endTime = Date.now();
     console.log("building graph of size:", this._nodes.length);
     console.log("time elasped (ms):", endTime - startTime);
 
-    for (let node of this._nodes) {
-      if (node.preds.length == 0) {
-        this._roots.push(node);
-        //console.log("root id:", node.id);
-      }
-    }
-
-    //console.log("num scene roots:", this._roots.length);
+    // TODO: Something is still off here as it's necessary to iterate through all
+    // the nodes again so that they're all inserted into topologicalOrder.
     this._discovered.clear();
     this._topologicalOrder.length = 0;
     startTime = Date.now();
-    for (let i in this._roots) {
-      if (this._discovered.has(this._roots[i])) {
+    for (let i in this._nodes) {
+      if (this._discovered.has(this._nodes[i])) {
         continue;
       }
-      this.topologicalSort(graph, this._roots[i]);
+      this.topologicalSort(graph, this._nodes[i]);
     }
     endTime = Date.now();
     console.log("time elasped for graph sort (ms):", endTime - startTime);
