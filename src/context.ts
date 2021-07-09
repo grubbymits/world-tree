@@ -22,6 +22,7 @@ export interface Controller {
   update(): void;
 }
 
+
 /** @internal */
 export class ContextImpl implements Context {
   private _scene: SceneRenderer;
@@ -60,6 +61,13 @@ export class ContextImpl implements Context {
       break;
     }
     this._entities.forEach(entity => this._scene.insertEntity(entity));
+    let scene = this._scene;
+    let spatialGraph = this._octree;
+    this._movables.forEach(entity => 
+      entity.addEventListener(EntityEvent.Moving, function() {
+        spatialGraph.update(entity);
+        scene.updateEntity(entity);
+    }));
   }
 
   addController(controller: Controller): void {
@@ -84,7 +92,7 @@ export class ContextImpl implements Context {
     let scene = this._scene;
     entity.addEventListener(EntityEvent.Moving, function() {
       spatialGraph.update(entity);
-      scene.updateEntity(entity);
+      if (scene) scene.updateEntity(entity);
     });
   }
 

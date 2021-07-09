@@ -141,7 +141,6 @@ class SceneLevel {
         }
     }
     buildGraph(graph) {
-        let startTime = Date.now();
         this._nodes.sort((a, b) => graph.drawOrder(a, b));
         for (let i = 0; i < this._nodes.length - 1; i++) {
             let nodeI = this._nodes[i];
@@ -154,20 +153,14 @@ class SceneLevel {
                 nodeJ.addSucc(nodeI);
             }
         }
-        let endTime = Date.now();
-        console.log("building graph of size:", this._nodes.length);
-        console.log("time elasped (ms):", endTime - startTime);
         this._discovered.clear();
         this._topologicalOrder.length = 0;
-        startTime = Date.now();
         for (let i in this._nodes) {
             if (this._discovered.has(this._nodes[i])) {
                 continue;
             }
             this.topologicalSort(graph, this._nodes[i]);
         }
-        endTime = Date.now();
-        console.log("time elasped for graph sort (ms):", endTime - startTime);
     }
     topologicalSort(graph, node) {
         this._discovered.add(node);
@@ -217,9 +210,6 @@ export class SceneGraph {
         if (this.initialised) {
             this.insertIntoLevel(node);
         }
-        else {
-            console.log("not inserting into level entity with id", node.entity.id);
-        }
     }
     updateNode(node) {
         this.setDrawCoords(node);
@@ -230,7 +220,6 @@ export class SceneGraph {
         }
         else {
             level.remove(node);
-            console.log("changing scene level of entity:", node.entity.id);
             this.insertIntoLevel(node);
         }
     }
@@ -241,7 +230,6 @@ export class SceneGraph {
                 return;
             }
         }
-        console.log("creating new SceneLevel");
         this._levels.push(new SceneLevel(node));
     }
     buildLevels() {

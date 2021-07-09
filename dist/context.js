@@ -32,6 +32,12 @@ export class ContextImpl {
                 break;
         }
         this._entities.forEach(entity => this._scene.insertEntity(entity));
+        let scene = this._scene;
+        let spatialGraph = this._octree;
+        this._movables.forEach(entity => entity.addEventListener(EntityEvent.Moving, function () {
+            spatialGraph.update(entity);
+            scene.updateEntity(entity);
+        }));
     }
     addController(controller) {
         this._controllers.push(controller);
@@ -52,7 +58,8 @@ export class ContextImpl {
         let scene = this._scene;
         entity.addEventListener(EntityEvent.Moving, function () {
             spatialGraph.update(entity);
-            scene.updateEntity(entity);
+            if (scene)
+                scene.updateEntity(entity);
         });
     }
     update(camera) {

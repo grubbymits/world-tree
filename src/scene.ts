@@ -172,7 +172,6 @@ class SceneLevel {
     // directed acyclic graphs, in which there is an arc xy in the graph whenever
     // there is an order relation x < y between the given pair of elements of the
     // partial order.
-    let startTime = Date.now();
     this._nodes.sort((a, b) => graph.drawOrder(a, b));
     for (let i = 0; i < this._nodes.length - 1; i++) {
       let nodeI = this._nodes[i];
@@ -184,23 +183,17 @@ class SceneLevel {
         nodeJ.addSucc(nodeI);
       }
     }
-    let endTime = Date.now();
-    console.log("building graph of size:", this._nodes.length);
-    console.log("time elasped (ms):", endTime - startTime);
 
     // TODO: Something is still off here as it's necessary to iterate through all
     // the nodes again so that they're all inserted into topologicalOrder.
     this._discovered.clear();
     this._topologicalOrder.length = 0;
-    startTime = Date.now();
     for (let i in this._nodes) {
       if (this._discovered.has(this._nodes[i])) {
         continue;
       }
       this.topologicalSort(graph, this._nodes[i]);
     }
-    endTime = Date.now();
-    console.log("time elasped for graph sort (ms):", endTime - startTime);
   }
 
   topologicalSort(graph: SceneGraph, node: SceneNode): void {
@@ -265,8 +258,6 @@ export abstract class SceneGraph {
     // Otherwise, find the level that it belongs in, or create a new level.
     if (this.initialised) {
       this.insertIntoLevel(node);
-    } else {
-      console.log("not inserting into level entity with id", node.entity.id);
     }
   }
 
@@ -279,7 +270,6 @@ export abstract class SceneGraph {
       level.update(node, this);
     } else {
       level.remove(node);
-      console.log("changing scene level of entity:", node.entity.id);
       this.insertIntoLevel(node);
     }
   }
@@ -291,7 +281,6 @@ export abstract class SceneGraph {
         return;
       }
     }
-    console.log("creating new SceneLevel");
     this._levels.push(new SceneLevel(node));
   }
 
