@@ -333,18 +333,78 @@ test('draw order of (x, y, z) eight in a cube', () => {
 
   scene.buildLevels();
   let level = scene.levels[0];
-  level.order.reverse();
-  expect(level.order.length).toBe(4);
-  expect(level.order[0].entity.id).toBe(1);
-  expect(level.order[1].entity.id).toBe(3);
-  expect(level.order[2].entity.id).toBe(0);
-  expect(level.order[3].entity.id).toBe(2);
+  let drawOrder = level.order.slice();
+  drawOrder.reverse();
+  expect(drawOrder.length).toBe(4);
+  expect(drawOrder[0].entity.id).toBe(1);
+  expect(drawOrder[1].entity.id).toBe(3);
+  expect(drawOrder[2].entity.id).toBe(0);
+  expect(drawOrder[3].entity.id).toBe(2);
 
   level = scene.levels[1];
-  level.order.reverse();
-  expect(level.order.length).toBe(4);
-  expect(level.order[0].entity.id).toBe(5);
-  expect(level.order[1].entity.id).toBe(7);
-  expect(level.order[2].entity.id).toBe(4);
-  expect(level.order[3].entity.id).toBe(6);
+  drawOrder = level.order.slice();
+  drawOrder.reverse();
+  expect(drawOrder.length).toBe(4);
+  expect(drawOrder[0].entity.id).toBe(5);
+  expect(drawOrder[1].entity.id).toBe(7);
+  expect(drawOrder[2].entity.id).toBe(4);
+  expect(drawOrder[3].entity.id).toBe(6);
+});
+
+test('draw order of (x, y, z) updating eight in a cube', () => {
+  WT.PhysicalEntity.reset();
+  const width = 72;
+  const depth = 72;
+  const height = 97;
+  const entityDimensions = new WT.Dimensions(width, depth, height);
+  const worldDims = new WT.Dimensions(width * 2, depth * 2, height * 2);
+  let context = new WT.createTestContext(worldDims);
+  let scene = new WT.TwoByOneIsometric();
+  let nodes = new Array();
+  for (let z = 0; z < 2; ++z) {
+    for (let y = 0; y < 2; ++y) {
+      for (let x = 0; x < 2; ++x) {
+        let minLocation = new WT.Point3D(x * entityDimensions.width,
+                                        y * entityDimensions.depth,
+                                        z * entityDimensions.height);
+        let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
+        let node = new WT.SceneNode(entity, drawCoord(entity));
+        scene.setDrawCoords(node);
+        nodes.push(node);
+      }
+    }
+  }
+  nodes.forEach((node) => scene.insertIntoLevel(node));
+  expect(scene.initialised).toBe(true);
+  expect(scene.levels.length).toBe(2);
+
+  scene.buildLevels();
+  let drawOrder = scene.levels[0].order.slice().reverse();
+  expect(drawOrder.length).toBe(4);
+  expect(drawOrder[0].entity.id).toBe(1);
+  expect(drawOrder[1].entity.id).toBe(3);
+  expect(drawOrder[2].entity.id).toBe(0);
+  expect(drawOrder[3].entity.id).toBe(2);
+
+  drawOrder = scene.levels[1].order.slice().reverse();
+  expect(drawOrder.length).toBe(4);
+  expect(drawOrder[0].entity.id).toBe(5);
+  expect(drawOrder[1].entity.id).toBe(7);
+  expect(drawOrder[2].entity.id).toBe(4);
+  expect(drawOrder[3].entity.id).toBe(6);
+
+  nodes.forEach((node) => scene.updateNode(node));
+  drawOrder = scene.levels[0].order.slice().reverse();
+  expect(drawOrder.length).toBe(4);
+  expect(drawOrder[0].entity.id).toBe(1);
+  expect(drawOrder[1].entity.id).toBe(3);
+  expect(drawOrder[2].entity.id).toBe(0);
+  expect(drawOrder[3].entity.id).toBe(2);
+
+  drawOrder = scene.levels[1].order.slice().reverse();
+  expect(drawOrder.length).toBe(4);
+  expect(drawOrder[0].entity.id).toBe(5);
+  expect(drawOrder[1].entity.id).toBe(7);
+  expect(drawOrder[2].entity.id).toBe(4);
+  expect(drawOrder[3].entity.id).toBe(6);
 });
