@@ -1,4 +1,4 @@
-import { Direction } from "./physics.js";
+import { Direction, Dimensions } from "./physics.js";
 import { PhysicalEntity } from "./entity.js";
 import { Sprite, StaticGraphicComponent } from "./graphics.js";
 import { Point3D, RampUpWestGeometry } from "./geometry.js";
@@ -228,11 +228,9 @@ export class Terrain extends PhysicalEntity {
         }
         if (this._shape == TerrainShape.RampUpWest) {
             this._geometry = new RampUpWestGeometry(this.geometry.bounds);
-            console.log("adding ramp up west geometry");
         }
         else if (this._shape == TerrainShape.RampUpEast) {
             this._geometry = new RampUpWestGeometry(this.geometry.bounds);
-            console.log("adding ramp up east geometry");
         }
         let x = this.bounds.centre.x;
         let y = this.bounds.centre.y;
@@ -250,6 +248,12 @@ export class Terrain extends PhysicalEntity {
                 }
             }
         }
+    }
+    static reset() {
+        this._dimensions = new Dimensions(0, 0, 0);
+        this._featureGraphics = new Map();
+        this._terrainGraphics =
+            new Map();
     }
     static graphics(terrainType, shape) {
         console.assert(this._terrainGraphics.has(terrainType), "undefined terrain graphic for TerrainType:", getTypeName(terrainType));
@@ -283,7 +287,6 @@ export class Terrain extends PhysicalEntity {
     }
     static init(dims) {
         this._dimensions = dims;
-        console.log("intialised Terrain with dimensions (WxDxH):", this.width, this.depth, this.height);
     }
     static get width() { return this._dimensions.width; }
     static get depth() { return this._dimensions.depth; }

@@ -219,7 +219,6 @@ export class Surface {
   get depth(): number { return this._depth; }
 
   init(heightMap: Array<Array<number>>) {
-    console.log("initialise surface");
     for (let y = 0; y < this._depth; y++) {
       this._surface.push(new Array<TerrainAttributes>());
       for (let x = 0; x < this._width; x++) {
@@ -329,11 +328,8 @@ export class TerrainBuilder {
       minHeight = Math.min(minHeight, min);
       maxHeight = Math.max(maxHeight, max);
     }
-    console.log("min height:", minHeight);
-    console.log("max height:", maxHeight);
     if (minHeight < 0) {
       minHeight = Math.abs(minHeight);
-      console.log("adjusting to make all heights non-negative");
       for (let y = 0; y < depth; y++) {
         for (let x = 0; x < width; x++) {
           heightMap[y][x] += minHeight;
@@ -342,17 +338,9 @@ export class TerrainBuilder {
       maxHeight += minHeight;
     }
     this._terraceSpacing = maxHeight / this.config.numTerraces;
-    console.log("Terrain builder",
-                "- with a ceiling of:", maxHeight, "\n",
-                "- ", this.config.numTerraces, "terraces\n",
-                "- ", this._terraceSpacing, "terrace spacing");
-    console.log("Using default floor", getTypeName(this.config.floor));
-    console.log("Using default wall", getTypeName(this.config.wall));
-
     this._surface = new Surface(width, depth);
     this._surface.init(heightMap);
 
-    console.log("calculating terraces");
     // Calculate the terraces.
     for (let y = 0; y < this._surface.depth; y++) {
       for (let x = 0; x < this._surface.width; x++) {
@@ -409,7 +397,6 @@ export class TerrainBuilder {
     let map =
       new SquareGrid(context, this._surface.width, this._surface.depth);
 
-    console.log("adding surface terrain entities"); 
     for (let y = 0; y < this._surface.depth; y++) {
       for (let x = 0; x < this._surface.width; x++) {
         let surface = this._surface.at(x, y);
@@ -422,7 +409,6 @@ export class TerrainBuilder {
       }
     }
 
-    console.log("adding subterranean entities");
     // Create a column of visible terrain below the surface tile.
     for (let y = 0; y < this._surface.depth; y++) {
       for (let x = 0; x < this._surface.width; x++) {
@@ -490,7 +476,6 @@ export class TerrainBuilder {
         }
       }
     }
-    console.log("number of ramp tiles added:", totalRamps);
   }
 
   setEdges(): void {
@@ -580,7 +565,6 @@ export class TerrainBuilder {
         // Fixup the sides of the map.
         if (centre.terrace > 0 && shapeType == TerrainShape.Flat &&
             neighbours.length != 8) {
-          console.log("Defaulting edge tile to Wall");
           shapeType = TerrainShape.Wall;
         }
 
@@ -590,8 +574,6 @@ export class TerrainBuilder {
           if (!Terrain.isSupportedShape(centre.type, shapeType)) {
             centre.type = this.config.wall;
             shapeType = TerrainShape.Wall;
-            console.log("Trying default wall shape and type",
-                        getTypeName(this.config.wall));
           }
         }
 
@@ -607,8 +589,6 @@ export class TerrainBuilder {
 
         // And if that fails, fallback to the base flat tile.
         if (!Terrain.isSupportedShape(centre.type, shapeType)) {
-          console.log("Defaulting to flat terrain. Unsupported shape for",
-                      getTypeName(centre.type), getShapeName(shapeType));
           shapeType = TerrainShape.Flat;
         }
         centre.shape = shapeType;
@@ -637,7 +617,6 @@ export class TerrainBuilder {
   }
 
   addRain(towards: Direction, water: number, waterLine: number): void {
-    console.log("adding rain towards", getDirectionName(towards));
     // Add moisture:
     // - clouds are added at the 'bottom' of the map and move northwards.
     Rain.init(waterLine, this._surface);
@@ -650,12 +629,9 @@ export class TerrainBuilder {
       while (!cloud.update()) { }
     }
 
-    console.log("total clouds added:", Rain.totalClouds);
-    console.log("total moisture added:", Rain.totalRain);
     let blurredMoisture = gaussianBlur(Rain.moistureGrid, this._surface.width,
                                        this._surface.depth);
    
-    console.log("calculating terrain biomes"); 
     // Calculate biome, type and shape.
     for (let y = 0; y < this._surface.depth; y++) {
       for (let x = 0; x < this._surface.width; x++) {
@@ -666,12 +642,6 @@ export class TerrainBuilder {
   }
 
   setBiomes(): void {
-    console.log("setBiomes with\n",
-                "- waterLine:", this.config.waterLine, "\n",
-                "- wetLimit:", this.config.wetLimit, "\n",
-                "- dryLimit:", this.config.dryLimit, "\n",
-                "- treeLimit:", this.config.treeLimit, "\n");
-
     let numWater = 0;
     let numSand = 0;
     let numDryGrass = 0;
@@ -726,6 +696,7 @@ export class TerrainBuilder {
         surface.biome = biome;
       }
     }
+    /*
     console.log("terrain type stats:");
     console.log("water tiles:", numWater);
     console.log("sand tiles:", numSand);
@@ -733,6 +704,7 @@ export class TerrainBuilder {
     console.log("mud tiles:", numMud);
     console.log("dry grass tiles:", numDryGrass);
     console.log("wet grass tiles:", numWetGrass);
+    */
   }
 
   setFeatures(): void {

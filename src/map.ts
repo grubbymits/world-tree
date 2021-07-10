@@ -26,7 +26,6 @@ export class SquareGrid {
               private readonly _height: number) {
     this._raisedTerrain = new Map();
     this._allTerrain = new Map<number, Terrain>();
-    console.log("creating map", _width, _height);
   }
 
   get width(): number { return this._width; }
@@ -58,7 +57,6 @@ export class SquareGrid {
     if ((x < 0 || x >= this.width) ||
         (y < 0 || y >= this.height) ||
         (z < 0)) {
-      console.log("SquareGrid: terrain coordinates out-of-range");
       return null;
     }
 

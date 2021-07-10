@@ -233,6 +233,13 @@ export class Terrain extends PhysicalEntity {
   private static _terrainGraphics =
     new Map<TerrainType, Map<TerrainShape, GraphicComponent>>();
 
+  static reset(): void {
+    this._dimensions = new Dimensions(0, 0, 0);
+    this._featureGraphics = new Map<TerrainFeature, GraphicComponent>();
+    this._terrainGraphics =
+      new Map<TerrainType, Map<TerrainShape, GraphicComponent>>();
+  }
+
   static graphics(terrainType: TerrainType,
                   shape: TerrainShape): GraphicComponent {
     console.assert(this._terrainGraphics.has(terrainType),
@@ -283,8 +290,6 @@ export class Terrain extends PhysicalEntity {
 
   static init(dims: Dimensions) {
     this._dimensions = dims;
-    console.log("intialised Terrain with dimensions (WxDxH):",
-                this.width, this.depth, this.height);
   }
 
   static get width(): number { return this._dimensions.width; }
@@ -332,10 +337,8 @@ export class Terrain extends PhysicalEntity {
 
     if (this._shape == TerrainShape.RampUpWest) {
       this._geometry = new RampUpWestGeometry(this.geometry.bounds);
-      console.log("adding ramp up west geometry");
     } else if (this._shape == TerrainShape.RampUpEast) {
       this._geometry = new RampUpWestGeometry(this.geometry.bounds);
-      console.log("adding ramp up east geometry");
     }
 
     let x = this.bounds.centre.x;

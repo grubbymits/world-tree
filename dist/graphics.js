@@ -12,7 +12,6 @@ export class SpriteSheet {
         SpriteSheet.add(this);
         let sheet = this;
         this._image.onload = function () {
-            console.log("loaded:", sheet.image.src);
             sheet.canvas = document.createElement('canvas');
             let width = sheet.width;
             let height = sheet.height;
@@ -23,6 +22,9 @@ export class SpriteSheet {
     }
     static add(sheet) {
         this._sheets.push(sheet);
+    }
+    static reset() {
+        this._sheets = new Array();
     }
     get image() { return this._image; }
     get width() { return this._image.width; }
@@ -45,7 +47,9 @@ export class Sprite {
         this._spriteOffset = new Point2D(offsetX, offsetY);
         this._sheet = _sheet;
         Sprite.add(this);
-        console.log("creating sprite from", _sheet.name, "(W x H):", _width, _height);
+    }
+    static reset() {
+        this._sprites = new Array();
     }
     static add(sprite) {
         this._sprites.push(sprite);

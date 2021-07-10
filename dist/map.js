@@ -11,7 +11,6 @@ export class SquareGrid {
             new Point2D(-1, 1), new Point2D(0, 1), new Point2D(1, 1),];
         this._raisedTerrain = new Map();
         this._allTerrain = new Map();
-        console.log("creating map", _width, _height);
     }
     get width() { return this._width; }
     get height() { return this._height; }
@@ -40,7 +39,6 @@ export class SquareGrid {
         if ((x < 0 || x >= this.width) ||
             (y < 0 || y >= this.height) ||
             (z < 0)) {
-            console.log("SquareGrid: terrain coordinates out-of-range");
             return null;
         }
         let raised = this._raisedTerrain.get(x).get(y);

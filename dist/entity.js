@@ -16,6 +16,9 @@ export class PhysicalEntity {
         this._geometry = new CuboidGeometry(bounds);
         this._context.addEntity(this);
     }
+    static reset() {
+        this._ids = 0;
+    }
     set visible(visible) { this._visible = visible; }
     get context() { return this._context; }
     get geometry() { return this._geometry; }

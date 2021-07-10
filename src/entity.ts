@@ -26,6 +26,10 @@ export class PhysicalEntity {
   protected _graphicComponents: Array<GraphicComponent> =
     new Array<GraphicComponent>();
 
+  static reset(): void {
+    this._ids = 0;
+  }
+
   constructor(protected _context: ContextImpl,
               minLocation: Point3D,
               dimensions: Dimensions) {
