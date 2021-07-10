@@ -134,10 +134,7 @@ class SceneLevel {
         this._discovered.clear();
         this._topologicalOrder.length = 0;
         for (let i in this._nodes) {
-            if (this._discovered.has(this._nodes[i])) {
-                continue;
-            }
-            this.topologicalSort(graph, this._nodes[i]);
+            this.topologicalSort(this._nodes[i]);
         }
     }
     buildGraph(graph) {
@@ -149,9 +146,6 @@ class SceneLevel {
             if (RenderOrder.Before == order) {
                 nodeI.addSucc(nodeJ);
             }
-            else if (RenderOrder.After == order) {
-                nodeJ.addSucc(nodeI);
-            }
         }
         this._discovered.clear();
         this._topologicalOrder.length = 0;
@@ -159,15 +153,16 @@ class SceneLevel {
             if (this._discovered.has(this._nodes[i])) {
                 continue;
             }
-            this.topologicalSort(graph, this._nodes[i]);
+            this.topologicalSort(this._nodes[i]);
         }
     }
-    topologicalSort(graph, node) {
+    topologicalSort(node) {
+        if (this._discovered.has(node)) {
+            return;
+        }
         this._discovered.add(node);
         for (let succ of node.succs) {
-            if (this._discovered.has(succ))
-                continue;
-            this.topologicalSort(graph, succ);
+            this.topologicalSort(succ);
         }
         this._topologicalOrder.push(node);
     }
