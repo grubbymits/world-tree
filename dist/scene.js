@@ -51,6 +51,9 @@ export class SceneNode {
         }
         return false;
     }
+    clear() {
+        this._succs = [];
+    }
     addSucc(succ) {
         let idx = this._succs.indexOf(succ);
         if (idx != -1)
@@ -110,11 +113,7 @@ class SceneLevel {
         this._nodes.splice(idx, 1);
     }
     update(node, graph) {
-        node.succs.forEach((succ) => {
-            if (graph.drawOrder(succ, node) != RenderOrder.After) {
-                node.removeSucc(succ);
-            }
-        });
+        node.clear();
         for (let i = 0; i < this._nodes.length; i++) {
             let existing = this._nodes[i];
             if (existing.id == node.id) {
@@ -132,7 +131,7 @@ class SceneLevel {
             }
         }
         this._discovered.clear();
-        this._topologicalOrder.length = 0;
+        this._topologicalOrder = [];
         for (let i in this._nodes) {
             this.topologicalSort(this._nodes[i]);
         }
@@ -148,7 +147,7 @@ class SceneLevel {
             }
         }
         this._discovered.clear();
-        this._topologicalOrder.length = 0;
+        this._topologicalOrder = [];
         for (let i in this._nodes) {
             if (this._discovered.has(this._nodes[i])) {
                 continue;

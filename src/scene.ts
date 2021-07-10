@@ -62,6 +62,9 @@ export class SceneNode {
     return false;
   }
 
+  clear(): void {
+    this._succs = [];
+  }
   addSucc(succ: SceneNode) {
     let idx = this._succs.indexOf(succ);
     if (idx != -1) return;
@@ -131,12 +134,7 @@ class SceneLevel {
   }
 
   update(node: SceneNode, graph: SceneGraph): void {
-    node.succs.forEach((succ) => {
-      if (graph.drawOrder(succ, node) != RenderOrder.After) {
-        node.removeSucc(succ);
-      }
-    });
-
+    node.clear();
     for (let i = 0; i < this._nodes.length; i++) {
       let existing = this._nodes[i];
       if (existing.id == node.id) {
@@ -153,7 +151,7 @@ class SceneLevel {
     }
 
     this._discovered.clear();
-    this._topologicalOrder.length = 0;
+    this._topologicalOrder = [];
     for (let i in this._nodes) {
       this.topologicalSort(this._nodes[i]);
     }
@@ -179,10 +177,8 @@ class SceneLevel {
       }
     }
 
-    // TODO: Something is still off here as it's necessary to iterate through all
-    // the nodes again so that they're all inserted into topologicalOrder.
     this._discovered.clear();
-    this._topologicalOrder.length = 0;
+    this._topologicalOrder = [];
     for (let i in this._nodes) {
       if (this._discovered.has(this._nodes[i])) {
         continue;
