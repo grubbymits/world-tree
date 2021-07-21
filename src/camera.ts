@@ -93,6 +93,10 @@ export class MouseCamera extends Camera {
         this.location = scene.getLocationAt(e.offsetX, e.offsetY, this);
       }
     });
+    canvas.addEventListener('touchstart', e => {
+      let touch = e.touches[0];
+      this.location = scene.getLocationAt(touch.pageX, touch.pageY, this);
+    });
   }
 }
 
