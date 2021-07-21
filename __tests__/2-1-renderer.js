@@ -408,3 +408,55 @@ test('draw order of (x, y, z) updating eight in a cube', () => {
   expect(drawOrder[2].entity.id).toBe(4);
   expect(drawOrder[3].entity.id).toBe(6);
 });
+
+test('draw order of (x, y, z) updating level in a cube', () => {
+  WT.PhysicalEntity.reset();
+  const width = 72;
+  const depth = 72;
+  const height = 97;
+  const entityDimensions = new WT.Dimensions(width, depth, height);
+  const worldDims = new WT.Dimensions(width * 2, depth * 2, height * 3);
+  let context = new WT.createTestContext(worldDims);
+  let scene = new WT.TwoByOneIsometric();
+  let nodes = new Array();
+
+  let addNodeAt = (x, y, z) => {
+     let minLocation = new WT.Point3D(x * entityDimensions.width,
+                                      y * entityDimensions.depth,
+                                      z * entityDimensions.height);
+     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
+     let node = new WT.SceneNode(entity, drawCoord(entity));
+     scene.setDrawCoords(node);
+     nodes.push(node);
+     return node;
+  }
+
+  for (let z = 0; z < 2; ++z) {
+    for (let y = 0; y < 2; ++y) {
+      let xMax = y == 0 ? 2 : 1;
+      for (let x = 0; x < xMax; ++x) {
+        addNodeAt(x, y, z);
+      }
+    }
+  }
+  // One cube above the rest
+  let movable = addNodeAt(0, 0, 2);
+
+  nodes.forEach((node) => scene.insertIntoLevel(node));
+  expect(scene.initialised).toBe(true);
+  expect(scene.levels.length).toBe(3);
+  scene.buildLevels();
+
+  movable.entity.updatePosition(new WT.Vector3D(0, 0, -95));
+  scene.updateNode(movable);
+
+  // Movable should still be in it's own level.
+  expect(scene.levels[2].order.length).toBe(1);
+  expect(scene.levels[2].order[0].entity.id).toBe(movable.entity.id);
+
+  let drawOrder = scene.levels[1].order.slice().reverse();
+  expect(drawOrder.length).toBe(3);
+  expect(drawOrder[0].entity.id).toBe(4);
+  expect(drawOrder[1].entity.id).toBe(3);
+  expect(drawOrder[2].entity.id).toBe(5);
+});
