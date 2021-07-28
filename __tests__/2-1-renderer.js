@@ -450,13 +450,13 @@ test('draw order of (x, y, z) updating level in a cube', () => {
   movable.entity.updatePosition(new WT.Vector3D(0, 0, -95));
   scene.updateNode(movable);
 
-  // Movable should still be in it's own level.
-  expect(scene.levels[2].order.length).toBe(1);
-  expect(scene.levels[2].order[0].entity.id).toBe(movable.entity.id);
+  // Movable shouldn't still be in it's own level.
+  expect(scene.levels[2].order.length).toBe(0);
 
   let drawOrder = scene.levels[1].order.slice().reverse();
-  expect(drawOrder.length).toBe(3);
+  expect(drawOrder.length).toBe(4);
   expect(drawOrder[0].entity.id).toBe(4);
   expect(drawOrder[1].entity.id).toBe(3);
-  expect(drawOrder[2].entity.id).toBe(5);
+  expect(drawOrder[2].entity.id).toBe(movable.entity.id);
+  expect(drawOrder[3].entity.id).toBe(5);
 });
