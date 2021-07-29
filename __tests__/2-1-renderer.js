@@ -449,6 +449,7 @@ test('draw order of (x, y, z) updating level in a cube', () => {
 
   movable.entity.updatePosition(new WT.Vector3D(0, 0, -95));
   scene.updateNode(movable);
+  scene.buildLevels();
 
   // Movable shouldn't still be in it's own level.
   expect(scene.levels[2].order.length).toBe(0);

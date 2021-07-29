@@ -102,10 +102,10 @@ type NodeCompare = (firstId: number, secondId: number) => RenderOrder;
 
 class SceneLevel {
   private _nodes: Array<SceneNode> = new Array<SceneNode>();
-  private _discovered: Set<SceneNode> = new Set<SceneNode>();
   private _topologicalOrder: Array<SceneNode> = new Array<SceneNode>();
   private readonly _minZ: number;
   private readonly _maxZ: number;
+  private _dirty: boolean = true;
 
   constructor(root: SceneNode) {
     this._minZ = root.minZ;
@@ -116,21 +116,26 @@ class SceneLevel {
 
   get nodes(): Array<SceneNode> { return this._nodes; }
   get order(): Array<SceneNode> { return this._topologicalOrder; }
+  get dirty(): boolean { return this._dirty; }
+  set dirty(d: boolean) { this._dirty = d; }
 
   inrange(entity: PhysicalEntity): boolean {
     return entity.bounds.minZ >= this._minZ && entity.bounds.minZ < this._maxZ;
   }
 
   add(node: SceneNode, graph: SceneGraph): void {
+    this.dirty = true;
     node.level = this;
     this._nodes.push(node);
     this.update(node, graph);
   }
 
   remove(node: SceneNode): void {
+    this.dirty = true;
     let idx = this._nodes.indexOf(node);
     console.assert(idx != -1);
     this._nodes.splice(idx, 1);
+    this._nodes.forEach((pred) => pred.removeSucc(node));
   }
 
   update(node: SceneNode, graph: SceneGraph): void {
@@ -149,16 +154,10 @@ class SceneLevel {
         existing.removeSucc(node);
       }
     }
-
-    this._discovered.clear();
-    this._topologicalOrder = [];
-    for (let i in this._nodes) {
-      this.topologicalSort(this._nodes[i]);
-    }
+    this.dirty = true;
   }
 
   buildGraph(graph: SceneGraph): void {
-
     // https://en.wikipedia.org/wiki/Transitive_reduction
     // In the mathematical theory of binary relations, any relation R on a set X may
     // be thought of as a directed graph that has the set X as its vertex set and
@@ -167,36 +166,33 @@ class SceneLevel {
     // directed acyclic graphs, in which there is an arc xy in the graph whenever
     // there is an order relation x < y between the given pair of elements of the
     // partial order.
-    this._nodes.sort((a, b) => graph.drawOrder(a, b));
-    for (let i = 0; i < this._nodes.length - 1; i++) {
-      let nodeI = this._nodes[i];
-      let nodeJ = this._nodes[i+1];
-      const order = graph.drawOrder(nodeI, nodeJ);
-      if (RenderOrder.Before == order) {
-        nodeI.addSucc(nodeJ);
-      }
-    }
-
-    this._discovered.clear();
-    this._topologicalOrder = [];
-    for (let i in this._nodes) {
-      if (this._discovered.has(this._nodes[i])) {
-        continue;
-      }
-      this.topologicalSort(this._nodes[i]);
-    }
-  }
-
-  topologicalSort(node: SceneNode): void {
-    if (this._discovered.has(node)) {
+    if (!this.dirty) {
       return;
     }
-    this._discovered.add(node);
-    for (let succ of node.succs) {
-      this.topologicalSort(succ);
+    this._nodes.sort((a, b) => graph.drawOrder(a, b));
+    this._topologicalOrder = [];
+    let discovered = new Set<SceneNode>();
+
+    let topologicalSort = (node: SceneNode): void => {
+      if (discovered.has(node)) {
+        return;
+      }
+      discovered.add(node);
+      for (let succ of node.succs) {
+        topologicalSort(succ);
+      }
+      this._topologicalOrder.push(node);
     }
-    this._topologicalOrder.push(node);
+
+    for (let i in this._nodes) {
+      if (discovered.has(this._nodes[i])) {
+        continue;
+      }
+      topologicalSort(this._nodes[i]);
+    }
+    this.dirty = false;
   }
+
 }
 
 export abstract class SceneGraph {
@@ -392,11 +388,12 @@ export class SceneRenderer {
                       return RenderOrder.Any;
                     });
       nodeList.forEach((node) => this.graph.insertIntoLevel(node));
-      this.graph.buildLevels();
+      //this.graph.buildLevels();
     }
 
     this.ctx.clearRect(0, 0, this._width, this._height);
     this.graph.levels.forEach((level) => {
+      level.buildGraph(this.graph);
       for (let i = level.order.length - 1; i >= 0; i--) {
         const node: SceneNode = level.order[i];
         this.renderNode(node, camera);

@@ -90,8 +90,8 @@ export class SceneNode {
 class SceneLevel {
     constructor(root) {
         this._nodes = new Array();
-        this._discovered = new Set();
         this._topologicalOrder = new Array();
+        this._dirty = true;
         this._minZ = root.minZ;
         this._maxZ = root.maxZ;
         this._nodes.push(root);
@@ -99,18 +99,23 @@ class SceneLevel {
     }
     get nodes() { return this._nodes; }
     get order() { return this._topologicalOrder; }
+    get dirty() { return this._dirty; }
+    set dirty(d) { this._dirty = d; }
     inrange(entity) {
         return entity.bounds.minZ >= this._minZ && entity.bounds.minZ < this._maxZ;
     }
     add(node, graph) {
+        this.dirty = true;
         node.level = this;
         this._nodes.push(node);
         this.update(node, graph);
     }
     remove(node) {
+        this.dirty = true;
         let idx = this._nodes.indexOf(node);
         console.assert(idx != -1);
         this._nodes.splice(idx, 1);
+        this._nodes.forEach((pred) => pred.removeSucc(node));
     }
     update(node, graph) {
         node.clear();
@@ -130,40 +135,32 @@ class SceneLevel {
                 existing.removeSucc(node);
             }
         }
-        this._discovered.clear();
-        this._topologicalOrder = [];
-        for (let i in this._nodes) {
-            this.topologicalSort(this._nodes[i]);
-        }
+        this.dirty = true;
     }
     buildGraph(graph) {
-        this._nodes.sort((a, b) => graph.drawOrder(a, b));
-        for (let i = 0; i < this._nodes.length - 1; i++) {
-            let nodeI = this._nodes[i];
-            let nodeJ = this._nodes[i + 1];
-            const order = graph.drawOrder(nodeI, nodeJ);
-            if (RenderOrder.Before == order) {
-                nodeI.addSucc(nodeJ);
-            }
-        }
-        this._discovered.clear();
-        this._topologicalOrder = [];
-        for (let i in this._nodes) {
-            if (this._discovered.has(this._nodes[i])) {
-                continue;
-            }
-            this.topologicalSort(this._nodes[i]);
-        }
-    }
-    topologicalSort(node) {
-        if (this._discovered.has(node)) {
+        if (!this.dirty) {
             return;
         }
-        this._discovered.add(node);
-        for (let succ of node.succs) {
-            this.topologicalSort(succ);
+        this._nodes.sort((a, b) => graph.drawOrder(a, b));
+        this._topologicalOrder = [];
+        let discovered = new Set();
+        let topologicalSort = (node) => {
+            if (discovered.has(node)) {
+                return;
+            }
+            discovered.add(node);
+            for (let succ of node.succs) {
+                topologicalSort(succ);
+            }
+            this._topologicalOrder.push(node);
+        };
+        for (let i in this._nodes) {
+            if (discovered.has(this._nodes[i])) {
+                continue;
+            }
+            topologicalSort(this._nodes[i]);
         }
-        this._topologicalOrder.push(node);
+        this.dirty = false;
     }
 }
 export class SceneGraph {
@@ -325,10 +322,10 @@ export class SceneRenderer {
                 return RenderOrder.Any;
             });
             nodeList.forEach((node) => this.graph.insertIntoLevel(node));
-            this.graph.buildLevels();
         }
         this.ctx.clearRect(0, 0, this._width, this._height);
         this.graph.levels.forEach((level) => {
+            level.buildGraph(this.graph);
             for (let i = level.order.length - 1; i >= 0; i--) {
                 const node = level.order[i];
                 this.renderNode(node, camera);
