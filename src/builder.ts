@@ -375,10 +375,22 @@ export class TerrainBuilder {
     return this._surface.at(x, y).shape;
   }
 
+  isFlatAt(x: number, y: number): boolean {
+    console.assert(x >= 0 && x < this._surface.width &&
+                   y >= 0 && y < this._surface.depth);
+    return isFlat(this._surface.at(x, y).shape);
+  }
+
   biomeAt(x: number, y: number): Biome {
     console.assert(x >= 0 && x < this._surface.width &&
                    y >= 0 && y < this._surface.depth);
     return this._surface.at(x, y).biome;
+  }
+
+  relativeHeightAt(x: number, y: number): number {
+    console.assert(x >= 0 && x < this._surface.width &&
+                   y >= 0 && y < this._surface.depth);
+    return this._surface.at(x, y).terrace;
   }
 
   generateMap(context: ContextImpl): void {

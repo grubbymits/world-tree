@@ -301,10 +301,20 @@ export class TerrainBuilder {
             y >= 0 && y < this._surface.depth);
         return this._surface.at(x, y).shape;
     }
+    isFlatAt(x, y) {
+        console.assert(x >= 0 && x < this._surface.width &&
+            y >= 0 && y < this._surface.depth);
+        return isFlat(this._surface.at(x, y).shape);
+    }
     biomeAt(x, y) {
         console.assert(x >= 0 && x < this._surface.width &&
             y >= 0 && y < this._surface.depth);
         return this._surface.at(x, y).biome;
+    }
+    relativeHeightAt(x, y) {
+        console.assert(x >= 0 && x < this._surface.width &&
+            y >= 0 && y < this._surface.depth);
+        return this._surface.at(x, y).terrace;
     }
     generateMap(context) {
         if (this.config.ramps) {
