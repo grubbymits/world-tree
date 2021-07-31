@@ -55,13 +55,9 @@ export class Segment2D {
   intersects(other: Segment2D): boolean {
     // Only consider an intersection which crosses properly.
     if (this.on(other.p0)) {
-      //console.log("segment of", this.p0, this.p1);
-      //console.log("contains p0:", other.p0);
       return false;
     }
     if (this.on(other.p1)) {
-      //console.log("segment of", this.p0, this.p1);
-      //console.log("contains p1:", other.p1);
       return false;
     }
     // https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
@@ -495,8 +491,8 @@ export class RampUpEastGeometry extends Geometry {
     ];
 
     // left
-    const v0 = new Vertex3D(p[0], p[1], p[5]);
-    const v1 = new Vertex3D(p[5], p[4], p[0]);
+    const v0 = new Vertex3D(p[0], p[4], p[5]);
+    const v1 = new Vertex3D(p[5], p[0], p[1]);
     this._faces.push(new QuadFace3D(v0, v1));
 
     // front
@@ -504,12 +500,12 @@ export class RampUpEastGeometry extends Geometry {
 
     // right
     const v2 = new Vertex3D(p[2], p[3], p[5]);
-    const v3 = new Vertex3D(p[5], p[4], p[2]);
+    const v3 = new Vertex3D(p[5], p[2], p[4]);
     this._faces.push(new QuadFace3D(v2, v3));
 
     // bottom
     const v4 = new Vertex3D(p[0], p[2], p[3]);
-    const v5 = new Vertex3D(p[3], p[1], p[0]);
+    const v5 = new Vertex3D(p[3], p[0], p[1]);
     this._faces.push(new QuadFace3D(v4, v5));
 
     // back

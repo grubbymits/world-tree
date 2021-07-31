@@ -356,12 +356,12 @@ export class RampUpEastGeometry extends Geometry {
             this.bounds.maxLocation.sub(this.depthVec3D),
             this.bounds.maxLocation
         ];
-        const v0 = new Vertex3D(p[0], p[1], p[5]);
-        const v1 = new Vertex3D(p[5], p[4], p[0]);
+        const v0 = new Vertex3D(p[0], p[4], p[5]);
+        const v1 = new Vertex3D(p[5], p[0], p[1]);
         this._faces.push(new QuadFace3D(v0, v1));
         this._faces.push(new TriangleFace3D(new Vertex3D(p[1], p[5], p[3])));
         const v2 = new Vertex3D(p[2], p[3], p[5]);
-        const v3 = new Vertex3D(p[5], p[4], p[2]);
+        const v3 = new Vertex3D(p[5], p[2], p[4]);
         this._faces.push(new QuadFace3D(v2, v3));
         const v4 = new Vertex3D(p[0], p[2], p[3]);
         const v5 = new Vertex3D(p[3], p[1], p[0]);

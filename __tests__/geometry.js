@@ -188,3 +188,64 @@ test('cuboid obstruction', () => {
   expect(cube.obstructs(p28, p29)).toBe(false);
   expect(cube.obstructs(p29, p28)).toBe(false);
 });
+
+test('ramp up west obstruction', () => {
+  const dims = new WT.Dimensions(10, 10, 10);
+  const centre = new WT.Point3D(5, 5, 5);
+  const bounds = new WT.BoundingCuboid(centre, dims);
+  const ramp = new WT.RampUpEastGeometry(bounds);
+
+  const p0 = new WT.Point3D(-1, 5, 1);
+  const p1 = new WT.Point3D(15, 5, 1);
+  // Through the ramp east/west.
+  expect(ramp.obstructs(p0, p1)).toBe(true);
+  expect(ramp.obstructs(p1, p0)).toBe(true);
+
+  const p2 = new WT.Point3D(5, 0, 5.1);
+  const p3 = new WT.Point3D(5, 11, 5.1);
+  // Across the ramp north/south
+  expect(ramp.obstructs(p2, p3)).toBe(false);
+  expect(ramp.obstructs(p3, p2)).toBe(false);
+
+  const p4 = new WT.Point3D(5, 0, 4.9);
+  const p5 = new WT.Point3D(5, 11, 4.9);
+  // Through the ramp north/south
+  expect(ramp.obstructs(p4, p5)).toBe(true);
+  expect(ramp.obstructs(p5, p4)).toBe(true);
+
+  // up/down the ramp.
+  const p6 = new WT.Point3D(10, 5, 0.2);
+  const p7 = new WT.Point3D(0, 5, 10.1);
+  expect(ramp.obstructs(p6, p7)).toBe(false);
+  expect(ramp.obstructs(p7, p6)).toBe(false);
+});
+
+test('ramp up east obstruction', () => {
+  const dims = new WT.Dimensions(10, 10, 10);
+  const centre = new WT.Point3D(5, 5, 5);
+  const bounds = new WT.BoundingCuboid(centre, dims);
+  const ramp = new WT.RampUpEastGeometry(bounds);
+
+  const p0 = new WT.Point3D(-1, 5, 1);
+  const p1 = new WT.Point3D(15, 5, 1);
+  // Through the ramp east/west.
+  expect(ramp.obstructs(p0, p1)).toBe(true);
+  expect(ramp.obstructs(p1, p0)).toBe(true);
+
+  const p2 = new WT.Point3D(5, 0, 5.1);
+  const p3 = new WT.Point3D(5, 11, 5.1);
+  // Across the ramp north/south
+  expect(ramp.obstructs(p2, p3)).toBe(false);
+  expect(ramp.obstructs(p3, p2)).toBe(false);
+
+  const p4 = new WT.Point3D(5, 0, 4.9);
+  const p5 = new WT.Point3D(5, 11, 4.9);
+  // Through the ramp north/south
+  expect(ramp.obstructs(p4, p5)).toBe(true);
+  expect(ramp.obstructs(p5, p4)).toBe(true);
+
+  // up/down the ramp.
+  const p6 = new WT.Point3D(10, 5, 10.2);
+  expect(ramp.obstructs(p0, p6)).toBe(false);
+  expect(ramp.obstructs(p6, p0)).toBe(false);
+});
