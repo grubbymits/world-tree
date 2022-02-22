@@ -14,7 +14,7 @@ class MoveAction extends Action {
     }
     obstructed(from, to, maxAngle) {
         let bounds = this._actor.bounds;
-        let path = to.vec(from);
+        let path = to.vec_diff(from);
         let area = new BoundingCuboid(to, bounds.dimensions);
         area.insert(bounds);
         return CollisionDetector.detectInArea(this._actor, path, maxAngle, area);
@@ -57,7 +57,7 @@ export class MoveDestination extends MoveAction {
     set destination(destination) {
         this._destination = destination;
         let currentPos = this.actor.bounds.minLocation;
-        let maxD = destination.vec(currentPos);
+        let maxD = destination.vec_diff(currentPos);
         console.assert(maxD.x == 0 || maxD.y == 0 || maxD.z == 0, "can only change distance along two axes simultaneously");
         let dx = 0;
         let dy = 0;
@@ -117,7 +117,7 @@ export class MoveDestination extends MoveAction {
         console.log("perform action");
         let bounds = this.actor.bounds;
         let location = bounds.minLocation;
-        let maxD = this.destination.vec(location);
+        let maxD = this.destination.vec_diff(location);
         let minD = maxD.absMin(this._d);
         this.actor.updatePosition(minD);
         this.actor.postEvent(EntityEvent.Moving);

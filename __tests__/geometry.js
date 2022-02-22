@@ -95,7 +95,7 @@ test('3D point arithmetic', () => {
   const p0 = new WT.Point3D(1, 2, 3);
   const p1 = new WT.Point3D(10, 9, 8);
   const v0 = new WT.Vector3D(2, 3, 4);
-  const diff = p0.vec(p1);
+  const diff = p0.vec_diff(p1);
   const add = p0.add(v0);
   const sub = p1.sub(v0);
 
@@ -119,6 +119,46 @@ test('compare 3D points', () => {
   expect(p1.isSameAs(p2)).toBe(false);
   expect(p2.isSameAsRounded(p0)).toBe(false);
   expect(p2.isSameAsRounded(p3)).toBe(true);
+});
+
+test('vertex plane', () => {
+  const dims = new WT.Dimensions(2, 2, 2);
+  const centre = new WT.Point3D(1, 1, 1);
+  const widthVec = new WT.Vector3D(2, 0, 0);
+  const depthVec = new WT.Vector3D(0, 2, 0);
+  const heightVec = new WT.Vector3D(0, 0, 2);
+  const bounds = new WT.BoundingCuboid(centre, dims);
+
+  // four points that could represent the base of a cube
+  const p0 = bounds.minLocation;
+  const p1 = bounds.minLocation.add(depthVec);
+  const p2 = bounds.minLocation.add(widthVec);
+  const p3 = p2.add(depthVec);
+
+  const v0 = new WT.Vertex3D(p3, p2, p1);
+  const v1 = new WT.Vertex3D(p0, p1, p2);
+  expect(v0.normal.equal(v1.normal)).toBe(true);
+});
+
+test('cuboid geometry construction', () => {
+  const dims = new WT.Dimensions(10, 10, 10);
+  const centre = new WT.Point3D(5, 5, 5);
+  const bounds = new WT.BoundingCuboid(centre, dims);
+  expect(new WT.CuboidGeometry(bounds)).not.toBeFalsy();
+});
+
+test('ramp up west construction', () => {
+  const dims = new WT.Dimensions(10, 10, 10);
+  const centre = new WT.Point3D(5, 5, 5);
+  const bounds = new WT.BoundingCuboid(centre, dims);
+  expect(new WT.RampUpWestGeometry(bounds)).not.toBeFalsy();
+});
+
+test('ramp up east construction', () => {
+  const dims = new WT.Dimensions(10, 10, 10);
+  const centre = new WT.Point3D(5, 5, 5);
+  const bounds = new WT.BoundingCuboid(centre, dims);
+  expect(new WT.RampUpEastGeometry(bounds)).not.toBeFalsy();
 });
 
 test('cuboid obstruction', () => {
@@ -193,7 +233,7 @@ test('ramp up west obstruction', () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);
-  const ramp = new WT.RampUpEastGeometry(bounds);
+  const ramp = new WT.RampUpWestGeometry(bounds);
 
   const p0 = new WT.Point3D(-1, 5, 1);
   const p1 = new WT.Point3D(15, 5, 1);
@@ -213,7 +253,7 @@ test('ramp up west obstruction', () => {
   expect(ramp.obstructs(p4, p5)).toBe(true);
   expect(ramp.obstructs(p5, p4)).toBe(true);
 
-  // up/down the ramp.
+  // up/down the ramp the middle
   const p6 = new WT.Point3D(10, 5, 0.2);
   const p7 = new WT.Point3D(0, 5, 10.1);
   expect(ramp.obstructs(p6, p7)).toBe(false);
@@ -244,8 +284,23 @@ test('ramp up east obstruction', () => {
   expect(ramp.obstructs(p4, p5)).toBe(true);
   expect(ramp.obstructs(p5, p4)).toBe(true);
 
-  // up/down the ramp.
+  // up/down the ramp the middle.
   const p6 = new WT.Point3D(10, 5, 10.2);
   expect(ramp.obstructs(p0, p6)).toBe(false);
+
+  if (ramp.obstructs(p6, p0)) {
+    console.log(ramp.intersectInfo);
+  }
   expect(ramp.obstructs(p6, p0)).toBe(false);
+
+  // up/down the ramp between min to max.
+  const minLocation = bounds.minLocation;
+  const maxLocation = bounds.maxLocation;
+  const p9 = minLocation.add(new WT.Vector3D(0, 0, 0.1));
+  const p10 = maxLocation.add(new WT.Vector3D(0, 0, 0.1));
+  expect(ramp.obstructs(p9, p10)).toBe(false);
+  expect(ramp.obstructs(p9, maxLocation)).toBe(true);
+  expect(ramp.obstructs(p10, minLocation)).toBe(true);
+  expect(ramp.obstructs(p10, p9)).toBe(false);
+
 });

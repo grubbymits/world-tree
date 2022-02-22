@@ -106,7 +106,7 @@ export class Point3D {
     sub(vector) {
         return new Point3D(this.x - vector.x, this.y - vector.y, this.z - vector.z);
     }
-    vec(other) {
+    vec_diff(other) {
         return new Vector3D(this.x - other.x, this.y - other.y, this.z - other.z);
     }
     isSameAsRounded(other) {
@@ -157,12 +157,17 @@ export class Vector3D {
         const z = Math.abs(this.z) < Math.abs(other.z) ? this.z : other.z;
         return new Vector3D(x, y, z);
     }
+    equal(other) {
+        return this.x == other.x &&
+            this.y == other.y &&
+            this.z == other.z;
+    }
 }
 export class Vertex3D {
-    constructor(_point, v1, v2) {
+    constructor(_point, a, b) {
         this._point = _point;
-        this._u = v1.vec(_point);
-        this._v = v2.vec(_point);
+        this._u = a.vec_diff(_point);
+        this._v = b.vec_diff(_point);
         this._normal = this.u.cross(this.v);
     }
     get point() { return this._point; }
@@ -173,20 +178,20 @@ export class Vertex3D {
         this._point = this.point.add(d);
     }
     distance(p) {
-        const sn = -this.normal.dot(p.vec(this.point));
+        const sn = -this.normal.dot(p.vec_diff(this.point));
         const sd = this.normal.dot(this.normal);
         const sb = sn / sd;
         const closest = p.addScalar(sb).mul(this.normal);
-        const d = p.vec(closest).norm();
+        const d = p.vec_diff(closest).norm();
         return d;
     }
     intersects(begin, end) {
-        const u = end.vec(begin);
+        const u = end.vec_diff(begin);
         const D = this.normal.dot(u);
         if (Math.abs(D) < 0.01) {
             return false;
         }
-        const w = begin.vec(this.point);
+        const w = begin.vec_diff(this.point);
         const N = -this.normal.dot(w);
         const intersection = N / D;
         return intersection >= 0 && intersection <= 1;
@@ -217,7 +222,7 @@ class TriangleFace3D extends Face3D {
         this.vertex.transform(d);
     }
     intersects(end) {
-        let w = end.vec(this.vertex.point);
+        let w = end.vec_diff(this.vertex.point);
         let u = this.vertex.u;
         let v = this.vertex.v;
         let wDotv = w.dot(v);
@@ -230,6 +235,9 @@ class TriangleFace3D extends Face3D {
 class QuadFace3D extends Face3D {
     constructor(vertexA, vertexB) {
         super(vertexA);
+        if (!vertexA.normal.equal(vertexB.normal)) {
+            throw ("Expected QuadFace3D vertices to have equilavent normals");
+        }
         this._triangleA = new TriangleFace3D(vertexA);
         this._triangleB = new TriangleFace3D(vertexB);
     }
@@ -302,23 +310,23 @@ export class CuboidGeometry extends Geometry {
             this.bounds.maxLocation.sub(this.widthVec3D),
             this.bounds.maxLocation
         ];
-        let v0 = new Vertex3D(p[0], p[1], p[6]);
-        let v1 = new Vertex3D(p[6], p[0], p[2]);
+        let v0 = new Vertex3D(p[2], p[6], p[0]);
+        let v1 = new Vertex3D(p[1], p[0], p[6]);
         this._faces.push(new QuadFace3D(v0, v1));
-        let v2 = new Vertex3D(p[2], p[6], p[7]);
-        let v3 = new Vertex3D(p[7], p[4], p[2]);
+        let v2 = new Vertex3D(p[4], p[7], p[2]);
+        let v3 = new Vertex3D(p[6], p[2], p[7]);
         this._faces.push(new QuadFace3D(v2, v3));
-        let v4 = new Vertex3D(p[3], p[5], p[7]);
-        let v5 = new Vertex3D(p[7], p[4], p[3]);
+        let v4 = new Vertex3D(p[3], p[5], p[4]);
+        let v5 = new Vertex3D(p[7], p[4], p[5]);
         this._faces.push(new QuadFace3D(v4, v5));
-        let v6 = new Vertex3D(p[1], p[5], p[7]);
-        let v7 = new Vertex3D(p[7], p[1], p[6]);
+        let v6 = new Vertex3D(p[5], p[1], p[7]);
+        let v7 = new Vertex3D(p[6], p[7], p[1]);
         this._faces.push(new QuadFace3D(v6, v7));
-        let v8 = new Vertex3D(p[0], p[3], p[4]);
-        let v9 = new Vertex3D(p[4], p[2], p[0]);
+        let v8 = new Vertex3D(p[0], p[3], p[2]);
+        let v9 = new Vertex3D(p[4], p[2], p[3]);
         this._faces.push(new QuadFace3D(v8, v9));
-        let v10 = new Vertex3D(p[0], p[1], p[5]);
-        let v11 = new Vertex3D(p[5], p[3], p[0]);
+        let v10 = new Vertex3D(p[0], p[1], p[3]);
+        let v11 = new Vertex3D(p[5], p[3], p[1]);
         this._faces.push(new QuadFace3D(v10, v11));
     }
 }
@@ -330,19 +338,19 @@ export class RampUpWestGeometry extends Geometry {
             this.bounds.minLocation.add(this.depthVec3D),
             this.bounds.minLocation.add(this.widthVec3D),
             this.bounds.maxLocation.sub(this.heightVec3D),
-            this.bounds.minLocation.sub(this.heightVec3D),
+            this.bounds.minLocation.add(this.heightVec3D),
             this.bounds.maxLocation.sub(this.widthVec3D)
         ];
-        const v0 = new Vertex3D(p[0], p[1], p[5]);
-        const v1 = new Vertex3D(p[5], p[4], p[0]);
+        const v0 = new Vertex3D(p[1], p[5], p[0]);
+        const v1 = new Vertex3D(p[4], p[0], p[5]);
         this._faces.push(new QuadFace3D(v0, v1));
-        this._faces.push(new TriangleFace3D(new Vertex3D(p[1], p[5], p[3])));
-        const v2 = new Vertex3D(p[2], p[3], p[5]);
-        const v3 = new Vertex3D(p[5], p[4], p[2]);
+        this._faces.push(new TriangleFace3D(new Vertex3D(p[1], p[3], p[5])));
+        const v2 = new Vertex3D(p[2], p[4], p[3]);
+        const v3 = new Vertex3D(p[5], p[3], p[4]);
         this._faces.push(new QuadFace3D(v2, v3));
-        const v4 = new Vertex3D(p[0], p[2], p[3]);
-        const v5 = new Vertex3D(p[3], p[1], p[0]);
-        this._faces.push(new TriangleFace3D(new Vertex3D(p[0], p[2], p[4])));
+        const v4 = new Vertex3D(p[3], p[1], p[2]);
+        const v5 = new Vertex3D(p[0], p[2], p[1]);
+        this._faces.push(new TriangleFace3D(new Vertex3D(p[0], p[4], p[2])));
     }
 }
 export class RampUpEastGeometry extends Geometry {
@@ -356,16 +364,21 @@ export class RampUpEastGeometry extends Geometry {
             this.bounds.maxLocation.sub(this.depthVec3D),
             this.bounds.maxLocation
         ];
-        const v0 = new Vertex3D(p[0], p[4], p[5]);
-        const v1 = new Vertex3D(p[5], p[0], p[1]);
-        this._faces.push(new QuadFace3D(v0, v1));
-        this._faces.push(new TriangleFace3D(new Vertex3D(p[1], p[5], p[3])));
-        const v2 = new Vertex3D(p[2], p[3], p[5]);
-        const v3 = new Vertex3D(p[5], p[2], p[4]);
-        this._faces.push(new QuadFace3D(v2, v3));
-        const v4 = new Vertex3D(p[0], p[2], p[3]);
-        const v5 = new Vertex3D(p[3], p[1], p[0]);
-        this._faces.push(new QuadFace3D(v4, v5));
-        this._faces.push(new TriangleFace3D(new Vertex3D(p[0], p[2], p[4])));
+        const v0 = new Vertex3D(p[1], p[5], p[0]);
+        const v1 = new Vertex3D(p[4], p[0], p[5]);
+        const left = new QuadFace3D(v0, v1);
+        this._faces.push(left);
+        const front = new TriangleFace3D(new Vertex3D(p[3], p[5], p[1]));
+        this._faces.push(front);
+        const v2 = new Vertex3D(p[2], p[4], p[3]);
+        const v3 = new Vertex3D(p[5], p[3], p[4]);
+        const right = new QuadFace3D(v2, v3);
+        this._faces.push(right);
+        const v4 = new Vertex3D(p[1], p[0], p[3]);
+        const v5 = new Vertex3D(p[2], p[3], p[0]);
+        const bottom = new QuadFace3D(v4, v5);
+        this._faces.push(bottom);
+        const back = new TriangleFace3D(new Vertex3D(p[4], p[2], p[0]));
+        this._faces.push(back);
     }
 }
