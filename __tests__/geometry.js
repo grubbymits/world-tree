@@ -229,6 +229,52 @@ test('cuboid obstruction', () => {
   expect(cube.obstructs(p29, p28)).toBe(false);
 });
 
+test('ramp up west plane intersection', () => {
+  const width = 10;
+  const depth = 10;
+  const height = 10;
+  const dims = new WT.Dimensions(width, depth, height);
+  const centre = new WT.Point3D(5, 5, 5);
+  const widthVec = new WT.Vector3D(width, 0, 0);
+  const depthVec = new WT.Vector3D(0, depth, 0);
+  const heightVec = new WT.Vector3D(0, 0, height);
+  const bounds = new WT.BoundingCuboid(centre, dims);
+
+  // four points that could represent the slope of a ramp
+  const p2 = bounds.minLocation.add(widthVec);
+  const p3 = bounds.maxLocation.sub(heightVec);
+  const p4 = bounds.minLocation.add(heightVec);
+  const p5 = bounds.maxLocation.sub(widthVec);
+
+  const v0 = new WT.Vertex3D(p2, p4, p3);
+  const v1 = new WT.Vertex3D(p5, p3, p4);
+  const face = new WT.QuadFace3D(v0, v1);
+
+  // up/down the ramp the middle, no intersection
+  const p6 = new WT.Point3D(10, 5, 0.2);
+  const p7 = new WT.Point3D(0, 5, 10.1);
+  expect(v0.intersects(p6, p7)).toBe(null);
+  expect(v1.intersects(p6, p7)).toBe(null);
+  expect(v0.intersects(p7, p6)).toBe(null);
+  expect(v1.intersects(p7, p6)).toBe(null);
+  expect(face.intersectsPlane(p6, p7)).toBe(null);
+  expect(face.intersectsPlane(p7, p6)).toBe(null);
+  expect(face.intersectsPlane(p6, p7) && face.intersects(p7)).toBe(null);
+  expect(face.intersectsPlane(p7, p6) && face.intersects(p6)).toBe(null);
+
+  // up/down the ramp the middle, with intersection
+  const p8 = new WT.Point3D(10, 5, -1);
+  const p9 = new WT.Point3D(0, 5, 10.1);
+  expect(v0.intersects(p8, p9)).not.toBe(null);
+  expect(v1.intersects(p8, p9)).not.toBe(null);
+  expect(v0.intersects(p9, p8)).not.toBe(null);
+  expect(v1.intersects(p9, p8)).not.toBe(null);
+  expect(face.intersectsPlane(p8, p9)).not.toBe(null);
+  expect(face.intersectsPlane(p9, p8)).not.toBe(null);
+  expect(face.intersects(p9)).not.toBe(null);
+  expect(face.intersects(p8)).not.toBe(null);
+});
+
 test('ramp up west obstruction', () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
@@ -287,10 +333,6 @@ test('ramp up east obstruction', () => {
   // up/down the ramp the middle.
   const p6 = new WT.Point3D(10, 5, 10.2);
   expect(ramp.obstructs(p0, p6)).toBe(false);
-
-  if (ramp.obstructs(p6, p0)) {
-    console.log(ramp.intersectInfo);
-  }
   expect(ramp.obstructs(p6, p0)).toBe(false);
 
   // up/down the ramp between min to max.

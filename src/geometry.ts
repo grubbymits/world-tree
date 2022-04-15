@@ -157,11 +157,21 @@ export class Vector3D {
   get zero(): boolean {
     return this.x === 0 && this.y === 0 && this.z === 0;
   }
+  get asString(): string {
+      return "(x, y, z) = (" + this.x + ", " + this.y + ", " + this.z + ")";
+  }
 
   add(other: Vector3D): Vector3D {
     const x = this.x + other.x;
     const y = this.y + other.y;
     const z = this.z + other.z;
+    return new Vector3D(x, y, z);
+  }
+
+  mulScalar(factor: number): Vector3D {
+    const x = this.x * factor;
+    const y = this.y * factor;
+    const z = this.z * factor;
     return new Vector3D(x, y, z);
   }
 
@@ -218,6 +228,12 @@ export class Vertex3D {
     this._point = this.point.add(d);
   }
 
+  get asString(): string {
+    return "normal = " + this.normal.asString +
+    ", u = " + this.u.asString +
+    ", v = " + this.u.asString;
+  }
+
   // http://www.geomalgorithms.com/a04-_planes.html#Distance-Point-to-Plane
   distance(p: Point3D): number {
     const sn: number = -this.normal.dot(p.vec_diff(this.point));
@@ -229,19 +245,22 @@ export class Vertex3D {
   }
 
   // https://www.geomalgorithms.com/a05-_intersect-1.html 
-  intersects(begin: Point3D, end: Point3D): boolean {
+  intersects(begin: Point3D, end: Point3D): Point3D|null {
     // Use the vertex to represent a plane and calculate whether the segment
     // (begin, end) intersects that plane.
-    const u: Vector3D = end.vec_diff(begin);
-    const w: Vector3D = begin.vec_diff(this.point);
-    const D: number = this.normal.dot(u);
+    const dir: Vector3D = end.vec_diff(begin);
+    const w0: Vector3D = begin.vec_diff(this.point);
+    const a: number = -this.normal.dot(w0);
+    const b: number = this.normal.dot(dir);
     // Check whether the line is (almost) parallel to the plane.
-    if (Math.abs(D) < 0.01) {
-      return false;
+    if (Math.abs(b) < 0.01) {
+      return null;
     }
-    const N: number = -this.normal.dot(w);
-    const intersection = N / D;
-    return intersection >= 0 && intersection <= 1;
+    const r = a / b;
+    if (r < 0 || r  > 1) {
+      return null;
+    }
+    return begin.add(dir.mulScalar(r));
   }
 }
 
@@ -249,7 +268,7 @@ export abstract class Face3D {
   constructor(protected readonly _vertex: Vertex3D) { }
   get vertex(): Vertex3D { return this._vertex; }
   get plane(): Vertex3D { return this._vertex; }
-  intersectsPlane(begin: Point3D, end: Point3D): boolean {
+  intersectsPlane(begin: Point3D, end: Point3D): Point3D|null {
     return this.plane.intersects(begin, end);
   }
   abstract transform(d: Vector3D): void;
@@ -283,10 +302,10 @@ class TriangleFace3D extends Face3D {
   }
 
   // https://www.geomalgorithms.com/a06-_intersect-2.html 
-  intersects(end: Point3D): boolean {
-    // Given that a segment intersects the plane of this face, calculate
+  intersects(i: Point3D): boolean {
+    // Given that a segment intersects the plane, at i, of this face, calculate
     // whether the intersection point is within the triangle.
-    let w = end.vec_diff(this.vertex.point);
+    let w = i.vec_diff(this.vertex.point);
     let u = this.vertex.u;
     let v = this.vertex.v;
     let wDotv = w.dot(v);
@@ -299,7 +318,7 @@ class TriangleFace3D extends Face3D {
 
 // Two vertices, which can be connected to create a diagonal edge across a
 // quad-edge polygon (two triangles). Both vertices are on the same plane.
-class QuadFace3D extends Face3D {
+export class QuadFace3D extends Face3D {
   private readonly _triangleA: TriangleFace3D;
   private readonly _triangleB: TriangleFace3D;
 
@@ -321,8 +340,8 @@ class QuadFace3D extends Face3D {
     this._triangleB.transform(d);
   }
 
-  intersects(end: Point3D): boolean {
-    return this._triangleA.intersects(end) || this._triangleB.intersects(end);
+  intersects(i: Point3D): boolean {
+    return this._triangleA.intersects(i) || this._triangleB.intersects(i);
   }
 }
 
@@ -362,7 +381,8 @@ export class Geometry {
 
   obstructs(begin: Point3D, end: Point3D): boolean {
     for (let face of this._faces) {
-      if (face.intersectsPlane(begin, end) && face.intersects(end)) {
+      let i = face.intersectsPlane(begin, end);
+      if (i != null && face.intersects(i)) {
         this._intersectInfo = new IntersectInfo(face, begin, end);
         return true;
       }

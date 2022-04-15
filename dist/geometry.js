@@ -130,10 +130,19 @@ export class Vector3D {
     get zero() {
         return this.x === 0 && this.y === 0 && this.z === 0;
     }
+    get asString() {
+        return "(x, y, z) = (" + this.x + ", " + this.y + ", " + this.z + ")";
+    }
     add(other) {
         const x = this.x + other.x;
         const y = this.y + other.y;
         const z = this.z + other.z;
+        return new Vector3D(x, y, z);
+    }
+    mulScalar(factor) {
+        const x = this.x * factor;
+        const y = this.y * factor;
+        const z = this.z * factor;
         return new Vector3D(x, y, z);
     }
     dot(other) {
@@ -177,6 +186,11 @@ export class Vertex3D {
     transform(d) {
         this._point = this.point.add(d);
     }
+    get asString() {
+        return "normal = " + this.normal.asString +
+            ", u = " + this.u.asString +
+            ", v = " + this.u.asString;
+    }
     distance(p) {
         const sn = -this.normal.dot(p.vec_diff(this.point));
         const sd = this.normal.dot(this.normal);
@@ -186,15 +200,18 @@ export class Vertex3D {
         return d;
     }
     intersects(begin, end) {
-        const u = end.vec_diff(begin);
-        const D = this.normal.dot(u);
-        if (Math.abs(D) < 0.01) {
-            return false;
+        const dir = end.vec_diff(begin);
+        const w0 = begin.vec_diff(this.point);
+        const a = -this.normal.dot(w0);
+        const b = this.normal.dot(dir);
+        if (Math.abs(b) < 0.01) {
+            return null;
         }
-        const w = begin.vec_diff(this.point);
-        const N = -this.normal.dot(w);
-        const intersection = N / D;
-        return intersection >= 0 && intersection <= 1;
+        const r = a / b;
+        if (r < 0 || r > 1) {
+            return null;
+        }
+        return begin.add(dir.mulScalar(r));
     }
 }
 export class Face3D {
@@ -221,8 +238,8 @@ class TriangleFace3D extends Face3D {
     transform(d) {
         this.vertex.transform(d);
     }
-    intersects(end) {
-        let w = end.vec_diff(this.vertex.point);
+    intersects(i) {
+        let w = i.vec_diff(this.vertex.point);
         let u = this.vertex.u;
         let v = this.vertex.v;
         let wDotv = w.dot(v);
@@ -232,7 +249,7 @@ class TriangleFace3D extends Face3D {
         return s1 >= 0 && t1 >= 0 && s1 + t1 <= 1;
     }
 }
-class QuadFace3D extends Face3D {
+export class QuadFace3D extends Face3D {
     constructor(vertexA, vertexB) {
         super(vertexA);
         if (!vertexA.normal.equal(vertexB.normal)) {
@@ -249,8 +266,8 @@ class QuadFace3D extends Face3D {
         this._triangleA.transform(d);
         this._triangleB.transform(d);
     }
-    intersects(end) {
-        return this._triangleA.intersects(end) || this._triangleB.intersects(end);
+    intersects(i) {
+        return this._triangleA.intersects(i) || this._triangleB.intersects(i);
     }
 }
 export class IntersectInfo {
@@ -283,7 +300,8 @@ export class Geometry {
     }
     obstructs(begin, end) {
         for (let face of this._faces) {
-            if (face.intersectsPlane(begin, end) && face.intersects(end)) {
+            let i = face.intersectsPlane(begin, end);
+            if (i != null && face.intersects(i)) {
                 this._intersectInfo = new IntersectInfo(face, begin, end);
                 return true;
             }
