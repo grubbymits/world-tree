@@ -376,11 +376,12 @@ export class CollisionDetector {
       for (const beginPoint of beginPoints) {
         const endPoint = beginPoint.add(path);
 
-        if (geometry.obstructs(beginPoint, endPoint)) {
-          const blocking =
-            maxAngle.zero || geometry.obstructs(beginPoint, endPoint.add(maxAngle));
+        let intersectInfo = geometry.obstructs(beginPoint, endPoint);
+        if (intersectInfo != null) {
+          const blocking = true;
+            //maxAngle.zero || geometry.obstructs(beginPoint, endPoint.add(maxAngle));
           const collision =
-            new CollisionInfo(entity, blocking, geometry.intersectInfo!);
+            new CollisionInfo(entity, blocking, intersectInfo!);
           this._collisionInfo.set(movable, collision);
           movable.postEvent(EntityEvent.Collision);
           return collision;

@@ -151,6 +151,9 @@ export class Vector3D {
         const z = this.z * other.z;
         return x + y + z;
     }
+    mag() {
+        return this.dot(this);
+    }
     cross(other) {
         const x = this.y * other.z - this.z * other.y;
         const y = this.z * other.x - this.x * other.z;
@@ -159,6 +162,11 @@ export class Vector3D {
     }
     norm() {
         return Math.sqrt(this.dot(this));
+    }
+    angle(other) {
+        let x = this.cross(other).mag();
+        let y = this.dot(other);
+        return Math.atan2(x, y);
     }
     absMin(other) {
         const x = Math.abs(this.x) < Math.abs(other.x) ? this.x : other.x;
@@ -271,14 +279,18 @@ export class QuadFace3D extends Face3D {
     }
 }
 export class IntersectInfo {
-    constructor(_face, _begin, _end) {
+    constructor(_face, _begin, _end, _i, _theta) {
         this._face = _face;
         this._begin = _begin;
         this._end = _end;
+        this._i = _i;
+        this._theta = _theta;
     }
     get face() { return this._face; }
     get begin() { return this._begin; }
     get end() { return this._end; }
+    get i() { return this._i; }
+    get theta() { return this._theta; }
 }
 export class Geometry {
     constructor(_bounds) {
@@ -302,18 +314,20 @@ export class Geometry {
         for (let face of this._faces) {
             let i = face.intersectsPlane(begin, end);
             if (i != null && face.intersects(i)) {
-                this._intersectInfo = new IntersectInfo(face, begin, end);
-                return true;
+                let v0 = i.vec_diff(begin);
+                let v1 = face.plane.normal;
+                let theta = v0.angle(v1);
+                return new IntersectInfo(face, begin, end, i, theta);
             }
         }
-        return false;
+        return null;
     }
 }
 export class NoGeometry extends Geometry {
     constructor(bounds) {
         super(bounds);
     }
-    obstructs(begin, end) { return false; }
+    obstructs(begin, end) { return null; }
 }
 export class CuboidGeometry extends Geometry {
     constructor(bounds) {

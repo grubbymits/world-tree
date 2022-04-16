@@ -182,6 +182,10 @@ export class Vector3D {
     return x + y + z;
   }
 
+  mag(): number {
+    return this.dot(this);
+  }
+
   cross(other: Vector3D): Vector3D {
     const x = this.y * other.z - this.z * other.y;
     const y = this.z * other.x - this.x * other.z;
@@ -191,6 +195,13 @@ export class Vector3D {
 
   norm(): number {
     return Math.sqrt(this.dot(this));
+  }
+
+  angle(other: Vector3D): number {
+    // https://www.jwwalker.com/pages/angle-between-vectors.html
+    let x = this.cross(other).mag();
+    let y = this.dot(other);
+    return Math.atan2(x, y);
   }
 
   absMin(other: Vector3D): Vector3D {
@@ -348,10 +359,14 @@ export class QuadFace3D extends Face3D {
 export class IntersectInfo {
   constructor(private readonly _face: Face3D,
               private readonly _begin: Point3D,
-              private readonly _end: Point3D) { }
+              private readonly _end: Point3D,
+              private readonly _i: Point3D,
+              private readonly _theta: number) { }
   get face(): Face3D { return this._face; }
   get begin(): Point3D { return this._begin; }
   get end(): Point3D { return this._end; }
+  get i(): Point3D { return this._i; }
+  get theta(): number { return this._theta; }
 }
 
 export class Geometry {
@@ -379,15 +394,17 @@ export class Geometry {
     }
   }
 
-  obstructs(begin: Point3D, end: Point3D): boolean {
+  obstructs(begin: Point3D, end: Point3D): IntersectInfo|null {
     for (let face of this._faces) {
       let i = face.intersectsPlane(begin, end);
       if (i != null && face.intersects(i)) {
-        this._intersectInfo = new IntersectInfo(face, begin, end);
-        return true;
+        let v0 = i.vec_diff(begin);
+        let v1 = face.plane.normal;
+        let theta = v0.angle(v1);
+        return new IntersectInfo(face, begin, end, i, theta);
       }
     }
-    return false;
+    return null;
   }
 }
 
@@ -395,7 +412,7 @@ export class NoGeometry extends Geometry {
   constructor(bounds: BoundingCuboid) {
     super(bounds);
   }
-  obstructs(begin: Point3D, end: Point3D): boolean { return false; }
+  obstructs(begin: Point3D, end: Point3D): IntersectInfo|null { return null; }
 }
 
 export class CuboidGeometry extends Geometry {

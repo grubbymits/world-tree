@@ -172,61 +172,61 @@ test('cuboid obstruction', () => {
   const p3 = new WT.Point3D(11, 5, 5);
   const p4 = new WT.Point3D(5, -1, 5);
   const p5 = new WT.Point3D(5, 11, 5);
-  expect(cube.obstructs(p0, p1)).toBe(true);
-  expect(cube.obstructs(p1, p0)).toBe(true);
-  expect(cube.obstructs(p2, p3)).toBe(true);
-  expect(cube.obstructs(p3, p2)).toBe(true);
-  expect(cube.obstructs(p4, p5)).toBe(true);
-  expect(cube.obstructs(p5, p4)).toBe(true);
+  expect(cube.obstructs(p0, p1)).not.toBe(null);
+  expect(cube.obstructs(p1, p0)).not.toBe(null);
+  expect(cube.obstructs(p2, p3)).not.toBe(null);
+  expect(cube.obstructs(p3, p2)).not.toBe(null);
+  expect(cube.obstructs(p4, p5)).not.toBe(null);
+  expect(cube.obstructs(p5, p4)).not.toBe(null);
   const p6 = new WT.Point3D(0.1, 0.1, 11);
   const p7 = new WT.Point3D(0.1, 0.1, -1);
   const p8 = new WT.Point3D(9.9, 9.9, 11);
   const p9 = new WT.Point3D(9.9, 9.9, -1);
-  expect(cube.obstructs(p6, p7)).toBe(true);
-  expect(cube.obstructs(p7, p6)).toBe(true);
-  expect(cube.obstructs(p8, p9)).toBe(true);
-  expect(cube.obstructs(p9, p8)).toBe(true);
+  expect(cube.obstructs(p6, p7)).not.toBe(null);
+  expect(cube.obstructs(p7, p6)).not.toBe(null);
+  expect(cube.obstructs(p8, p9)).not.toBe(null);
+  expect(cube.obstructs(p9, p8)).not.toBe(null);
   const p10 = new WT.Point3D(-1, 0.1, 0.1);
   const p11 = new WT.Point3D(11, 0.1, 0.1);
   const p12 = new WT.Point3D(-1, 9.9, 9.9);
   const p13 = new WT.Point3D(11, 9.9, 9.9);
-  expect(cube.obstructs(p10, p11)).toBe(true);
-  expect(cube.obstructs(p11, p10)).toBe(true);
-  expect(cube.obstructs(p12, p13)).toBe(true);
-  expect(cube.obstructs(p13, p12)).toBe(true);
+  expect(cube.obstructs(p10, p11)).not.toBe(null);
+  expect(cube.obstructs(p11, p10)).not.toBe(null);
+  expect(cube.obstructs(p12, p13)).not.toBe(null);
+  expect(cube.obstructs(p13, p12)).not.toBe(null);
   const p14 = new WT.Point3D(0.1, -1, 0.1);
   const p15 = new WT.Point3D(0.1, 11, 0.1);
   const p16 = new WT.Point3D(9.9, -1, 9.9);
   const p17 = new WT.Point3D(9.9, 11, 9.9);
-  expect(cube.obstructs(p14, p15)).toBe(true);
-  expect(cube.obstructs(p15, p14)).toBe(true);
-  expect(cube.obstructs(p16, p17)).toBe(true);
-  expect(cube.obstructs(p17, p16)).toBe(true);
+  expect(cube.obstructs(p14, p15)).not.toBe(null);
+  expect(cube.obstructs(p15, p14)).not.toBe(null);
+  expect(cube.obstructs(p16, p17)).not.toBe(null);
+  expect(cube.obstructs(p17, p16)).not.toBe(null);
 
   const p18 = new WT.Point3D(-0.1, -0.1, 11);
   const p19 = new WT.Point3D(-0.1, -0.1, -1);
   const p20 = new WT.Point3D(10.1, 10., 11);
   const p21 = new WT.Point3D(10.1, 10.1, -1);
-  expect(cube.obstructs(p18, p19)).toBe(false);
-  expect(cube.obstructs(p19, p18)).toBe(false);
-  expect(cube.obstructs(p20, p21)).toBe(false);
-  expect(cube.obstructs(p21, p20)).toBe(false);
+  expect(cube.obstructs(p18, p19)).toBe(null);
+  expect(cube.obstructs(p19, p18)).toBe(null);
+  expect(cube.obstructs(p20, p21)).toBe(null);
+  expect(cube.obstructs(p21, p20)).toBe(null);
   const p22 = new WT.Point3D(-1, -0.1, -0.1);
   const p23 = new WT.Point3D(11, -0.1, -0.1);
   const p24 = new WT.Point3D(-1, 10.1, 10.1);
   const p25 = new WT.Point3D(11, 10.1, 10.1);
-  expect(cube.obstructs(p22, p23)).toBe(false);
-  expect(cube.obstructs(p23, p22)).toBe(false);
-  expect(cube.obstructs(p24, p25)).toBe(false);
-  expect(cube.obstructs(p25, p24)).toBe(false);
+  expect(cube.obstructs(p22, p23)).toBe(null);
+  expect(cube.obstructs(p23, p22)).toBe(null);
+  expect(cube.obstructs(p24, p25)).toBe(null);
+  expect(cube.obstructs(p25, p24)).toBe(null);
   const p26 = new WT.Point3D(-0.1, -1, -0.1);
   const p27 = new WT.Point3D(-0.1, 11, -0.1);
   const p28 = new WT.Point3D(10.1, -1, 10.1);
   const p29 = new WT.Point3D(10.1, 11, 10.1);
-  expect(cube.obstructs(p26, p27)).toBe(false);
-  expect(cube.obstructs(p27, p26)).toBe(false);
-  expect(cube.obstructs(p28, p29)).toBe(false);
-  expect(cube.obstructs(p29, p28)).toBe(false);
+  expect(cube.obstructs(p26, p27)).toBe(null);
+  expect(cube.obstructs(p27, p26)).toBe(null);
+  expect(cube.obstructs(p28, p29)).toBe(null);
+  expect(cube.obstructs(p29, p28)).toBe(null);
 });
 
 test('ramp up west plane intersection', () => {
@@ -284,26 +284,26 @@ test('ramp up west obstruction', () => {
   const p0 = new WT.Point3D(-1, 5, 1);
   const p1 = new WT.Point3D(15, 5, 1);
   // Through the ramp east/west.
-  expect(ramp.obstructs(p0, p1)).toBe(true);
-  expect(ramp.obstructs(p1, p0)).toBe(true);
+  expect(ramp.obstructs(p0, p1)).not.toBe(null);
+  expect(ramp.obstructs(p1, p0)).not.toBe(null);
 
   const p2 = new WT.Point3D(5, 0, 5.1);
   const p3 = new WT.Point3D(5, 11, 5.1);
   // Across the ramp north/south
-  expect(ramp.obstructs(p2, p3)).toBe(false);
-  expect(ramp.obstructs(p3, p2)).toBe(false);
+  expect(ramp.obstructs(p2, p3)).toBe(null);
+  expect(ramp.obstructs(p3, p2)).toBe(null);
 
   const p4 = new WT.Point3D(5, 0, 4.9);
   const p5 = new WT.Point3D(5, 11, 4.9);
   // Through the ramp north/south
-  expect(ramp.obstructs(p4, p5)).toBe(true);
-  expect(ramp.obstructs(p5, p4)).toBe(true);
+  expect(ramp.obstructs(p4, p5)).not.toBe(null);
+  expect(ramp.obstructs(p5, p4)).not.toBe(null);
 
   // up/down the ramp the middle
   const p6 = new WT.Point3D(10, 5, 0.2);
   const p7 = new WT.Point3D(0, 5, 10.1);
-  expect(ramp.obstructs(p6, p7)).toBe(false);
-  expect(ramp.obstructs(p7, p6)).toBe(false);
+  expect(ramp.obstructs(p6, p7)).toBe(null);
+  expect(ramp.obstructs(p7, p6)).toBe(null);
 });
 
 test('ramp up east obstruction', () => {
@@ -315,34 +315,34 @@ test('ramp up east obstruction', () => {
   const p0 = new WT.Point3D(-1, 5, 1);
   const p1 = new WT.Point3D(15, 5, 1);
   // Through the ramp east/west.
-  expect(ramp.obstructs(p0, p1)).toBe(true);
-  expect(ramp.obstructs(p1, p0)).toBe(true);
+  expect(ramp.obstructs(p0, p1)).not.toBe(null);
+  expect(ramp.obstructs(p1, p0)).not.toBe(null);
 
   const p2 = new WT.Point3D(5, 0, 5.1);
   const p3 = new WT.Point3D(5, 11, 5.1);
   // Across the ramp north/south
-  expect(ramp.obstructs(p2, p3)).toBe(false);
-  expect(ramp.obstructs(p3, p2)).toBe(false);
+  expect(ramp.obstructs(p2, p3)).toBe(null);
+  expect(ramp.obstructs(p3, p2)).toBe(null);
 
   const p4 = new WT.Point3D(5, 0, 4.9);
   const p5 = new WT.Point3D(5, 11, 4.9);
   // Through the ramp north/south
-  expect(ramp.obstructs(p4, p5)).toBe(true);
-  expect(ramp.obstructs(p5, p4)).toBe(true);
+  expect(ramp.obstructs(p4, p5)).not.toBe(null);
+  expect(ramp.obstructs(p5, p4)).not.toBe(null);
 
   // up/down the ramp the middle.
   const p6 = new WT.Point3D(10, 5, 10.2);
-  expect(ramp.obstructs(p0, p6)).toBe(false);
-  expect(ramp.obstructs(p6, p0)).toBe(false);
+  expect(ramp.obstructs(p0, p6)).toBe(null);
+  expect(ramp.obstructs(p6, p0)).toBe(null);
 
   // up/down the ramp between min to max.
   const minLocation = bounds.minLocation;
   const maxLocation = bounds.maxLocation;
   const p9 = minLocation.add(new WT.Vector3D(0, 0, 0.1));
   const p10 = maxLocation.add(new WT.Vector3D(0, 0, 0.1));
-  expect(ramp.obstructs(p9, p10)).toBe(false);
-  expect(ramp.obstructs(p9, maxLocation)).toBe(true);
-  expect(ramp.obstructs(p10, minLocation)).toBe(true);
-  expect(ramp.obstructs(p10, p9)).toBe(false);
+  expect(ramp.obstructs(p9, p10)).toBe(null);
+  expect(ramp.obstructs(p9, maxLocation)).not.toBe(null);
+  expect(ramp.obstructs(p10, minLocation)).not.toBe(null);
+  expect(ramp.obstructs(p10, p9)).toBe(null);
 
 });
