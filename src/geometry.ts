@@ -6,16 +6,49 @@ export enum Orientation {
   CounterClockwise,
 }
 
-export class Point2D {
+export class Vector2D {
   constructor(private readonly _x: number,
-              private readonly _y: number) { }
+              private readonly _y: number) {
+    Object.freeze(this);
+  }
   get x() { return this._x; }
   get y() { return this._y; }
-  add(other: Point2D): Point2D {
-    return new Point2D(this.x + other.x, this.y + other.y);
+
+  dot(other: Vector2D): number {
+    const x = this.x * other.x;
+    const y = this.y * other.y;
+    return x + y;
   }
-  sub(other: Point2D): Point2D {
-    return new Point2D(this.x - other.x, this.y - other.y);
+
+  mag(): number {
+    return this.dot(this);
+  }
+
+  angle(other: Vector2D): number {
+    let x = this.x * other.y - other.x * this.y;
+    let y = this.dot(other);
+    return Math.atan2(x, y);
+  }
+}
+
+export class Point2D {
+  constructor(private readonly _x: number,
+              private readonly _y: number) {
+    Object.freeze(this);
+  }
+  get x() { return this._x; }
+  get y() { return this._y; }
+
+  add(vec: Vector2D): Point2D {
+    return new Point2D(this.x + vec.x, this.y + vec.y);
+  }
+
+  sub(vec: Vector2D): Point2D {
+    return new Point2D(this.x - vec.x, this.y - vec.y);
+  }
+
+  diff(other: Point2D): Vector2D {
+    return new Vector2D(this.x - other.x, this.y - other.y);
   }
 
   static orientation(p: Point2D, q: Point2D, r: Point2D): Orientation {
@@ -96,16 +129,15 @@ export class Segment2D {
 }
 
 export class Point3D {
-  constructor(private _x: number,
-              private _y: number,
-              private _z: number) { }
+  constructor(private readonly _x: number,
+              private readonly _y: number,
+              private readonly _z: number) {
+    Object.freeze(this);
+  }
 
   get x(): number { return this._x; }
   get y(): number { return this._y; }
   get z(): number { return this._z; }
-  set x(x: number) { this._x = x; }
-  set y(y: number) { this._y = y; }
-  set z(z: number) { this._z = z; }
 
   add(vector: Vector3D): Point3D {
     return new Point3D(this.x + vector.x,
@@ -149,7 +181,9 @@ export class Point3D {
 export class Vector3D {
   constructor(private readonly _x: number,
               private readonly _y: number,
-              private readonly _z: number) { }
+              private readonly _z: number) {
+    Object.freeze(this);
+  }
 
   get x(): number { return this._x; }
   get y(): number { return this._y; }

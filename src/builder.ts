@@ -11,7 +11,7 @@ import { Terrain,
 import { Rain } from "./weather.js"
 import { Dimensions,
          Direction,
-         getDirection,
+         getDirectionFromPoints,
          getDirectionName } from "./physics.js"
 import { Point2D } from "./geometry.js"
 import { ContextImpl } from "./context.js"
@@ -732,7 +732,7 @@ export class TerrainBuilder {
               if (neighbour.biome != Biome.Water) {
                 continue;
               }
-              switch (getDirection(neighbour.pos, surface.pos)) {
+              switch (getDirectionFromPoints(surface.pos, neighbour.pos)) {
               default:
                 break;
               case Direction.North:

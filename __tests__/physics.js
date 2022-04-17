@@ -1,5 +1,45 @@
 import * as WT from '../dist/world-tree.js'
 
+test('direction from vector', () => {
+  let north = new WT.Vector2D(0, -1);
+  let northEast = new WT.Vector2D(2, -1);
+  let east = new WT.Vector2D(2, 0);
+  let southEast = new WT.Vector2D(2, 2);
+  let south = new WT.Vector2D(0, 1);
+  let southWest = new WT.Vector2D(-2, 2);
+  let west = new WT.Vector2D(-3, 0);
+  let northWest = new WT.Vector2D(-3, -3);
+
+  expect(WT.getDirectionFromVector(north)).toBe(WT.Direction.North);
+  expect(WT.getDirectionFromVector(northEast)).toBe(WT.Direction.NorthEast);
+  expect(WT.getDirectionFromVector(east)).toBe(WT.Direction.East);
+  expect(WT.getDirectionFromVector(southEast)).toBe(WT.Direction.SouthEast);
+  expect(WT.getDirectionFromVector(south)).toBe(WT.Direction.South);
+  expect(WT.getDirectionFromVector(southWest)).toBe(WT.Direction.SouthWest);
+  expect(WT.getDirectionFromVector(west)).toBe(WT.Direction.West);
+  expect(WT.getDirectionFromVector(northWest)).toBe(WT.Direction.NorthWest);
+});
+
+test('direction from 2D points', () => {
+  let north = new WT.Point2D(0, -2);
+  let northEast = new WT.Point2D(1, -1);
+  let east = new WT.Point2D(2, 0);
+  let southEast = new WT.Point2D(1, 1);
+  let south = new WT.Point2D(0, 2);
+  let southWest = new WT.Point2D(-1, 1);
+  let west = new WT.Point2D(-2, 0);
+  let northWest = new WT.Point2D(-1, -1);
+
+  expect(WT.getDirectionFromPoints(south, north)).toBe(WT.Direction.North);
+  expect(WT.getDirectionFromPoints(north, south)).toBe(WT.Direction.South);
+  expect(WT.getDirectionFromPoints(east, west)).toBe(WT.Direction.West);
+  expect(WT.getDirectionFromPoints(west, east)).toBe(WT.Direction.East);
+  expect(WT.getDirectionFromPoints(northEast, southWest)).toBe(WT.Direction.SouthWest);
+  expect(WT.getDirectionFromPoints(southWest, northEast)).toBe(WT.Direction.NorthEast);
+  expect(WT.getDirectionFromPoints(northWest, southEast)).toBe(WT.Direction.SouthEast);
+  expect(WT.getDirectionFromPoints(southEast, northWest)).toBe(WT.Direction.NorthWest);
+});
+
 test('initial locations', () => {
   const centre = new WT.Point3D(10, 15, 20);
   const dims = new WT.Dimensions(5, 7, 8);

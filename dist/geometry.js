@@ -4,18 +4,44 @@ export var Orientation;
     Orientation[Orientation["Clockwise"] = 1] = "Clockwise";
     Orientation[Orientation["CounterClockwise"] = 2] = "CounterClockwise";
 })(Orientation || (Orientation = {}));
+export class Vector2D {
+    constructor(_x, _y) {
+        this._x = _x;
+        this._y = _y;
+        Object.freeze(this);
+    }
+    get x() { return this._x; }
+    get y() { return this._y; }
+    dot(other) {
+        const x = this.x * other.x;
+        const y = this.y * other.y;
+        return x + y;
+    }
+    mag() {
+        return this.dot(this);
+    }
+    angle(other) {
+        let x = this.x * other.y - other.x * this.y;
+        let y = this.dot(other);
+        return Math.atan2(x, y);
+    }
+}
 export class Point2D {
     constructor(_x, _y) {
         this._x = _x;
         this._y = _y;
+        Object.freeze(this);
     }
     get x() { return this._x; }
     get y() { return this._y; }
-    add(other) {
-        return new Point2D(this.x + other.x, this.y + other.y);
+    add(vec) {
+        return new Point2D(this.x + vec.x, this.y + vec.y);
     }
-    sub(other) {
-        return new Point2D(this.x - other.x, this.y - other.y);
+    sub(vec) {
+        return new Point2D(this.x - vec.x, this.y - vec.y);
+    }
+    diff(other) {
+        return new Vector2D(this.x - other.x, this.y - other.y);
     }
     static orientation(p, q, r) {
         const res = (q.y - p.y) * (r.x - q.x) -
@@ -87,13 +113,11 @@ export class Point3D {
         this._x = _x;
         this._y = _y;
         this._z = _z;
+        Object.freeze(this);
     }
     get x() { return this._x; }
     get y() { return this._y; }
     get z() { return this._z; }
-    set x(x) { this._x = x; }
-    set y(y) { this._y = y; }
-    set z(z) { this._z = z; }
     add(vector) {
         return new Point3D(this.x + vector.x, this.y + vector.y, this.z + vector.z);
     }
@@ -123,6 +147,7 @@ export class Vector3D {
         this._x = _x;
         this._y = _y;
         this._z = _z;
+        Object.freeze(this);
     }
     get x() { return this._x; }
     get y() { return this._y; }

@@ -1,5 +1,5 @@
 import { Direction,
-         getDirection,
+         getDirectionFromPoints,
          getOppositeDirection } from "./physics.js"
 import { Point2D,
          Point3D } from "./geometry.js"
@@ -123,7 +123,11 @@ export class SquareGrid {
                      "can only handle neighbours separated by 1 terrace max");
 
       let toPoint: Point2D = new Point2D(to.x, to.y);
-      let direction: Direction = getDirection(centrePoint, toPoint);
+      let direction: Direction = getDirectionFromPoints(centrePoint, toPoint);
+      console.assert(direction == Direction.North ||
+                     direction == Direction.East ||
+                     direction == Direction.South ||
+                     direction == Direction.West);
       let oppositeDir: Direction = getOppositeDirection(direction);
       if (to.z == centre.z) {
         return true;

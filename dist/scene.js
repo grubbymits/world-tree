@@ -189,7 +189,7 @@ export class SceneGraph {
         node.topSegments.push(new Segment2D(top2, max2D));
         node.sideSegments.push(new Segment2D(min2D, top1));
         node.sideSegments.push(new Segment2D(base2, max2D));
-        const drawHeightOffset = min2D.sub(top2);
+        const drawHeightOffset = min2D.diff(top2);
         const coord = this.getDrawCoord(entity.bounds.minLocation);
         const adjustedCoord = new Point2D(coord.x, coord.y - drawHeightOffset.y);
         node.drawCoord = adjustedCoord;

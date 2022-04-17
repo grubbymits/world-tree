@@ -1,7 +1,7 @@
 import { SquareGrid } from "./map.js";
 import { Terrain, TerrainShape, TerrainType, TerrainFeature, isFlat, isEdge, getTypeName } from "./terrain.js";
 import { Rain } from "./weather.js";
-import { Direction, getDirection } from "./physics.js";
+import { Direction, getDirectionFromPoints } from "./physics.js";
 import { Point2D } from "./geometry.js";
 export var Biome;
 (function (Biome) {
@@ -610,7 +610,7 @@ export class TerrainBuilder {
                             if (neighbour.biome != Biome.Water) {
                                 continue;
                             }
-                            switch (getDirection(neighbour.pos, surface.pos)) {
+                            switch (getDirectionFromPoints(surface.pos, neighbour.pos)) {
                                 default:
                                     break;
                                 case Direction.North:

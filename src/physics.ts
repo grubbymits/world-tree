@@ -4,6 +4,7 @@ import { TerrainType, TerrainShape, Terrain } from "./terrain.js"
 import { SquareGrid } from "./map.js"
 import { Point2D,
          Point3D,
+         Vector2D,
          Vector3D,
          Geometry,
          IntersectInfo } from "./geometry.js"
@@ -49,12 +50,12 @@ export function getDirectionName(direction: Direction): string {
 }
 
 export function getDirectionCoords(x: number, y: number,
-                                   direction: Direction): Point2D{
+                                   direction: Direction): Vector2D{
   let xDiff: number = 0;
   let yDiff: number = 0;
   switch(direction) {
   default:
-    console.error("unhandled cloud direction");
+    console.error("unhandled direction");
     break;
   case Direction.North:
     yDiff = -1;
@@ -85,42 +86,23 @@ export function getDirectionCoords(x: number, y: number,
     yDiff = -1;
     break;
   }
-  return new Point2D(x + xDiff, y + yDiff);
+  return new Vector2D(x + xDiff, y + yDiff);
 }
 
-export function getDirection(from: Point2D, to: Point2D): Direction {
-  let xDiff = from.x - to.x;
-  let yDiff = from.y - to.y;
-
-  if (xDiff < 0 && yDiff < 0) {
-    return Direction.NorthWest;
-  } else if (xDiff == 0 && yDiff < 0) {
-    return Direction.North;
-  } else if (xDiff > 0 && yDiff < 0) {
-    return Direction.NorthEast;
-  } else if (xDiff < 0 && yDiff == 0) {
-    return Direction.West;
-  } else if (xDiff > 0 && yDiff == 0) {
-    return Direction.East;
-  } else if (xDiff < 0 && yDiff > 0) {
-    return Direction.SouthWest;
-  } else if (xDiff == 0 && yDiff > 0) {
-    return Direction.South;
-  }
-  console.assert(xDiff > 0 && yDiff > 0, "unhandled direction", xDiff, yDiff);
-  return Direction.SouthEast;
+export function getDirectionFromPoints(from: Point2D, to: Point2D): Direction {
+  return getDirectionFromVector(to.diff(from));
 }
 
-export function getDirectionFromVector(d: Vector3D): Direction {
-  if (d.y < 0 && d.y < d.x) {
-    return Direction.North;
-  } else if (d.x > d.y && d.x > 0) {
-    return Direction.East;
-  } else if (d.y > 0 && d.y > d.x) {
-    return Direction.South;
+export function getDirectionFromVector(w: Vector2D): Direction {
+  let mag = w.mag();
+  let u = new Vector2D(0, -mag);  // 'north'
+  let theta = 180 * u.angle(w) / Math.PI;
+  if (theta < 0) {
+    let rotate = 180 + theta;
+    theta = 180 + rotate;
   }
-  console.assert(d.x < 0 && d.x < d.y);
-  return Direction.West;
+  const direction = Math.round(theta / 45);
+  return <Direction>direction;
 }
 
 export function getOppositeDirection(direction: Direction): Direction {

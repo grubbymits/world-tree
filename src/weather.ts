@@ -51,7 +51,8 @@ export class Rain {
       return true;
     }
 
-    let nextCoord = getDirectionCoords(this._x, this._y, this._direction);
+    let changeVec = getDirectionCoords(this._x, this._y, this._direction);
+    let nextCoord = new Point2D(this._x, this._y).add(changeVec);
 
     // Cloud may have left the map.
     if (!Rain._surface.inbounds(nextCoord)) {
@@ -81,8 +82,9 @@ export class Rain {
     if (next.terrace > current.terrace) {
       let dirA: Direction = (this._direction + 1) % Direction.Max;
       let dirB: Direction = (this._direction + Direction.NorthWest) % Direction.Max;
-      let pointA: Point2D= getDirectionCoords(this._x, this._y, dirA);
-      let pointB: Point2D= getDirectionCoords(this._x, this._y, dirB);
+      let pos = new Point2D(this._x, this._y);
+      let pointA: Point2D = pos.add(getDirectionCoords(this._x, this._y, dirA));
+      let pointB: Point2D = pos.add(getDirectionCoords(this._x, this._y, dirB));
       let numClouds: number = 2;
       if (Rain._surface.inbounds(pointA) && Rain._surface.inbounds(pointB)) {
         Rain.add(pointA.x, pointA.y, this._moisture / 3, dirA);

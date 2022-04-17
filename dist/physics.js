@@ -1,4 +1,4 @@
-import { Point2D, Point3D, Vector3D } from "./geometry.js";
+import { Point3D, Vector2D, Vector3D } from "./geometry.js";
 import { EntityEvent } from "./events.js";
 export var Direction;
 (function (Direction) {
@@ -41,7 +41,7 @@ export function getDirectionCoords(x, y, direction) {
     let yDiff = 0;
     switch (direction) {
         default:
-            console.error("unhandled cloud direction");
+            console.error("unhandled direction");
             break;
         case Direction.North:
             yDiff = -1;
@@ -72,47 +72,21 @@ export function getDirectionCoords(x, y, direction) {
             yDiff = -1;
             break;
     }
-    return new Point2D(x + xDiff, y + yDiff);
+    return new Vector2D(x + xDiff, y + yDiff);
 }
-export function getDirection(from, to) {
-    let xDiff = from.x - to.x;
-    let yDiff = from.y - to.y;
-    if (xDiff < 0 && yDiff < 0) {
-        return Direction.NorthWest;
-    }
-    else if (xDiff == 0 && yDiff < 0) {
-        return Direction.North;
-    }
-    else if (xDiff > 0 && yDiff < 0) {
-        return Direction.NorthEast;
-    }
-    else if (xDiff < 0 && yDiff == 0) {
-        return Direction.West;
-    }
-    else if (xDiff > 0 && yDiff == 0) {
-        return Direction.East;
-    }
-    else if (xDiff < 0 && yDiff > 0) {
-        return Direction.SouthWest;
-    }
-    else if (xDiff == 0 && yDiff > 0) {
-        return Direction.South;
-    }
-    console.assert(xDiff > 0 && yDiff > 0, "unhandled direction", xDiff, yDiff);
-    return Direction.SouthEast;
+export function getDirectionFromPoints(from, to) {
+    return getDirectionFromVector(to.diff(from));
 }
-export function getDirectionFromVector(d) {
-    if (d.y < 0 && d.y < d.x) {
-        return Direction.North;
+export function getDirectionFromVector(w) {
+    let mag = w.mag();
+    let u = new Vector2D(0, -mag);
+    let theta = 180 * u.angle(w) / Math.PI;
+    if (theta < 0) {
+        let rotate = 180 + theta;
+        theta = 180 + rotate;
     }
-    else if (d.x > d.y && d.x > 0) {
-        return Direction.East;
-    }
-    else if (d.y > 0 && d.y > d.x) {
-        return Direction.South;
-    }
-    console.assert(d.x < 0 && d.x < d.y);
-    return Direction.West;
+    const direction = Math.round(theta / 45);
+    return direction;
 }
 export function getOppositeDirection(direction) {
     switch (direction) {

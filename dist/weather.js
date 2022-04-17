@@ -1,4 +1,5 @@
 import { Direction, getDirectionCoords } from "./physics.js";
+import { Point2D } from "./geometry.js";
 export class Rain {
     constructor(_x, _y, _moisture, _direction) {
         this._x = _x;
@@ -34,7 +35,8 @@ export class Rain {
         if (this._finished) {
             return true;
         }
-        let nextCoord = getDirectionCoords(this._x, this._y, this._direction);
+        let changeVec = getDirectionCoords(this._x, this._y, this._direction);
+        let nextCoord = new Point2D(this._x, this._y).add(changeVec);
         if (!Rain._surface.inbounds(nextCoord)) {
             this._finished = true;
             return true;
@@ -56,8 +58,9 @@ export class Rain {
         if (next.terrace > current.terrace) {
             let dirA = (this._direction + 1) % Direction.Max;
             let dirB = (this._direction + Direction.NorthWest) % Direction.Max;
-            let pointA = getDirectionCoords(this._x, this._y, dirA);
-            let pointB = getDirectionCoords(this._x, this._y, dirB);
+            let pos = new Point2D(this._x, this._y);
+            let pointA = pos.add(getDirectionCoords(this._x, this._y, dirA));
+            let pointB = pos.add(getDirectionCoords(this._x, this._y, dirB));
             let numClouds = 2;
             if (Rain._surface.inbounds(pointA) && Rain._surface.inbounds(pointB)) {
                 Rain.add(pointA.x, pointA.y, this._moisture / 3, dirA);

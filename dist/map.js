@@ -1,4 +1,4 @@
-import { getDirection, getOppositeDirection } from "./physics.js";
+import { Direction, getDirectionFromPoints, getOppositeDirection } from "./physics.js";
 import { Point2D } from "./geometry.js";
 import { Terrain, isFlat, isRampUp } from "./terrain.js";
 export class SquareGrid {
@@ -78,7 +78,11 @@ export class SquareGrid {
         return neighbours.filter(function (to) {
             console.assert(Math.abs(centre.z - to.z) <= 1, "can only handle neighbours separated by 1 terrace max");
             let toPoint = new Point2D(to.x, to.y);
-            let direction = getDirection(centrePoint, toPoint);
+            let direction = getDirectionFromPoints(centrePoint, toPoint);
+            console.assert(direction == Direction.North ||
+                direction == Direction.East ||
+                direction == Direction.South ||
+                direction == Direction.West);
             let oppositeDir = getOppositeDirection(direction);
             if (to.z == centre.z) {
                 return true;
