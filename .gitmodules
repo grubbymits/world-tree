@@ -1,0 +1,3 @@
+[submodule "demos/graphics"]
+	path = demos/graphics
+	url = https://github.com/grubbymits/graphics

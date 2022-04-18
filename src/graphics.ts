@@ -245,10 +245,11 @@ export class DirectionalGraphicComponent extends GraphicComponent {
 
   get direction(): Direction { return this._direction; }
   set direction(direction: Direction) {
-    if (!this._staticGraphics.has(direction)) {
+    if (this._staticGraphics.has(direction)) {
+      this._direction = direction;
+    } else {
       console.log("graphic direction unsupported");
     }
-    this._direction = direction;
   } 
 
   update(): number {
@@ -275,11 +276,11 @@ export class AnimatedDirectionalGraphicComponent extends GraphicComponent {
   get direction(): Direction { return this._direction; }
   set stationary(stationary: boolean) { this._stationary = stationary; }
   set direction(direction: Direction) {
-    if (!this._staticGraphics.has(direction) ||
-        !this._movementGraphics.has(direction)) {
+    if (this._staticGraphics.has(direction) && this._movementGraphics.has(direction)) {
+      this._direction = direction;
+    } else {
       console.log("graphic direction unsupported");
     }
-    this._direction = direction;
   } 
 
   update(): number {

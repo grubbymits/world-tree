@@ -2,6 +2,7 @@
   "name": "world-tree",
   "scripts": {
     "build": "tsc --project .",
+    "build-demo": "cp dist/*.js demos/lib/",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage",
     "benchmark": "node --experimental-vm-modules benchmarks/all.js"
   },
