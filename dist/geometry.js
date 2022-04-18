@@ -468,3 +468,32 @@ export class RampUpNorthGeometry extends Geometry {
         this._faces.push(bottom);
     }
 }
+export class RampUpSouthGeometry extends Geometry {
+    constructor(bounds) {
+        super(bounds);
+        const p = [
+            this.bounds.minLocation,
+            this.bounds.minLocation.add(this.depthVec3D),
+            this.bounds.maxLocation.sub(this.widthVec3D),
+            this.bounds.maxLocation,
+            this.bounds.maxLocation.sub(this.heightVec3D),
+            this.bounds.minLocation.add(this.widthVec3D),
+        ];
+        const left = new TriangleFace3D(new Vertex3D(p[0], p[1], p[2]));
+        this._faces.push(left);
+        const v0 = new Vertex3D(p[1], p[4], p[2]);
+        const v1 = new Vertex3D(p[3], p[2], p[4]);
+        const front = new QuadFace3D(v0, v1);
+        this._faces.push(front);
+        const right = new TriangleFace3D(new Vertex3D(p[5], p[3], p[4]));
+        this._faces.push(right);
+        const v2 = new Vertex3D(p[0], p[2], p[5]);
+        const v3 = new Vertex3D(p[3], p[5], p[2]);
+        const back = new QuadFace3D(v2, v3);
+        this._faces.push(back);
+        const v4 = new Vertex3D(p[1], p[4], p[0]);
+        const v5 = new Vertex3D(p[5], p[0], p[4]);
+        const bottom = new QuadFace3D(v4, v5);
+        this._faces.push(bottom);
+    }
+}
