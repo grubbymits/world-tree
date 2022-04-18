@@ -233,3 +233,69 @@ test('shoreline', () => {
     expect(builder.hasFeature(3, y, WT.TerrainFeature.ShorelineEast)).toBe(true);
   }
 });
+
+test('rain northwards', () => {
+  const dims = new WT.Dimensions(5, 5, 5);
+  const width = 11;
+  const depth = 11;
+  const numTerraces = 3;
+  const worldDims = new WT.Dimensions(dims.width * width,
+                                      dims.depth * depth,
+                                      dims.height * (numTerraces + 1));
+  const heightMap = [ [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+                      [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 ],
+                      [ 0, 1, 2, 2, 2, 2, 1, 1, 1, 1, 0 ],
+                      [ 0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0 ],
+                      [ 0, 1, 2, 3, 3, 4, 3, 2, 2, 1, 0 ],
+                      [ 0, 1, 2, 3, 4, 6, 4, 2, 2, 1, 0 ],
+                      [ 0, 1, 2, 3, 4, 4, 3, 2, 2, 1, 0 ],
+                      [ 0, 1, 2, 3, 3, 2, 2, 2, 2, 1, 0 ],
+                      [ 0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0 ],
+                      [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 ],
+                      [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ];
+  let config = new WT.TerrainBuilderConfig(numTerraces,
+                                           WT.TerrainType.Rock,
+                                           WT.TerrainType.Rock);
+  config.hasRamps = true;
+  config.hasWater = true;
+  config.waterLine = 0;
+  config.rainfall = 30;
+  config.rainDirection = WT.Direction.North;
+
+  let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
+  let context = WT.createTestContext(worldDims);
+  builder.generateMap(context);
+
+  // No 'moisture' over the surrounding water.
+  for (let x = 0; x < width; ++x) {
+    expect(builder.moistureAt(x, 0)).toBe(0);
+    expect(builder.moistureAt(x, depth - 1)).toBe(0);
+  }
+  for (let y = 0; y < depth; ++y) {
+    expect(builder.moistureAt(0, y)).toBe(0);
+    expect(builder.moistureAt(width - 1, y)).toBe(0);
+  }
+  // Check first row of rainfall
+  let y = depth - 2;
+  expect(Math.round(builder.moistureAt(1, y))).toBe(2);
+  expect(Math.round(builder.moistureAt(2, y))).toBe(2);
+  expect(Math.round(builder.moistureAt(3, y))).toBe(3);
+  expect(Math.round(builder.moistureAt(4, y))).toBe(3);
+  expect(Math.round(builder.moistureAt(5, y))).toBe(3);
+  expect(Math.round(builder.moistureAt(6, y))).toBe(3);
+  expect(Math.round(builder.moistureAt(7, y))).toBe(3);
+  expect(Math.round(builder.moistureAt(8, y))).toBe(2);
+  expect(Math.round(builder.moistureAt(9, y))).toBe(2);
+
+  // Check second row of rainfall
+  y = depth - 3;
+  expect(Math.round(builder.moistureAt(1, y))).toBe(1);
+  expect(Math.round(builder.moistureAt(2, y))).toBe(4);
+  expect(Math.round(builder.moistureAt(3, y))).toBe(3);
+  expect(Math.round(builder.moistureAt(4, y))).toBe(3);
+  expect(Math.round(builder.moistureAt(5, y))).toBe(4);
+  expect(Math.round(builder.moistureAt(6, y))).toBe(3);
+  expect(Math.round(builder.moistureAt(7, y))).toBe(3);
+  expect(Math.round(builder.moistureAt(8, y))).toBe(4);
+  expect(Math.round(builder.moistureAt(9, y))).toBe(1);
+});

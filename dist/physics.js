@@ -36,7 +36,7 @@ export function getDirectionName(direction) {
     console.error("unhandled direction when getting name:", direction);
     return "error";
 }
-export function getDirectionCoords(x, y, direction) {
+export function getAdjacentCoord(p, direction) {
     let xDiff = 0;
     let yDiff = 0;
     switch (direction) {
@@ -72,7 +72,8 @@ export function getDirectionCoords(x, y, direction) {
             yDiff = -1;
             break;
     }
-    return new Vector2D(x + xDiff, y + yDiff);
+    let v = new Vector2D(xDiff, yDiff);
+    return p.add(v);
 }
 export function getDirectionFromPoints(from, to) {
     return getDirectionFromVector(to.diff(from));

@@ -49,8 +49,8 @@ export function getDirectionName(direction: Direction): string {
   return "error";
 }
 
-export function getDirectionCoords(x: number, y: number,
-                                   direction: Direction): Vector2D{
+export function getAdjacentCoord(p: Point2D,
+                                 direction: Direction): Point2D {
   let xDiff: number = 0;
   let yDiff: number = 0;
   switch(direction) {
@@ -86,7 +86,8 @@ export function getDirectionCoords(x: number, y: number,
     yDiff = -1;
     break;
   }
-  return new Vector2D(x + xDiff, y + yDiff);
+  let v = new Vector2D(xDiff, yDiff);
+  return p.add(v);
 }
 
 export function getDirectionFromPoints(from: Point2D, to: Point2D): Direction {

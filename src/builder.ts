@@ -375,6 +375,12 @@ export class TerrainBuilder {
     return this._surface.at(x, y).shape;
   }
 
+  moistureAt(x: number, y: number): number {
+    console.assert(x >= 0 && x < this._surface.width &&
+                   y >= 0 && y < this._surface.depth);
+    return this._surface.at(x, y).moisture;
+  }
+
   isFlatAt(x: number, y: number): boolean {
     console.assert(x >= 0 && x < this._surface.width &&
                    y >= 0 && y < this._surface.depth);
@@ -633,7 +639,8 @@ export class TerrainBuilder {
     // - clouds are added at the 'bottom' of the map and move northwards.
     Rain.init(waterLine, this._surface);
     for (let x = 0; x < this._surface.width; x++) {
-      Rain.add(x, this._surface.depth - 1, water, towards);
+      let pos = new Point2D(x, this._surface.depth - 1);
+      Rain.add(pos, water, towards);
     }
 
     for (let i = 0; i < Rain.clouds.length; i++) {
