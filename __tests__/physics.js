@@ -40,6 +40,38 @@ test('direction from 2D points', () => {
   expect(WT.getDirectionFromPoints(southEast, northWest)).toBe(WT.Direction.NorthWest);
 });
 
+test('adjacent coord', () => {
+  const centre = new WT.Point2D(0, 0);
+  const north = new WT.Point2D(0, -1);
+  const northEast = new WT.Point2D(1, -1);
+  const east = new WT.Point2D(1, 0);
+  const southEast = new WT.Point2D(1, 1);
+  const south = new WT.Point2D(0, 1);
+  const southWest = new WT.Point2D(-1, 1);
+  const west = new WT.Point2D(-1, 0);
+  const northWest = new WT.Point2D(-1, -1);
+
+  expect(WT.getAdjacentCoord(centre, WT.Direction.North)).toEqual(north);
+  expect(WT.getAdjacentCoord(centre, WT.Direction.NorthEast)).toEqual(northEast);
+  expect(WT.getAdjacentCoord(centre, WT.Direction.East)).toEqual(east);
+  expect(WT.getAdjacentCoord(centre, WT.Direction.SouthEast)).toEqual(southEast);
+  expect(WT.getAdjacentCoord(centre, WT.Direction.South)).toEqual(south);
+  expect(WT.getAdjacentCoord(centre, WT.Direction.SouthWest)).toEqual(southWest);
+  expect(WT.getAdjacentCoord(centre, WT.Direction.West)).toEqual(west);
+  expect(WT.getAdjacentCoord(centre, WT.Direction.NorthWest)).toEqual(northWest);
+});
+
+test('opposite direction', () => {
+  expect(WT.getOppositeDirection(WT.Direction.North)).toBe(WT.Direction.South);
+  expect(WT.getOppositeDirection(WT.Direction.NorthEast)).toBe(WT.Direction.SouthWest);
+  expect(WT.getOppositeDirection(WT.Direction.East)).toBe(WT.Direction.West);
+  expect(WT.getOppositeDirection(WT.Direction.SouthEast)).toBe(WT.Direction.NorthWest);
+  expect(WT.getOppositeDirection(WT.Direction.South)).toBe(WT.Direction.North);
+  expect(WT.getOppositeDirection(WT.Direction.SouthWest)).toBe(WT.Direction.NorthEast);
+  expect(WT.getOppositeDirection(WT.Direction.West)).toBe(WT.Direction.East);
+  expect(WT.getOppositeDirection(WT.Direction.NorthWest)).toBe(WT.Direction.SouthEast);
+});
+
 test('initial locations', () => {
   const centre = new WT.Point3D(10, 15, 20);
   const dims = new WT.Dimensions(5, 7, 8);

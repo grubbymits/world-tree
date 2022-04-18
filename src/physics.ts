@@ -107,27 +107,7 @@ export function getDirectionFromVector(w: Vector2D): Direction {
 }
 
 export function getOppositeDirection(direction: Direction): Direction {
-  switch (direction) {
-  default:
-    break;
-  case Direction.NorthEast:
-    return Direction.SouthWest;
-  case Direction.East:
-    return Direction.West;
-  case Direction.SouthEast:
-    return Direction.NorthWest;
-  case Direction.South:
-    return Direction.North;
-  case Direction.SouthWest:
-    return Direction.NorthEast;
-  case Direction.West:
-    return Direction.East;
-  case Direction.NorthWest:
-    return Direction.SouthEast;
-  }
-  console.assert(direction == Direction.North,
-                 "unhandled direction");
-  return Direction.North;
+  return (direction + (Direction.Max / 2)) % Direction.Max;
 }
 
 export class Dimensions {
