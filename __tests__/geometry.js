@@ -344,5 +344,43 @@ test('ramp up east obstruction', () => {
   expect(ramp.obstructs(p9, maxLocation)).not.toBe(null);
   expect(ramp.obstructs(p10, minLocation)).not.toBe(null);
   expect(ramp.obstructs(p10, p9)).toBe(null);
+});
 
+test('ramp up north obstruction', () => {
+  const dims = new WT.Dimensions(10, 10, 10);
+  const centre = new WT.Point3D(5, 5, 5);
+  const bounds = new WT.BoundingCuboid(centre, dims);
+  const ramp = new WT.RampUpNorthGeometry(bounds);
+
+  const p0 = new WT.Point3D(-1, 5, 5.2);
+  const p1 = new WT.Point3D(15, 5, 5.2);
+  // Across the ramp east/west.
+  expect(ramp.obstructs(p0, p1)).toBe(null);
+  expect(ramp.obstructs(p1, p0)).toBe(null);
+
+  const p2 = new WT.Point3D(5, 0, 10.1);
+  const p3 = new WT.Point3D(5, 11, 0.1);
+  // up/down the ramp the middle.
+  expect(ramp.obstructs(p2, p3)).toBe(null);
+  expect(ramp.obstructs(p3, p2)).toBe(null);
+
+  const p4 = new WT.Point3D(5, -1, 2);
+  const p5 = new WT.Point3D(5, 11, 2);
+  // Blocked through the ramp south/north
+  expect(ramp.obstructs(p4, p5)).not.toBe(null);
+  expect(ramp.obstructs(p5, p4)).not.toBe(null);
+
+  const p6 = new WT.Point3D(-1, 5, 4.9);
+  const p7 = new WT.Point3D(15, 5, 4.9);
+  // Through the ramp east/west.
+  expect(ramp.obstructs(p6, p7)).not.toBe(null);
+  expect(ramp.obstructs(p7, p6)).not.toBe(null);
+
+  // up/down the ramp between min to max.
+  const topCorner = bounds.minLocation.add(new WT.Vector3D(0, 0, 10.1));
+  const bottomCorner = bounds.maxLocation.sub(new WT.Vector3D(0, 0, 9.9));
+  expect(ramp.obstructs(topCorner, bottomCorner)).toBe(null);
+  expect(ramp.obstructs(bottomCorner, topCorner)).toBe(null);
+  expect(ramp.obstructs(topCorner, bounds.minLocation)).not.toBe(null);
+  expect(ramp.obstructs(bottomCorner, bounds.minLocation)).not.toBe(null);
 });
