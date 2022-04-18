@@ -330,6 +330,7 @@ export class Geometry {
     get depthVec3D() { return this._depthVec3D; }
     get heightVec3D() { return this._heightVec3D; }
     get intersectInfo() { return this._intersectInfo; }
+    get name() { return this._name; }
     transform(d) {
         for (let face of this._faces) {
             face.transform(d);
@@ -351,12 +352,14 @@ export class Geometry {
 export class NoGeometry extends Geometry {
     constructor(bounds) {
         super(bounds);
+        this._name = "NoGeometry";
     }
     obstructs(begin, end) { return null; }
 }
 export class CuboidGeometry extends Geometry {
     constructor(bounds) {
         super(bounds);
+        this._name = "CuboidGeometry";
         const p = [
             this.bounds.minLocation,
             this.bounds.minLocation.add(this.heightVec3D),
@@ -390,6 +393,7 @@ export class CuboidGeometry extends Geometry {
 export class RampUpWestGeometry extends Geometry {
     constructor(bounds) {
         super(bounds);
+        this._name = "RampUpWestGeometry";
         const p = [
             this.bounds.minLocation,
             this.bounds.minLocation.add(this.depthVec3D),
@@ -413,6 +417,7 @@ export class RampUpWestGeometry extends Geometry {
 export class RampUpEastGeometry extends Geometry {
     constructor(bounds) {
         super(bounds);
+        this._name = "RampUpEastGeometry";
         const p = [
             this.bounds.minLocation,
             this.bounds.minLocation.add(this.depthVec3D),
@@ -442,6 +447,7 @@ export class RampUpEastGeometry extends Geometry {
 export class RampUpNorthGeometry extends Geometry {
     constructor(bounds) {
         super(bounds);
+        this._name = "RampUpNorthGeometry";
         const p = [
             this.bounds.minLocation,
             this.bounds.minLocation.add(this.depthVec3D),
@@ -471,6 +477,7 @@ export class RampUpNorthGeometry extends Geometry {
 export class RampUpSouthGeometry extends Geometry {
     constructor(bounds) {
         super(bounds);
+        this._name = "RampUpSouthGeometry";
         const p = [
             this.bounds.minLocation,
             this.bounds.minLocation.add(this.depthVec3D),

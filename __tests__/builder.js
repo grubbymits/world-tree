@@ -112,29 +112,42 @@ test('ramps', () => {
 
   for (let y = 0; y < depth; ++y) {
     for (let x = 0; x < width; ++x) {
-      let result = WT.TerrainShape.Flat;
+      let shape = WT.TerrainShape.Flat;
+      let geometry = "CuboidGeometry";
+
       if (x == 3 && y == 3) {
-        result = WT.TerrainShape.RampUpEast;
+        shape = WT.TerrainShape.RampUpEast;
+        geometry = "RampUpEastGeometry";
       } else if (x == 2 && y == 4) {
-        result = WT.TerrainShape.RampUpSouth;
+        shape = WT.TerrainShape.RampUpSouth;
+        geometry = "RampUpSouthGeometry";
       } else if (x == 5 && y == 2) {
-        result = WT.TerrainShape.RampUpWest;
+        shape = WT.TerrainShape.RampUpWest;
+        geometry = "RampUpWestGeometry";
       } else if (x == 7 && y == 3) {
-        result = WT.TerrainShape.RampUpWest;
+        shape = WT.TerrainShape.RampUpWest;
+        geometry = "RampUpWestGeometry";
       } else if (x == 2 && y == 7) {
-        result = WT.TerrainShape.RampUpNorth;
+        shape = WT.TerrainShape.RampUpNorth;
+        geometry = "RampUpNorthGeometry";
       } else if (x == 4 && y == 6) {
-        result = WT.TerrainShape.RampUpNorth;
+        shape = WT.TerrainShape.RampUpNorth;
+        geometry = "RampUpNorthGeometry";
       } else if (x == 3 && y == 8) {
-        result = WT.TerrainShape.RampUpEast;
+        shape = WT.TerrainShape.RampUpEast;
+        geometry = "RampUpEastGeometry";
       } else if (x == 7 && y == 8) {
-        result = WT.TerrainShape.RampUpWest;
+        shape = WT.TerrainShape.RampUpWest;
+        geometry = "RampUpWestGeometry";
       } else if (x == 8 && y == 7) {
-        result = WT.TerrainShape.RampUpNorth;
+        shape = WT.TerrainShape.RampUpNorth;
+        geometry = "RampUpNorthGeometry";
       } else if (x == 8 && y == 4) {
-        result = WT.TerrainShape.RampUpSouth;
+        shape = WT.TerrainShape.RampUpSouth;
+        geometry = "RampUpSouthGeometry";
       }
-      expect(builder.terrainShapeAt(x, y)).toBe(result);
+      expect(builder.terrainShapeAt(x, y)).toBe(shape);
+      //expect(builder.terrainGeometryName(x, y)).toBe(geometry);
     }
   }
 });

@@ -409,6 +409,7 @@ export class Geometry {
   protected readonly _widthVec3D: Vector3D;
   protected readonly _depthVec3D: Vector3D;
   protected readonly _heightVec3D: Vector3D;
+  protected _name: string;
 
   constructor(protected _bounds: BoundingCuboid) {
     this._widthVec3D = new Vector3D(_bounds.width, 0, 0);
@@ -421,6 +422,7 @@ export class Geometry {
   get depthVec3D(): Vector3D { return this._depthVec3D; }
   get heightVec3D(): Vector3D { return this._heightVec3D; }
   get intersectInfo(): IntersectInfo | null { return this._intersectInfo; }
+  get name(): string { return this._name; }
 
   transform(d: Vector3D): void {
     for (let face of this._faces) {
@@ -445,6 +447,7 @@ export class Geometry {
 export class NoGeometry extends Geometry {
   constructor(bounds: BoundingCuboid) {
     super(bounds);
+    this._name = "NoGeometry";
   }
   obstructs(begin: Point3D, end: Point3D): IntersectInfo|null { return null; }
 }
@@ -452,6 +455,7 @@ export class NoGeometry extends Geometry {
 export class CuboidGeometry extends Geometry {
   constructor(bounds: BoundingCuboid) {
     super(bounds);
+    this._name = "CuboidGeometry";
 
     //  1  ________ 5
     //    |\       \
@@ -508,6 +512,7 @@ export class CuboidGeometry extends Geometry {
 export class RampUpWestGeometry extends Geometry {
   constructor(bounds: BoundingCuboid) {
     super(bounds);
+    this._name = "RampUpWestGeometry";
     //     4
     //     /\
     //    /  \
@@ -552,6 +557,7 @@ export class RampUpWestGeometry extends Geometry {
 export class RampUpEastGeometry extends Geometry {
   constructor(bounds: BoundingCuboid) {
     super(bounds);
+    this._name = "RampUpEastGeometry";
     //         4
     //        / \
     //       /   \
@@ -601,6 +607,7 @@ export class RampUpEastGeometry extends Geometry {
 export class RampUpNorthGeometry extends Geometry {
   constructor(bounds: BoundingCuboid) {
     super(bounds);
+    this._name = "RampUpNorthGeometry";
 
     //   2 ______  3
     //    | \    \
@@ -648,6 +655,7 @@ export class RampUpNorthGeometry extends Geometry {
 export class RampUpSouthGeometry extends Geometry {
   constructor(bounds: BoundingCuboid) {
     super(bounds);
+    this._name = "RampUpSouthGeometry";
 
     //   2 ______  3
     //    /|     |

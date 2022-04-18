@@ -10,7 +10,9 @@ import { Point3D,
          Geometry,
          CuboidGeometry,
          RampUpWestGeometry,
-         RampUpEastGeometry } from "./geometry.js"
+         RampUpEastGeometry,
+         RampUpSouthGeometry,
+         RampUpNorthGeometry } from "./geometry.js"
 
 export enum TerrainShape {
   Flat,             // 0
@@ -338,7 +340,11 @@ export class Terrain extends PhysicalEntity {
     if (this._shape == TerrainShape.RampUpWest) {
       this._geometry = new RampUpWestGeometry(this.geometry.bounds);
     } else if (this._shape == TerrainShape.RampUpEast) {
-      this._geometry = new RampUpWestGeometry(this.geometry.bounds);
+      this._geometry = new RampUpEastGeometry(this.geometry.bounds);
+    } else if (this._shape == TerrainShape.RampUpSouth) {
+      this._geometry = new RampUpSouthGeometry(this.geometry.bounds);
+    } else if (this._shape == TerrainShape.RampUpNorth) {
+      this._geometry = new RampUpNorthGeometry(this.geometry.bounds);
     }
 
     let x = this.bounds.centre.x;

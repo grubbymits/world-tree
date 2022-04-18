@@ -1,7 +1,7 @@
 import { Direction, Dimensions } from "./physics.js";
 import { PhysicalEntity } from "./entity.js";
 import { Sprite, StaticGraphicComponent } from "./graphics.js";
-import { Point3D, RampUpWestGeometry } from "./geometry.js";
+import { Point3D, RampUpWestGeometry, RampUpEastGeometry, RampUpSouthGeometry, RampUpNorthGeometry } from "./geometry.js";
 export var TerrainShape;
 (function (TerrainShape) {
     TerrainShape[TerrainShape["Flat"] = 0] = "Flat";
@@ -230,7 +230,13 @@ export class Terrain extends PhysicalEntity {
             this._geometry = new RampUpWestGeometry(this.geometry.bounds);
         }
         else if (this._shape == TerrainShape.RampUpEast) {
-            this._geometry = new RampUpWestGeometry(this.geometry.bounds);
+            this._geometry = new RampUpEastGeometry(this.geometry.bounds);
+        }
+        else if (this._shape == TerrainShape.RampUpSouth) {
+            this._geometry = new RampUpSouthGeometry(this.geometry.bounds);
+        }
+        else if (this._shape == TerrainShape.RampUpNorth) {
+            this._geometry = new RampUpNorthGeometry(this.geometry.bounds);
         }
         let x = this.bounds.centre.x;
         let y = this.bounds.centre.y;
