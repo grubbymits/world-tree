@@ -339,21 +339,22 @@ export class TerrainBuilder {
             for (let x = 0; x < this.surface.width; x++) {
                 let surface = this.surface.at(x, y);
                 console.assert(surface.terrace <= this.config.numTerraces && surface.terrace >= 0, "terrace out-of-range", surface.terrace);
-                map.addRaisedTerrain(x, y, surface.terrace, surface.type, surface.shape, surface.features);
+                map.addSurfaceTerrain(x, y, surface.terrace, surface.type, surface.shape, surface.features);
             }
         }
+        console.log("total grid surface:", map.totalSurface);
         for (let y = 0; y < this.surface.depth; y++) {
             for (let x = 0; x < this.surface.width; x++) {
                 let z = this.surface.at(x, y).terrace;
                 let zStop = z - this.calcRelativeHeight(x, y);
-                let terrain = map.getTerrain(x, y, z);
+                let terrain = map.getSurfaceTerrainAt(x, y);
                 if (terrain == null) {
                     console.error("didn't find terrain in map at", x, y, z);
                 }
                 const shape = isFlat(terrain.shape) ? terrain.shape : TerrainShape.Flat;
                 while (z > zStop) {
                     z--;
-                    map.addRaisedTerrain(x, y, z, terrain.type, shape, TerrainFeature.None);
+                    map.addSubSurfaceTerrain(x, y, z, terrain.type, shape);
                 }
             }
         }

@@ -14,63 +14,45 @@ import { ContextImpl } from "./context.js"
 
 export class SquareGrid {
   private readonly _neighbourOffsets: Array<Point2D> =
-    [ new Point2D(-1, -1), new Point2D(0, -1), new Point2D(1, -1),
-      new Point2D(-1, 0),                    new Point2D(1, 0),
-      new Point2D(-1, 1),  new Point2D(0, 1),  new Point2D(1, 1), ];
+    [ new Point2D(-1, -1), new Point2D(0, -1),  new Point2D(1, -1),
+      new Point2D(-1, 0),                       new Point2D(1, 0),
+      new Point2D(-1, 1),  new Point2D(0, 1),   new Point2D(1, 1), ];
 
-  private _raisedTerrain: Map<number, Map<number, Array<Terrain>>>;
-  private _allTerrain: Map<number, Terrain>;
+  private _surfaceTerrain: Array<Array<Terrain>>;
+  private _totalSurface: number = 0;
 
   constructor(private readonly _context: ContextImpl,
               private readonly _width: number,
               private readonly _height: number) {
-    this._raisedTerrain = new Map();
-    this._allTerrain = new Map<number, Terrain>();
+    this._surfaceTerrain = new Array();
+    for (let y = 0; y < _height; ++y) {
+      this._surfaceTerrain.push(new Array<Terrain>(_width));
+    }
   }
 
   get width(): number { return this._width; }
   get height(): number { return this._height; }
+  get totalSurface(): number { return this._totalSurface; }
+  get surfaceTerrain(): Array<Array<Terrain>> { return this._surfaceTerrain; }
 
-  addRaisedTerrain(x: number, y: number, z: number, type: TerrainType,
-                   shape: TerrainShape, feature: TerrainFeature) {
+  addSurfaceTerrain(x: number, y: number, z: number, type: TerrainType,
+                    shape: TerrainShape, feature: TerrainFeature): void {
     let terrain = Terrain.create(this._context, x, y, z, type, shape, feature);
-    if (!this._raisedTerrain.has(x)) {
-      this._raisedTerrain.set(x, new Map<number, Array<Terrain>>());
-      this._raisedTerrain.get(x)!.set(y, new Array<Terrain>());
-      this._raisedTerrain.get(x)!.get(y)!.push(terrain);
-    } else {
-      if (this._raisedTerrain.get(x)!.has(y)) {
-        this._raisedTerrain.get(x)!.get(y)!.push(terrain);
-      } else {
-        this._raisedTerrain.get(x)!.set(y, new Array<Terrain>());
-        this._raisedTerrain.get(x)!.get(y)!.push(terrain);
-      }
-    }
-    this._allTerrain.set(terrain.id, terrain);
+    this.surfaceTerrain[y][x] = terrain;
+    this._totalSurface++
   }
 
-  get allTerrain(): Map<number, Terrain> {
-    return this._allTerrain;
+  addSubSurfaceTerrain(x: number, y: number, z: number, type: TerrainType,
+                       shape: TerrainShape): void {
+    Terrain.create(this._context, x, y, z, type, shape, TerrainFeature.None);
   }
 
-  getTerrain(x: number, y: number, z: number): Terrain | null {
+  getSurfaceTerrainAt(x: number, y: number): Terrain|null {
     if ((x < 0 || x >= this.width) ||
-        (y < 0 || y >= this.height) ||
-        (z < 0)) {
+        (y < 0 || y >= this.height)) {
       return null;
     }
-
-    let raised: Array<Terrain> = this._raisedTerrain.get(x)!.get(y)!;
-    for (let terrain of raised) {
-      if (terrain.gridZ == z) {
-        return terrain;
-      }
-    }
-    return null;
-  }
-
-  getTerrainFromId(id: number): Terrain {
-    return this._allTerrain.get(id)!;
+    return this.surfaceTerrain[y][x];
   }
 
   getNeighbourCost(centre: Terrain, to: Terrain): number {
@@ -86,16 +68,13 @@ export class SquareGrid {
   getNeighbours(centre: Terrain): Array<Terrain> {
     let neighbours = new Array<Terrain>();
    
-    for (let z of [ -1, 0, 1 ]) {
-      for (let offset of this._neighbourOffsets) {
-        let neighbour = this.getTerrain(centre.x + offset.x,
-                                        centre.y + offset.y,
-                                        centre.z + z);
-        if (!neighbour) {
-          continue;
-        }
-        neighbours.push(neighbour);
+    for (let offset of this._neighbourOffsets) {
+      let neighbour = this.getSurfaceTerrainAt(centre.x + offset.x,
+                                               centre.y + offset.y);
+      if (!neighbour) {
+        continue;
       }
+      neighbours.push(neighbour);
     }
     return neighbours;
   }

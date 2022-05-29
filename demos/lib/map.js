@@ -1,6 +1,6 @@
 import { Direction, getDirectionFromPoints, getOppositeDirection } from "./physics.js";
 import { Point2D } from "./geometry.js";
-import { Terrain, isFlat, isRampUp } from "./terrain.js";
+import { Terrain, TerrainFeature, isFlat, isRampUp } from "./terrain.js";
 export class SquareGrid {
     constructor(_context, _width, _height) {
         this._context = _context;
@@ -9,48 +9,30 @@ export class SquareGrid {
         this._neighbourOffsets = [new Point2D(-1, -1), new Point2D(0, -1), new Point2D(1, -1),
             new Point2D(-1, 0), new Point2D(1, 0),
             new Point2D(-1, 1), new Point2D(0, 1), new Point2D(1, 1),];
-        this._raisedTerrain = new Map();
-        this._allTerrain = new Map();
+        this._totalSurface = 0;
+        this._surfaceTerrain = new Array();
+        for (let y = 0; y < _height; ++y) {
+            this._surfaceTerrain.push(new Array(_width));
+        }
     }
     get width() { return this._width; }
     get height() { return this._height; }
-    addRaisedTerrain(x, y, z, type, shape, feature) {
+    get totalSurface() { return this._totalSurface; }
+    get surfaceTerrain() { return this._surfaceTerrain; }
+    addSurfaceTerrain(x, y, z, type, shape, feature) {
         let terrain = Terrain.create(this._context, x, y, z, type, shape, feature);
-        if (!this._raisedTerrain.has(x)) {
-            this._raisedTerrain.set(x, new Map());
-            this._raisedTerrain.get(x).set(y, new Array());
-            this._raisedTerrain.get(x).get(y).push(terrain);
-        }
-        else {
-            if (this._raisedTerrain.get(x).has(y)) {
-                this._raisedTerrain.get(x).get(y).push(terrain);
-            }
-            else {
-                this._raisedTerrain.get(x).set(y, new Array());
-                this._raisedTerrain.get(x).get(y).push(terrain);
-            }
-        }
-        this._allTerrain.set(terrain.id, terrain);
+        this.surfaceTerrain[y][x] = terrain;
+        this._totalSurface++;
     }
-    get allTerrain() {
-        return this._allTerrain;
+    addSubSurfaceTerrain(x, y, z, type, shape) {
+        Terrain.create(this._context, x, y, z, type, shape, TerrainFeature.None);
     }
-    getTerrain(x, y, z) {
+    getSurfaceTerrainAt(x, y) {
         if ((x < 0 || x >= this.width) ||
-            (y < 0 || y >= this.height) ||
-            (z < 0)) {
+            (y < 0 || y >= this.height)) {
             return null;
         }
-        let raised = this._raisedTerrain.get(x).get(y);
-        for (let terrain of raised) {
-            if (terrain.gridZ == z) {
-                return terrain;
-            }
-        }
-        return null;
-    }
-    getTerrainFromId(id) {
-        return this._allTerrain.get(id);
+        return this.surfaceTerrain[y][x];
     }
     getNeighbourCost(centre, to) {
         let cost = centre.x == to.x || centre.y == to.y ? 2 : 3;
@@ -61,14 +43,12 @@ export class SquareGrid {
     }
     getNeighbours(centre) {
         let neighbours = new Array();
-        for (let z of [-1, 0, 1]) {
-            for (let offset of this._neighbourOffsets) {
-                let neighbour = this.getTerrain(centre.x + offset.x, centre.y + offset.y, centre.z + z);
-                if (!neighbour) {
-                    continue;
-                }
-                neighbours.push(neighbour);
+        for (let offset of this._neighbourOffsets) {
+            let neighbour = this.getSurfaceTerrainAt(centre.x + offset.x, centre.y + offset.y);
+            if (!neighbour) {
+                continue;
             }
+            neighbours.push(neighbour);
         }
         return neighbours;
     }
