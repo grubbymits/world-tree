@@ -79,6 +79,9 @@ const tileColumns = [
   WT.TerrainShape.FlatWestOut,
   WT.TerrainShape.FlatSouthOut,
   WT.TerrainShape.FlatSouthWest,
+  WT.TerrainShape.FlatNorthEast,
+  WT.TerrainShape.FlatNorth,
+  WT.TerrainShape.FlatEast,
 ];
 
 function addGraphic(column, row) {
@@ -109,7 +112,7 @@ const cellsY = 11;
 const numTerraces = 2;
 const heightMap = [ [ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4 ],
                     [ 2, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4 ],
-                    [ 2, 0, 1, 1, 1, 1, 1, 1, 0, 0, 4 ],
+                    [ 2, 0, 2, 2, 2, 2, 2, 1, 0, 0, 4 ],
                     [ 2, 0, 1, 2, 2, 2, 2, 1, 0, 0, 4 ],
                     [ 2, 0, 1, 2, 2, 2, 2, 1, 0, 0, 4 ],
                     [ 2, 4, 1, 2, 2, 2, 2, 1, 0, 4, 4 ],
