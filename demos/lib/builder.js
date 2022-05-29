@@ -1,5 +1,5 @@
 import { SquareGrid } from "./map.js";
-import { Terrain, TerrainShape, TerrainType, TerrainFeature, isFlat, isEdge, getTypeName, getShapeName } from "./terrain.js";
+import { Terrain, TerrainShape, TerrainType, TerrainFeature, isFlat, isEdge, getTypeName } from "./terrain.js";
 import { Rain } from "./weather.js";
 import { Direction, getDirectionFromPoints } from "./physics.js";
 import { Point2D } from "./geometry.js";
@@ -350,9 +350,10 @@ export class TerrainBuilder {
                 if (terrain == null) {
                     console.error("didn't find terrain in map at", x, y, z);
                 }
+                const shape = isFlat(terrain.shape) ? terrain.shape : TerrainShape.Flat;
                 while (z > zStop) {
                     z--;
-                    map.addRaisedTerrain(x, y, z, terrain.type, TerrainShape.Flat, TerrainFeature.None);
+                    map.addRaisedTerrain(x, y, z, terrain.type, shape, TerrainFeature.None);
                 }
             }
         }
@@ -396,8 +397,6 @@ export class TerrainBuilder {
                 }
             }
         }
-        console.log("terrace spacing:", this.terraceSpacing);
-        console.log("total ramps:", totalRamps);
     }
     setEdges() {
         for (let y = 0; y < this.surface.depth; y++) {
@@ -510,7 +509,6 @@ export class TerrainBuilder {
                     }
                 }
                 if (!Terrain.isSupportedShape(centre.type, shapeType)) {
-                    console.log("defaulting to flat for unsupported shape:", getTypeName(centre.type), getShapeName(shapeType));
                     shapeType = TerrainShape.Flat;
                 }
                 centre.shape = shapeType;

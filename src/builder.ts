@@ -437,10 +437,10 @@ export class TerrainBuilder {
         if (terrain == null) {
           console.error("didn't find terrain in map at", x, y, z);
         }
+        const shape = isFlat(terrain.shape) ? terrain.shape : TerrainShape.Flat;
         while (z > zStop) {
           z--;
-          map.addRaisedTerrain(x, y, z, terrain.type,
-                               TerrainShape.Flat,
+          map.addRaisedTerrain(x, y, z, terrain.type, shape,
                                TerrainFeature.None);
         }
       }
@@ -495,8 +495,6 @@ export class TerrainBuilder {
         }
       }
     }
-    console.log("terrace spacing:", this.terraceSpacing)
-    console.log("total ramps:", totalRamps);
   }
 
   setEdges(): void {
@@ -610,8 +608,6 @@ export class TerrainBuilder {
 
         // And if that fails, fallback to the base flat tile.
         if (!Terrain.isSupportedShape(centre.type, shapeType)) {
-          console.log("defaulting to flat for unsupported shape:",
-                      getTypeName(centre.type), getShapeName(shapeType));
           shapeType = TerrainShape.Flat;
         }
         centre.shape = shapeType;
