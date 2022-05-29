@@ -81,6 +81,7 @@ const tileColumns = [
   WT.TerrainShape.FlatSouthWest,
   WT.TerrainShape.FlatNorthEast,
   WT.TerrainShape.FlatNorth,
+  WT.TerrainShape.FlatEastOut,
   WT.TerrainShape.FlatEast,
 ];
 
