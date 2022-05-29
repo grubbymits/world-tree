@@ -310,7 +310,7 @@ export class CollisionDetector {
     return this._missInfo.get(movable)!;
   }
 
-  static detectInArea(movable: MovableEntity, path: Vector3D, maxAngle: Vector3D,
+  static detectInArea(movable: MovableEntity, path: Vector3D,
                       area: BoundingCuboid): CollisionInfo|null {
     const bounds = movable.bounds;
     const widthVec3D = new Vector3D(bounds.width, 0, 0);
@@ -342,7 +342,6 @@ export class CollisionDetector {
         let intersectInfo = geometry.obstructs(beginPoint, endPoint);
         if (intersectInfo != null) {
           const blocking = true;
-            //maxAngle.zero || geometry.obstructs(beginPoint, endPoint.add(maxAngle));
           const collision =
             new CollisionInfo(entity, blocking, intersectInfo!);
           this._collisionInfo.set(movable, collision);
@@ -352,9 +351,6 @@ export class CollisionDetector {
           misses.push(entity);
           movable.postEvent(EntityEvent.NoCollision);
         }
-      }
-      if (movable.bounds.intersects(entity.bounds) && maxAngle.zero) {
-        console.log("movable entity intersects entity but hasn't collided!");
       }
     }
     this.addMissInfo(movable, misses);
@@ -366,10 +362,9 @@ export class Gravity {
   private static _enabled: boolean = false;
   private static _force: number = 0;
   private static _context: ContextImpl;
-  private static readonly _zero: Vector3D = new Vector3D(0, 0, 0);
 
   static init(force: number, context: ContextImpl) {
-    this._force = force;
+    this._force = -force;
     this._context = context;
     this._enabled = true;
   }
@@ -379,20 +374,19 @@ export class Gravity {
       return;
     }
 
-    entities.forEach(movable => {
-      const relativeEffect = movable.lift - this._force;
-      if (relativeEffect < 0) {
-        const path = new Vector3D(0, 0, relativeEffect)
+    if (this._force < 0) {
+      const path = new Vector3D(0, 0, this._force);
+      entities.forEach(movable => {
         let bounds = movable.bounds;
         // Create a bounds to contain the current location and the destination.
         let area = new BoundingCuboid(bounds.centre.add(path), bounds.dimensions);
         area.insert(bounds);
         const collision =
-          CollisionDetector.detectInArea(movable, path, this._zero, area);
+        CollisionDetector.detectInArea(movable, path, area);
         if (collision == null) {
           movable.updatePosition(path);
         }
-      }
-    });
+      });
+    }
   }
 }

@@ -24,13 +24,13 @@ class MoveAction extends Action {
     super(actor);
   }
 
-  obstructed(from: Point3D, to: Point3D, maxAngle: Vector3D): CollisionInfo|null {
+  obstructed(from: Point3D, to: Point3D): CollisionInfo|null {
     let bounds = this._actor.bounds;
     // Create a bounds to contain the current location and the destination.
     let path: Vector3D = to.vec_diff(from);
     let area = new BoundingCuboid(to, bounds.dimensions);
     area.insert(bounds);
-    return CollisionDetector.detectInArea(this._actor, path, maxAngle, area);
+    return CollisionDetector.detectInArea(this._actor, path, area);
   }
 
   perform(): boolean { return true; }
@@ -39,7 +39,6 @@ class MoveAction extends Action {
 export class MoveDirection extends MoveAction {
   constructor(actor: Actor,
               private readonly _d: Vector3D,
-              private readonly _maxAngle: Vector3D,
               private _bounds: BoundingCuboid) {
     super(actor);
   }
@@ -47,7 +46,7 @@ export class MoveDirection extends MoveAction {
   perform(): boolean {
     const currentPos = this.actor.bounds.bottomCentre;
     const nextPos = currentPos.add(this._d);
-    const obstruction = this.obstructed(currentPos, nextPos, this._maxAngle);
+    const obstruction = this.obstructed(currentPos, nextPos);
     if (obstruction == null) {
       this.actor.updatePosition(this._d);
       return false;
@@ -57,7 +56,7 @@ export class MoveDirection extends MoveAction {
       return true;
     }
     console.log("adjusting movement with max angle");
-    this.actor.updatePosition(this._d.add(this._maxAngle));
+    this.actor.updatePosition(this._d);
     return false;
   }
 }

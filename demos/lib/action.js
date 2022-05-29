@@ -12,26 +12,25 @@ class MoveAction extends Action {
     constructor(actor) {
         super(actor);
     }
-    obstructed(from, to, maxAngle) {
+    obstructed(from, to) {
         let bounds = this._actor.bounds;
         let path = to.vec_diff(from);
         let area = new BoundingCuboid(to, bounds.dimensions);
         area.insert(bounds);
-        return CollisionDetector.detectInArea(this._actor, path, maxAngle, area);
+        return CollisionDetector.detectInArea(this._actor, path, area);
     }
     perform() { return true; }
 }
 export class MoveDirection extends MoveAction {
-    constructor(actor, _d, _maxAngle, _bounds) {
+    constructor(actor, _d, _bounds) {
         super(actor);
         this._d = _d;
-        this._maxAngle = _maxAngle;
         this._bounds = _bounds;
     }
     perform() {
         const currentPos = this.actor.bounds.bottomCentre;
         const nextPos = currentPos.add(this._d);
-        const obstruction = this.obstructed(currentPos, nextPos, this._maxAngle);
+        const obstruction = this.obstructed(currentPos, nextPos);
         if (obstruction == null) {
             this.actor.updatePosition(this._d);
             return false;
@@ -41,7 +40,7 @@ export class MoveDirection extends MoveAction {
             return true;
         }
         console.log("adjusting movement with max angle");
-        this.actor.updatePosition(this._d.add(this._maxAngle));
+        this.actor.updatePosition(this._d);
         return false;
     }
 }

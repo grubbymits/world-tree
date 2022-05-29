@@ -339,12 +339,12 @@ export class TerrainBuilder {
     }
     this._terraceSpacing = maxHeight / this.config.numTerraces;
     this._surface = new Surface(width, depth);
-    this._surface.init(heightMap);
+    this.surface.init(heightMap);
 
     // Calculate the terraces.
-    for (let y = 0; y < this._surface.depth; y++) {
-      for (let x = 0; x < this._surface.width; x++) {
-        let surface = this._surface.at(x, y);
+    for (let y = 0; y < this.surface.depth; y++) {
+      for (let x = 0; x < this.surface.width; x++) {
+        let surface = this.surface.at(x, y);
         surface.terrace = Math.floor(surface.height / this._terraceSpacing);
         surface.shape = TerrainShape.Flat;
         surface.type = this.config.floor;
@@ -355,48 +355,49 @@ export class TerrainBuilder {
   }
 
   get config(): TerrainBuilderConfig { return this._config; }
+  get surface(): Surface { return this._surface; }
   get terraceSpacing(): number { return this._terraceSpacing; }
 
   hasFeature(x: number, y: number, feature: TerrainFeature): boolean {
-    console.assert(x >= 0 && x < this._surface.width &&
-                   y >= 0 && y < this._surface.depth);
-    return (this._surface.at(x, y).features & feature) != 0;
+    console.assert(x >= 0 && x < this.surface.width &&
+                   y >= 0 && y < this.surface.depth);
+    return (this.surface.at(x, y).features & feature) != 0;
   }
 
   terrainTypeAt(x: number, y: number): TerrainType {
-    console.assert(x >= 0 && x < this._surface.width &&
-                   y >= 0 && y < this._surface.depth);
-    return this._surface.at(x, y).type;
+    console.assert(x >= 0 && x < this.surface.width &&
+                   y >= 0 && y < this.surface.depth);
+    return this.surface.at(x, y).type;
   }
 
   terrainShapeAt(x: number, y: number): TerrainShape {
-    console.assert(x >= 0 && x < this._surface.width &&
-                   y >= 0 && y < this._surface.depth);
-    return this._surface.at(x, y).shape;
+    console.assert(x >= 0 && x < this.surface.width &&
+                   y >= 0 && y < this.surface.depth);
+    return this.surface.at(x, y).shape;
   }
 
   moistureAt(x: number, y: number): number {
-    console.assert(x >= 0 && x < this._surface.width &&
-                   y >= 0 && y < this._surface.depth);
-    return this._surface.at(x, y).moisture;
+    console.assert(x >= 0 && x < this.surface.width &&
+                   y >= 0 && y < this.surface.depth);
+    return this.surface.at(x, y).moisture;
   }
 
   isFlatAt(x: number, y: number): boolean {
-    console.assert(x >= 0 && x < this._surface.width &&
-                   y >= 0 && y < this._surface.depth);
-    return isFlat(this._surface.at(x, y).shape);
+    console.assert(x >= 0 && x < this.surface.width &&
+                   y >= 0 && y < this.surface.depth);
+    return isFlat(this.surface.at(x, y).shape);
   }
 
   biomeAt(x: number, y: number): Biome {
-    console.assert(x >= 0 && x < this._surface.width &&
-                   y >= 0 && y < this._surface.depth);
-    return this._surface.at(x, y).biome;
+    console.assert(x >= 0 && x < this.surface.width &&
+                   y >= 0 && y < this.surface.depth);
+    return this.surface.at(x, y).biome;
   }
 
   relativeHeightAt(x: number, y: number): number {
-    console.assert(x >= 0 && x < this._surface.width &&
-                   y >= 0 && y < this._surface.depth);
-    return this._surface.at(x, y).terrace;
+    console.assert(x >= 0 && x < this.surface.width &&
+                   y >= 0 && y < this.surface.depth);
+    return this.surface.at(x, y).terrace;
   }
 
   generateMap(context: ContextImpl): void {
@@ -413,11 +414,11 @@ export class TerrainBuilder {
     this.setFeatures();
 
     let map =
-      new SquareGrid(context, this._surface.width, this._surface.depth);
+      new SquareGrid(context, this.surface.width, this.surface.depth);
 
-    for (let y = 0; y < this._surface.depth; y++) {
-      for (let x = 0; x < this._surface.width; x++) {
-        let surface = this._surface.at(x, y);
+    for (let y = 0; y < this.surface.depth; y++) {
+      for (let x = 0; x < this.surface.width; x++) {
+        let surface = this.surface.at(x, y);
         // Add terrain objects that will be visible.
         console.assert(surface.terrace <= this.config.numTerraces && surface.terrace >= 0,
                        "terrace out-of-range", surface.terrace);
@@ -428,9 +429,9 @@ export class TerrainBuilder {
     }
 
     // Create a column of visible terrain below the surface tile.
-    for (let y = 0; y < this._surface.depth; y++) {
-      for (let x = 0; x < this._surface.width; x++) {
-        let z = this._surface.at(x, y).terrace;
+    for (let y = 0; y < this.surface.depth; y++) {
+      for (let x = 0; x < this.surface.width; x++) {
+        let z = this.surface.at(x, y).terrace;
         let zStop = z - this.calcRelativeHeight(x, y);
         let terrain = map.getTerrain(x, y, z)!;
         if (terrain == null) {
@@ -465,24 +466,24 @@ export class TerrainBuilder {
     // and then find their adjacent locations that are higher terraces. Set
     // those locations to be ramps.
     let totalRamps = 0;
-    for (let y = this._surface.depth - 3; y > 1 ;y--) {
-      for (let x = 2; x < this._surface.width - 2; x++) {
-        let centre: TerrainAttributes = this._surface.at(x, y);
+    for (let y = this.surface.depth - 3; y > 1 ;y--) {
+      for (let x = 2; x < this.surface.width - 2; x++) {
+        let centre: TerrainAttributes = this.surface.at(x, y);
         if (!isFlat(centre.shape)) {
           continue;
         }
 
-        let roundUpHeight = centre.height + (this._terraceSpacing / 2);
-        if (roundUpHeight != (centre.terrace + 1) * this._terraceSpacing) {
+        let roundUpHeight = centre.height + (this.terraceSpacing / 2);
+        if (roundUpHeight != (centre.terrace + 1) * this.terraceSpacing) {
           continue;
         }
 
         for (let i in coordOffsets) {
           let offset: Point2D = coordOffsets[i];
           let neighbour: TerrainAttributes =
-            this._surface.at(centre.x + offset.x, centre.y + offset.y);
+            this.surface.at(centre.x + offset.x, centre.y + offset.y);
           let nextNeighbour: TerrainAttributes =
-            this._surface.at(neighbour.x + offset.x, neighbour.y + offset.y);
+            this.surface.at(neighbour.x + offset.x, neighbour.y + offset.y);
           if (!neighbour.fixed && !nextNeighbour.fixed &&
               neighbour.terrace == centre.terrace + 1 &&
               neighbour.terrace == nextNeighbour.terrace) {
@@ -494,17 +495,19 @@ export class TerrainBuilder {
         }
       }
     }
+    console.log("terrace spacing:", this.terraceSpacing)
+    console.log("total ramps:", totalRamps);
   }
 
   setEdges(): void {
-    for (let y = 0; y < this._surface.depth; y++) {
-      for (let x = 0; x < this._surface.width; x++) {
-        let centre = this._surface.at(x, y);
+    for (let y = 0; y < this.surface.depth; y++) {
+      for (let x = 0; x < this.surface.width; x++) {
+        let centre = this.surface.at(x, y);
         if (centre.type == TerrainType.Water) {
           continue;
         }
 
-        let neighbours = this._surface.getNeighbours(x, y);
+        let neighbours = this.surface.getNeighbours(x, y);
         let shapeType = centre.shape;
         let northEdge: boolean = false;
         let eastEdge: boolean = false;
@@ -607,6 +610,8 @@ export class TerrainBuilder {
 
         // And if that fails, fallback to the base flat tile.
         if (!Terrain.isSupportedShape(centre.type, shapeType)) {
+          console.log("defaulting to flat for unsupported shape:",
+                      getTypeName(centre.type), getShapeName(shapeType));
           shapeType = TerrainShape.Flat;
         }
         centre.shape = shapeType;
@@ -615,9 +620,9 @@ export class TerrainBuilder {
   }
 
   calcRelativeHeight(x: number, y: number): number {
-    let neighbours = this._surface.getNeighbours(x, y);
+    let neighbours = this.surface.getNeighbours(x, y);
     let relativeHeight: number = 0;
-    let centre = this._surface.at(x, y);
+    let centre = this.surface.at(x, y);
    
     for (let neighbour of neighbours) { 
       console.assert(neighbour.terrace >= 0,
@@ -638,8 +643,8 @@ export class TerrainBuilder {
     // Add moisture:
     // - clouds are added at the 'bottom' of the map and move northwards.
     Rain.init(waterLine, this._surface);
-    for (let x = 0; x < this._surface.width; x++) {
-      let pos = new Point2D(x, this._surface.depth - 1);
+    for (let x = 0; x < this.surface.width; x++) {
+      let pos = new Point2D(x, this.surface.depth - 1);
       Rain.add(pos, water, towards);
     }
 
@@ -648,13 +653,13 @@ export class TerrainBuilder {
       while (!cloud.update()) { }
     }
 
-    let blurredMoisture = gaussianBlur(Rain.moistureGrid, this._surface.width,
-                                       this._surface.depth);
+    let blurredMoisture = gaussianBlur(Rain.moistureGrid, this.surface.width,
+                                       this.surface.depth);
    
     // Calculate biome, type and shape.
-    for (let y = 0; y < this._surface.depth; y++) {
-      for (let x = 0; x < this._surface.width; x++) {
-        let surface = this._surface.at(x, y);
+    for (let y = 0; y < this.surface.depth; y++) {
+      for (let x = 0; x < this.surface.width; x++) {
+        let surface = this.surface.at(x, y);
         surface.moisture = blurredMoisture[y][x];
       }
     }
@@ -667,9 +672,9 @@ export class TerrainBuilder {
     let numWetGrass = 0;
     let numRock = 0;
     let numMud = 0;
-    for (let y = 0; y < this._surface.depth; y++) {
-      for (let x = 0; x < this._surface.width; x++) {
-        let surface = this._surface.at(x, y);
+    for (let y = 0; y < this.surface.depth; y++) {
+      for (let x = 0; x < this.surface.width; x++) {
+        let surface = this.surface.at(x, y);
         let biome: Biome = Biome.Water;
         let terrain: TerrainType = TerrainType.Water;
 
@@ -727,14 +732,14 @@ export class TerrainBuilder {
   }
 
   setFeatures(): void {
-    for (let y = 0; y < this._surface.depth; y++) {
-      for (let x = 0; x < this._surface.width; x++) {
+    for (let y = 0; y < this.surface.depth; y++) {
+      for (let x = 0; x < this.surface.width; x++) {
 
-        let surface = this._surface.at(x, y);
+        let surface = this.surface.at(x, y);
         // Add shoreline features on beach tiles.
         if (isFlat(surface.shape)) {
           if (surface.biome == Biome.Beach) {
-            let neighbours = this._surface.getNeighbours(surface.x, surface.y);
+            let neighbours = this.surface.getNeighbours(surface.x, surface.y);
             for (let neighbour of neighbours) {
               if (neighbour.biome != Biome.Water) {
                 continue;

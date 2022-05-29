@@ -35,7 +35,7 @@ class Droid extends WT.Actor {
     let moveRandomDirection = () => {
       let dx = Math.round(Math.random() * 2) - 1;
       let dy = 0;
-      let dz = 0;
+      let dz = 2;
       // Move along either the x or y axis.
       // Choose values between: -1, 0, 1
       if (dx == 0) {
@@ -82,7 +82,7 @@ const tileColumns = [
 ];
 
 function addGraphic(column, row) {
-  const shape = WT.TerrainShape.Flat;
+  const shape = tileColumns[column];
   const type = tileRows[row];
   WT.Terrain.addGraphic(/*terrainType*/type,
                         /*terrainShape*/shape,
@@ -96,7 +96,7 @@ function addGraphic(column, row) {
 for (let row in tileRows) {
   if (tileRows[row] == WT.TerrainType.Sand || tileRows[row] == WT.TerrainType.Water) {
     // Only supporting flat water and sand tiles.
-    addGraphic(tileColumns[0], row);
+    addGraphic(0, row);
     continue;
   }
   for (let column in tileColumns) {
@@ -104,18 +104,20 @@ for (let row in tileRows) {
   }
 }
 
-const cellsX = 9;
-const cellsY = 9;
-const numTerraces = 1;
-let heightMap = [ [ 2, 2, 2, 2, 2, 2, 2, 2, 2 ],
-                  [ 2, 2, 1, 1, 1, 2, 1, 1, 2 ],
-                  [ 2, 1, 1, 1, 1, 2, 1, 1, 2 ],
-                  [ 2, 1, 1, 1, 1, 1, 1, 1, 2 ],
-                  [ 2, 1, 1, 2, 1, 1, 1, 2, 2 ],
-                  [ 2, 1, 2, 1, 1, 1, 1, 1, 2 ],
-                  [ 2, 1, 1, 1, 2, 1, 1, 1, 2 ],
-                  [ 2, 2, 1, 1, 1, 1, 2, 1, 2 ],
-                  [ 2, 2, 2, 2, 2, 2, 2, 2, 2] ];
+const cellsX = 11;
+const cellsY = 11;
+const numTerraces = 2;
+const heightMap = [ [ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4 ],
+                    [ 2, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4 ],
+                    [ 2, 0, 1, 1, 1, 1, 1, 1, 0, 0, 4 ],
+                    [ 2, 0, 1, 2, 2, 2, 2, 1, 0, 0, 4 ],
+                    [ 2, 0, 1, 2, 2, 2, 2, 1, 0, 0, 4 ],
+                    [ 2, 4, 1, 2, 2, 2, 2, 1, 0, 4, 4 ],
+                    [ 2, 0, 1, 2, 2, 2, 2, 1, 0, 0, 4 ],
+                    [ 2, 0, 1, 2, 2, 2, 2, 1, 0, 0, 4 ],
+                    [ 2, 0, 1, 1, 1, 1, 1, 1, 0, 0, 4 ],
+                    [ 2, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4 ],
+                    [ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] ];
 
 window.onload = (event) => {
   const physicalDims =
@@ -123,22 +125,24 @@ window.onload = (event) => {
   const worldDims = new WT.Dimensions(physicalDims.width * cellsX,
                                       physicalDims.depth * cellsY,
                                       physicalDims.height * (2 + numTerraces));
-  const config = new WT.TerrainBuilderConfig(numTerraces,
-                                             WT.TerrainType.DryGrass,
-                                             WT.TerrainType.Rock);
-  // Use the height map to construct a terrain.
-  let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,
-                                      config, physicalDims);
 
   let canvas = document.getElementById("demoCanvas");
   let context = WT.createContext(canvas, worldDims, WT.Perspective.TwoByOneIsometric);
-  builder.generateMap(context);
 
-  // Place the droid in the middle of the map. 
+  const config = new WT.TerrainBuilderConfig(numTerraces,
+                                             WT.TerrainType.DryGrass,
+                                             WT.TerrainType.DryGrass);
+  config.hasRamps = true;
+  // Use the height map to construct a terrain.
+  let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,
+                                      config, physicalDims);
+  builder.generateMap(context);
+  WT.Gravity.init(4, context);
+
   Droid.initGraphics();
-  let droidPosition = new WT.Point3D(Math.floor(worldDims.width / 2),
-                                     Math.floor(worldDims.depth / 2),
-                                     Math.floor(physicalDims.height + 1));
+  let droidPosition = new WT.Point3D(physicalDims.width + 1,
+                                     physicalDims.depth + 1,
+                                     physicalDims.height + 1);
   var droid = new Droid(context, droidPosition); 
   let camera = new WT.TrackerCamera(context.scene,
                                     canvas.width, canvas.height,

@@ -247,7 +247,7 @@ export class CollisionDetector {
         console.assert(this.hasMissInfo(movable));
         return this._missInfo.get(movable);
     }
-    static detectInArea(movable, path, maxAngle, area) {
+    static detectInArea(movable, path, area) {
         const bounds = movable.bounds;
         const widthVec3D = new Vector3D(bounds.width, 0, 0);
         const depthVec3D = new Vector3D(0, bounds.depth, 0);
@@ -284,9 +284,6 @@ export class CollisionDetector {
                     movable.postEvent(EntityEvent.NoCollision);
                 }
             }
-            if (movable.bounds.intersects(entity.bounds) && maxAngle.zero) {
-                console.log("movable entity intersects entity but hasn't collided!");
-            }
         }
         this.addMissInfo(movable, misses);
         return null;
@@ -294,7 +291,7 @@ export class CollisionDetector {
 }
 export class Gravity {
     static init(force, context) {
-        this._force = force;
+        this._force = -force;
         this._context = context;
         this._enabled = true;
     }
@@ -302,21 +299,19 @@ export class Gravity {
         if (!this._enabled) {
             return;
         }
-        entities.forEach(movable => {
-            const relativeEffect = movable.lift - this._force;
-            if (relativeEffect < 0) {
-                const path = new Vector3D(0, 0, relativeEffect);
+        if (this._force < 0) {
+            const path = new Vector3D(0, 0, this._force);
+            entities.forEach(movable => {
                 let bounds = movable.bounds;
                 let area = new BoundingCuboid(bounds.centre.add(path), bounds.dimensions);
                 area.insert(bounds);
-                const collision = CollisionDetector.detectInArea(movable, path, this._zero, area);
+                const collision = CollisionDetector.detectInArea(movable, path, area);
                 if (collision == null) {
                     movable.updatePosition(path);
                 }
-            }
-        });
+            });
+        }
     }
 }
 Gravity._enabled = false;
 Gravity._force = 0;
-Gravity._zero = new Vector3D(0, 0, 0);
