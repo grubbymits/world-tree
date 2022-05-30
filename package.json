@@ -3,10 +3,12 @@
   "scripts": {
     "build": "tsc --project .",
     "build-demo": "cp dist/*.js demos/lib/",
+    "build-as": "asc assembly/geometry.ts --target release",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage",
     "benchmark": "node --experimental-vm-modules benchmarks/all.js"
   },
   "devDependencies": {
+    "assemblyscript": "^0.20.7",
     "jest": "^26.6.3",
     "typescript": "^4.2.4"
   },
