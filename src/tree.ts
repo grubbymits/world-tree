@@ -20,11 +20,11 @@ class OctNode {
   get height(): number { return this._bounds.height; }
   get depth(): number { return this._bounds.depth; }
   get recursiveCountNumEntities(): number {
-    if (this._entities.length != 0) {
-      return this._entities.length;
+    if (this.entities.length != 0) {
+      return this.entities.length;
     }
     let total = 0;
-    for (let child of this._children) {
+    for (let child of this.children) {
       total += child.recursiveCountNumEntities;
     }
     return total;
@@ -34,14 +34,14 @@ class OctNode {
 
   insert(entity: PhysicalEntity): boolean {
     let inserted: boolean = false;
-    if (this._children.length == 0) {
+    if (this.children.length == 0) {
       // For a leaf node, insert it into the entity list and check that we're
       // within the size limit.
-      this._entities.push(entity);
+      this.entities.push(entity);
       // Allow the bounds to grow to completely contain the entity. This means
       // that some of the nodes could overlap.
       this.bounds.insert(entity.bounds);
-      if (this._entities.length > OctNode.MaxEntities) {
+      if (this.entities.length > OctNode.MaxEntities) {
         inserted = this.split();
       } else {
         inserted = true;
@@ -50,7 +50,7 @@ class OctNode {
       // Other wise, pass the entity down through one of the children.
       // First try inserting an entity that is fully contained by an existing
       // boundary.
-      for (let child of this._children) {
+      for (let child of this.children) {
         if (child.bounds.containsBounds(entity.bounds)) {
           inserted = child.insert(entity);
           break;
@@ -59,7 +59,7 @@ class OctNode {
       // Otherwise, place it based on the entity's centre point and we will then
       // grow the bounds.
       if (!inserted) {
-        for (let child of this._children) {
+        for (let child of this.children) {
           if (child.containsLocation(entity.centre)) {
             inserted = child.insert(entity);
             break;
@@ -74,9 +74,9 @@ class OctNode {
   split(): boolean {
     this._children = new Array<OctNode>();
     // split each dimension into 2.
-    const width = (this._bounds.width / 2);
-    const depth = (this._bounds.depth / 2);
-    const height = (this._bounds.height / 2);
+    const width = this.bounds.width / 2;
+    const depth = this.bounds.depth / 2;
+    const height = this.bounds.height / 2;
     const dimensions = new Dimensions(width, depth, height);
     //console.log("splitting into 8x (WxDxH):", width, depth, height);
 
@@ -96,7 +96,7 @@ class OctNode {
 
           //console.log("chosen centre point (x,y,z):", centre.x, centre.y, centre.z);
           let bounds = new BoundingCuboid(centre, dimensions);
-          this._children.push(new OctNode(bounds));
+          this.children.push(new OctNode(bounds));
         }
       }
     }
@@ -127,15 +127,15 @@ class OctNode {
   }
 
   containsBounds(bounds: BoundingCuboid): boolean {
-    return this._bounds.containsBounds(bounds);
+    return this.bounds.containsBounds(bounds);
   }
 
   containsLocation(location: Point3D): boolean {
-    return this._bounds.contains(location);
+    return this.bounds.contains(location);
   }
 
   containsEntity(entity: PhysicalEntity): boolean {
-    return this._entities.indexOf(entity) != -1;
+    return this.entities.indexOf(entity) != -1;
   }
 
   recursivelyContainsEntity(entity: PhysicalEntity): boolean {
@@ -151,12 +151,12 @@ class OctNode {
   }
 
   recursiveRemoveEntity(entity: PhysicalEntity): boolean {
-    const idx = this._entities.indexOf(entity);
+    const idx = this.entities.indexOf(entity);
     if (idx != -1) {
-      this._entities.splice(idx, 1);
+      this.entities.splice(idx, 1);
       return true;
     }
-    for (let child of this._children) {
+    for (let child of this.children) {
       if (child.recursiveRemoveEntity(entity)) {
         return true;
       }
@@ -171,15 +171,16 @@ export class Octree {
   private readonly _worldBounds: BoundingCuboid;
 
   constructor(dimensions: Dimensions) {
-    let x = (dimensions.width / 2);
-    let y = (dimensions.depth / 2);
-    let z = (dimensions.height / 2);
+    let x = dimensions.width / 2;
+    let y = dimensions.depth / 2;
+    let z = dimensions.height / 2;
     let centre = new Point3D(x, y, z);
     this._worldBounds = new BoundingCuboid(centre, dimensions);
     this._root = new OctNode(this._worldBounds);
   }
 
-  get bounds(): BoundingCuboid { return this._root.bounds; }
+  get root(): OctNode { return this._root; }
+  get bounds(): BoundingCuboid { return this.root.bounds; }
 
   insert(entity: PhysicalEntity): void {
     let inserted = this._root.insert(entity);
@@ -204,12 +205,12 @@ export class Octree {
 
   getEntities(area: BoundingCuboid): Array<PhysicalEntity> {
     let entities = new Array<PhysicalEntity>();
-    this.findEntitiesInArea(this._root, area, entities);
+    this.findEntitiesInArea(this.root, area, entities);
     return entities;
   }
 
   update(entity: PhysicalEntity): void {
-    const removed: boolean = this._root.recursiveRemoveEntity(entity);
+    const removed: boolean = this.root.recursiveRemoveEntity(entity);
     console.assert(removed);
     this._numEntities--;
     this.insert(entity);
@@ -217,7 +218,7 @@ export class Octree {
 
   verify(entities: Array<PhysicalEntity>): boolean {
     console.log("spatial graph should have num entities:", this._numEntities);
-    console.log("counted: ", this._root.recursiveCountNumEntities);
+    console.log("counted: ", this.root.recursiveCountNumEntities);
     for (let entity of entities) {
       if (!this._root.recursivelyContainsEntity(entity)) {
         console.error("tree doesn't contain entity at (x,y,z):",
