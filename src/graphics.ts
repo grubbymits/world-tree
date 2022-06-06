@@ -237,7 +237,7 @@ export class LoopGraphicComponent extends AnimatedGraphicComponent {
 }
 
 export class DirectionalGraphicComponent extends GraphicComponent {
-  protected _direction: Direction;
+  protected _direction: Direction = Direction.North;
 
   constructor(protected _staticGraphics: Map<Direction, GraphicComponent>) {
     super(0);
@@ -265,7 +265,7 @@ export class DirectionalGraphicComponent extends GraphicComponent {
 
 export class AnimatedDirectionalGraphicComponent extends GraphicComponent {
   protected _stationary: boolean = true;
-  protected _direction: Direction;
+  protected _direction: Direction = Direction.North;
 
   constructor(protected _staticGraphics: Map<Direction, GraphicComponent>,
               protected _movementGraphics: Map<Direction, GraphicComponent>) {

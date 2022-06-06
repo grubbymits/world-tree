@@ -358,6 +358,7 @@ export class TerrainBuilder {
                 }
             }
         }
+        console.log("total grid sub-surface:", map.totalSubSurface);
     }
     setShapes() {
         const coordOffsets = [
@@ -522,11 +523,8 @@ export class TerrainBuilder {
         let centre = this.surface.at(x, y);
         for (let neighbour of neighbours) {
             console.assert(neighbour.terrace >= 0, "Found neighbour with negative terrace!", neighbour.terrace);
-            if (neighbour.terrace < centre.terrace) {
-                if (centre.terrace - neighbour.terrace > relativeHeight) {
-                    relativeHeight = centre.terrace - neighbour.terrace;
-                }
-            }
+            const height = centre.terrace - neighbour.terrace;
+            relativeHeight = Math.max(height, relativeHeight);
         }
         console.assert(relativeHeight <= this.config.numTerraces, "impossible relative height:", relativeHeight, "\ncentre:", centre);
         return relativeHeight;

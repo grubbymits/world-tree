@@ -1,5 +1,5 @@
 import { Point2D } from "./geometry.js";
-import { getDirectionName } from "./physics.js";
+import { getDirectionName, Direction } from "./physics.js";
 export class SpriteSheet {
     constructor(name) {
         this._image = new Image();
@@ -188,6 +188,7 @@ export class DirectionalGraphicComponent extends GraphicComponent {
     constructor(_staticGraphics) {
         super(0);
         this._staticGraphics = _staticGraphics;
+        this._direction = Direction.North;
     }
     get direction() { return this._direction; }
     set direction(direction) {
@@ -214,6 +215,7 @@ export class AnimatedDirectionalGraphicComponent extends GraphicComponent {
         this._staticGraphics = _staticGraphics;
         this._movementGraphics = _movementGraphics;
         this._stationary = true;
+        this._direction = Direction.North;
     }
     get stationary() { return this._stationary; }
     get direction() { return this._direction; }
