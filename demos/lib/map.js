@@ -10,6 +10,7 @@ export class SquareGrid {
             new Point2D(-1, 0), new Point2D(1, 0),
             new Point2D(-1, 1), new Point2D(0, 1), new Point2D(1, 1),];
         this._totalSurface = 0;
+        this._totalSubSurface = 0;
         this._surfaceTerrain = new Array();
         for (let y = 0; y < _height; ++y) {
             this._surfaceTerrain.push(new Array(_width));
@@ -18,6 +19,7 @@ export class SquareGrid {
     get width() { return this._width; }
     get height() { return this._height; }
     get totalSurface() { return this._totalSurface; }
+    get totalSubSurface() { return this._totalSubSurface; }
     get surfaceTerrain() { return this._surfaceTerrain; }
     addSurfaceTerrain(x, y, z, type, shape, feature) {
         let terrain = Terrain.create(this._context, x, y, z, type, shape, feature);
@@ -25,7 +27,9 @@ export class SquareGrid {
         this._totalSurface++;
     }
     addSubSurfaceTerrain(x, y, z, type, shape) {
+        console.assert(this.getSurfaceTerrainAt(x, y).z > z, "adding sub-surface terrain which is above surface!");
         Terrain.create(this._context, x, y, z, type, shape, TerrainFeature.None);
+        this._totalSubSurface++;
     }
     getSurfaceTerrainAt(x, y) {
         if ((x < 0 || x >= this.width) ||
