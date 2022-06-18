@@ -3,6 +3,8 @@ import { PhysicalEntity,
 import { EntityEvent } from "./events.js"
 import { SceneGraph,
          SceneRenderer,
+         OnscreenSceneRenderer,
+         OffscreenSceneRenderer,
          Perspective,
          TrueIsometric,
          TwoByOneIsometric } from "./scene.js"
@@ -47,17 +49,39 @@ export class ContextImpl implements Context {
     this._octree.verify(this._entities);
   }
 
-  addRenderer(canvas: HTMLCanvasElement, 
+  addOnscreenRenderer(canvas: HTMLCanvasElement, 
               perspective: Perspective): void {
     switch (perspective) {
     default:
       console.error("unhandled perspective");
       break;
     case Perspective.TrueIsometric:
-      this._scene = new SceneRenderer(canvas, new TrueIsometric());
+      this._scene = new OnscreenSceneRenderer(canvas, new TrueIsometric());
       break;
     case Perspective.TwoByOneIsometric:
-      this._scene = new SceneRenderer(canvas, new TwoByOneIsometric());
+      this._scene = new OnscreenSceneRenderer(canvas, new TwoByOneIsometric());
+      break;
+    }
+    this._entities.forEach(entity => this._scene.insertEntity(entity));
+    let scene = this._scene;
+    let spatialGraph = this._octree;
+    this._movables.forEach(entity => 
+      entity.addEventListener(EntityEvent.Moving, function() {
+        spatialGraph.update(entity);
+        scene.updateEntity(entity);
+    }));
+  }
+
+  addOffscreenRenderer(perspective: Perspective): void {
+    switch (perspective) {
+    default:
+      console.error("unhandled perspective");
+      break;
+    case Perspective.TrueIsometric:
+      this._scene = new OffscreenSceneRenderer(new TrueIsometric());
+      break;
+    case Perspective.TwoByOneIsometric:
+      this._scene = new OffscreenSceneRenderer(new TwoByOneIsometric());
       break;
     }
     this._entities.forEach(entity => this._scene.insertEntity(entity));
@@ -116,10 +140,13 @@ export function createContext(canvas: HTMLCanvasElement,
                               worldDims: Dimensions,
                               perspective: Perspective): Context {
   let context = new ContextImpl(worldDims);
-  context.addRenderer(canvas, perspective);
+  context.addOnscreenRenderer(canvas, perspective);
   return context;
 }
 
-export function createTestContext(worldDims: Dimensions): Context {
-  return new ContextImpl(worldDims);
+export function createTestContext(worldDims: Dimensions,
+                                  perspective: Perspective): Context {
+  let context = new ContextImpl(worldDims);
+  context.addOffscreenRenderer(perspective);
+  return context;
 }

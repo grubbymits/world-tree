@@ -107,7 +107,7 @@ test('ramps', () => {
                                            WT.TerrainType.Rock);
   config.hasRamps = true;
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
-  let context = WT.createTestContext(worldDims);
+  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
   builder.generateMap(context);
 
   for (let y = 0; y < depth; ++y) {
@@ -173,7 +173,7 @@ test('walls', () => {
                                              WT.TerrainType.Rock,
                                              WT.TerrainType.Rock);
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
-  let context = WT.createTestContext(worldDims);
+  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
   builder.generateMap(context);
   for (let y = 0; y < depth; ++y) {
     for (let x = 0; x < width; ++x) {
@@ -218,7 +218,7 @@ test('shoreline', () => {
   config.hasWater = true;
   config.hasBiomes = true;
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
-  let context = WT.createTestContext(worldDims);
+  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
   builder.generateMap(context);
 
   for (let x = 0; x < width; ++x) {
@@ -276,7 +276,7 @@ test('rain northwards', () => {
   config.rainDirection = WT.Direction.North;
 
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
-  let context = WT.createTestContext(worldDims);
+  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
   builder.generateMap(context);
 
   // No 'moisture' over the surrounding water.

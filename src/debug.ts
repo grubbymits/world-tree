@@ -32,16 +32,18 @@ export class MovableEntityDebug {
       const start = Date.now();
 
       scene.addTimedEvent(function() {
-        // outline the movable in green
-        scene.ctx.strokeStyle = "Green";
-        for (let entity of missedEntities) {
-          for (const segment of scene.getNode(entity.id).allSegments) {
-            scene.ctx.beginPath();
-            let drawP0 = camera.getDrawCoord(segment.p0);
-            let drawP1 = camera.getDrawCoord(segment.p1);
-            scene.ctx.moveTo(drawP0.x, drawP0.y);
-            scene.ctx.lineTo(drawP1.x, drawP1.y);
-            scene.ctx.stroke();
+        if (scene.ctx != null) {
+          // outline the movable in green
+          scene.ctx!.strokeStyle = "Green";
+          for (let entity of missedEntities) {
+            for (const segment of scene.getNode(entity.id).allSegments) {
+              scene.ctx!.beginPath();
+              let drawP0 = camera.getDrawCoord(segment.p0);
+              let drawP1 = camera.getDrawCoord(segment.p1);
+              scene.ctx!.moveTo(drawP0.x, drawP0.y);
+              scene.ctx!.lineTo(drawP1.x, drawP1.y);
+              scene.ctx!.stroke();
+            }
           }
         }
         // Draw for ~1 second.
@@ -65,46 +67,49 @@ export class MovableEntityDebug {
       const start = Date.now();
 
       scene.addTimedEvent(function() {
-        // outline the movable in green
-        scene.ctx.strokeStyle = "Green";
-        for (const segment of scene.getNode(movable.id).allSegments) {
-          scene.ctx.beginPath();
-          let drawP0 = camera.getDrawCoord(segment.p0);
-          let drawP1 = camera.getDrawCoord(segment.p1);
-          scene.ctx.moveTo(drawP0.x, drawP0.y);
-          scene.ctx.lineTo(drawP1.x, drawP1.y);
-          scene.ctx.stroke();
-        }
+        if (scene.ctx != null) {
+          // outline the movable in green
+          let ctx = scene.ctx!;
+          ctx.strokeStyle = "Green";
+          for (const segment of scene.getNode(movable.id).allSegments) {
+            ctx.beginPath();
+            let drawP0 = camera.getDrawCoord(segment.p0);
+            let drawP1 = camera.getDrawCoord(segment.p1);
+            ctx.moveTo(drawP0.x, drawP0.y);
+            ctx.lineTo(drawP1.x, drawP1.y);
+            ctx.stroke();
+          }
 
-        // outline the entity that it collided with in orange.
-        scene.ctx.strokeStyle = "Orange";
-        for (const segment of scene.getNode(collidedEntity.id).allSegments) {
-          scene.ctx.beginPath();
-          let drawP0 = camera.getDrawCoord(segment.p0);
-          let drawP1 = camera.getDrawCoord(segment.p1);
-          scene.ctx.moveTo(drawP0.x, drawP0.y);
-          scene.ctx.lineTo(drawP1.x, drawP1.y);
-          scene.ctx.stroke();
-        }
-        
-        // draw the collided face red and the other faces orange.
-        scene.ctx.strokeStyle = "Red";
-        scene.ctx.fillStyle = "Red";
-        for (let vertex of collidedFace.vertices()) {
-          scene.ctx.beginPath();
-          let p0: Point2D =
-            camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point));
-          let p1: Point2D =
-            camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point.add(vertex.u)));
-          let p2: Point2D =
-            camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point.add(vertex.v)));
-          scene.ctx.beginPath();
-          scene.ctx.moveTo(p0.x, p0.y);
-          scene.ctx.lineTo(p1.x, p1.y);
-          scene.ctx.lineTo(p2.x, p2.y);
-          scene.ctx.closePath();
-          scene.ctx.stroke();
-          scene.ctx.fill();
+          // outline the entity that it collided with in orange.
+          ctx.strokeStyle = "Orange";
+          for (const segment of scene.getNode(collidedEntity.id).allSegments) {
+            ctx.beginPath();
+            let drawP0 = camera.getDrawCoord(segment.p0);
+            let drawP1 = camera.getDrawCoord(segment.p1);
+            ctx.moveTo(drawP0.x, drawP0.y);
+            ctx.lineTo(drawP1.x, drawP1.y);
+            ctx.stroke();
+          }
+          
+          // draw the collided face red and the other faces orange.
+          ctx.strokeStyle = "Red";
+          ctx.fillStyle = "Red";
+          for (let vertex of collidedFace.vertices()) {
+            ctx.beginPath();
+            let p0: Point2D =
+              camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point));
+            let p1: Point2D =
+              camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point.add(vertex.u)));
+            let p2: Point2D =
+              camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point.add(vertex.v)));
+            ctx.beginPath();
+            ctx.moveTo(p0.x, p0.y);
+            ctx.lineTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.closePath();
+            ctx.stroke();
+            ctx.fill();
+          }
         }
 
         // Draw for ~1 second.
