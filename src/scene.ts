@@ -136,7 +136,7 @@ class SceneLevel {
     console.assert(idx != -1);
     this._nodes.splice(idx, 1);
     this._nodes.forEach((pred) => pred.removeSucc(node));
-  }
+}
 
   update(node: SceneNode, graph: SceneGraph): void {
     node.clear();
@@ -277,12 +277,88 @@ export abstract class SceneGraph {
   }
 }
 
-export class SceneRenderer {
-  protected readonly _width: number;
-  protected readonly _height: number;
-  protected _ctx: CanvasRenderingContext2D;
-  protected _handler = new TimedEventHandler();
-  protected _nodes: Map<number, SceneNode> = new Map<number, SceneNode>();
+export interface SceneRenderer {
+  readonly graph: SceneGraph;
+  readonly ctx: CanvasRenderingContext2D|null;
+
+  insertEntity(entity: PhysicalEntity): void;
+  updateEntity(entity: PhysicalEntity): void;
+  getNode(id: number): SceneNode;
+  getLocationAt(x: number, y: number, camera: Camera): Point3D | null;
+  getEntityDrawnAt(x: number, y: number, camera: Camera): PhysicalEntity | null;
+  addTimedEvent(callback: Function): void;
+  buildLevels(): void;
+  render(camera: Camera): void;
+}
+
+function initialiseSceneGraph(graph: SceneGraph, nodes: Map<number, SceneNode>) {
+  let nodeList = new Array<SceneNode>();
+  for (let node of nodes.values()) {
+    nodeList.push(node);
+  }
+  nodeList.sort((a, b) => {
+                  if (a.minZ < b.minZ)
+                    return RenderOrder.Before;
+                  if (a.minZ > b.minZ)
+                    return RenderOrder.After;
+                  return RenderOrder.Any;
+                });
+  nodeList.forEach((node) => graph.insertIntoLevel(node));
+}
+
+export class OffscreenSceneRenderer implements SceneRenderer {
+  private _nodes: Map<number, SceneNode> = new Map<number, SceneNode>();
+
+  constructor(private _graph: SceneGraph) { }
+
+  get ctx(): CanvasRenderingContext2D|null {
+    return null;
+  }
+  get graph(): SceneGraph { return this._graph; }
+  get nodes(): Map<number, SceneNode> { return this._nodes; }
+
+  insertEntity(entity: PhysicalEntity): void {
+    let node =
+      new SceneNode(entity, this.graph.getDrawCoord(entity.bounds.minLocation));
+    this.nodes.set(node.id, node);
+    this.graph.insertNode(node);
+  }
+
+  updateEntity(entity: PhysicalEntity): void {
+    let node: SceneNode = this._nodes.get(entity.id)!;
+    this.graph.updateNode(node);
+  }
+
+  getNode(id: number): SceneNode {
+    console.assert(this.nodes.has(id));
+    return this.nodes.get(id)!;
+  }
+
+  getLocationAt(x: number, y: number, camera: Camera): Point3D | null {
+    return null;
+  }
+
+  getEntityDrawnAt(x: number, y: number, camera: Camera): PhysicalEntity | null {
+    return null;
+  }
+
+  buildLevels(): void {
+    if (!this.graph.initialised) {
+      initialiseSceneGraph(this.graph, this.nodes);
+    }
+    this.graph.levels.forEach((level) => level.buildGraph(this.graph));
+  }
+
+  render(camera: Camera): void { }
+  addTimedEvent(callback: Function): void { }
+}
+
+export class OnscreenSceneRenderer implements SceneRenderer {
+  private readonly _width: number;
+  private readonly _height: number;
+  private _ctx: CanvasRenderingContext2D;
+  private _handler = new TimedEventHandler();
+  private _nodes: Map<number, SceneNode> = new Map<number, SceneNode>();
 
   constructor(private _canvas: HTMLCanvasElement,
               private _graph: SceneGraph) {
@@ -291,7 +367,9 @@ export class SceneRenderer {
     this._ctx = this._canvas.getContext("2d", { alpha: false })!;
   }
 
-  get ctx(): CanvasRenderingContext2D { return this._ctx; }
+  get width(): number { return this._width; }
+  get height(): number { return this._height; }
+  get ctx(): CanvasRenderingContext2D|null { return this._ctx; }
   get graph(): SceneGraph { return this._graph; }
   get nodes(): Map<number, SceneNode> { return this._nodes; }
 
@@ -366,34 +444,23 @@ export class SceneRenderer {
       const coord = camera.getDrawCoord(node.drawCoord);
       entity.graphics.forEach((component) => {
         const spriteId: number = component.update();
-        Sprite.sprites[spriteId].draw(coord, this.ctx);
+        Sprite.sprites[spriteId].draw(coord, this.ctx!);
       });
     }
   };
 
-  render(camera: Camera): void {
+  buildLevels(): void {
     // Is this the first run? If so, organise the nodes into a level structure.
     if (!this.graph.initialised) {
-      let nodeList = new Array<SceneNode>();
-      for (let node of this._nodes.values()) {
-        nodeList.push(node);
-      }
-      console.log("first render...");
-      console.log("inserted nodes into list:", nodeList.length);
-      nodeList.sort((a, b) => {
-                      if (a.minZ < b.minZ)
-                        return RenderOrder.Before;
-                      if (a.minZ > b.minZ)
-                        return RenderOrder.After;
-                      return RenderOrder.Any;
-                    });
-      nodeList.forEach((node) => this.graph.insertIntoLevel(node));
-      //this.graph.buildLevels();
+      initialiseSceneGraph(this.graph, this.nodes);
     }
+    this.graph.levels.forEach((level) => level.buildGraph(this.graph));
+  }
 
-    this.ctx.clearRect(0, 0, this._width, this._height);
+  render(camera: Camera): void {
+    this.buildLevels();
+    this.ctx!.clearRect(0, 0, this._width, this._height);
     this.graph.levels.forEach((level) => {
-      level.buildGraph(this.graph);
       for (let i = level.order.length - 1; i >= 0; i--) {
         const node: SceneNode = level.order[i];
         this.renderNode(node, camera);

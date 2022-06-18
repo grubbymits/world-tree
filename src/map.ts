@@ -37,18 +37,18 @@ export class SquareGrid {
   get totalSubSurface(): number { return this._totalSubSurface; }
   get surfaceTerrain(): Array<Array<Terrain>> { return this._surfaceTerrain; }
 
-  addSurfaceTerrain(x: number, y: number, z: number, type: TerrainType,
+  addSurfaceTerrain(x: number, y: number, z: number, ty: TerrainType,
                     shape: TerrainShape, feature: TerrainFeature): void {
-    let terrain = Terrain.create(this._context, x, y, z, type, shape, feature);
+    let terrain = Terrain.create(this._context, x, y, z, ty, shape, feature);
     this.surfaceTerrain[y][x] = terrain;
     this._totalSurface++;
   }
 
-  addSubSurfaceTerrain(x: number, y: number, z: number, type: TerrainType,
+  addSubSurfaceTerrain(x: number, y: number, z: number, ty: TerrainType,
                        shape: TerrainShape): void {
     console.assert(this.getSurfaceTerrainAt(x, y)!.z > z,
                    "adding sub-surface terrain which is above surface!");
-    Terrain.create(this._context, x, y, z, type, shape, TerrainFeature.None);
+    Terrain.create(this._context, x, y, z, ty, shape, TerrainFeature.None);
     this._totalSubSurface++;
   }
 
