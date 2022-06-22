@@ -78,7 +78,6 @@ class OctNode {
     const depth = this.bounds.depth / 2;
     const height = this.bounds.height / 2;
     const dimensions = new Dimensions(width, depth, height);
-    //console.log("splitting into 8x (WxDxH):", width, depth, height);
 
     // half the dimensions again to get the distances to/from the centre.
     const offset = [-0.5, 0.5];
@@ -94,7 +93,6 @@ class OctNode {
                                     this.centre.y + offsetY,
                                     this.centre.z + offsetZ);
 
-          //console.log("chosen centre point (x,y,z):", centre.x, centre.y, centre.z);
           let bounds = new BoundingCuboid(centre, dimensions);
           this.children.push(new OctNode(bounds));
         }
@@ -217,8 +215,6 @@ export class Octree {
   }
 
   verify(entities: Array<PhysicalEntity>): boolean {
-    console.log("spatial graph should have num entities:", this._numEntities);
-    console.log("counted: ", this.root.recursiveCountNumEntities);
     for (let entity of entities) {
       if (!this._root.recursivelyContainsEntity(entity)) {
         console.error("tree doesn't contain entity at (x,y,z):",
@@ -226,7 +222,6 @@ export class Octree {
         return false;
       }
     }
-    console.log("verified entities in spatial graph:", entities.length);
     return true;
   }
 }

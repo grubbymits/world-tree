@@ -1,5 +1,5 @@
 import { EntityEvent } from "./events.js";
-import { SceneRenderer, Perspective, TrueIsometric, TwoByOneIsometric } from "./scene.js";
+import { OnscreenSceneRenderer, OffscreenSceneRenderer, verifyRenderer, Perspective, TrueIsometric, TwoByOneIsometric } from "./scene.js";
 import { Octree } from "./tree.js";
 import { CollisionDetector, Gravity } from "./physics.js";
 export class ContextImpl {
@@ -16,19 +16,38 @@ export class ContextImpl {
     get spatial() { return this._octree; }
     get controllers() { return this._controllers; }
     verify() {
-        console.log("context contains num entities:", this._entities.length);
-        this._octree.verify(this._entities);
+        return this._octree.verify(this._entities) && verifyRenderer(this.scene);
     }
-    addRenderer(canvas, perspective) {
+    addOnscreenRenderer(canvas, perspective) {
         switch (perspective) {
             default:
                 console.error("unhandled perspective");
                 break;
             case Perspective.TrueIsometric:
-                this._scene = new SceneRenderer(canvas, new TrueIsometric());
+                this._scene = new OnscreenSceneRenderer(canvas, new TrueIsometric());
                 break;
             case Perspective.TwoByOneIsometric:
-                this._scene = new SceneRenderer(canvas, new TwoByOneIsometric());
+                this._scene = new OnscreenSceneRenderer(canvas, new TwoByOneIsometric());
+                break;
+        }
+        this._entities.forEach(entity => this._scene.insertEntity(entity));
+        let scene = this._scene;
+        let spatialGraph = this._octree;
+        this._movables.forEach(entity => entity.addEventListener(EntityEvent.Moving, function () {
+            spatialGraph.update(entity);
+            scene.updateEntity(entity);
+        }));
+    }
+    addOffscreenRenderer(perspective) {
+        switch (perspective) {
+            default:
+                console.error("unhandled perspective");
+                break;
+            case Perspective.TrueIsometric:
+                this._scene = new OffscreenSceneRenderer(new TrueIsometric());
+                break;
+            case Perspective.TwoByOneIsometric:
+                this._scene = new OffscreenSceneRenderer(new TwoByOneIsometric());
                 break;
         }
         this._entities.forEach(entity => this._scene.insertEntity(entity));
@@ -76,9 +95,11 @@ export class ContextImpl {
 }
 export function createContext(canvas, worldDims, perspective) {
     let context = new ContextImpl(worldDims);
-    context.addRenderer(canvas, perspective);
+    context.addOnscreenRenderer(canvas, perspective);
     return context;
 }
-export function createTestContext(worldDims) {
-    return new ContextImpl(worldDims);
+export function createTestContext(worldDims, perspective) {
+    let context = new ContextImpl(worldDims);
+    context.addOffscreenRenderer(perspective);
+    return context;
 }

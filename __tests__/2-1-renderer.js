@@ -478,7 +478,7 @@ const shapes = [
   WT.TerrainShape.RampUpNorth,
 ];
 
-test('test blocks not drawn bug', () => {
+test('test bug where some blocks were not drawn', () => {
   const cellsX = 11;
   const cellsY = 11;
   const numTerraces = 2;
@@ -493,10 +493,6 @@ test('test blocks not drawn bug', () => {
                       [ 2, 0, 1, 1, 1, 1, 1, 1, 0, 0, 4 ],
                       [ 2, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4 ],
                       [ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] ];
-
-  for (let shape of shapes) {
-    addDummyGraphic(dummySheet, WT.TerrainType.DryGrass, shape);
-  }
 
   const spriteWidth = 322;
   const spriteHeight = 270;
@@ -515,8 +511,18 @@ test('test blocks not drawn bug', () => {
   // Use the height map to construct a terrain.
   let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,
                                       config, physicalDims);
+  for (let shape of shapes) {
+    addDummyGraphic(dummySheet, WT.TerrainType.DryGrass, shape);
+  }
   builder.generateMap(context);
   context.scene.buildLevels();
 
+  expect(context.verify()).toBe(true);
   expect(context.scene.graph.levels.length).toBe(3);
+  expect(context.scene.nodes.size).toBe(196);
+
+  let camera = new WT.Camera(context.scene, 1024, 1024);
+  expect(context.scene.render(camera)).toBe(196);
+
+  expect(context.scene.getNode(0)).not.toBe(null);
 });

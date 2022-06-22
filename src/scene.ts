@@ -136,7 +136,7 @@ class SceneLevel {
     console.assert(idx != -1);
     this._nodes.splice(idx, 1);
     this._nodes.forEach((pred) => pred.removeSucc(node));
-}
+  }
 
   update(node: SceneNode, graph: SceneGraph): void {
     node.clear();
@@ -197,6 +197,7 @@ class SceneLevel {
 
 export abstract class SceneGraph {
   protected _levels: Array<SceneLevel> = new Array<SceneLevel>();
+  protected _numNodes: number = 0;
 
   abstract getDrawCoord(location: Point3D): Point2D;
   abstract drawOrder(first: SceneNode, second: SceneNode): RenderOrder;
@@ -238,8 +239,10 @@ export abstract class SceneGraph {
 
   get levels(): Array<SceneLevel> { return this._levels; }
   get initialised(): boolean { return this.levels.length != 0; }
+  get numNodes(): number { return this._numNodes; }
 
   insertNode(node: SceneNode): void {
+    this._numNodes++;
     this.setDrawCoords(node);
     // If we haven't initialised levels yet (its done in the first call to
     // render), just store the entity for then.
@@ -277,20 +280,6 @@ export abstract class SceneGraph {
   }
 }
 
-export interface SceneRenderer {
-  readonly graph: SceneGraph;
-  readonly ctx: CanvasRenderingContext2D|null;
-
-  insertEntity(entity: PhysicalEntity): void;
-  updateEntity(entity: PhysicalEntity): void;
-  getNode(id: number): SceneNode;
-  getLocationAt(x: number, y: number, camera: Camera): Point3D | null;
-  getEntityDrawnAt(x: number, y: number, camera: Camera): PhysicalEntity | null;
-  addTimedEvent(callback: Function): void;
-  buildLevels(): void;
-  render(camera: Camera): void;
-}
-
 function initialiseSceneGraph(graph: SceneGraph, nodes: Map<number, SceneNode>) {
   let nodeList = new Array<SceneNode>();
   for (let node of nodes.values()) {
@@ -306,8 +295,72 @@ function initialiseSceneGraph(graph: SceneGraph, nodes: Map<number, SceneNode>) 
   nodeList.forEach((node) => graph.insertIntoLevel(node));
 }
 
+export interface SceneRenderer {
+  readonly graph: SceneGraph;
+  readonly ctx: CanvasRenderingContext2D|null;
+  readonly numEntities: number;
+  readonly nodes: Map<number, SceneNode>;
+
+  insertEntity(entity: PhysicalEntity): void;
+  updateEntity(entity: PhysicalEntity): void;
+  getNode(id: number): SceneNode;
+  getLocationAt(x: number, y: number, camera: Camera): Point3D | null;
+  getEntityDrawnAt(x: number, y: number, camera: Camera): PhysicalEntity | null;
+  addTimedEvent(callback: Function): void;
+  buildLevels(): void;
+  render(camera: Camera): number;
+}
+
+export function verifyRenderer(renderer: SceneRenderer,
+                               entities: Array<PhysicalEntity>): boolean {
+  let counted: number = 0;
+  let levelNodeIds = new Array<number>();
+  let nodeIds = new Array<number>();
+  let entityIds = new Array<number>();
+
+  for (let level of renderer.graph.levels) {
+    counted += level.nodes.length;
+    level.nodes.forEach(node => levelNodeIds.push(node.id));
+  }
+  
+  for (let node of renderer.nodes.values()) {
+    nodeIds.push(node.id);
+  }
+
+  entities.forEach(entity => entityIds.push(entity.id));
+
+  if (nodeIds.length != entityIds.length || nodeIds.length != levelNodeIds.length) {
+    console.error("number of scene nodes and entities don't match up");
+    return false;
+  }
+
+  nodeIds.sort();
+  levelNodeIds.sort();
+  entityIds.sort();
+
+  for (let i = 0; i < nodeIds.length; ++i) {
+    if (nodeIds[i] != entityIds[i]) {
+      console.error("mismatch node vs entity ids:", nodeIds[i], entityIds[i]);
+      return false;
+    }
+    if (nodeIds[i] != levelNodeIds[i]) {
+      console.error("mismatch top level node vs found in level ids:", nodeIds[i], levelNodeIds[i]);
+      return false;
+    }
+    if (i != nodeIds[i]) {
+      console.error("mismatch in expected ids:", i, nodeIds[i]);
+      return false;
+    }
+  }
+
+  return renderer.numEntities == renderer.graph.numNodes &&
+         renderer.numEntities == counted &&
+         renderer.numEntities == entities.length;
+}
+
 export class OffscreenSceneRenderer implements SceneRenderer {
   private _nodes: Map<number, SceneNode> = new Map<number, SceneNode>();
+  private _numEntities: number = 0;
 
   constructor(private _graph: SceneGraph) { }
 
@@ -315,6 +368,7 @@ export class OffscreenSceneRenderer implements SceneRenderer {
     return null;
   }
   get graph(): SceneGraph { return this._graph; }
+  get numEntities(): number { return this._numEntities; }
   get nodes(): Map<number, SceneNode> { return this._nodes; }
 
   insertEntity(entity: PhysicalEntity): void {
@@ -322,6 +376,7 @@ export class OffscreenSceneRenderer implements SceneRenderer {
       new SceneNode(entity, this.graph.getDrawCoord(entity.bounds.minLocation));
     this.nodes.set(node.id, node);
     this.graph.insertNode(node);
+    this._numEntities++;
   }
 
   updateEntity(entity: PhysicalEntity): void {
@@ -349,7 +404,22 @@ export class OffscreenSceneRenderer implements SceneRenderer {
     this.graph.levels.forEach((level) => level.buildGraph(this.graph));
   }
 
-  render(camera: Camera): void { }
+  render(camera: Camera): number {
+    let drawn: number = 0;
+    this.buildLevels();
+    this.graph.levels.forEach((level) => {
+      for (let i = level.order.length - 1; i >= 0; i--) {
+        const node: SceneNode = level.order[i];
+        const entity: PhysicalEntity = node.entity;
+        if (!entity.visible || !entity.drawable) {
+          continue;
+        }
+        drawn++;
+      }
+    });
+    return drawn;
+  }
+
   addTimedEvent(callback: Function): void { }
 }
 
@@ -359,6 +429,7 @@ export class OnscreenSceneRenderer implements SceneRenderer {
   private _ctx: CanvasRenderingContext2D;
   private _handler = new TimedEventHandler();
   private _nodes: Map<number, SceneNode> = new Map<number, SceneNode>();
+  private _numEntities: number = 0;
 
   constructor(private _canvas: HTMLCanvasElement,
               private _graph: SceneGraph) {
@@ -372,6 +443,7 @@ export class OnscreenSceneRenderer implements SceneRenderer {
   get ctx(): CanvasRenderingContext2D|null { return this._ctx; }
   get graph(): SceneGraph { return this._graph; }
   get nodes(): Map<number, SceneNode> { return this._nodes; }
+  get numEntities(): number { return this._numEntities; }
 
   getNode(id: number): SceneNode {
     console.assert(this.nodes.has(id));
@@ -387,6 +459,7 @@ export class OnscreenSceneRenderer implements SceneRenderer {
       new SceneNode(entity, this.graph.getDrawCoord(entity.bounds.minLocation));
     this.nodes.set(node.id, node);
     this.graph.insertNode(node);
+    this._numEntities++;
   }
 
   updateEntity(entity: PhysicalEntity): void {
@@ -457,7 +530,7 @@ export class OnscreenSceneRenderer implements SceneRenderer {
     this.graph.levels.forEach((level) => level.buildGraph(this.graph));
   }
 
-  render(camera: Camera): void {
+  render(camera: Camera): number {
     this.buildLevels();
     this.ctx!.clearRect(0, 0, this._width, this._height);
     this.graph.levels.forEach((level) => {
@@ -468,6 +541,7 @@ export class OnscreenSceneRenderer implements SceneRenderer {
     });
 
     this._handler.service();
+    return 0;
   }
 }
 
