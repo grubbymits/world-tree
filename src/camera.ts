@@ -22,7 +22,6 @@ export class Camera {
     this._y = 0;
     this._upperX = _width;
     this._upperY = _height;
-    console.log("initialising camera at (x,y):", this._x, this._y);
     this._surfaceLocation = _scene.getLocationAt(this._x, this._y, this);
   }
 

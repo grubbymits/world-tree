@@ -30,6 +30,10 @@ export class PhysicalEntity {
     this._ids = 0;
   }
 
+  static getNumEntities(): number {
+    return this._ids;
+  }
+
   constructor(protected _context: ContextImpl,
               minLocation: Point3D,
               dimensions: Dimensions) {

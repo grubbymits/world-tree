@@ -23,11 +23,6 @@ const shapes = [
   WT.TerrainShape.RampUpEast,
   WT.TerrainShape.RampUpNorth,
 ];
-for (let type of types) {
-  for (let shape of shapes) {
-    addDummyGraphic(dummySheet, type, shape);
-  }
-}
                                            
 test('terrace spacing with non-negative heights', () => {
   const dims = new WT.Dimensions(5, 5, 5);
@@ -40,6 +35,9 @@ test('terrace spacing with non-negative heights', () => {
                       [0, 1, 3, 1, 0],
                       [0, 1, 2, 1, 0],
                       [0, 0, 0, 0, 0] ];
+  for (let type of types) {
+    addDummyGraphic(dummySheet, type, WT.TerrainShape.Wall);
+  }
   const config = new WT.TerrainBuilderConfig(numTerraces,
                                              WT.TerrainType.Rock,
                                              WT.TerrainType.Sand);
@@ -58,6 +56,9 @@ test('terrace spacing with non-positive heights', () => {
                       [0, -1, -3, -1, 0],
                       [0, -1, -2, -1, 0],
                       [0,  0,  0,  0, 0] ];
+  for (let type of types) {
+    addDummyGraphic(dummySheet, type, WT.TerrainShape.Wall);
+  }
   const config = new WT.TerrainBuilderConfig(numTerraces,
                                              WT.TerrainType.Rock,
                                              WT.TerrainType.Sand);
@@ -76,6 +77,9 @@ test('terrace spacing with positive and negative heights', () => {
                       [ 0,  1,  3,  1, 0],
                       [ 0,  1,  2,  1, 0],
                       [ 0,  0,  0,  0, 0] ];
+  for (let type of types) {
+    addDummyGraphic(dummySheet, type, WT.TerrainShape.Wall);
+  }
   const config = new WT.TerrainBuilderConfig(numTerraces,
                                              WT.TerrainType.Rock,
                                              WT.TerrainType.Sand);
@@ -91,6 +95,7 @@ test('ramps', () => {
   const worldDims = new WT.Dimensions(dims.width * width,
                                       dims.depth * depth,
                                       dims.height * (numTerraces + 1));
+  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
   const heightMap = [ [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
                       [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 ],
                       [ 0, 1, 2, 2, 2, 2, 1, 1, 1, 1, 0 ],
@@ -102,12 +107,16 @@ test('ramps', () => {
                       [ 0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0 ],
                       [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 ],
                       [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ];
+  for (let type of types) {
+    for (let shape of shapes) {
+      addDummyGraphic(dummySheet, type, shape);
+    }
+  }
   let config = new WT.TerrainBuilderConfig(numTerraces,
                                            WT.TerrainType.Rock,
                                            WT.TerrainType.Rock);
   config.hasRamps = true;
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
   builder.generateMap(context);
 
   for (let y = 0; y < depth; ++y) {
@@ -153,9 +162,6 @@ test('ramps', () => {
 });
 
 test('walls', () => {
-  for (let type of types) {
-    addDummyGraphic(dummySheet, type, WT.TerrainShape.Wall);
-  }
   const dims = new WT.Dimensions(5, 5, 5);
   const width = 5;
   const depth = 6;
@@ -163,17 +169,21 @@ test('walls', () => {
   const worldDims = new WT.Dimensions(dims.width * width,
                                       dims.depth * depth,
                                       dims.height * (numTerraces + 1));
+  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
   const heightMap = [ [ 0, 0, 0, 0, 1],
                       [ 0, 0, 0, 0, 1],
                       [ 0, 0, 2, 0, 1],
                       [ 0, 2, 2, 2, 1],
                       [ 0, 0, 2, 0, 1],
                       [ 0, 0, 0, 0, 1] ];
+  for (let type of types) {
+    addDummyGraphic(dummySheet, type, WT.TerrainShape.Wall);
+    addDummyGraphic(dummySheet, type, WT.TerrainShape.Flat);
+  }
   const config = new WT.TerrainBuilderConfig(numTerraces,
                                              WT.TerrainType.Rock,
                                              WT.TerrainType.Rock);
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
   builder.generateMap(context);
   for (let y = 0; y < depth; ++y) {
     for (let x = 0; x < width; ++x) {
@@ -192,13 +202,6 @@ test('walls', () => {
 });
 
 test('shoreline', () => {
-  const features = [ WT.TerrainFeature.ShorelineNorth,
-                     WT.TerrainFeature.ShorelineWest,
-                     WT.TerrainFeature.ShorelineEast,
-                     WT.TerrainFeature.ShorelineSouth ];
-  for (let feature of features) {
-    WT.Terrain.addFeatureGraphics(feature, dummySprite);
-  }
   const dims = new WT.Dimensions(5, 5, 5);
   const width = 5;
   const depth = 5;
@@ -206,11 +209,24 @@ test('shoreline', () => {
   const worldDims = new WT.Dimensions(dims.width * width,
                                       dims.depth * depth,
                                       dims.height * (numTerraces + 1));
+  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
   const heightMap = [ [ 0, 0, 0, 0, 0 ],
                       [ 0, 1, 1, 1, 0 ],
                       [ 0, 1, 2, 1, 0 ],
                       [ 0, 1, 1, 1, 0 ],
                       [ 0, 0, 0, 0, 0 ]];
+  const features = [ WT.TerrainFeature.ShorelineNorth,
+                     WT.TerrainFeature.ShorelineWest,
+                     WT.TerrainFeature.ShorelineEast,
+                     WT.TerrainFeature.ShorelineSouth ];
+  for (let feature of features) {
+    WT.Terrain.addFeatureGraphics(feature, dummySprite);
+  }
+  for (let type of types) {
+    for (let shape of shapes) {
+      addDummyGraphic(dummySheet, type, shape);
+    }
+  }
   let config = new WT.TerrainBuilderConfig(numTerraces,
                                            WT.TerrainType.Rock,
                                            WT.TerrainType.Rock);
@@ -218,7 +234,6 @@ test('shoreline', () => {
   config.hasWater = true;
   config.hasBiomes = true;
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
   builder.generateMap(context);
 
   for (let x = 0; x < width; ++x) {
@@ -255,6 +270,7 @@ test('rain northwards', () => {
   const worldDims = new WT.Dimensions(dims.width * width,
                                       dims.depth * depth,
                                       dims.height * (numTerraces + 1));
+  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
   const heightMap = [ [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
                       [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 ],
                       [ 0, 1, 2, 2, 2, 2, 1, 1, 1, 1, 0 ],
@@ -266,6 +282,11 @@ test('rain northwards', () => {
                       [ 0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0 ],
                       [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 ],
                       [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ];
+  for (let type of types) {
+    for (let shape of shapes) {
+      addDummyGraphic(dummySheet, type, shape);
+    }
+  }
   let config = new WT.TerrainBuilderConfig(numTerraces,
                                            WT.TerrainType.Rock,
                                            WT.TerrainType.Rock);
@@ -276,7 +297,6 @@ test('rain northwards', () => {
   config.rainDirection = WT.Direction.North;
 
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
   builder.generateMap(context);
 
   // No 'moisture' over the surrounding water.

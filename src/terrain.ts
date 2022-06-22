@@ -244,12 +244,12 @@ export class Terrain extends PhysicalEntity {
 
   static graphics(terrainType: TerrainType,
                   shape: TerrainShape): GraphicComponent {
-    console.assert(this._terrainGraphics.has(terrainType),
-                   "undefined terrain graphic for TerrainType:",
-                   getTypeName(terrainType));
-    console.assert(this._terrainGraphics.get(terrainType)!.has(shape),
-                   "undefined terrain graphic for:", getTypeName(terrainType),
-                   getShapeName(shape));
+    if (!this._terrainGraphics.has(terrainType)) {
+      console.error("missing graphics for TerrainType", getTypeName(terrainType));
+    }
+    if (!this._terrainGraphics.get(terrainType)!.has(shape)) {
+      console.error("missing graphics for TerrainShape:", getShapeName(shape));
+    }
     return this._terrainGraphics.get(terrainType)!.get(shape)!;
   }
 

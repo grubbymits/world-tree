@@ -1,13 +1,16 @@
 import { PhysicalEntity,
          MovableEntity } from "./entity.js"
+import { Terrain } from "./terrain.js"
 import { EntityEvent } from "./events.js"
 import { SceneGraph,
          SceneRenderer,
          OnscreenSceneRenderer,
          OffscreenSceneRenderer,
+         verifyRenderer,
          Perspective,
          TrueIsometric,
          TwoByOneIsometric } from "./scene.js"
+import { SpriteSheet } from "./graphics.js"
 import { Camera } from "./camera.js"
 import { Octree } from "./tree.js"
 import { Dimensions,
@@ -18,6 +21,7 @@ import { Dimensions,
 export interface Context {
   update(camera: Camera): void;
   addController(controller: Controller): void;
+  verify(): boolean;
 }
 
 export interface Controller {
@@ -34,6 +38,12 @@ export class ContextImpl implements Context {
   private _controllers: Array<Controller> = new Array<Controller>();
   private _octree: Octree;
 
+  static reset(): void {
+    PhysicalEntity.reset();
+    Terrain.reset();
+    SpriteSheet.reset();
+  }
+
   constructor(worldDims: Dimensions) {
     this._octree = new Octree(worldDims);
     CollisionDetector.init(this._octree);
@@ -44,13 +54,12 @@ export class ContextImpl implements Context {
   get spatial(): Octree { return this._octree; }
   get controllers(): Array<Controller> { return this._controllers; }
 
-  verify(): void {
-    console.log("context contains num entities:", this._entities.length);
-    this._octree.verify(this._entities);
+  verify(): boolean {
+    return this._octree.verify(this._entities) && verifyRenderer(this.scene, this._entities);
   }
 
   addOnscreenRenderer(canvas: HTMLCanvasElement, 
-              perspective: Perspective): void {
+                      perspective: Perspective): void {
     switch (perspective) {
     default:
       console.error("unhandled perspective");
@@ -99,6 +108,15 @@ export class ContextImpl implements Context {
   }
 
   addEntity(entity: PhysicalEntity): void {
+    if (this._entities.length == 0) {
+      if (entity.id != 0) {
+        console.error("Adding entity with unexpected id:", entity.id);
+      }
+    } else if (this._entities.length > 0) {
+      if (entity.id != this._entities[this._entities.length - 1].id + 1) {
+        console.error("Adding entity with unexpected id:", entity.id);
+      }
+    }
     this._entities.push(entity);
     this._octree.insert(entity);
     if (this._scene != undefined) {
@@ -139,6 +157,7 @@ export class ContextImpl implements Context {
 export function createContext(canvas: HTMLCanvasElement,
                               worldDims: Dimensions,
                               perspective: Perspective): Context {
+  ContextImpl.reset();
   let context = new ContextImpl(worldDims);
   context.addOnscreenRenderer(canvas, perspective);
   return context;
@@ -146,6 +165,7 @@ export function createContext(canvas: HTMLCanvasElement,
 
 export function createTestContext(worldDims: Dimensions,
                                   perspective: Perspective): Context {
+  ContextImpl.reset();
   let context = new ContextImpl(worldDims);
   context.addOffscreenRenderer(perspective);
   return context;

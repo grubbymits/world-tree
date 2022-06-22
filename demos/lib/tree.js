@@ -168,15 +168,12 @@ export class Octree {
         this.insert(entity);
     }
     verify(entities) {
-        console.log("spatial graph should have num entities:", this._numEntities);
-        console.log("counted: ", this._root.recursiveCountNumEntities);
         for (let entity of entities) {
             if (!this._root.recursivelyContainsEntity(entity)) {
                 console.error("tree doesn't contain entity at (x,y,z):", entity.x, entity.y, entity.z);
                 return false;
             }
         }
-        console.log("verified entities in spatial graph:", entities.length);
         return true;
     }
 }
