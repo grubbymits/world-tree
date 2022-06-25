@@ -261,9 +261,16 @@ export class Terrain extends PhysicalEntity {
         this._terrainGraphics =
             new Map();
     }
+    static getDimensions() {
+        return this._dimensions;
+    }
     static graphics(terrainType, shape) {
-        console.assert(this._terrainGraphics.has(terrainType), "undefined terrain graphic for TerrainType:", getTypeName(terrainType));
-        console.assert(this._terrainGraphics.get(terrainType).has(shape), "undefined terrain graphic for:", getTypeName(terrainType), getShapeName(shape));
+        if (!this._terrainGraphics.has(terrainType)) {
+            console.error("missing graphics for TerrainType", getTypeName(terrainType));
+        }
+        if (!this._terrainGraphics.get(terrainType).has(shape)) {
+            console.error("missing graphics for TerrainShape:", getShapeName(shape));
+        }
         return this._terrainGraphics.get(terrainType).get(shape);
     }
     static featureGraphics(terrainFeature) {
@@ -271,6 +278,7 @@ export class Terrain extends PhysicalEntity {
         return this._featureGraphics.get(terrainFeature);
     }
     static addGraphic(terrainType, terrainShape, sheet, x, y, width, height) {
+        console.log("adding Terrain graphic at offset", x, y);
         let sprite = new Sprite(sheet, x, y, width, height);
         let component = new StaticGraphicComponent(sprite.id);
         if (!this._terrainGraphics.has(terrainType)) {

@@ -342,7 +342,6 @@ export class TerrainBuilder {
                 map.addSurfaceTerrain(x, y, surface.terrace, surface.type, surface.shape, surface.features);
             }
         }
-        console.log("total grid surface:", map.totalSurface);
         for (let y = 0; y < this.surface.depth; y++) {
             for (let x = 0; x < this.surface.width; x++) {
                 let z = this.surface.at(x, y).terrace;
@@ -358,7 +357,6 @@ export class TerrainBuilder {
                 }
             }
         }
-        console.log("total grid sub-surface:", map.totalSubSurface);
     }
     setShapes() {
         const coordOffsets = [

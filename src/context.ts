@@ -37,6 +37,7 @@ export class ContextImpl implements Context {
   private _movables: Array<MovableEntity> = new Array<MovableEntity>();
   private _controllers: Array<Controller> = new Array<Controller>();
   private _octree: Octree;
+  private _totalEntities: number = 0;
 
   static reset(): void {
     PhysicalEntity.reset();
@@ -50,12 +51,16 @@ export class ContextImpl implements Context {
   }
 
   get scene(): SceneRenderer { return this._scene; }
+  get entities(): Array<PhysicalEntity> { return this._entities; }
   get bounds(): BoundingCuboid { return this._octree.bounds; }
   get spatial(): Octree { return this._octree; }
   get controllers(): Array<Controller> { return this._controllers; }
 
   verify(): boolean {
-    return this._octree.verify(this._entities) && verifyRenderer(this.scene, this._entities);
+    return this.entities.length == PhysicalEntity.getNumEntities() &&
+           this.entities.length == this._totalEntities &&
+           this._octree.verify(this.entities) &&
+           verifyRenderer(this.scene, this.entities);
   }
 
   addOnscreenRenderer(canvas: HTMLCanvasElement, 
@@ -119,9 +124,8 @@ export class ContextImpl implements Context {
     }
     this._entities.push(entity);
     this._octree.insert(entity);
-    if (this._scene != undefined) {
-      this._scene.insertEntity(entity);
-    }
+    this._scene.insertEntity(entity);
+    this._totalEntities++;
   }
 
   addUpdateableEntity(entity: PhysicalEntity): void {
@@ -157,7 +161,6 @@ export class ContextImpl implements Context {
 export function createContext(canvas: HTMLCanvasElement,
                               worldDims: Dimensions,
                               perspective: Perspective): Context {
-  ContextImpl.reset();
   let context = new ContextImpl(worldDims);
   context.addOnscreenRenderer(canvas, perspective);
   return context;

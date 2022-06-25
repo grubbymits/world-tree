@@ -11,13 +11,16 @@ export class PhysicalEntity {
         this._graphicComponents = new Array();
         this._id = PhysicalEntity._ids;
         PhysicalEntity._ids++;
-        const centre = new Point3D(minLocation.x + Math.floor(dimensions.width / 2), minLocation.y + Math.floor(dimensions.depth / 2), minLocation.z + Math.floor(dimensions.height / 2));
+        const centre = new Point3D(minLocation.x + (dimensions.width / 2), minLocation.y + (dimensions.depth / 2), minLocation.z + (dimensions.height / 2));
         const bounds = new BoundingCuboid(centre, dimensions);
         this._geometry = new CuboidGeometry(bounds);
         this._context.addEntity(this);
     }
     static reset() {
         this._ids = 0;
+    }
+    static getNumEntities() {
+        return this._ids;
     }
     set visible(visible) { this._visible = visible; }
     get context() { return this._context; }

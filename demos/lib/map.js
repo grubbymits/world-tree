@@ -2,22 +2,22 @@ import { Direction, getDirectionFromPoints, getOppositeDirection } from "./physi
 import { Point2D } from "./geometry.js";
 import { Terrain, TerrainFeature, isFlat, isRampUp } from "./terrain.js";
 export class SquareGrid {
-    constructor(_context, _width, _height) {
+    constructor(_context, _width, _depth) {
         this._context = _context;
         this._width = _width;
-        this._height = _height;
+        this._depth = _depth;
         this._neighbourOffsets = [new Point2D(-1, -1), new Point2D(0, -1), new Point2D(1, -1),
             new Point2D(-1, 0), new Point2D(1, 0),
             new Point2D(-1, 1), new Point2D(0, 1), new Point2D(1, 1),];
         this._totalSurface = 0;
         this._totalSubSurface = 0;
         this._surfaceTerrain = new Array();
-        for (let y = 0; y < _height; ++y) {
+        for (let y = 0; y < _depth; ++y) {
             this._surfaceTerrain.push(new Array(_width));
         }
     }
     get width() { return this._width; }
-    get height() { return this._height; }
+    get depth() { return this._depth; }
     get totalSurface() { return this._totalSurface; }
     get totalSubSurface() { return this._totalSubSurface; }
     get surfaceTerrain() { return this._surfaceTerrain; }
@@ -33,7 +33,7 @@ export class SquareGrid {
     }
     getSurfaceTerrainAt(x, y) {
         if ((x < 0 || x >= this.width) ||
-            (y < 0 || y >= this.height)) {
+            (y < 0 || y >= this.depth)) {
             return null;
         }
         return this.surfaceTerrain[y][x];

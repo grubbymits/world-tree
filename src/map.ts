@@ -24,15 +24,15 @@ export class SquareGrid {
 
   constructor(private readonly _context: ContextImpl,
               private readonly _width: number,
-              private readonly _height: number) {
+              private readonly _depth: number) {
     this._surfaceTerrain = new Array();
-    for (let y = 0; y < _height; ++y) {
+    for (let y = 0; y < _depth; ++y) {
       this._surfaceTerrain.push(new Array<Terrain>(_width));
     }
   }
 
   get width(): number { return this._width; }
-  get height(): number { return this._height; }
+  get depth(): number { return this._depth; }
   get totalSurface(): number { return this._totalSurface; }
   get totalSubSurface(): number { return this._totalSubSurface; }
   get surfaceTerrain(): Array<Array<Terrain>> { return this._surfaceTerrain; }
@@ -54,7 +54,7 @@ export class SquareGrid {
 
   getSurfaceTerrainAt(x: number, y: number): Terrain|null {
     if ((x < 0 || x >= this.width) ||
-        (y < 0 || y >= this.height)) {
+        (y < 0 || y >= this.depth)) {
       return null;
     }
     return this.surfaceTerrain[y][x];
