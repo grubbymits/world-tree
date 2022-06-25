@@ -6,7 +6,7 @@ function addDummyGraphic(sheet, type, shape) {
                         /*spriteSheet*/sheet,
                         /*coord.x*/1, 1, 1, 1);
 }
-const dummySheet = { };
+const dummySheet = WT.DummySpriteSheet;
 const dummySprite = { };
 const types = [
   WT.TerrainType.Rock,

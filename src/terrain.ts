@@ -268,7 +268,6 @@ export class Terrain extends PhysicalEntity {
                     sheet: SpriteSheet,
                     x: number, y: number,
                     width: number, height: number) {
-    console.log("adding Terrain graphic at offset", x, y);
     let sprite = new Sprite(sheet, x, y, width, height);
     let component = new StaticGraphicComponent(sprite.id); 
     if (!this._terrainGraphics.has(terrainType)) {
