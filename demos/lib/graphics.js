@@ -2,6 +2,8 @@ import { Point2D } from "./geometry.js";
 import { getDirectionName, Direction } from "./physics.js";
 export class SpriteSheet {
     constructor(name) {
+        this._loaded = false;
+        this._toValidate = new Array();
         this._image = new Image();
         if (name) {
             this._image.src = name + ".png";
@@ -10,14 +12,16 @@ export class SpriteSheet {
             throw new Error("No filename passed");
         }
         SpriteSheet.add(this);
-        let sheet = this;
-        this._image.onload = function () {
-            sheet.canvas = document.createElement('canvas');
-            let width = sheet.width;
-            let height = sheet.height;
-            sheet.canvas.width = width;
-            sheet.canvas.height = height;
-            sheet.canvas.getContext('2d').drawImage(sheet.image, 0, 0, width, height);
+        this._image.onload = () => {
+            this.canvas = document.createElement('canvas');
+            this.canvas.width = this.width;
+            this.canvas.height = this.height;
+            this.canvas.getContext('2d').drawImage(this.image, 0, 0, this.width, this.height);
+            console.log("loaded spritesheet (WxH):", this.width, this.height);
+            this.loaded = true;
+            for (let sprite of this._toValidate) {
+                sprite.validate();
+            }
         };
     }
     static add(sheet) {
@@ -30,11 +34,16 @@ export class SpriteSheet {
     get width() { return this._image.width; }
     get height() { return this._image.height; }
     get name() { return this._image.src; }
+    get loaded() { return this._loaded; }
+    set loaded(b) { this._loaded = b; }
     get canvas() { return this._canvas; }
     set canvas(c) { this._canvas = c; }
     isTransparentAt(x, y) {
-        let data = this._canvas.getContext('2d').getImageData(x, y, 1, 1).data;
+        let data = this.canvas.getContext('2d').getImageData(x, y, 1, 1).data;
         return data[3] == 0;
+    }
+    addForValidation(sprite) {
+        this._toValidate.push(sprite);
     }
 }
 SpriteSheet._sheets = new Array();
@@ -43,10 +52,19 @@ export class Sprite {
         this._sheet = _sheet;
         this._width = _width;
         this._height = _height;
+        console.assert(offsetX >= 0, "offsetX < 0");
+        console.assert(offsetY >= 0, "offsetY < 0");
         this._id = Sprite.sprites.length;
         this._spriteOffset = new Point2D(offsetX, offsetY);
+        this._maxOffset = new Point2D(this.offset.x + this.width, this.offset.y + this.height);
         this._sheet = _sheet;
         Sprite.add(this);
+        if (this.sheet.loaded) {
+            this.validate();
+        }
+        else {
+            this.sheet.addForValidation(this);
+        }
     }
     static reset() {
         this._sprites = new Array();
@@ -58,16 +76,23 @@ export class Sprite {
         return this._sprites;
     }
     draw(coord, ctx) {
-        ctx.drawImage(this._sheet.image, this._spriteOffset.x, this._spriteOffset.y, this._width, this._height, coord.x, coord.y, this._width, this._height);
+        ctx.drawImage(this.sheet.image, this.offset.x, this.offset.y, this.width, this.height, coord.x, coord.y, this.width, this.height);
+    }
+    validate() {
+        console.assert(this.maxOffset.x <= this.sheet.width, "sprite id:", this.id, "sprite max X offset too large", this.maxOffset.x);
+        console.assert(this.maxOffset.y <= this.sheet.height, "sprite id:", this.id, "sprite max Y offset too large", this.maxOffset.y);
     }
     isTransparentAt(x, y) {
-        x += this._spriteOffset.x;
-        y += this._spriteOffset.y;
-        return this._sheet.isTransparentAt(x, y);
+        x += this.offset.x;
+        y += this.offset.y;
+        return this.sheet.isTransparentAt(x, y);
     }
     get id() { return this._id; }
     get width() { return this._width; }
     get height() { return this._height; }
+    get sheet() { return this._sheet; }
+    get offset() { return this._spriteOffset; }
+    get maxOffset() { return this._maxOffset; }
 }
 Sprite._sprites = new Array();
 export function generateSprites(sheet, width, height, xBegin, yBegin, columns, rows) {

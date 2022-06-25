@@ -87,7 +87,7 @@ export class SceneNode {
     set drawCoord(coord) { this._drawCoord = coord; }
     get isRoot() { return this._preds.length == 0; }
 }
-class SceneLevel {
+export class SceneLevel {
     constructor(root) {
         this._nodes = new Array();
         this._topologicalOrder = new Array();
@@ -99,6 +99,8 @@ class SceneLevel {
     }
     get nodes() { return this._nodes; }
     get order() { return this._topologicalOrder; }
+    get minZ() { return this._minZ; }
+    get maxZ() { return this._maxZ; }
     get dirty() { return this._dirty; }
     set dirty(d) { this._dirty = d; }
     inrange(entity) {
@@ -244,27 +246,62 @@ function initialiseSceneGraph(graph, nodes) {
     });
     nodeList.forEach((node) => graph.insertIntoLevel(node));
 }
-export function verifyRenderer(renderer) {
+export function verifyRenderer(renderer, entities) {
+    if (renderer.graph.numNodes != entities.length) {
+        console.error("top-level comparison between scene node and entities failed");
+    }
     let counted = 0;
+    let levelNodeIds = new Array();
     let nodeIds = new Array();
     let entityIds = new Array();
     for (let level of renderer.graph.levels) {
         counted += level.nodes.length;
-        level.nodes.forEach(node => nodeIds.push(node.id));
+        level.nodes.forEach(node => levelNodeIds.push(node.id));
     }
-    for (let entity of renderer.nodes.values()) {
-        entityIds.push(entity.id);
+    for (let node of renderer.nodes.values()) {
+        nodeIds.push(node.id);
     }
-    if (nodeIds.length != entityIds.length)
+    entities.forEach(entity => entityIds.push(entity.id));
+    if (nodeIds.length != entityIds.length || nodeIds.length != levelNodeIds.length) {
+        console.error("number of scene nodes and entities don't match up");
         return false;
-    nodeIds.sort();
-    entityIds.sort();
-    for (let i = 0; i < nodeIds.length; ++i) {
-        if (nodeIds[i] != entityIds[i])
-            return false;
     }
-    return renderer.numEntities == renderer.graph.numNodes &&
-        renderer.numEntities == counted;
+    if (renderer.numEntities != entities.length) {
+        console.error("mismatch in number of entities in context and scene");
+    }
+    nodeIds.sort((a, b) => {
+        if (a < b)
+            return -1;
+        else
+            return 1;
+    });
+    entityIds.sort((a, b) => {
+        if (a < b)
+            return -1;
+        else
+            return 1;
+    });
+    levelNodeIds.sort((a, b) => {
+        if (a < b)
+            return -1;
+        else
+            return 1;
+    });
+    for (let i = 0; i < nodeIds.length; ++i) {
+        if (i != nodeIds[i]) {
+            console.error("mismatch in expected ids:", i, nodeIds[i]);
+            return false;
+        }
+        if (nodeIds[i] != entityIds[i]) {
+            console.error("mismatch node vs entity ids:", nodeIds[i], entityIds[i]);
+            return false;
+        }
+        if (nodeIds[i] != levelNodeIds[i]) {
+            console.error("mismatch top level node vs found in level ids:", nodeIds[i], levelNodeIds[i]);
+            return false;
+        }
+    }
+    return true;
 }
 export class OffscreenSceneRenderer {
     constructor(_graph) {
@@ -304,7 +341,21 @@ export class OffscreenSceneRenderer {
         }
         this.graph.levels.forEach((level) => level.buildGraph(this.graph));
     }
-    render(camera) { }
+    render(camera) {
+        let drawn = 0;
+        this.buildLevels();
+        this.graph.levels.forEach((level) => {
+            for (let i = level.order.length - 1; i >= 0; i--) {
+                const node = level.order[i];
+                const entity = node.entity;
+                if (!entity.visible || !entity.drawable) {
+                    continue;
+                }
+                drawn++;
+            }
+        });
+        return drawn;
+    }
     addTimedEvent(callback) { }
 }
 export class OnscreenSceneRenderer {
@@ -407,6 +458,7 @@ export class OnscreenSceneRenderer {
             }
         });
         this._handler.service();
+        return 0;
     }
 }
 export var Perspective;

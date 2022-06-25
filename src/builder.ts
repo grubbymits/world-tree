@@ -427,7 +427,6 @@ export class TerrainBuilder {
                               surface.features);
       }
     }
-    console.log("total grid surface:", map.totalSurface);
 
     // Create a column of visible terrain below the surface tile.
     for (let y = 0; y < this.surface.depth; y++) {
@@ -445,7 +444,6 @@ export class TerrainBuilder {
         }
       }
     }
-    console.log("total grid sub-surface:", map.totalSubSurface);
   }
 
   setShapes(): void {

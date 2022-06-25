@@ -100,7 +100,7 @@ export class SceneNode {
 
 type NodeCompare = (firstId: number, secondId: number) => RenderOrder;
 
-class SceneLevel {
+export class SceneLevel {
   private _nodes: Array<SceneNode> = new Array<SceneNode>();
   private _topologicalOrder: Array<SceneNode> = new Array<SceneNode>();
   private readonly _minZ: number;
@@ -116,6 +116,8 @@ class SceneLevel {
 
   get nodes(): Array<SceneNode> { return this._nodes; }
   get order(): Array<SceneNode> { return this._topologicalOrder; }
+  get minZ(): number { return this._minZ; }
+  get maxZ(): number { return this._maxZ; }
   get dirty(): boolean { return this._dirty; }
   set dirty(d: boolean) { this._dirty = d; }
 
@@ -313,6 +315,9 @@ export interface SceneRenderer {
 
 export function verifyRenderer(renderer: SceneRenderer,
                                entities: Array<PhysicalEntity>): boolean {
+  if (renderer.graph.numNodes != entities.length) {
+    console.error("top-level comparison between scene node and entities failed");
+  }
   let counted: number = 0;
   let levelNodeIds = new Array<number>();
   let nodeIds = new Array<number>();
@@ -334,11 +339,37 @@ export function verifyRenderer(renderer: SceneRenderer,
     return false;
   }
 
-  nodeIds.sort();
-  levelNodeIds.sort();
-  entityIds.sort();
+  if (renderer.numEntities != entities.length) {
+    console.error("mismatch in number of entities in context and scene");
+  }
+
+  nodeIds.sort(
+    (a, b) => {
+      if (a < b)
+        return -1;
+      else
+        return 1;
+    });
+  entityIds.sort(
+    (a, b) => {
+      if (a < b)
+        return -1;
+      else
+        return 1;
+    });
+  levelNodeIds.sort(
+    (a, b) => {
+      if (a < b)
+        return -1;
+      else
+        return 1;
+    });
 
   for (let i = 0; i < nodeIds.length; ++i) {
+    if (i != nodeIds[i]) {
+      console.error("mismatch in expected ids:", i, nodeIds[i]);
+      return false;
+    }
     if (nodeIds[i] != entityIds[i]) {
       console.error("mismatch node vs entity ids:", nodeIds[i], entityIds[i]);
       return false;
@@ -347,15 +378,9 @@ export function verifyRenderer(renderer: SceneRenderer,
       console.error("mismatch top level node vs found in level ids:", nodeIds[i], levelNodeIds[i]);
       return false;
     }
-    if (i != nodeIds[i]) {
-      console.error("mismatch in expected ids:", i, nodeIds[i]);
-      return false;
-    }
   }
 
-  return renderer.numEntities == renderer.graph.numNodes &&
-         renderer.numEntities == counted &&
-         renderer.numEntities == entities.length;
+  return true;
 }
 
 export class OffscreenSceneRenderer implements SceneRenderer {
@@ -517,6 +542,9 @@ export class OnscreenSceneRenderer implements SceneRenderer {
       const coord = camera.getDrawCoord(node.drawCoord);
       entity.graphics.forEach((component) => {
         const spriteId: number = component.update();
+        //if (node.id == 11) {
+        //  console.log("draw spriteId at:", spriteId, coord.x, coord.y);
+        //}
         Sprite.sprites[spriteId].draw(coord, this.ctx!);
       });
     }

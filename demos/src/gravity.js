@@ -1,18 +1,18 @@
 import * as WT from "../lib/world-tree.js";
 
 class Droid extends WT.Actor {
-  static sheet = new WT.SpriteSheet("../graphics/png/levitate-droid");
-  static directions = [ WT.Direction.West,
+    
+  static initGraphics() {
+    this.sheet = new WT.SpriteSheet("../graphics/png/levitate-droid");
+    this.directions = [ WT.Direction.West,
                         WT.Direction.South,
                         WT.Direction.East,
                         WT.Direction.North ];
-  static sprites = new Array();
-  static spriteWidth = 58;
-  static spriteHeight = 107;
-  static dims =
-    WT.TwoByOneIsometric.getDimensions(this.spriteWidth, this.spriteHeight);
-    
-  static initGraphics() {
+    this.sprites = new Array();
+    this.spriteWidth = 58;
+    this.spriteHeight = 107;
+    this.dims =
+      WT.TwoByOneIsometric.getDimensions(this.spriteWidth, this.spriteHeight);
     this.staticGraphics = new Map();
     for (let x in this.directions) {
       let direction = this.directions[x];
@@ -81,7 +81,6 @@ const tileColumns = [
   WT.TerrainShape.FlatSouthWest,
   WT.TerrainShape.FlatNorthEast,
   WT.TerrainShape.FlatNorth,
-  WT.TerrainShape.FlatEastOut,
   WT.TerrainShape.FlatEast,
 ];
 
@@ -100,7 +99,7 @@ function addGraphic(column, row) {
 for (let row in tileRows) {
   if (tileRows[row] == WT.TerrainType.Sand || tileRows[row] == WT.TerrainType.Water) {
     // Only supporting flat water and sand tiles.
-    addGraphic(0, row);
+    addGraphic(tileColumns[0], row);
     continue;
   }
   for (let column in tileColumns) {
@@ -111,7 +110,7 @@ for (let row in tileRows) {
 const cellsX = 11;
 const cellsY = 11;
 const numTerraces = 2;
-const heightMap = [ [ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4 ],
+const heightMap = [ [ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4 ],
                     [ 2, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4 ],
                     [ 2, 0, 2, 2, 2, 2, 2, 1, 0, 0, 4 ],
                     [ 2, 0, 1, 2, 2, 2, 2, 1, 0, 0, 4 ],

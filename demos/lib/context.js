@@ -1,5 +1,8 @@
+import { PhysicalEntity } from "./entity.js";
+import { Terrain } from "./terrain.js";
 import { EntityEvent } from "./events.js";
 import { OnscreenSceneRenderer, OffscreenSceneRenderer, verifyRenderer, Perspective, TrueIsometric, TwoByOneIsometric } from "./scene.js";
+import { SpriteSheet } from "./graphics.js";
 import { Octree } from "./tree.js";
 import { CollisionDetector, Gravity } from "./physics.js";
 export class ContextImpl {
@@ -8,15 +11,25 @@ export class ContextImpl {
         this._updateables = new Array();
         this._movables = new Array();
         this._controllers = new Array();
+        this._totalEntities = 0;
         this._octree = new Octree(worldDims);
         CollisionDetector.init(this._octree);
     }
+    static reset() {
+        PhysicalEntity.reset();
+        Terrain.reset();
+        SpriteSheet.reset();
+    }
     get scene() { return this._scene; }
+    get entities() { return this._entities; }
     get bounds() { return this._octree.bounds; }
     get spatial() { return this._octree; }
     get controllers() { return this._controllers; }
     verify() {
-        return this._octree.verify(this._entities) && verifyRenderer(this.scene);
+        return this.entities.length == PhysicalEntity.getNumEntities() &&
+            this.entities.length == this._totalEntities &&
+            this._octree.verify(this.entities) &&
+            verifyRenderer(this.scene, this.entities);
     }
     addOnscreenRenderer(canvas, perspective) {
         switch (perspective) {
@@ -62,11 +75,20 @@ export class ContextImpl {
         this._controllers.push(controller);
     }
     addEntity(entity) {
+        if (this._entities.length == 0) {
+            if (entity.id != 0) {
+                console.error("Adding entity with unexpected id:", entity.id);
+            }
+        }
+        else if (this._entities.length > 0) {
+            if (entity.id != this._entities[this._entities.length - 1].id + 1) {
+                console.error("Adding entity with unexpected id:", entity.id);
+            }
+        }
         this._entities.push(entity);
         this._octree.insert(entity);
-        if (this._scene != undefined) {
-            this._scene.insertEntity(entity);
-        }
+        this._scene.insertEntity(entity);
+        this._totalEntities++;
     }
     addUpdateableEntity(entity) {
         this._updateables.push(entity);
@@ -99,6 +121,7 @@ export function createContext(canvas, worldDims, perspective) {
     return context;
 }
 export function createTestContext(worldDims, perspective) {
+    ContextImpl.reset();
     let context = new ContextImpl(worldDims);
     context.addOffscreenRenderer(perspective);
     return context;

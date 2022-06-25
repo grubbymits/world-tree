@@ -483,8 +483,8 @@ test('test bug where some blocks were not drawn', () => {
   const cellsY = 11;
   const numTerraces = 2;
   const heightMap = [ [ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4 ],
-                      [ 2, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4 ],
-                      [ 2, 0, 2, 2, 2, 2, 2, 1, 0, 0, 4 ],
+                      [ 3, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4 ],
+                      [ 2, 0, 2, 2, 2, 2, 3, 1, 0, 0, 4 ],
                       [ 2, 0, 1, 2, 2, 2, 2, 1, 0, 0, 4 ],
                       [ 2, 0, 1, 2, 2, 2, 2, 1, 0, 0, 4 ],
                       [ 2, 4, 1, 2, 2, 2, 2, 1, 0, 4, 4 ],
@@ -511,18 +511,52 @@ test('test bug where some blocks were not drawn', () => {
   // Use the height map to construct a terrain.
   let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,
                                       config, physicalDims);
+
   for (let shape of shapes) {
     addDummyGraphic(dummySheet, WT.TerrainType.DryGrass, shape);
   }
   builder.generateMap(context);
   context.scene.buildLevels();
+  let camera = new WT.Camera(context.scene, 1024, 1024);
 
   expect(context.verify()).toBe(true);
   expect(context.scene.graph.levels.length).toBe(3);
   expect(context.scene.nodes.size).toBe(196);
-
-  let camera = new WT.Camera(context.scene, 1024, 1024);
   expect(context.scene.render(camera)).toBe(196);
 
-  expect(context.scene.getNode(0)).not.toBe(null);
+  expect(WT.Terrain.getDimensions().width).toBe(physicalDims.width);
+  expect(WT.Terrain.getDimensions().depth).toBe(physicalDims.depth);
+  expect(WT.Terrain.getDimensions().height).toBe(physicalDims.height);
+
+  let node0 = context.scene.getNode(0);
+  camera.location = node0.entity.bounds.minLocation;
+
+  expect(node0.level).not.toBe(null);
+  expect(node0.level.minZ).toBe(physicalDims.height);
+  expect(node0.level.maxZ).toBe(physicalDims.height * 2);
+  expect(node0.minZ).toBe(physicalDims.height);
+  expect(node0.maxZ).toBe(physicalDims.height * 2);
+  expect(node0.level.order.indexOf(node0)).not.toBe(-1);
+  expect(node0.drawCoord.x).toBe(0);
+  expect(node0.drawCoord.y).toBe(-297);
+  expect(node0.entity.visible).toBe(true);
+  expect(node0.entity.drawable).toBe(true);
+  expect(camera.isOnScreen(node0.drawCoord, spriteWidth, spriteHeight)).toBe(true);
+
+  let node11 = context.scene.getNode(11);
+  expect(node11.level).not.toBe(null);
+  expect(node11.level.minZ).toBe(physicalDims.height);
+  expect(node11.level.maxZ).toBe(physicalDims.height * 2);
+  expect(node11.minZ).toBe(physicalDims.height);
+  expect(node11.maxZ).toBe(physicalDims.height * 2);
+  expect(node11.level.order.indexOf(node11)).not.toBe(-1);
+  expect(node11.drawCoord.x).toBe(Math.floor(spriteWidth / 2));
+  expect(node11.drawCoord.y).toBe(-217);
+  expect(node11.entity.visible).toBe(true);
+  expect(node11.entity.drawable).toBe(true);
+  expect(camera.isOnScreen(node11.drawCoord, spriteWidth, spriteHeight)).toBe(true);
+
+  expect(node0.succs.length).not.toBe(0);
+  expect(node11.succs.length).not.toBe(0);
+  expect(node0.succs.indexOf(node11)).not.toBe(-1);
 });

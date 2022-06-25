@@ -6,23 +6,23 @@ import { Point2D, Point3D } from "./geometry.js"
 import { SceneRenderer } from "./scene.js"
 
 export class Camera {
-  protected _x: number;
-  protected _y: number;
   protected _lowerX : number = 0;
   protected _lowerY : number = 0;
   protected _upperX : number;
   protected _upperY : number;
+  protected readonly _width: number;
+  protected readonly _height: number;
   protected _handler = new EventHandler<InputEvent>();
   protected _surfaceLocation : Point3D|null;
 
   constructor(protected _scene: SceneRenderer,
-              protected readonly _width: number,
-              protected readonly _height: number) {
-    this._x = 0;
-    this._y = 0;
-    this._upperX = _width;
-    this._upperY = _height;
-    this._surfaceLocation = _scene.getLocationAt(this._x, this._y, this);
+              width: number,
+              height: number) {
+    this._width = Math.floor(width);
+    this._height = Math.floor(height);
+    this._upperX = Math.floor(width);
+    this._upperY = Math.floor(height);
+    this._surfaceLocation = _scene.getLocationAt(this._lowerX, this._lowerY, this);
   }
 
   isOnScreen(coord : Point2D, width: number, depth: number) : boolean {
@@ -33,19 +33,15 @@ export class Camera {
     return true;
   }
 
-  get x(): number { return this._x; }
-  get y(): number { return this._y; }
   get min(): Point2D { return new Point2D(this._lowerX, this._lowerY); }
   get width(): number { return this._width; }
   get height(): number { return this._height; }
   get location(): Point3D|null { return this._surfaceLocation; }
   set x(x: number)  {
-    this._x = x;
     this._lowerX = x - Math.floor(this.width / 2);
     this._upperX = x + Math.floor(this.width / 2);
   }
   set y(y: number) {
-    this._y = y;
     this._lowerY = y - Math.floor(this.height / 2);
     this._upperY = y + Math.floor(this.height / 2);
   }
@@ -106,6 +102,7 @@ export class TrackerCamera extends Camera {
               movable: MovableEntity) {
     super(scene, width, height);
 
+    this.location = movable.centre;
     var camera = this;
     movable.addEventListener(EntityEvent.Moving, function() {
       camera.location = movable.centre;
