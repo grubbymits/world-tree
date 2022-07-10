@@ -73,183 +73,6 @@ function hasFeature(features: number, mask: TerrainFeature): boolean {
   return (features & <number>mask) == <number>mask;
 }
 
-function getFeatureName(feature: TerrainFeature): string {
-  switch (feature) {
-  default:
-    break;
-  case TerrainFeature.Shoreline:
-  case TerrainFeature.ShorelineNorth:
-  case TerrainFeature.ShorelineEast:
-  case TerrainFeature.ShorelineSouth:
-  case TerrainFeature.ShorelineWest:
-    return "Shoreline";
-  case TerrainFeature.DryGrass:
-    return "Dry Grass";
-  case TerrainFeature.WetGrass:
-    return "Wet Grass";
-  case TerrainFeature.Mud:
-    return "Mud";
-  }
-  return "None";
-}
-
-export function getShapeName(terrain: TerrainShape): string {
-  switch (terrain) {
-  default:
-    console.error("unhandled terrain shape:", terrain);
-  case TerrainShape.Flat:
-    return "flat";
-  case TerrainShape.Wall:
-    return "wall";
-  case TerrainShape.FlatNorth:
-    return "flat north";
-  case TerrainShape.FlatNorthEast:
-    return "flat north east";
-  case TerrainShape.FlatNorthWest:
-    return "flat north west";
-  case TerrainShape.FlatEast:
-    return "flat east";
-  case TerrainShape.FlatWest:
-    return "flat west";
-  case TerrainShape.FlatSouth:
-    return "flat south";
-  case TerrainShape.FlatSouthEast:
-    return "flat south east";
-  case TerrainShape.FlatSouthWest:
-    return "flat south west";
-  case TerrainShape.RampUpNorth:
-    return "ramp up north";
-  case TerrainShape.RampUpNorthEdge:
-    return "ramp up north edge";
-  case TerrainShape.RampUpEast:
-    return "ramp up east";
-  case TerrainShape.RampUpEastEdge:
-    return "ramp up east edge";
-  case TerrainShape.RampUpSouth:
-    return "ramp up south";
-  case TerrainShape.RampUpSouthEdge:
-    return "ramp up south edge";
-  case TerrainShape.RampUpWest:
-    return "ramp up west";
-  case TerrainShape.RampUpWestEdge:
-    return "ramp up west edge";
-  case TerrainShape.FlatNorthOut:
-    return "flat north out";
-  case TerrainShape.FlatEastOut:
-    return "flat east out";
-  case TerrainShape.FlatWestOut:
-    return "flat west out";
-  case TerrainShape.FlatSouthOut:
-    return "flat south out";
-  case TerrainShape.FlatAloneOut:
-    return "flat alone out";
-  }
-}
-
-export function getTypeName(terrain: TerrainType): string {
-  switch (terrain) {
-  default:
-    console.error("unhandled terrain type:", terrain);
-  case TerrainType.Water:
-    return "water";
-  case TerrainType.Lowland0:
-    return "lowland 0";
-  case TerrainType.Lowland1:
-    return "lowland 1";
-  case TerrainType.Lowland2:
-    return "lowland 2";
-  case TerrainType.Lowland3:
-    return "lowland 3";
-  case TerrainType.Lowland4:
-    return "lowland 4";
-  case TerrainType.Lowland5:
-    return "lowland 5";
-  case TerrainType.Upland0:
-    return "upland 0";
-  case TerrainType.Upland1:
-    return "upland 1";
-  case TerrainType.Upland2:
-    return "upland 2";
-  case TerrainType.Upland3:
-    return "upland 3";
-  case TerrainType.Upland4:
-    return "upland 4";
-  case TerrainType.Upland5:
-    return "upland 5";
-  }
-}
-
-export function isFlat(terrain: TerrainShape): boolean {
-  switch (terrain) {
-  default:
-    break;
-  case TerrainShape.FlatNorthWest:
-  case TerrainShape.FlatNorth:
-  case TerrainShape.FlatNorthEast:
-  case TerrainShape.FlatWest:
-  case TerrainShape.Flat:
-  case TerrainShape.Wall:
-  case TerrainShape.FlatEast:
-  case TerrainShape.FlatSouthWest:
-  case TerrainShape.FlatSouth:
-  case TerrainShape.FlatSouthEast:
-  case TerrainShape.FlatNorthOut:
-  case TerrainShape.FlatEastOut:
-  case TerrainShape.FlatSouthOut:
-  case TerrainShape.FlatWestOut:
-  case TerrainShape.FlatAloneOut:
-    return true;
-  }
-  return false;
-}
-
-export function isEdge(terrain: TerrainShape): boolean {
-  switch (terrain) {
-  default:
-    break;
-  case TerrainShape.FlatNorthWest:
-  case TerrainShape.FlatNorth:
-  case TerrainShape.FlatNorthEast:
-  case TerrainShape.FlatWest:
-  case TerrainShape.Wall:
-  case TerrainShape.FlatEast:
-  case TerrainShape.FlatSouthWest:
-  case TerrainShape.FlatSouth:
-  case TerrainShape.FlatSouthEast:
-  case TerrainShape.FlatNorthOut:
-  case TerrainShape.FlatEastOut:
-  case TerrainShape.FlatSouthOut:
-  case TerrainShape.FlatWestOut:
-  case TerrainShape.FlatAloneOut:
-  case TerrainShape.RampUpSouthEdge:
-  case TerrainShape.RampUpWestEdge:
-  case TerrainShape.RampUpEastEdge:
-  case TerrainShape.RampUpNorthEdge:
-    return true;
-  }
-  return false;
-}
-
-export function isRampUp(shape: TerrainShape, direction: Direction): boolean {
-  switch (direction) {
-  default:
-    break;
-  case Direction.North:
-    return shape == TerrainShape.RampUpNorthEdge ||
-           shape == TerrainShape.RampUpNorth;
-  case Direction.East:
-    return shape == TerrainShape.RampUpEastEdge ||
-           shape == TerrainShape.RampUpEast;
-  case Direction.South:
-    return shape == TerrainShape.RampUpSouthEdge ||
-           shape == TerrainShape.RampUpSouth;
-  case Direction.West:
-    return shape == TerrainShape.RampUpWestEdge ||
-           shape == TerrainShape.RampUpWest;
-  }
-  return false;
-}
-
 export class Terrain extends PhysicalEntity {
   private static _dimensions: Dimensions;
   private static _featureGraphics = new Map<TerrainFeature, GraphicComponent>();
@@ -336,6 +159,183 @@ export class Terrain extends PhysicalEntity {
     return new Terrain(context, x, y, z, this._dimensions, type, shape, feature);
   }
 
+  static function getFeatureName(feature: TerrainFeature): string {
+    switch (feature) {
+    default:
+      break;
+    case TerrainFeature.Shoreline:
+    case TerrainFeature.ShorelineNorth:
+    case TerrainFeature.ShorelineEast:
+    case TerrainFeature.ShorelineSouth:
+    case TerrainFeature.ShorelineWest:
+      return "Shoreline";
+    case TerrainFeature.DryGrass:
+      return "Dry Grass";
+    case TerrainFeature.WetGrass:
+      return "Wet Grass";
+    case TerrainFeature.Mud:
+      return "Mud";
+    }
+    return "None";
+  }
+  
+  static function getShapeName(terrain: TerrainShape): string {
+    switch (terrain) {
+    default:
+      console.error("unhandled terrain shape:", terrain);
+    case TerrainShape.Flat:
+      return "flat";
+    case TerrainShape.Wall:
+      return "wall";
+    case TerrainShape.FlatNorth:
+      return "flat north";
+    case TerrainShape.FlatNorthEast:
+      return "flat north east";
+    case TerrainShape.FlatNorthWest:
+      return "flat north west";
+    case TerrainShape.FlatEast:
+      return "flat east";
+    case TerrainShape.FlatWest:
+      return "flat west";
+    case TerrainShape.FlatSouth:
+      return "flat south";
+    case TerrainShape.FlatSouthEast:
+      return "flat south east";
+    case TerrainShape.FlatSouthWest:
+      return "flat south west";
+    case TerrainShape.RampUpNorth:
+      return "ramp up north";
+    case TerrainShape.RampUpNorthEdge:
+      return "ramp up north edge";
+    case TerrainShape.RampUpEast:
+      return "ramp up east";
+    case TerrainShape.RampUpEastEdge:
+      return "ramp up east edge";
+    case TerrainShape.RampUpSouth:
+      return "ramp up south";
+    case TerrainShape.RampUpSouthEdge:
+      return "ramp up south edge";
+    case TerrainShape.RampUpWest:
+      return "ramp up west";
+    case TerrainShape.RampUpWestEdge:
+      return "ramp up west edge";
+    case TerrainShape.FlatNorthOut:
+      return "flat north out";
+    case TerrainShape.FlatEastOut:
+      return "flat east out";
+    case TerrainShape.FlatWestOut:
+      return "flat west out";
+    case TerrainShape.FlatSouthOut:
+      return "flat south out";
+    case TerrainShape.FlatAloneOut:
+      return "flat alone out";
+    }
+  }
+  
+  static function getTypeName(terrain: TerrainType): string {
+    switch (terrain) {
+    default:
+      console.error("unhandled terrain type:", terrain);
+    case TerrainType.Water:
+      return "water";
+    case TerrainType.Lowland0:
+      return "lowland 0";
+    case TerrainType.Lowland1:
+      return "lowland 1";
+    case TerrainType.Lowland2:
+      return "lowland 2";
+    case TerrainType.Lowland3:
+      return "lowland 3";
+    case TerrainType.Lowland4:
+      return "lowland 4";
+    case TerrainType.Lowland5:
+      return "lowland 5";
+    case TerrainType.Upland0:
+      return "upland 0";
+    case TerrainType.Upland1:
+      return "upland 1";
+    case TerrainType.Upland2:
+      return "upland 2";
+    case TerrainType.Upland3:
+      return "upland 3";
+    case TerrainType.Upland4:
+      return "upland 4";
+    case TerrainType.Upland5:
+      return "upland 5";
+    }
+  }
+  
+  static function isFlat(terrain: TerrainShape): boolean {
+    switch (terrain) {
+    default:
+      break;
+    case TerrainShape.FlatNorthWest:
+    case TerrainShape.FlatNorth:
+    case TerrainShape.FlatNorthEast:
+    case TerrainShape.FlatWest:
+    case TerrainShape.Flat:
+    case TerrainShape.Wall:
+    case TerrainShape.FlatEast:
+    case TerrainShape.FlatSouthWest:
+    case TerrainShape.FlatSouth:
+    case TerrainShape.FlatSouthEast:
+    case TerrainShape.FlatNorthOut:
+    case TerrainShape.FlatEastOut:
+    case TerrainShape.FlatSouthOut:
+    case TerrainShape.FlatWestOut:
+    case TerrainShape.FlatAloneOut:
+      return true;
+    }
+    return false;
+  }
+  
+  static function isEdge(terrain: TerrainShape): boolean {
+    switch (terrain) {
+    default:
+      break;
+    case TerrainShape.FlatNorthWest:
+    case TerrainShape.FlatNorth:
+    case TerrainShape.FlatNorthEast:
+    case TerrainShape.FlatWest:
+    case TerrainShape.Wall:
+    case TerrainShape.FlatEast:
+    case TerrainShape.FlatSouthWest:
+    case TerrainShape.FlatSouth:
+    case TerrainShape.FlatSouthEast:
+    case TerrainShape.FlatNorthOut:
+    case TerrainShape.FlatEastOut:
+    case TerrainShape.FlatSouthOut:
+    case TerrainShape.FlatWestOut:
+    case TerrainShape.FlatAloneOut:
+    case TerrainShape.RampUpSouthEdge:
+    case TerrainShape.RampUpWestEdge:
+    case TerrainShape.RampUpEastEdge:
+    case TerrainShape.RampUpNorthEdge:
+      return true;
+    }
+    return false;
+  }
+  
+  static function isRampUp(shape: TerrainShape, direction: Direction): boolean {
+    switch (direction) {
+    default:
+      break;
+    case Direction.North:
+      return shape == TerrainShape.RampUpNorthEdge ||
+             shape == TerrainShape.RampUpNorth;
+    case Direction.East:
+      return shape == TerrainShape.RampUpEastEdge ||
+             shape == TerrainShape.RampUpEast;
+    case Direction.South:
+      return shape == TerrainShape.RampUpSouthEdge ||
+             shape == TerrainShape.RampUpSouth;
+    case Direction.West:
+      return shape == TerrainShape.RampUpWestEdge ||
+             shape == TerrainShape.RampUpWest;
+    }
+    return false;
+  }
+
   private readonly _tanTheta: number;
   private readonly _surfaceLocation: Point3D;
 
@@ -410,6 +410,68 @@ export class Terrain extends PhysicalEntity {
       return this.z + this.height;
     }
     return this.z + (location.y * this._tanTheta);
+  }
+}
+
+export class TerrainGrid {
+  static readonly neighbourOffsets: Array<Point2D> =
+    [ new Point2D(-1, -1), new Point2D(0, -1),  new Point2D(1, -1),
+      new Point2D(-1, 0),                       new Point2D(1, 0),
+      new Point2D(-1, 1),  new Point2D(0, 1),   new Point2D(1, 1), ];
+
+  private _surfaceTerrain: Array<Array<Terrain>> = new Array();
+  private _totalSurface: number = 0;
+  private _totalSubSurface: number = 0;
+
+  constructor(private readonly _context: ContextImpl,
+              private readonly _width: number,
+              private readonly _depth: number) {
+    for (let y = 0; y < this.depth; ++y) {
+      this.surfaceTerrain.push(new Array<Terrain>(this.width));
+    }
+  }
+
+  get width(): number { return this._width; }
+  get depth(): number { return this._depth; }
+  get totalSurface(): number { return this._totalSurface; }
+  get totalSubSurface(): number { return this._totalSubSurface; }
+  get surfaceTerrain(): Array<Array<Terrain>> { return this._surfaceTerrain; }
+
+  addSurfaceTerrain(x: number, y: number, z: number, ty: TerrainType,
+                    shape: TerrainShape, feature: TerrainFeature): void {
+    let terrain = Terrain.create(this._context, x, y, z, ty, shape, feature);
+    this.surfaceTerrain[y][x] = terrain;
+    this._totalSurface++;
+  }
+
+  addSubSurfaceTerrain(x: number, y: number, z: number, ty: TerrainType,
+                       shape: TerrainShape): void {
+    console.assert(this.getSurfaceTerrainAt(x, y)!.z > z,
+                   "adding sub-surface terrain which is above surface!");
+    Terrain.create(this._context, x, y, z, ty, shape, TerrainFeature.None);
+    this._totalSubSurface++;
+  }
+
+  getSurfaceTerrainAt(x: number, y: number): Terrain|null {
+    if ((x < 0 || x >= this.width) ||
+        (y < 0 || y >= this.depth)) {
+      return null;
+    }
+    return this.surfaceTerrain[y][x];
+  }
+
+  getNeighbours(centre: Terrain): Array<Terrain> {
+    let neighbours = new Array<Terrain>();
+   
+    for (let offset of TerrainGrid.neighbourOffsets) {
+      let neighbour = this.getSurfaceTerrainAt(centre.x + offset.x,
+                                               centre.y + offset.y);
+      if (!neighbour) {
+        continue;
+      }
+      neighbours.push(neighbour);
+    }
+    return neighbours;
   }
 }
 
