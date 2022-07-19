@@ -28,14 +28,13 @@ export function benchmark_collision() {
   const worldDims = new WT.Dimensions(tileDims.width * cellsX,
                                       tileDims.depth * cellsY,
                                       tileDims.height * (numTerraces + 1));
-  let context = WT.createTestContext(worldDims);
-  let entities = new Array();
+  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
   for (let y = 0; y < cellsY; ++y) {
     for (let x = 0; x < cellsX; ++x) {
       const minLocation = new WT.Point3D(tileDims.width * x,
                                          tileDims.depth * y,
                                          tileDims.height * terraceMap[y][x]); 
-      entities.push(new WT.PhysicalEntity(context, minLocation, tileDims));
+      new WT.PhysicalEntity(context, minLocation, tileDims);
     }
   }
   const actorDims = new WT.Dimensions(5, 5, 7);

@@ -138,13 +138,13 @@ export class ContextImpl implements Context {
     let scene = this._scene;
     entity.addEventListener(EntityEvent.Moving, function() {
       spatialGraph.update(entity);
-      if (scene) scene.updateEntity(entity);
+      scene.updateEntity(entity);
     });
   }
 
   update(camera: Camera): void {
     camera.update();
-    this._scene.render(camera);
+    this._scene.render(camera, false);
 
     Gravity.update(this._movables);
 

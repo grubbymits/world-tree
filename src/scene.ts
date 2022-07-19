@@ -159,7 +159,7 @@ export class SceneLevel {
     this.dirty = true;
   }
 
-  buildGraph(graph: SceneGraph): void {
+  buildGraph(graph: SceneGraph, force: boolean): void {
     // https://en.wikipedia.org/wiki/Transitive_reduction
     // In the mathematical theory of binary relations, any relation R on a set X may
     // be thought of as a directed graph that has the set X as its vertex set and
@@ -168,7 +168,7 @@ export class SceneLevel {
     // directed acyclic graphs, in which there is an arc xy in the graph whenever
     // there is an order relation x < y between the given pair of elements of the
     // partial order.
-    if (!this.dirty) {
+    if (!force && !this.dirty) {
       return;
     }
     this._nodes.sort((a, b) => graph.drawOrder(a, b));
@@ -255,6 +255,9 @@ export abstract class SceneGraph {
   }
 
   updateNode(node: SceneNode): void {
+    if (!this.initialised) {
+      return;
+    }
     this.setDrawCoords(node);
     console.assert(node.level != null, "node with id:", node.entity.id,
                    "isn't assigned a level!");
@@ -277,8 +280,8 @@ export abstract class SceneGraph {
     this._levels.push(new SceneLevel(node));
   }
 
-  buildLevels(): void {
-    this._levels.forEach((level) => level.buildGraph(this));
+  buildLevels(force: boolean): void {
+    this._levels.forEach((level) => level.buildGraph(this, force));
   }
 }
 
@@ -309,8 +312,8 @@ export interface SceneRenderer {
   getLocationAt(x: number, y: number, camera: Camera): Point3D | null;
   getEntityDrawnAt(x: number, y: number, camera: Camera): PhysicalEntity | null;
   addTimedEvent(callback: Function): void;
-  buildLevels(): void;
-  render(camera: Camera): number;
+  buildLevels(force: boolean): void;
+  render(camera: Camera, force: boolean): number;
 }
 
 export function verifyRenderer(renderer: SceneRenderer,
@@ -422,16 +425,16 @@ export class OffscreenSceneRenderer implements SceneRenderer {
     return null;
   }
 
-  buildLevels(): void {
+  buildLevels(force: boolean): void {
     if (!this.graph.initialised) {
       initialiseSceneGraph(this.graph, this.nodes);
     }
-    this.graph.levels.forEach((level) => level.buildGraph(this.graph));
+    this.graph.levels.forEach((level) => level.buildGraph(this.graph, force));
   }
 
-  render(camera: Camera): number {
+  render(camera: Camera, force: boolean): number {
     let drawn: number = 0;
-    this.buildLevels();
+    this.buildLevels(force);
     this.graph.levels.forEach((level) => {
       for (let i = level.order.length - 1; i >= 0; i--) {
         const node: SceneNode = level.order[i];
@@ -550,16 +553,16 @@ export class OnscreenSceneRenderer implements SceneRenderer {
     }
   };
 
-  buildLevels(): void {
+  buildLevels(force: boolean): void {
     // Is this the first run? If so, organise the nodes into a level structure.
     if (!this.graph.initialised) {
       initialiseSceneGraph(this.graph, this.nodes);
     }
-    this.graph.levels.forEach((level) => level.buildGraph(this.graph));
+    this.graph.levels.forEach((level) => level.buildGraph(this.graph, force));
   }
 
-  render(camera: Camera): number {
-    this.buildLevels();
+  render(camera: Camera, force: boolean): number {
+    this.buildLevels(force);
     this.ctx!.clearRect(0, 0, this._width, this._height);
     this.graph.levels.forEach((level) => {
       for (let i = level.order.length - 1; i >= 0; i--) {

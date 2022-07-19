@@ -39,8 +39,8 @@ class WorldConfig {
     this._worldDims = new WT.Dimensions(this._tileDims.width * this._cellsX,
                                         this._tileDims.depth * this._cellsY,
                                         this._tileDims.height * (this._numTerraces + 1));
-    this._entities = new Array();
-    this._context = WT.createTestContext(this._worldDims);
+    this._context = WT.createTestContext(this._worldDims, WT.Perspective.TwoByOneIsometric);
+
     for (let y = 0; y < this._cellsY; ++y) {
       for (let x = 0; x < this._cellsX; ++x) {
         let terrace = this._terraceMap[y][x];
@@ -48,45 +48,36 @@ class WorldConfig {
           const minLocation = new WT.Point3D(this._tileDims.width * x,
                                              this._tileDims.depth * y,
                                              this._tileDims.height * terrace);
-          this._entities.push(new WT.PhysicalEntity(this._context, minLocation, this._tileDims));
+          new WT.PhysicalEntity(this._context, minLocation, this._tileDims);
         }
       }
     }
-    this._nodes = new Array();
-    this._scene = new WT.TwoByOneIsometric();
-    for (let entity of this._entities) {
-      this._nodes.push(new WT.SceneNode(entity, this._scene.getDrawCoord(entity.bounds.minLocation)));
-    }
   }
+  get scene() { return this._context.scene; }
 }
 
 
 export function benchmark_draw_coords() {
   let totalTime = 0;
   let world = new WorldConfig();
-  for (let node of world._nodes) {
-    const startTime = performance.now();
-    world._scene.setDrawCoords(node);
-    const endTime = performance.now();
-    totalTime += endTime - startTime;
+  const startTime = performance.now();
+  for (let node of world.scene.nodes.values()) {
+    world.scene.graph.setDrawCoords(node);
   }
-  return totalTime;
+  const endTime = performance.now();
+  return endTime - startTime;
 }
 
 export function benchmark_build_levels() { 
   let world = new WorldConfig();
-  world._nodes.sort((a, b) => {
-                if (a.minZ < b.minZ)
-                  return WT.RenderOrder.Before;
-                if (a.minZ > b.minZ)
-                  return WT.RenderOrder.After;
-                return WT.RenderOrder.Any;
-             });
-  world._nodes.forEach((node) => world._scene.insertIntoLevel(node));
   const startTime = performance.now();
-  world._scene.buildLevels();
+  const force = true;
+  // Run 20 times to amortise the cost of graph initialisation.
+  const N = 20;
+  for (let i = 0; i < N; i++) {
+    world.scene.buildLevels(force);
+  }
   const endTime = performance.now();
-  let totalTime = endTime - startTime;
-  return totalTime;
+  return (endTime - startTime) / N;
 }
 
