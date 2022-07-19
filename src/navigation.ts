@@ -223,69 +223,27 @@ export class PathFinder {
     return centre.hasSuccessor(succ);
   }
 
-  identifySuccessors(current: node, start: node, end: node Array<node> {
-    let successors = new Array<>(node);
-    let neighbours: Array<> = getNeighbours(current);
-  
-    for (let node of neighbours) {
-      let direction = getDirection(current, neighbour);
-      let jump = jump(current, direction, start, end);
-      if (jump != null) {
-        successors.push(jump);
-      }
-    }
-    return successors;
-  }
-  
-  jump(current: Terrain, dir: Direction, start: Terrain, end: Terrain)-> Terrain {
-    let neighbour = getAccessibleNeighbour(current, dir);
-    if (neighbour == null) {
-      return null;
-    }
-    if (neighbour == end) {
-      return neighbour;
-    }
-  
-    let dv = Navigation.getVector2D(dir);
- 
-    // https://zerowidth.com/2013/a-visual-explanation-of-jump-point-search.html 
-    // https://github.com/kevinsheehan/jps
-    // Forced neighbours
-    if (Navigation.isDiagonal(dir)) {
-      if ((this.isAccessible(neighbour, -dv.x, dv.y) &&
-          !this.isAccessible(neighbour, -dv.x, 0))) {
-        return neighbour;
-      }
+  findPath() {
+    let frontier = new MaxPriorityQueue<PathNode, number>();
+    frontier.insert(startNode, 0);
+    came_from: Map<PathNode, PathNode> = new Map<PathNode, PathNode>();
+    cost_so_far: Map<PathNode, number> = new Map<PathNode, number>();
 
-      if (this.isAccessible(neighbour, dv.x, -dv.y) &&
-          !this.isAccessible(neighbour, 0, -dv.y)) {
-        return neighbour;
-      }
-  
-      // when moving diagonally, must check for vertical/horizontal jump points
-      if (jump(graph.getNode(neighbor.x + dx, neighbor.y), neighbor, goals) != null ||
-          jump(graph.getNode(neighbor.x, neighbor.y + dy), neighbor, goals) != null) {
-        return neighbor;
-      }
-    } else {
-      if (dx != 0) {
-        if ((graph.isWalkable(neighbor.x + dx, neighbor.y + 1) &&
-            !graph.isWalkable(neighbor.x, neighbor.y + 1)) ||
-           (graph.isWalkable(neighbor.x + dx, neighbor.y - 1) &&
-           !graph.isWalkable(neighbor.x, neighbor.y - 1))) {
-          return neighbor;
-        }
-      } else {
-        if ((graph.isWalkable(neighbor.x + 1, neighbor.y + dy) &&
-            !graph.isWalkable(neighbor.x + 1, neighbor.y)) ||
-           (graph.isWalkable(neighbor.x - 1, neighbor.y + dy) &&
-           !graph.isWalkable(neighbor.x - 1, neighbor.y))) {
-          return neighbor;
-        }
-      }
-    }
-  
-    return this.jump(graph.getNode(neighbour.x + d.x, neighbour.y + d.y), neighbour, goals);
-  }
+    //came_from.set(start, null);
+    cost_so_far.set(start, 0);
+    
+    while not frontier.empty():
+       let current: PathNode = frontier.pop();
+    
+       if current == goal:
+          break
+       
+       for next in graph.neighbors(current):
+          new_cost = cost_so_far[current] + graph.cost(current, next)
+          if next not in cost_so_far or new_cost < cost_so_far[next]:
+             cost_so_far[next] = new_cost
+             priority = new_cost + heuristic(goal, next)
+             frontier.put(next, priority)
+             came_from[next] = current
+   } 
 }
-
