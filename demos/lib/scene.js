@@ -90,7 +90,7 @@ export class SceneNode {
 export class SceneLevel {
     constructor(root) {
         this._nodes = new Array();
-        this._topologicalOrder = new Array();
+        this._order = new Array();
         this._dirty = true;
         this._minZ = root.minZ;
         this._maxZ = root.maxZ;
@@ -98,11 +98,12 @@ export class SceneLevel {
         root.level = this;
     }
     get nodes() { return this._nodes; }
-    get order() { return this._topologicalOrder; }
+    get order() { return this._order; }
     get minZ() { return this._minZ; }
     get maxZ() { return this._maxZ; }
     get dirty() { return this._dirty; }
     set dirty(d) { this._dirty = d; }
+    set order(o) { this._order = o; }
     inrange(entity) {
         return entity.bounds.minZ >= this._minZ && entity.bounds.minZ < this._maxZ;
     }
@@ -139,28 +140,38 @@ export class SceneLevel {
         }
         this.dirty = true;
     }
-    buildGraph(graph) {
-        if (!this.dirty) {
+    shouldDraw(node, camera) {
+        const entity = node.entity;
+        if (!entity.visible || !entity.drawable) {
+            return false;
+        }
+        const width = entity.graphics[0].width;
+        const height = entity.graphics[0].height;
+        return camera.isOnScreen(node.drawCoord, width, height);
+    }
+    buildGraph(graph, camera, force) {
+        if (!force && !this.dirty) {
             return;
         }
-        this._nodes.sort((a, b) => graph.drawOrder(a, b));
-        this._topologicalOrder = [];
+        const toDraw = this._nodes.filter(node => this.shouldDraw(node, camera));
+        toDraw.sort((a, b) => graph.drawOrder(a, b));
+        this.order = [];
         let discovered = new Set();
-        let topologicalSort = (node) => {
+        let topoSort = (node) => {
             if (discovered.has(node)) {
                 return;
             }
             discovered.add(node);
             for (let succ of node.succs) {
-                topologicalSort(succ);
+                topoSort(succ);
             }
-            this._topologicalOrder.push(node);
+            this.order.push(node);
         };
-        for (let i in this._nodes) {
-            if (discovered.has(this._nodes[i])) {
+        for (let i in toDraw) {
+            if (discovered.has(toDraw[i])) {
                 continue;
             }
-            topologicalSort(this._nodes[i]);
+            topoSort(toDraw[i]);
         }
         this.dirty = false;
     }
@@ -169,6 +180,8 @@ export class SceneGraph {
     constructor() {
         this._levels = new Array();
         this._numNodes = 0;
+        this._prevCameraLower = new Point2D(0, 0);
+        this._prevCameraUpper = new Point2D(0, 0);
     }
     setDrawCoords(node) {
         const entity = node.entity;
@@ -208,6 +221,9 @@ export class SceneGraph {
         }
     }
     updateNode(node) {
+        if (!this.initialised) {
+            return;
+        }
         this.setDrawCoords(node);
         console.assert(node.level != null, "node with id:", node.entity.id, "isn't assigned a level!");
         let level = node.level;
@@ -228,23 +244,37 @@ export class SceneGraph {
         }
         this._levels.push(new SceneLevel(node));
     }
-    buildLevels() {
-        this._levels.forEach((level) => level.buildGraph(this));
+    cameraHasMoved(camera) {
+        const lower = camera.min;
+        const upper = camera.max;
+        const needsRedraw = this._prevCameraLower.x != lower.x ||
+            this._prevCameraLower.y != lower.y ||
+            this._prevCameraUpper.x != upper.x ||
+            this._prevCameraUpper.y != upper.y;
+        this._prevCameraLower = lower;
+        this._prevCameraUpper = upper;
+        return needsRedraw;
     }
-}
-function initialiseSceneGraph(graph, nodes) {
-    let nodeList = new Array();
-    for (let node of nodes.values()) {
-        nodeList.push(node);
+    initialise(nodes) {
+        let nodeList = new Array();
+        for (let node of nodes.values()) {
+            nodeList.push(node);
+        }
+        nodeList.sort((a, b) => {
+            if (a.minZ < b.minZ)
+                return RenderOrder.Before;
+            if (a.minZ > b.minZ)
+                return RenderOrder.After;
+            return RenderOrder.Any;
+        });
+        nodeList.forEach((node) => this.insertIntoLevel(node));
     }
-    nodeList.sort((a, b) => {
-        if (a.minZ < b.minZ)
-            return RenderOrder.Before;
-        if (a.minZ > b.minZ)
-            return RenderOrder.After;
-        return RenderOrder.Any;
-    });
-    nodeList.forEach((node) => graph.insertIntoLevel(node));
+    buildLevels(camera, force) {
+        if (this.cameraHasMoved(camera)) {
+            force = true;
+        }
+        this._levels.forEach((level) => level.buildGraph(this, camera, force));
+    }
 }
 export function verifyRenderer(renderer, entities) {
     if (renderer.graph.numNodes != entities.length) {
@@ -335,15 +365,12 @@ export class OffscreenSceneRenderer {
     getEntityDrawnAt(x, y, camera) {
         return null;
     }
-    buildLevels() {
-        if (!this.graph.initialised) {
-            initialiseSceneGraph(this.graph, this.nodes);
-        }
-        this.graph.levels.forEach((level) => level.buildGraph(this.graph));
-    }
-    render(camera) {
+    render(camera, force) {
         let drawn = 0;
-        this.buildLevels();
+        if (!this.graph.initialised) {
+            this.graph.initialise(this.nodes);
+        }
+        this.graph.buildLevels(camera, force);
         this.graph.levels.forEach((level) => {
             for (let i = level.order.length - 1; i >= 0; i--) {
                 const node = level.order[i];
@@ -428,28 +455,18 @@ export class OnscreenSceneRenderer {
     }
     renderNode(node, camera) {
         const entity = node.entity;
-        if (!entity.visible || !entity.drawable) {
-            return;
-        }
-        const width = entity.graphics[0].width;
-        const height = entity.graphics[0].height;
-        if (camera.isOnScreen(node.drawCoord, width, height)) {
-            const coord = camera.getDrawCoord(node.drawCoord);
-            entity.graphics.forEach((component) => {
-                const spriteId = component.update();
-                Sprite.sprites[spriteId].draw(coord, this.ctx);
-            });
-        }
+        const coord = camera.getDrawCoord(node.drawCoord);
+        entity.graphics.forEach((component) => {
+            const spriteId = component.update();
+            Sprite.sprites[spriteId].draw(coord, this.ctx);
+        });
     }
     ;
-    buildLevels() {
+    render(camera, force) {
         if (!this.graph.initialised) {
-            initialiseSceneGraph(this.graph, this.nodes);
+            this.graph.initialise(this.nodes);
         }
-        this.graph.levels.forEach((level) => level.buildGraph(this.graph));
-    }
-    render(camera) {
-        this.buildLevels();
+        this.graph.buildLevels(camera, force);
         this.ctx.clearRect(0, 0, this._width, this._height);
         this.graph.levels.forEach((level) => {
             for (let i = level.order.length - 1; i >= 0; i--) {

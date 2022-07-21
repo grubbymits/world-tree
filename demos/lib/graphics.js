@@ -1,5 +1,8 @@
 import { Point2D } from "./geometry.js";
 import { getDirectionName, Direction } from "./physics.js";
+export var DummySpriteSheet = {
+    addForValidation: function (sprite) { return true; }
+};
 export class SpriteSheet {
     constructor(name) {
         this._loaded = false;
@@ -57,7 +60,6 @@ export class Sprite {
         this._id = Sprite.sprites.length;
         this._spriteOffset = new Point2D(offsetX, offsetY);
         this._maxOffset = new Point2D(this.offset.x + this.width, this.offset.y + this.height);
-        this._sheet = _sheet;
         Sprite.add(this);
         if (this.sheet.loaded) {
             this.validate();

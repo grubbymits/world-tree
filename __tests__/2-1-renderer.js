@@ -260,7 +260,9 @@ test('draw order of (x, y) increasing diagonal', () => {
   expect(scene.initialised).toBe(true);
   expect(scene.levels.length).toBe(1);
 
-  scene.buildLevels();
+  let camera = new WT.Camera(context.scene, 1024, 1024);
+  camera.location = new WT.Point3D(0, 0, 0);
+  scene.buildLevels(camera, false);
   let level = scene.levels[0];
   expect(level.order.length).toBe(4);
   expect(level.order[0].entity.id).toBe(0);
@@ -294,7 +296,8 @@ test('draw order of (x, y) four in a square', () => {
   expect(scene.initialised).toBe(true);
   expect(scene.levels.length).toBe(1);
 
-  scene.buildLevels();
+  let camera = new WT.Camera(context.scene, 1024, 1024);
+  scene.buildLevels(camera, false);
   let level = scene.levels[0];
   level.order.reverse();
   expect(level.order.length).toBe(4);
@@ -331,7 +334,10 @@ test('draw order of (x, y, z) eight in a cube', () => {
   expect(scene.initialised).toBe(true);
   expect(scene.levels.length).toBe(2);
 
-  scene.buildLevels();
+  let camera = new WT.Camera(context.scene, 1024, 1024);
+  camera.location = node0.entity.bounds.minLocation;
+
+  scene.buildLevels(camera, false);
   let level = scene.levels[0];
   let drawOrder = level.order.slice();
   drawOrder.reverse();
@@ -378,7 +384,7 @@ test('draw order of (x, y, z) updating eight in a cube', () => {
   expect(scene.initialised).toBe(true);
   expect(scene.levels.length).toBe(2);
 
-  scene.buildLevels();
+  scene.buildLevels(false);
   let drawOrder = scene.levels[0].order.slice().reverse();
   expect(drawOrder.length).toBe(4);
   expect(drawOrder[0].entity.id).toBe(1);
@@ -445,11 +451,11 @@ test('draw order of (x, y, z) updating level in a cube', () => {
   nodes.forEach((node) => scene.insertIntoLevel(node));
   expect(scene.initialised).toBe(true);
   expect(scene.levels.length).toBe(3);
-  scene.buildLevels();
+  scene.buildLevels(false);
 
   movable.entity.updatePosition(new WT.Vector3D(0, 0, -95));
   scene.updateNode(movable);
-  scene.buildLevels();
+  scene.buildLevels(false);
 
   // Movable shouldn't still be in it's own level.
   expect(scene.levels[2].order.length).toBe(0);
@@ -516,8 +522,8 @@ test('test bug where some blocks were not drawn', () => {
     addDummyGraphic(dummySheet, WT.TerrainType.DryGrass, shape);
   }
   builder.generateMap(context);
-  context.scene.buildLevels();
   let camera = new WT.Camera(context.scene, 1024, 1024);
+  context.scene.buildLevels(camera, false);
 
   expect(context.verify()).toBe(true);
   expect(context.scene.graph.levels.length).toBe(3);

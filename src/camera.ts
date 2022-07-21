@@ -34,6 +34,7 @@ export class Camera {
   }
 
   get min(): Point2D { return new Point2D(this._lowerX, this._lowerY); }
+  get max(): Point2D { return new Point2D(this._upperX, this._upperY); }
   get width(): number { return this._width; }
   get height(): number { return this._height; }
   get location(): Point3D|null { return this._surfaceLocation; }

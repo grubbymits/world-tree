@@ -40,6 +40,8 @@ class WorldConfig {
                                         this._tileDims.depth * this._cellsY,
                                         this._tileDims.height * (this._numTerraces + 1));
     this._context = WT.createTestContext(this._worldDims, WT.Perspective.TwoByOneIsometric);
+    this._camera = new WT.Camera(this.scene, 1024, 1024);
+    this._camera.location = new WT.Point3D(0, 0, 0);
 
     for (let y = 0; y < this._cellsY; ++y) {
       for (let x = 0; x < this._cellsX; ++x) {
@@ -54,6 +56,7 @@ class WorldConfig {
     }
   }
   get scene() { return this._context.scene; }
+  get camera() { return this._camera; }
 }
 
 
@@ -75,7 +78,7 @@ export function benchmark_build_levels() {
   // Run 20 times to amortise the cost of graph initialisation.
   const N = 20;
   for (let i = 0; i < N; i++) {
-    world.scene.buildLevels(force);
+    world.scene.render(world.camera, force);
   }
   const endTime = performance.now();
   return (endTime - startTime) / N;

@@ -20,6 +20,7 @@ export class Camera {
         return true;
     }
     get min() { return new Point2D(this._lowerX, this._lowerY); }
+    get max() { return new Point2D(this._upperX, this._upperY); }
     get width() { return this._width; }
     get height() { return this._height; }
     get location() { return this._surfaceLocation; }
