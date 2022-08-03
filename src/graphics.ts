@@ -149,12 +149,7 @@ export function generateSprites(sheet: SpriteSheet, width: number, height: numbe
 }
 
 export abstract class GraphicComponent {
-  constructor(protected _currentSpriteId: number) {
-    console.assert(typeof(this._currentSpriteId) == "number", "spriteId not a number");
-    console.assert(this._currentSpriteId > -1 &&
-                   this._currentSpriteId < Sprite.sprites.length,
-                   "spriteId not in range:", this._currentSpriteId);
-  }
+  constructor(protected _currentSpriteId: number) { }
               
   abstract update(): number;
   isTransparentAt(x: number, y: number): boolean {
@@ -166,6 +161,16 @@ export abstract class GraphicComponent {
   get height(): number { 
     return Sprite.sprites[this._currentSpriteId].height;
   }
+}
+
+export class DummyGraphicComponent extends GraphicComponent {
+  constructor(private readonly _width: number,
+              private readonly _height: number) {
+    super(0);
+  }
+  get width(): number { return this._width; }
+  get height(): number { return this._height; }
+  update(): number { return 0; }
 }
 
 export class StaticGraphicComponent extends GraphicComponent {

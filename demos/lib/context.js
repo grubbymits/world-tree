@@ -1,7 +1,7 @@
 import { PhysicalEntity } from "./entity.js";
 import { Terrain } from "./terrain.js";
 import { EntityEvent } from "./events.js";
-import { OnscreenSceneRenderer, OffscreenSceneRenderer, verifyRenderer, Perspective, TrueIsometric, TwoByOneIsometric } from "./scene.js";
+import { OnscreenSceneRenderer, OffscreenSceneRenderer, Perspective, TrueIsometric, TwoByOneIsometric } from "./scene.js";
 import { SpriteSheet } from "./graphics.js";
 import { Octree } from "./tree.js";
 import { CollisionDetector, Gravity } from "./physics.js";
@@ -29,7 +29,7 @@ export class ContextImpl {
         return this.entities.length == PhysicalEntity.getNumEntities() &&
             this.entities.length == this._totalEntities &&
             this._octree.verify(this.entities) &&
-            verifyRenderer(this.scene, this.entities);
+            this.scene.verifyRenderer(this.entities);
     }
     addOnscreenRenderer(canvas, perspective) {
         switch (perspective) {

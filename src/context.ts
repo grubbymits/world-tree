@@ -6,7 +6,6 @@ import { SceneGraph,
          SceneRenderer,
          OnscreenSceneRenderer,
          OffscreenSceneRenderer,
-         verifyRenderer,
          Perspective,
          TrueIsometric,
          TwoByOneIsometric } from "./scene.js"
@@ -60,7 +59,7 @@ export class ContextImpl implements Context {
     return this.entities.length == PhysicalEntity.getNumEntities() &&
            this.entities.length == this._totalEntities &&
            this._octree.verify(this.entities) &&
-           verifyRenderer(this.scene, this.entities);
+           this.scene.verifyRenderer(this.entities);
   }
 
   addOnscreenRenderer(canvas: HTMLCanvasElement, 

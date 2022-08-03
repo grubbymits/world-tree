@@ -111,9 +111,6 @@ export function generateSprites(sheet, width, height, xBegin, yBegin, columns, r
 export class GraphicComponent {
     constructor(_currentSpriteId) {
         this._currentSpriteId = _currentSpriteId;
-        console.assert(typeof (this._currentSpriteId) == "number", "spriteId not a number");
-        console.assert(this._currentSpriteId > -1 &&
-            this._currentSpriteId < Sprite.sprites.length, "spriteId not in range:", this._currentSpriteId);
     }
     isTransparentAt(x, y) {
         return Sprite.sprites[this._currentSpriteId].isTransparentAt(x, y);
@@ -124,6 +121,16 @@ export class GraphicComponent {
     get height() {
         return Sprite.sprites[this._currentSpriteId].height;
     }
+}
+export class DummyGraphicComponent extends GraphicComponent {
+    constructor(_width, _height) {
+        super(0);
+        this._width = _width;
+        this._height = _height;
+    }
+    get width() { return this._width; }
+    get height() { return this._height; }
+    update() { return 0; }
 }
 export class StaticGraphicComponent extends GraphicComponent {
     constructor(id) {

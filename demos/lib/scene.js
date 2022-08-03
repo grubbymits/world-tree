@@ -142,15 +142,18 @@ export class SceneLevel {
     }
     shouldDraw(node, camera) {
         const entity = node.entity;
-        if (!entity.visible || !entity.drawable) {
+        if (entity.visible && entity.drawable) {
+            const width = entity.graphics[0].width;
+            const height = entity.graphics[0].height;
+            return camera.isOnScreen(node.drawCoord, width, height);
+        }
+        else {
             return false;
         }
-        const width = entity.graphics[0].width;
-        const height = entity.graphics[0].height;
-        return camera.isOnScreen(node.drawCoord, width, height);
     }
     buildGraph(graph, camera, force) {
         if (!force && !this.dirty) {
+            console.assert(this.order.length != 0);
             return;
         }
         const toDraw = this._nodes.filter(node => this.shouldDraw(node, camera));
@@ -213,13 +216,6 @@ export class SceneGraph {
     get levels() { return this._levels; }
     get initialised() { return this.levels.length != 0; }
     get numNodes() { return this._numNodes; }
-    insertNode(node) {
-        this._numNodes++;
-        this.setDrawCoords(node);
-        if (this.initialised) {
-            this.insertIntoLevel(node);
-        }
-    }
     updateNode(node) {
         if (!this.initialised) {
             return;
@@ -236,13 +232,34 @@ export class SceneGraph {
         }
     }
     insertIntoLevel(node) {
-        for (let level of this._levels) {
+        for (let level of this.levels) {
             if (level.inrange(node.entity)) {
                 level.add(node, this);
                 return;
             }
         }
-        this._levels.push(new SceneLevel(node));
+        this.levels.push(new SceneLevel(node));
+    }
+    insertNode(node) {
+        this.setDrawCoords(node);
+        if (this.initialised) {
+            this.insertIntoLevel(node);
+        }
+    }
+    initialise(nodes) {
+        let nodeList = new Array();
+        for (let node of nodes.values()) {
+            nodeList.push(node);
+            this.setDrawCoords(node);
+        }
+        nodeList.sort((a, b) => {
+            if (a.minZ < b.minZ)
+                return RenderOrder.Before;
+            if (a.minZ > b.minZ)
+                return RenderOrder.After;
+            return RenderOrder.Any;
+        });
+        nodeList.forEach((node) => this.insertIntoLevel(node));
     }
     cameraHasMoved(camera) {
         const lower = camera.min;
@@ -255,20 +272,6 @@ export class SceneGraph {
         this._prevCameraUpper = upper;
         return needsRedraw;
     }
-    initialise(nodes) {
-        let nodeList = new Array();
-        for (let node of nodes.values()) {
-            nodeList.push(node);
-        }
-        nodeList.sort((a, b) => {
-            if (a.minZ < b.minZ)
-                return RenderOrder.Before;
-            if (a.minZ > b.minZ)
-                return RenderOrder.After;
-            return RenderOrder.Any;
-        });
-        nodeList.forEach((node) => this.insertIntoLevel(node));
-    }
     buildLevels(camera, force) {
         if (this.cameraHasMoved(camera)) {
             force = true;
@@ -276,82 +279,28 @@ export class SceneGraph {
         this._levels.forEach((level) => level.buildGraph(this, camera, force));
     }
 }
-export function verifyRenderer(renderer, entities) {
-    if (renderer.graph.numNodes != entities.length) {
-        console.error("top-level comparison between scene node and entities failed");
-    }
-    let counted = 0;
-    let levelNodeIds = new Array();
-    let nodeIds = new Array();
-    let entityIds = new Array();
-    for (let level of renderer.graph.levels) {
-        counted += level.nodes.length;
-        level.nodes.forEach(node => levelNodeIds.push(node.id));
-    }
-    for (let node of renderer.nodes.values()) {
-        nodeIds.push(node.id);
-    }
-    entities.forEach(entity => entityIds.push(entity.id));
-    if (nodeIds.length != entityIds.length || nodeIds.length != levelNodeIds.length) {
-        console.error("number of scene nodes and entities don't match up");
-        return false;
-    }
-    if (renderer.numEntities != entities.length) {
-        console.error("mismatch in number of entities in context and scene");
-    }
-    nodeIds.sort((a, b) => {
-        if (a < b)
-            return -1;
-        else
-            return 1;
-    });
-    entityIds.sort((a, b) => {
-        if (a < b)
-            return -1;
-        else
-            return 1;
-    });
-    levelNodeIds.sort((a, b) => {
-        if (a < b)
-            return -1;
-        else
-            return 1;
-    });
-    for (let i = 0; i < nodeIds.length; ++i) {
-        if (i != nodeIds[i]) {
-            console.error("mismatch in expected ids:", i, nodeIds[i]);
-            return false;
-        }
-        if (nodeIds[i] != entityIds[i]) {
-            console.error("mismatch node vs entity ids:", nodeIds[i], entityIds[i]);
-            return false;
-        }
-        if (nodeIds[i] != levelNodeIds[i]) {
-            console.error("mismatch top level node vs found in level ids:", nodeIds[i], levelNodeIds[i]);
-            return false;
-        }
-    }
-    return true;
-}
-export class OffscreenSceneRenderer {
+class BaseSceneRenderer {
     constructor(_graph) {
         this._graph = _graph;
         this._nodes = new Map();
         this._numEntities = 0;
     }
-    get ctx() {
-        return null;
-    }
     get graph() { return this._graph; }
     get numEntities() { return this._numEntities; }
     get nodes() { return this._nodes; }
+    get ctx() {
+        return null;
+    }
     insertEntity(entity) {
         let node = new SceneNode(entity, this.graph.getDrawCoord(entity.bounds.minLocation));
         this.nodes.set(node.id, node);
-        this.graph.insertNode(node);
+        if (this.graph.initialised) {
+            this.graph.insertNode(node);
+        }
         this._numEntities++;
     }
     updateEntity(entity) {
+        console.assert(this._nodes.has(entity.id));
         let node = this._nodes.get(entity.id);
         this.graph.updateNode(node);
     }
@@ -364,6 +313,70 @@ export class OffscreenSceneRenderer {
     }
     getEntityDrawnAt(x, y, camera) {
         return null;
+    }
+    render(camera, force) { return 0; }
+    addTimedEvent(callback) { }
+    verifyRenderer(entities) {
+        if (this.graph.numNodes != entities.length) {
+            console.error("top-level comparison between scene node and entities failed");
+        }
+        let counted = 0;
+        let levelNodeIds = new Array();
+        let nodeIds = new Array();
+        let entityIds = new Array();
+        for (let level of this.graph.levels) {
+            counted += level.nodes.length;
+            level.nodes.forEach(node => levelNodeIds.push(node.id));
+        }
+        for (let node of this.nodes.values()) {
+            nodeIds.push(node.id);
+        }
+        entities.forEach(entity => entityIds.push(entity.id));
+        if (nodeIds.length != entityIds.length || nodeIds.length != levelNodeIds.length) {
+            console.error("number of scene nodes and entities don't match up");
+            return false;
+        }
+        if (this.numEntities != entities.length) {
+            console.error("mismatch in number of entities in context and scene");
+        }
+        nodeIds.sort((a, b) => {
+            if (a < b)
+                return -1;
+            else
+                return 1;
+        });
+        entityIds.sort((a, b) => {
+            if (a < b)
+                return -1;
+            else
+                return 1;
+        });
+        levelNodeIds.sort((a, b) => {
+            if (a < b)
+                return -1;
+            else
+                return 1;
+        });
+        for (let i = 0; i < nodeIds.length; ++i) {
+            if (i != nodeIds[i]) {
+                console.error("mismatch in expected ids:", i, nodeIds[i]);
+                return false;
+            }
+            if (nodeIds[i] != entityIds[i]) {
+                console.error("mismatch node vs entity ids:", nodeIds[i], entityIds[i]);
+                return false;
+            }
+            if (nodeIds[i] != levelNodeIds[i]) {
+                console.error("mismatch top level node vs found in level ids:", nodeIds[i], levelNodeIds[i]);
+                return false;
+            }
+        }
+        return true;
+    }
+}
+export class OffscreenSceneRenderer extends BaseSceneRenderer {
+    constructor(graph) {
+        super(graph);
     }
     render(camera, force) {
         let drawn = 0;
@@ -383,15 +396,12 @@ export class OffscreenSceneRenderer {
         });
         return drawn;
     }
-    addTimedEvent(callback) { }
 }
-export class OnscreenSceneRenderer {
-    constructor(_canvas, _graph) {
+export class OnscreenSceneRenderer extends BaseSceneRenderer {
+    constructor(_canvas, graph) {
+        super(graph);
         this._canvas = _canvas;
-        this._graph = _graph;
         this._handler = new TimedEventHandler();
-        this._nodes = new Map();
-        this._numEntities = 0;
         this._width = _canvas.width;
         this._height = _canvas.height;
         this._ctx = this._canvas.getContext("2d", { alpha: false });
@@ -399,26 +409,8 @@ export class OnscreenSceneRenderer {
     get width() { return this._width; }
     get height() { return this._height; }
     get ctx() { return this._ctx; }
-    get graph() { return this._graph; }
-    get nodes() { return this._nodes; }
-    get numEntities() { return this._numEntities; }
-    getNode(id) {
-        console.assert(this.nodes.has(id));
-        return this.nodes.get(id);
-    }
     addTimedEvent(callback) {
         this._handler.add(callback);
-    }
-    insertEntity(entity) {
-        let node = new SceneNode(entity, this.graph.getDrawCoord(entity.bounds.minLocation));
-        this.nodes.set(node.id, node);
-        this.graph.insertNode(node);
-        this._numEntities++;
-    }
-    updateEntity(entity) {
-        console.assert(this._nodes.has(entity.id));
-        let node = this._nodes.get(entity.id);
-        this.graph.updateNode(node);
     }
     getLocationAt(x, y, camera) {
         let entity = this.getEntityDrawnAt(x, y, camera);
