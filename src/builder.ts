@@ -20,10 +20,17 @@ export enum Biome {
   Water,
   Beach,
   Marshland,
-  Grassland,
-  Woodland,
-  Tundra,
   Desert,
+  Grassland,
+  Shrubland,
+  MoistForest,
+  WetForest,
+  RainForest,
+  Tundra,
+  AlpineGrassland,
+  AlpineMeadow,
+  AlpineForest,
+  Taiga,
 }
 
 export function getBiomeName(biome: Biome): string {
@@ -36,14 +43,28 @@ export function getBiomeName(biome: Biome): string {
     return "beach";
   case Biome.Marshland:
     return "marshland";
-  case Biome.Grassland:
-    return "grassland";
-  case Biome.Woodland:
-    return "woodland";
-  case Biome.Tundra:
-    return "tundra";
   case Biome.Desert:
     return "desert";
+  case Biome.Grassland:
+    return "grassland";
+  case Biome.Shrubland:
+    return "shrubland";
+  case Biome.MoistForest:
+    return "moist forest";
+  case Biome.WetForest:
+    return "wet forest";
+  case Biome.RainForest:
+    return "rain forest";
+  case Biome.Tundra:
+    return "tundra";
+  case Biome.AlpineGrassland:
+    return "alpine grassland";
+  case Biome.AlpineMeadow:
+    return "alpine meadow";
+  case Biome.AlpineForest:
+    return "alpine forest";
+  case Biome.Taiga:
+    return "taiga";
   }
 }
 
@@ -266,7 +287,7 @@ export class TerrainBuilderConfig {
   private _waterLine: number = 0;
   private _wetLimit: number = 0;
   private _dryLimit: number = 0;
-  private _treeLimit: number = 0;
+  private _uplandThreshold: number = 0;
   private _hasWater: boolean = false;
   private _hasRamps: boolean = false;
   private _hasBiomes: boolean = false;
@@ -284,19 +305,18 @@ export class TerrainBuilderConfig {
   set rainfall(level: number) { this._rainfall = level; }
   set rainDirection(direction: Direction) { this._rainDirection = direction; }
   set dryLimit(level: number) { this._dryLimit = level; }
-  set treeLimit(level: number) { this._treeLimit = level; }
   set hasWater(enable: boolean) { this._hasWater = enable; }
   set hasRamps(enable: boolean) { this._hasRamps = enable; }
   set hasBiomes(enable: boolean) { this._hasBiomes = enable; }
 
   get numTerraces(): number { return this._numTerraces; }
+  get uplandThreshold(): number { return this._uplandThreshold; }
   get hasWater(): boolean { return this._hasWater; }
   get floor(): TerrainType { return this._defaultFloor; }
   get wall(): TerrainType { return this._defaultWall; }
   get waterLine(): number { return this._waterLine; }
   get wetLimit(): number { return this._wetLimit; }
   get dryLimit(): number { return this._dryLimit; }
-  get treeLimit(): number { return this._treeLimit; }
   get ramps(): boolean { return this._hasRamps; }
   get biomes(): boolean { return this._hasBiomes; }
   get rainfall(): number { return this._rainfall; }
@@ -658,48 +678,79 @@ export class TerrainBuilder {
   }
 
   setBiomes(): void {
-    let numWater = 0;
-    let numSand = 0;
-    let numDryGrass = 0;
-    let numWetGrass = 0;
-    let numRock = 0;
-    let numMud = 0;
+    let moistureRange =
+      this.config.wetLimit == 0
+      ? 1
+      : this.config.wetLimit;
     for (let y = 0; y < this.surface.depth; y++) {
       for (let x = 0; x < this.surface.width; x++) {
         let surface = this.surface.at(x, y);
         let biome: Biome = Biome.Water;
         let terrain: TerrainType = TerrainType.Water;
+        let moisturePercent =
+          Math.min(moistureRange, surface.moisture / moistureRange);
 
         if (surface.height <= this.config.waterLine) {
           biome = Biome.Water;
           terrain = TerrainType.Water;
-          numWater++;
-        } else if (surface.terrace < 1) {
-          biome = Biome.Beach;
-          terrain = TerrainType.Sand;
-          numSand++;
-        } else if (surface.height > this.config.treeLimit) {
-          if (surface.moisture > this.config.dryLimit) {
-            biome = Biome.Grassland;
-            terrain = TerrainType.DryGrass;
-            numDryGrass++;
-          } else {
-            biome = Biome.Tundra;
-            terrain = TerrainType.Rock;
-            numRock++;
+        } else if (surface.height >= this.config.uplandThreshold) {
+          // Uplands is split into five biomes based on moisture.
+          let moistureScaled = Math.floor(5 * moisturePercent);
+          switch(moistureScaled) {
+            default:
+              console.assert('unhandled moisture scale');
+            case 0:
+              biome = Biome.Tundra;
+              terrain = TerrainType.Upland0;
+              break;
+            case 1:
+              biome = Biome.AlpineGrassland;
+              terrain = TerrainType.Upland1;
+              break;
+            case 2:
+              biome = Biome.AlpineMeadow;
+              terrain = TerrainType.Upland2;
+              break;
+            case 3:
+              biome = Biome.AlpineForest;
+              terrain = TerrainType.Upland3;
+              break;
+            case 4:
+              biome = Biome.Taiga;
+              terrain = TerrainType.Upland4;
+              break;
           }
-        } else if (surface.moisture < this.config.dryLimit) {
-          biome = Biome.Desert;
-          terrain = TerrainType.Rock;
-          numRock++;
-        } else if (surface.moisture > this.config.wetLimit) {
-          biome = Biome.Marshland;
-          terrain = TerrainType.WetGrass;
-          numWetGrass++;
         } else {
-          biome = Biome.Woodland;
-          terrain = TerrainType.Mud;
-          numMud++;
+          // Lowlands is split into six biomes based on moisture.
+          let moistureScaled = Math.floor(6 * moisturePercent);
+          switch(moistureScaled) {
+            default:
+              console.assert('unhandled moisture scale');
+            case 0:
+              biome = Biome.Desert;
+              terrain = TerrainType.Lowland0;
+              break;
+            case 1:
+              biome = Biome.Grassland;
+              terrain = TerrainType.Lowland1;
+              break;
+            case 2:
+              biome = Biome.Shrubland;
+              terrain = TerrainType.Lowland2;
+              break;
+            case 3:
+              biome = Biome.MoistForest;
+              terrain = TerrainType.Lowland3;
+              break;
+            case 4:
+              biome = Biome.WetForest;
+              terrain = TerrainType.Lowland4;
+              break;
+            case 5:
+              biome = Biome.RainForest;
+              terrain = TerrainType.Lowland5;
+              break;
+          }
         }
         // Only change the type if it's supported, otherwise we'll just
         // fallback to the default which is set in the constructor.
@@ -712,15 +763,6 @@ export class TerrainBuilder {
         surface.biome = biome;
       }
     }
-    /*
-    console.log("terrain type stats:");
-    console.log("water tiles:", numWater);
-    console.log("sand tiles:", numSand);
-    console.log("rock tiles:", numRock);
-    console.log("mud tiles:", numMud);
-    console.log("dry grass tiles:", numDryGrass);
-    console.log("wet grass tiles:", numWetGrass);
-    */
   }
 
   setFeatures(): void {
@@ -760,7 +802,6 @@ export class TerrainBuilder {
             surface.features |= TerrainFeature.DryGrass;
           } else if (surface.biome == Biome.Tundra) {
             surface.features |= TerrainFeature.DryGrass;
-          } else if (surface.biome == Biome.Woodland) {
           }
         }
       }

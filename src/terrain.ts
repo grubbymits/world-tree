@@ -43,11 +43,17 @@ export enum TerrainShape {
 
 export enum TerrainType {
   Water,
-  Sand,
-  Mud,
-  DryGrass,
-  WetGrass,
-  Rock,
+  Lowland0,
+  Lowland1,
+  Lowland2,
+  Lowland3,
+  Lowland4,
+  Lowland5,
+  Upland0,
+  Upland1,
+  Upland2,
+  Upland3,
+  Upland4,
 }
 
 export enum TerrainFeature {
@@ -145,16 +151,28 @@ export function getTypeName(terrain: TerrainType): string {
     console.error("unhandled terrain type:", terrain);
   case TerrainType.Water:
     return "water";
-  case TerrainType.Sand:
-    return "sand";
-  case TerrainType.Mud:
-    return "mud";
-  case TerrainType.DryGrass:
-    return "dry grass";
-  case TerrainType.WetGrass:
-    return "wet grass";
-  case TerrainType.Rock:
-    return "rock";
+  case TerrainType.Lowland0:
+    return "lowland 0";
+  case TerrainType.Lowland1:
+    return "lowland 1";
+  case TerrainType.Lowland2:
+    return "lowland 2";
+  case TerrainType.Lowland3:
+    return "lowland 3";
+  case TerrainType.Lowland4:
+    return "lowland 4";
+  case TerrainType.Lowland5:
+    return "lowland 5";
+  case TerrainType.Upland0:
+    return "upland 0";
+  case TerrainType.Upland1:
+    return "upland 1";
+  case TerrainType.Upland2:
+    return "upland 2";
+  case TerrainType.Upland3:
+    return "upland 3";
+  case TerrainType.Upland4:
+    return "upland 4";
   }
 }
 
