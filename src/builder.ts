@@ -19,6 +19,7 @@ import { ContextImpl } from "./context.js"
 export enum Biome {
   Water,
   Beach,
+  Rock,
   Marshland,
   Desert,
   Grassland,
@@ -672,7 +673,7 @@ export class TerrainBuilder {
     for (let y = 0; y < this.surface.depth; y++) {
       for (let x = 0; x < this.surface.width; x++) {
         let surface = this.surface.at(x, y);
-        surface.moisture = blurredMoisture[y][x];
+        surface.moisture = Rain.moistureGrid[y][x];
       }
     }
   }
@@ -689,40 +690,42 @@ export class TerrainBuilder {
         let terrain: TerrainType = TerrainType.Water;
         let moisturePercent =
           Math.min(moistureRange, surface.moisture / moistureRange);
+        // Split into six biomes based on moisture.
+        let moistureScaled = Math.floor(6 * moisturePercent);
 
         if (surface.height <= this.config.waterLine) {
           biome = Biome.Water;
           terrain = TerrainType.Water;
         } else if (surface.height >= this.config.uplandThreshold) {
-          // Uplands is split into five biomes based on moisture.
-          let moistureScaled = Math.floor(5 * moisturePercent);
           switch(moistureScaled) {
             default:
               console.assert('unhandled moisture scale');
             case 0:
-              biome = Biome.Tundra;
+              biome = Biome.Rock;
               terrain = TerrainType.Upland0;
               break;
             case 1:
-              biome = Biome.AlpineGrassland;
+              biome = Biome.Tundra;
               terrain = TerrainType.Upland1;
               break;
             case 2:
-              biome = Biome.AlpineMeadow;
+              biome = Biome.AlpineGrassland;
               terrain = TerrainType.Upland2;
               break;
             case 3:
-              biome = Biome.AlpineForest;
+              biome = Biome.AlpineMeadow;
               terrain = TerrainType.Upland3;
               break;
             case 4:
-              biome = Biome.Taiga;
+              biome = Biome.AlpineForest;
               terrain = TerrainType.Upland4;
+              break;
+            case 5:
+              biome = Biome.Taiga;
+              terrain = TerrainType.Upland5;
               break;
           }
         } else {
-          // Lowlands is split into six biomes based on moisture.
-          let moistureScaled = Math.floor(6 * moisturePercent);
           switch(moistureScaled) {
             default:
               console.assert('unhandled moisture scale');

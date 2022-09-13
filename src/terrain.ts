@@ -54,6 +54,7 @@ export enum TerrainType {
   Upland2,
   Upland3,
   Upland4,
+  Upland5,
 }
 
 export enum TerrainFeature {
@@ -173,6 +174,8 @@ export function getTypeName(terrain: TerrainType): string {
     return "upland 3";
   case TerrainType.Upland4:
     return "upland 4";
+  case TerrainType.Upland5:
+    return "upland 5";
   }
 }
 
@@ -288,6 +291,7 @@ export class Terrain extends PhysicalEntity {
                     width: number, height: number) {
     let sprite = new Sprite(sheet, x, y, width, height);
     let component = new StaticGraphicComponent(sprite.id); 
+    console.log("adding graphic", getTypeName(terrainType), getShapeName(terrainShape));
     if (!this._terrainGraphics.has(terrainType)) {
       this._terrainGraphics.set(terrainType, new Map<TerrainShape, GraphicComponent>());
     }

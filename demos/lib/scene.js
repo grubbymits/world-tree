@@ -153,7 +153,6 @@ export class SceneLevel {
     }
     buildGraph(graph, camera, force) {
         if (!force && !this.dirty) {
-            console.assert(this.order.length != 0);
             return;
         }
         const toDraw = this._nodes.filter(node => this.shouldDraw(node, camera));

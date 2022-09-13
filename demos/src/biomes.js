@@ -1,13 +1,20 @@
 import * as WT from "../lib/world-tree.js";
 const spriteWidth = 322;
 const spriteHeight = 270;
-const sheet = new WT.SpriteSheet("../graphics/png/outside-terrain-tiles");
+const sheet = new WT.SpriteSheet("../graphics/png/outside-terrain-tiles-muted");
 const tileRows = [
-  WT.TerrainType.Rock,
-  WT.TerrainType.DryGrass,
-  WT.TerrainType.WetGrass,
-  WT.TerrainType.Mud,
-  WT.TerrainType.Sand,
+  WT.TerrainType.Lowland5,
+  WT.TerrainType.Lowland4,
+  WT.TerrainType.Lowland3,
+  WT.TerrainType.Lowland2,
+  WT.TerrainType.Lowland1,
+  WT.TerrainType.Lowland0,
+  WT.TerrainType.Upland5,
+  WT.TerrainType.Upland4,
+  WT.TerrainType.Upland3,
+  WT.TerrainType.Upland2,
+  WT.TerrainType.Upland1,
+  WT.TerrainType.Upland0,
   WT.TerrainType.Water,
 ];
 
@@ -27,37 +34,28 @@ for (let row in tileRows) {
   addGraphic(/*column*/0, row);
 }
 
-// Add graphical features: Waves.
-const waveSheet = new WT.SpriteSheet("../graphics/png/waves");
-const features = [ WT.TerrainFeature.ShorelineNorth,
-                   WT.TerrainFeature.ShorelineWest,
-                   WT.TerrainFeature.ShorelineEast,
-                   WT.TerrainFeature.ShorelineSouth ];
-
-for (let y in features) {
-  let waveSprites = new Array();
-  for (let x = 0; x < 3; x++) {
-    waveSprites.push(new WT.Sprite(waveSheet,
-                                   x * spriteWidth,
-                                   y * spriteHeight,
-                                   spriteWidth, spriteHeight));
-  }
-  const waves = new WT.OssilateGraphicComponent(waveSprites, 500);
-  const feature = features[y];
-  WT.Terrain.addFeatureGraphics(feature, waves);
-}
-
 const cellsX = 11;
 const cellsY = 11;
-const numTerraces = 3;
+const numTerraces = 1;
+//let heightMap = [ [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+//                  [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 ],
+//                  [ 0, 1, 2, 2, 2, 2, 1, 1, 1, 1, 0 ],
+//                  [ 0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0 ],
+//                  [ 0, 1, 2, 3, 3, 4, 3, 2, 2, 1, 0 ],
+//                  [ 0, 1, 2, 3, 4, 5, 4, 2, 2, 1, 0 ],
+//                  [ 0, 1, 2, 3, 4, 4, 3, 2, 2, 1, 0 ],
+//                  [ 0, 1, 2, 3, 3, 2, 2, 2, 2, 1, 0 ],
+//                  [ 0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0 ],
+//                  [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 ],
+//                  [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ];
 let heightMap = [ [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
                   [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 ],
                   [ 0, 1, 2, 2, 2, 2, 1, 1, 1, 1, 0 ],
                   [ 0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0 ],
-                  [ 0, 1, 2, 3, 3, 4, 3, 2, 2, 1, 0 ],
-                  [ 0, 1, 2, 3, 4, 5, 4, 2, 2, 1, 0 ],
-                  [ 0, 1, 2, 3, 4, 4, 3, 2, 2, 1, 0 ],
-                  [ 0, 1, 2, 3, 3, 2, 2, 2, 2, 1, 0 ],
+                  [ 0, 1, 2, 2, 2, 2, 2, 2, 2, 1, 0 ],
+                  [ 0, 1, 2, 2, 2, 2, 2, 2, 2, 1, 0 ],
+                  [ 0, 1, 2, 2, 2, 2, 2, 2, 2, 1, 0 ],
+                  [ 0, 1, 2, 2, 2, 2, 2, 2, 2, 1, 0 ],
                   [ 0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0 ],
                   [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 ],
                   [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ];
@@ -71,15 +69,15 @@ window.onload = (event) => {
   let canvas = document.getElementById("demoCanvas");
   let context = WT.createContext(canvas, worldDims, WT.Perspective.TwoByOneIsometric);
   const config = new WT.TerrainBuilderConfig(numTerraces,
-                                             WT.TerrainType.DryGrass,
-                                             WT.TerrainType.DryGrass);
+                                             WT.TerrainType.Lowland3,
+                                             WT.TerrainType.Lowland3);
   config.hasWater = true;
   config.waterLine = 0;
   config.hasBiomes = true;
   config.rainfall = 30;
   config.rainDirection = WT.Direction.North;
   config.wetLimit = 1;
-  config.treeLimit = 4;
+  config.uplandLimit = 4;
   config.dryLimit = 0.2;
 
   // Use the height map to construct a terrain.

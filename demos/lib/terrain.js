@@ -32,11 +32,18 @@ export var TerrainShape;
 export var TerrainType;
 (function (TerrainType) {
     TerrainType[TerrainType["Water"] = 0] = "Water";
-    TerrainType[TerrainType["Sand"] = 1] = "Sand";
-    TerrainType[TerrainType["Mud"] = 2] = "Mud";
-    TerrainType[TerrainType["DryGrass"] = 3] = "DryGrass";
-    TerrainType[TerrainType["WetGrass"] = 4] = "WetGrass";
-    TerrainType[TerrainType["Rock"] = 5] = "Rock";
+    TerrainType[TerrainType["Lowland0"] = 1] = "Lowland0";
+    TerrainType[TerrainType["Lowland1"] = 2] = "Lowland1";
+    TerrainType[TerrainType["Lowland2"] = 3] = "Lowland2";
+    TerrainType[TerrainType["Lowland3"] = 4] = "Lowland3";
+    TerrainType[TerrainType["Lowland4"] = 5] = "Lowland4";
+    TerrainType[TerrainType["Lowland5"] = 6] = "Lowland5";
+    TerrainType[TerrainType["Upland0"] = 7] = "Upland0";
+    TerrainType[TerrainType["Upland1"] = 8] = "Upland1";
+    TerrainType[TerrainType["Upland2"] = 9] = "Upland2";
+    TerrainType[TerrainType["Upland3"] = 10] = "Upland3";
+    TerrainType[TerrainType["Upland4"] = 11] = "Upland4";
+    TerrainType[TerrainType["Upland5"] = 12] = "Upland5";
 })(TerrainType || (TerrainType = {}));
 export var TerrainFeature;
 (function (TerrainFeature) {
@@ -130,16 +137,30 @@ export function getTypeName(terrain) {
             console.error("unhandled terrain type:", terrain);
         case TerrainType.Water:
             return "water";
-        case TerrainType.Sand:
-            return "sand";
-        case TerrainType.Mud:
-            return "mud";
-        case TerrainType.DryGrass:
-            return "dry grass";
-        case TerrainType.WetGrass:
-            return "wet grass";
-        case TerrainType.Rock:
-            return "rock";
+        case TerrainType.Lowland0:
+            return "lowland 0";
+        case TerrainType.Lowland1:
+            return "lowland 1";
+        case TerrainType.Lowland2:
+            return "lowland 2";
+        case TerrainType.Lowland3:
+            return "lowland 3";
+        case TerrainType.Lowland4:
+            return "lowland 4";
+        case TerrainType.Lowland5:
+            return "lowland 5";
+        case TerrainType.Upland0:
+            return "upland 0";
+        case TerrainType.Upland1:
+            return "upland 1";
+        case TerrainType.Upland2:
+            return "upland 2";
+        case TerrainType.Upland3:
+            return "upland 3";
+        case TerrainType.Upland4:
+            return "upland 4";
+        case TerrainType.Upland5:
+            return "upland 5";
     }
 }
 export function isFlat(terrain) {
@@ -280,6 +301,7 @@ export class Terrain extends PhysicalEntity {
     static addGraphic(terrainType, terrainShape, sheet, x, y, width, height) {
         let sprite = new Sprite(sheet, x, y, width, height);
         let component = new StaticGraphicComponent(sprite.id);
+        console.log("adding graphic", getTypeName(terrainType), getShapeName(terrainShape));
         if (!this._terrainGraphics.has(terrainType)) {
             this._terrainGraphics.set(terrainType, new Map());
         }

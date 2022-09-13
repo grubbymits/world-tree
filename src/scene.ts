@@ -181,7 +181,7 @@ export class SceneLevel {
     // there is an order relation x < y between the given pair of elements of the
     // partial order.
     if (!force && !this.dirty) {
-      console.assert(this.order.length != 0);
+      //console.assert(this.order.length != 0);
       return;
     }
 
