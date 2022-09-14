@@ -1,92 +1,108 @@
 import { Direction, getAdjacentCoord } from "./physics.js";
-export class Rain {
-    constructor(_pos, _moisture, _direction) {
+import { Point2D } from "./geometry.js";
+class Cloud {
+    constructor(_pos, _moisture, _direction, _rain) {
         this._pos = _pos;
         this._moisture = _moisture;
         this._direction = _direction;
-        this._finished = false;
-    }
-    static init(waterLevel, surface) {
-        this._waterLevel = waterLevel;
-        this._surface = surface;
-        this._moistureGrid = new Array();
-        for (let y = 0; y < surface.depth; y++) {
-            this._moistureGrid.push(new Float32Array(surface.width));
-        }
-    }
-    static get clouds() { return this._clouds; }
-    static get totalClouds() { return this._totalClouds; }
-    static get totalRain() { return this._totalRainDropped; }
-    static get moistureGrid() { return this._moistureGrid; }
-    static add(pos, moisture, direction) {
-        this._clouds.push(new Rain(pos, moisture, direction));
-        this._totalClouds++;
+        this._rain = _rain;
     }
     get x() { return this._pos.x; }
     get y() { return this._pos.y; }
     get pos() { return this._pos; }
     get moisture() { return this._moisture; }
+    get rain() { return this._rain; }
+    get minHeight() { return this.rain.minHeight; }
     get direction() { return this._direction; }
-    get finished() { return this._finished; }
+    get surface() { return this.rain.surface; }
     set pos(p) { this._pos = p; }
     set moisture(m) { this._moisture = m; }
-    set finished(f) { this._finished = f; }
-    dropMoisture(moisture) {
-        Rain.moistureGrid[this.y][this.x] += moisture;
-        this._moisture -= moisture;
-        Rain._totalRainDropped += moisture;
-        return this._moisture <= 0;
+    dropMoisture(multiplier) {
+        let moisture = this.moisture * 0.1;
+        this.moisture -= moisture;
+        this.rain.addMoistureAt(this.pos, moisture);
     }
-    update() {
-        if (this.finished) {
-            return true;
-        }
-        let nextCoord = getAdjacentCoord(this.pos, this.direction);
-        if (!Rain._surface.inbounds(nextCoord)) {
-            this.finished = true;
-            return true;
-        }
-        let current = Rain._surface.at(this.x, this.y);
-        if (current.height <= Rain._waterLevel) {
-            this.pos = nextCoord;
-            return false;
-        }
-        let next = Rain._surface.at(nextCoord.x, nextCoord.y);
-        let multiplier = (next.height / current.height);
-        let total = 0.01 + (0.05 * this.moisture * multiplier);
-        let available = Math.min(this.moisture, total);
-        this.finished = this.dropMoisture(available);
-        if (this.finished) {
-            return true;
-        }
-        if (next.terrace > current.terrace) {
-            let dirA = (this.direction + 1) % Direction.Max;
-            let dirB = (this.direction + Direction.NorthWest) % Direction.Max;
-            let pointA = getAdjacentCoord(this.pos, dirA);
-            let pointB = getAdjacentCoord(this.pos, dirB);
-            let numClouds = 2;
-            if (Rain._surface.inbounds(pointA) && Rain._surface.inbounds(pointB)) {
-                Rain.add(pointA, this.moisture / 3, dirA);
-                Rain.add(pointB, this.moisture / 3, dirB);
-                numClouds = 3;
+    move() {
+        while (this.surface.inbounds(this.pos)) {
+            let nextCoord = getAdjacentCoord(this.pos, this.direction);
+            if (!this.surface.inbounds(nextCoord)) {
+                this.dropMoisture(1);
+                return;
             }
-            else if (Rain._surface.inbounds(pointA)) {
-                Rain.add(pointA, this.moisture / 2, dirA);
-            }
-            else if (Rain._surface.inbounds(pointB)) {
-                Rain.add(pointB, this.moisture / 2, dirB);
-            }
-            else {
+            let current = this.surface.at(this.x, this.y);
+            if (current.height <= this.minHeight || current.terrace < 1) {
                 this.pos = nextCoord;
-                return false;
+                continue;
             }
-            this.moisture /= numClouds;
+            this.dropMoisture(1);
+            this.pos = nextCoord;
         }
-        this.pos = nextCoord;
-        return false;
     }
 }
-Rain.rain = 0.5;
-Rain._clouds = Array();
-Rain._totalClouds = 0;
-Rain._totalRainDropped = 0;
+export class Rain {
+    constructor(_surface, _minHeight, moisture, direction) {
+        this._surface = _surface;
+        this._minHeight = _minHeight;
+        this._clouds = Array();
+        this._totalClouds = 0;
+        this._moistureGrid = new Array();
+        for (let y = 0; y < this.surface.depth; y++) {
+            this._moistureGrid.push(new Float32Array(this.surface.width));
+        }
+        switch (direction) {
+            default:
+                console.assert('unhandled direction');
+                break;
+            case Direction.North: {
+                const y = this.surface.depth - 1;
+                for (let x = 0; x < this.surface.width; x++) {
+                    this.addCloud(new Point2D(x, y), moisture, direction);
+                }
+                break;
+            }
+            case Direction.East: {
+                const x = 0;
+                for (let y = 0; y < this.surface.depth; y++) {
+                    this.addCloud(new Point2D(x, y), moisture, direction);
+                }
+                break;
+            }
+            case Direction.South: {
+                const y = 0;
+                for (let x = 0; x < this.surface.width; x++) {
+                    this.addCloud(new Point2D(x, y), moisture, direction);
+                }
+                break;
+            }
+            case Direction.West: {
+                const x = this.surface.width - 1;
+                for (let y = 0; y < this.surface.depth; y++) {
+                    this.addCloud(new Point2D(x, y), moisture, direction);
+                }
+                break;
+            }
+        }
+    }
+    get clouds() { return this._clouds; }
+    get totalClouds() { return this._totalClouds; }
+    get surface() { return this._surface; }
+    get minHeight() { return this._minHeight; }
+    get moistureGrid() { return this._moistureGrid; }
+    moistureAt(x, y) {
+        return this._moistureGrid[y][x];
+    }
+    addMoistureAt(pos, moisture) {
+        this.moistureGrid[pos.y][pos.x] += moisture;
+    }
+    addCloud(pos, moisture, direction) {
+        this.clouds.push(new Cloud(pos, moisture, direction, this));
+        this._totalClouds++;
+    }
+    run() {
+        while (this.clouds.length != 0) {
+            let cloud = this.clouds[this.clouds.length - 1];
+            this.clouds.pop();
+            cloud.move();
+        }
+    }
+}

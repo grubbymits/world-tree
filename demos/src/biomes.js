@@ -74,11 +74,10 @@ window.onload = (event) => {
   config.hasWater = true;
   config.waterLine = 0;
   config.hasBiomes = true;
-  config.rainfall = 30;
+  config.rainfall = 50;
   config.rainDirection = WT.Direction.North;
-  config.wetLimit = 1;
+  //config.wetLimit = 5;
   config.uplandLimit = 4;
-  config.dryLimit = 0.2;
 
   // Use the height map to construct a terrain.
   let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,

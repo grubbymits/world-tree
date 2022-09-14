@@ -517,7 +517,6 @@ export class TerrainBuilder {
                 }
                 if (isFlat(shapeType) && isEdge(shapeType)) {
                     if (!Terrain.isSupportedShape(centre.type, shapeType)) {
-                        centre.type = this.config.wall;
                         shapeType = TerrainShape.Wall;
                     }
                 }
@@ -549,34 +548,25 @@ export class TerrainBuilder {
         return relativeHeight;
     }
     addRain(towards, water, waterLine) {
-        Rain.init(waterLine, this._surface);
-        for (let x = 0; x < this.surface.width; x++) {
-            let pos = new Point2D(x, this.surface.depth - 1);
-            Rain.add(pos, water, towards);
-        }
-        for (let i = 0; i < Rain.clouds.length; i++) {
-            let cloud = Rain.clouds[i];
-            while (!cloud.update()) { }
-        }
-        let blurredMoisture = gaussianBlur(Rain.moistureGrid, this.surface.width, this.surface.depth);
+        let rain = new Rain(this.surface, waterLine, water, towards);
+        rain.run();
         for (let y = 0; y < this.surface.depth; y++) {
             for (let x = 0; x < this.surface.width; x++) {
                 let surface = this.surface.at(x, y);
-                surface.moisture = Rain.moistureGrid[y][x];
+                surface.moisture = rain.moistureAt(x, y);
             }
         }
     }
     setBiomes() {
-        let moistureRange = this.config.wetLimit == 0
-            ? 1
-            : this.config.wetLimit;
+        const moistureRange = 6;
         for (let y = 0; y < this.surface.depth; y++) {
             for (let x = 0; x < this.surface.width; x++) {
                 let surface = this.surface.at(x, y);
                 let biome = Biome.Water;
                 let terrain = TerrainType.Water;
-                let moisturePercent = Math.min(moistureRange, surface.moisture / moistureRange);
+                let moisturePercent = Math.min(1, surface.moisture / moistureRange);
                 let moistureScaled = Math.floor(6 * moisturePercent);
+                console.log('surface moisture scaled', surface.moisture, moistureScaled);
                 if (surface.height <= this.config.waterLine) {
                     biome = Biome.Water;
                     terrain = TerrainType.Water;
