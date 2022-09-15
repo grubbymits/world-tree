@@ -102,25 +102,27 @@ function standardDevWindow(grid, centreX, centreY, offsets) {
     return Math.sqrt(mean(diffsSquared));
 }
 function gaussianBlur(grid, width, depth) {
+    const filterSize = 5;
+    const halfSize = Math.floor(filterSize / 2);
     const offsets = [-2, -1, 0, 1, 2];
     const distancesSquared = [4, 1, 0, 1, 4];
     let result = new Array();
-    for (let y = 0; y < 2; y++) {
+    for (let y = 0; y < halfSize; y++) {
         result[y] = grid[y];
     }
-    for (let y = depth - 2; y < depth; y++) {
+    for (let y = depth - halfSize; y < depth; y++) {
         result[y] = grid[y];
     }
-    let filter = new Float32Array(5);
-    for (let y = 2; y < depth - 2; y++) {
+    let filter = new Float32Array(filterSize);
+    for (let y = halfSize; y < depth - halfSize; y++) {
         result[y] = new Float32Array(width);
-        for (let x = 0; x < 2; x++) {
+        for (let x = 0; x < halfSize; x++) {
             result[y][x] = grid[y][x];
         }
-        for (let x = width - 2; x < width; x++) {
+        for (let x = width - halfSize; x < width; x++) {
             result[y][x] = grid[y][x];
         }
-        for (let x = 2; x < width - 2; x++) {
+        for (let x = halfSize; x < width - halfSize; x++) {
             let sigma = standardDevWindow(grid, x, y, offsets);
             if (sigma == 0) {
                 continue;
@@ -550,10 +552,11 @@ export class TerrainBuilder {
     addRain(towards, water, waterLine) {
         let rain = new Rain(this.surface, waterLine, water, towards);
         rain.run();
+        let blurred = gaussianBlur(rain.moistureGrid, this.surface.width, this.surface.depth);
         for (let y = 0; y < this.surface.depth; y++) {
             for (let x = 0; x < this.surface.width; x++) {
                 let surface = this.surface.at(x, y);
-                surface.moisture = rain.moistureAt(x, y);
+                surface.moisture = blurred[y][x];
             }
         }
     }
@@ -565,7 +568,7 @@ export class TerrainBuilder {
                 let biome = Biome.Water;
                 let terrain = TerrainType.Water;
                 let moisturePercent = Math.min(1, surface.moisture / moistureRange);
-                let moistureScaled = Math.floor(6 * moisturePercent);
+                let moistureScaled = Math.floor(5 * moisturePercent);
                 console.log('surface moisture scaled', surface.moisture, moistureScaled);
                 if (surface.height <= this.config.waterLine) {
                     biome = Biome.Water;
@@ -574,7 +577,8 @@ export class TerrainBuilder {
                 else if (surface.height >= this.config.uplandThreshold) {
                     switch (moistureScaled) {
                         default:
-                            console.assert('unhandled moisture scale');
+                            console.error('unhandled moisture scale');
+                            break;
                         case 0:
                             biome = Biome.Rock;
                             terrain = TerrainType.Upland0;
@@ -604,7 +608,8 @@ export class TerrainBuilder {
                 else {
                     switch (moistureScaled) {
                         default:
-                            console.assert('unhandled moisture scale');
+                            console.error('unhandled moisture scale');
+                            break;
                         case 0:
                             biome = Biome.Desert;
                             terrain = TerrainType.Lowland0;

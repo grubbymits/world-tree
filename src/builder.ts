@@ -125,32 +125,34 @@ function standardDevWindow(grid: Array<Float32Array>, centreX: number, centreY: 
 function gaussianBlur(grid: Array<Float32Array>, width: number,
                       depth: number) : Array<Float32Array> {
 
+  const filterSize = 5;
+  const halfSize = Math.floor(filterSize / 2);
   const offsets: Array<number> = [ -2, -1, 0, 1, 2 ];
-  const distancesSquared: Array<number> = [ 4, 1, 0, 1, 4];
+  const distancesSquared: Array<number> = [ 4, 1, 0, 1, 4 ];
 
   let result = new Array<Float32Array>();
   // Just copy the two left columns
-  for (let y = 0; y < 2; y++) {
+  for (let y = 0; y < halfSize; y++) {
     result[y] = grid[y];
   }
   // Just copy the two right columns.
-  for (let y = depth - 2; y < depth; y++) {
+  for (let y = depth - halfSize; y < depth; y++) {
     result[y] = grid[y];
   }
 
-  let filter = new Float32Array(5);
-  for (let y = 2; y < depth - 2; y++) {
+  let filter = new Float32Array(filterSize);
+  for (let y = halfSize; y < depth - halfSize; y++) {
     result[y] = new Float32Array(width);
 
     // Just copy the edge values.
-    for (let x = 0; x < 2; x++) {
+    for (let x = 0; x < halfSize; x++) {
       result[y][x] = grid[y][x];
     }
-    for (let x = width - 2; x < width; x++) {
+    for (let x = width - halfSize; x < width; x++) {
       result[y][x] = grid[y][x];
     }
 
-    for (let x = 2; x < width - 2; x++) {
+    for (let x = halfSize; x < width - halfSize; x++) {
       let sigma: number = standardDevWindow(grid, x, y, offsets);
       if (sigma == 0) {
         continue;
@@ -655,19 +657,18 @@ export class TerrainBuilder {
   addRain(towards: Direction, water: number, waterLine: number): void {
     let rain = new Rain(this.surface, waterLine, water, towards);
     rain.run();
+    let blurred =
+      gaussianBlur(rain.moistureGrid, this.surface.width, this.surface.depth);
     for (let y = 0; y < this.surface.depth; y++) {
       for (let x = 0; x < this.surface.width; x++) {
         let surface = this.surface.at(x, y);
-        surface.moisture = rain.moistureAt(x, y);
+        surface.moisture = blurred[y][x]; //rain.moistureAt(x, y);
       }
     }
   }
 
   setBiomes(): void {
     const moistureRange = 6
-      //this.config.wetLimit == 0
-      //? 1
-      //: this.config.wetLimit;
     for (let y = 0; y < this.surface.depth; y++) {
       for (let x = 0; x < this.surface.width; x++) {
         let surface = this.surface.at(x, y);
@@ -676,7 +677,7 @@ export class TerrainBuilder {
         let moisturePercent =
           Math.min(1, surface.moisture / moistureRange);
         // Split into six biomes based on moisture.
-        let moistureScaled = Math.floor(6 * moisturePercent);
+        let moistureScaled = Math.floor(5 * moisturePercent);
         console.log('surface moisture scaled', surface.moisture, moistureScaled);
 
         if (surface.height <= this.config.waterLine) {
@@ -685,7 +686,8 @@ export class TerrainBuilder {
         } else if (surface.height >= this.config.uplandThreshold) {
           switch(moistureScaled) {
             default:
-              console.assert('unhandled moisture scale');
+              console.error('unhandled moisture scale');
+              break;
             case 0:
               biome = Biome.Rock;
               terrain = TerrainType.Upland0;
@@ -714,7 +716,8 @@ export class TerrainBuilder {
         } else {
           switch(moistureScaled) {
             default:
-              console.assert('unhandled moisture scale');
+              console.error('unhandled moisture scale');
+              break;
             case 0:
               biome = Biome.Desert;
               terrain = TerrainType.Lowland0;

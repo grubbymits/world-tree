@@ -18,7 +18,7 @@ class Cloud {
     set pos(p) { this._pos = p; }
     set moisture(m) { this._moisture = m; }
     dropMoisture(multiplier) {
-        let moisture = this.moisture * 0.1;
+        let moisture = this.moisture * 0.1 * multiplier;
         this.moisture -= moisture;
         this.rain.addMoistureAt(this.pos, moisture);
     }
@@ -34,7 +34,9 @@ class Cloud {
                 this.pos = nextCoord;
                 continue;
             }
-            this.dropMoisture(1);
+            let next = this.surface.at(nextCoord.x, nextCoord.y);
+            const multiplier = next.terrace > current.terrace ? 1.5 : 1;
+            this.dropMoisture(multiplier);
             this.pos = nextCoord;
         }
     }

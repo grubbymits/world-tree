@@ -23,7 +23,7 @@ class Cloud {
 
   dropMoisture(multiplier: number): void {
     // Default to 10%
-    let moisture = this.moisture * 0.1;
+    let moisture = this.moisture * 0.1 * multiplier;
     this.moisture -= moisture;
     this.rain.addMoistureAt(this.pos, moisture);
   }
@@ -68,7 +68,9 @@ class Cloud {
         this.moisture /= numClouds;
       }
       */
-      this.dropMoisture(1);
+      let next = this.surface.at(nextCoord.x, nextCoord.y);
+      const multiplier = next.terrace > current.terrace ? 1.5 : 1;
+      this.dropMoisture(multiplier);
       this.pos = nextCoord;
     }
   }
