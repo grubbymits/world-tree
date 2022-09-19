@@ -76,7 +76,6 @@ window.onload = (event) => {
   config.hasBiomes = true;
   config.rainfall = 50;
   config.rainDirection = WT.Direction.North;
-  //config.wetLimit = 5;
   config.uplandLimit = 4;
 
   // Use the height map to construct a terrain.

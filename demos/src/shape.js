@@ -1,13 +1,20 @@
 import * as WT from "../lib/world-tree.js";
 const spriteWidth = 322;
 const spriteHeight = 270;
-const sheet = new WT.SpriteSheet("../graphics/png/outside-terrain-tiles");
+const sheet = new WT.SpriteSheet("../graphics/png/outside-terrain-tiles-muted");
 const tileRows = [
-  WT.TerrainType.Rock,
-  WT.TerrainType.DryGrass,
-  WT.TerrainType.WetGrass,
-  WT.TerrainType.Mud,
-  WT.TerrainType.Sand,
+  WT.TerrainType.Lowland5,
+  WT.TerrainType.Lowland4,
+  WT.TerrainType.Lowland3,
+  WT.TerrainType.Lowland2,
+  WT.TerrainType.Lowland1,
+  WT.TerrainType.Lowland0,
+  WT.TerrainType.Upland5,
+  WT.TerrainType.Upland4,
+  WT.TerrainType.Upland3,
+  WT.TerrainType.Upland2,
+  WT.TerrainType.Upland1,
+  WT.TerrainType.Upland0,
   WT.TerrainType.Water,
 ];
 const tileColumns = [
@@ -21,6 +28,10 @@ const tileColumns = [
   WT.TerrainShape.FlatWestOut,
   WT.TerrainShape.FlatSouthOut,
   WT.TerrainShape.FlatSouthWest,
+  WT.TerrainShape.FlatNorthEast,
+  WT.TerrainShape.FlatNorth,
+  WT.TerrainShape.FlatEastOut,
+  WT.TerrainShape.FlatEast,
 ];
 
 function addGraphic(column, row) {
@@ -36,7 +47,7 @@ function addGraphic(column, row) {
 }
 
 for (let row in tileRows) {
-  if (tileRows[row] == WT.TerrainType.Sand || tileRows[row] == WT.TerrainType.Water) {
+  if (tileRows[row] == WT.TerrainType.Water) {
     // Only supporting flat water and sand tiles.
     addGraphic(tileColumns[0], row);
     continue;
@@ -47,6 +58,7 @@ for (let row in tileRows) {
 }
 
 // Add graphical features: Waves.
+/*
 const waveSheet = new WT.SpriteSheet("../graphics/png/waves");
 const features = [ WT.TerrainFeature.ShorelineNorth,
                    WT.TerrainFeature.ShorelineWest,
@@ -64,6 +76,7 @@ for (let y in features) {
   const feature = features[y];
   WT.Terrain.addFeatureGraphics(feature, waves);
 }
+*/
 
 const cellsX = 11;
 const cellsY = 11;
@@ -98,9 +111,7 @@ window.onload = (event) => {
   config.hasRamps = true;
   config.rainfall = 30;
   config.rainDirection = WT.Direction.North;
-  config.wetLimit = 1;
-  config.treeLimit = 4;
-  config.dryLimit = 0.2;
+  config.uplandLimit = 4;
 
   // Use the height map to construct a terrain.
   let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,
