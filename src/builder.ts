@@ -613,8 +613,42 @@ export class TerrainBuilder {
         // default wall type.
         if (isFlat(shapeType) && isEdge(shapeType)) {
           if (!Terrain.isSupportedShape(centre.type, shapeType)) {
-            //centre.type = this.config.wall;
-            shapeType = TerrainShape.Wall;
+
+            switch (shapeType) {
+            default:
+              //centre.type = this.config.wall;
+              shapeType = TerrainShape.Wall;
+              break;
+            case TerrainShape.FlatNorthOut:
+              if (Terrain.isSupportedShape(centre.type, TerrainShape.FlatNorth)) {
+                shapeType = TerrainShape.FlatNorth;
+              } else {
+                shapeType = TerrainShape.Wall;
+              }
+              break;
+            case TerrainShape.FlatNorthEast:
+            case TerrainShape.FlatSouthEast:
+              if (Terrain.isSupportedShape(centre.type, TerrainShape.FlatEast)) {
+                shapeType = TerrainShape.FlatEast;
+              } else {
+                shapeType = TerrainShape.Wall;
+              }
+              break;
+            case TerrainShape.FlatNorthWest:
+              if (Terrain.isSupportedShape(centre.type, TerrainShape.FlatWestOut)) {
+                shapeType = TerrainShape.FlatWestOut;
+              } else {
+                shapeType = TerrainShape.Wall;
+              }
+              break;
+            case TerrainShape.FlatSouthWest:
+              if (Terrain.isSupportedShape(centre.type, TerrainShape.FlatWest)) {
+                shapeType = TerrainShape.FlatWest;
+              } else {
+                shapeType = TerrainShape.Wall;
+              }
+              break;
+            }
           }
         }
 
