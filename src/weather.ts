@@ -44,30 +44,6 @@ class Cloud {
         continue;
       }
 
-      /*
-      let next = this.surface.at(nextCoord.x, nextCoord.y);
-      // Treat terraces as obsticles that will cause the cloud to split.
-      if (next.terrace > current.terrace) {
-        let dirA: Direction = (this.direction + 1) % Direction.Max;
-        let dirB: Direction = (this.direction + Direction.NorthWest) % Direction.Max;
-        let pointA: Point2D = getAdjacentCoord(this.pos, dirA);
-        let pointB: Point2D = getAdjacentCoord(this.pos, dirB);
-        let numClouds: number = 2;
-        if (this.surface.inbounds(pointA) && this.surface.inbounds(pointB)) {
-          this.rain.addCloud(pointA, this.moisture / 3, dirA);
-          this.rain.addCloud(pointB, this.moisture / 3, dirB);
-          numClouds = 3;
-        } else if (this.surface.inbounds(pointA)) {
-          this.rain.addCloud(pointA, this.moisture / 2, dirA);
-        } else if (this.surface.inbounds(pointB)) {
-          this.rain.addCloud(pointB, this.moisture / 2, dirB);
-        } else {
-          this.pos = nextCoord;
-          continue;
-        }
-        this.moisture /= numClouds;
-      }
-      */
       let next = this.surface.at(nextCoord.x, nextCoord.y);
       const multiplier = next.terrace > current.terrace ? 1.5 : 1;
       this.dropMoisture(multiplier);

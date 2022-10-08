@@ -301,7 +301,6 @@ export class Terrain extends PhysicalEntity {
     static addGraphic(terrainType, terrainShape, sheet, x, y, width, height) {
         let sprite = new Sprite(sheet, x, y, width, height);
         let component = new StaticGraphicComponent(sprite.id);
-        console.log("adding graphic", getTypeName(terrainType), getShapeName(terrainShape));
         if (!this._terrainGraphics.has(terrainType)) {
             this._terrainGraphics.set(terrainType, new Map());
         }

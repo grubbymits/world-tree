@@ -9,11 +9,12 @@ function addDummyGraphic(sheet, type, shape) {
 const dummySheet = WT.DummySpriteSheet;
 const dummySprite = { };
 const types = [
-  WT.TerrainType.Rock,
-  WT.TerrainType.DryGrass,
-  WT.TerrainType.WetGrass,
-  WT.TerrainType.Mud,
-  WT.TerrainType.Sand,
+  WT.TerrainType.Lowland0,
+  WT.TerrainType.Lowland1,
+  WT.TerrainType.Lowland2,
+  WT.TerrainType.Lowland3,
+  WT.TerrainType.Lowland4,
+  WT.TerrainType.Lowland5,
   WT.TerrainType.Water,
 ];
 const shapes = [
@@ -39,8 +40,8 @@ test('terrace spacing with non-negative heights', () => {
     addDummyGraphic(dummySheet, type, WT.TerrainShape.Wall);
   }
   const config = new WT.TerrainBuilderConfig(numTerraces,
-                                             WT.TerrainType.Rock,
-                                             WT.TerrainType.Sand);
+                                             WT.TerrainType.Lowland0,
+                                             WT.TerrainType.Lowland0);
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
   expect(builder.terraceSpacing).toBe(1);
 });
@@ -60,8 +61,8 @@ test('terrace spacing with non-positive heights', () => {
     addDummyGraphic(dummySheet, type, WT.TerrainShape.Wall);
   }
   const config = new WT.TerrainBuilderConfig(numTerraces,
-                                             WT.TerrainType.Rock,
-                                             WT.TerrainType.Sand);
+                                             WT.TerrainType.Lowland0,
+                                             WT.TerrainType.Lowland0);
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
   expect(builder.terraceSpacing).toBe(1);
 });
@@ -81,8 +82,8 @@ test('terrace spacing with positive and negative heights', () => {
     addDummyGraphic(dummySheet, type, WT.TerrainShape.Wall);
   }
   const config = new WT.TerrainBuilderConfig(numTerraces,
-                                             WT.TerrainType.Rock,
-                                             WT.TerrainType.Sand);
+                                             WT.TerrainType.Lowland0,
+                                             WT.TerrainType.Lowland0);
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
   expect(builder.terraceSpacing).toBe(1.5);
 });
@@ -113,8 +114,8 @@ test('ramps', () => {
     }
   }
   let config = new WT.TerrainBuilderConfig(numTerraces,
-                                           WT.TerrainType.Rock,
-                                           WT.TerrainType.Rock);
+                                           WT.TerrainType.Lowland0,
+                                           WT.TerrainType.Lowland0);
   config.hasRamps = true;
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
   builder.generateMap(context);
@@ -181,8 +182,8 @@ test('walls', () => {
     addDummyGraphic(dummySheet, type, WT.TerrainShape.Flat);
   }
   const config = new WT.TerrainBuilderConfig(numTerraces,
-                                             WT.TerrainType.Rock,
-                                             WT.TerrainType.Rock);
+                                             WT.TerrainType.Lowland0,
+                                             WT.TerrainType.Lowland0);
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
   builder.generateMap(context);
   for (let y = 0; y < depth; ++y) {
@@ -228,11 +229,12 @@ test('shoreline', () => {
     }
   }
   let config = new WT.TerrainBuilderConfig(numTerraces,
-                                           WT.TerrainType.Rock,
-                                           WT.TerrainType.Rock);
-  config.hasRamps = true;
+                                           WT.TerrainType.Lowland0,
+                                           WT.TerrainType.Lowland0);
   config.hasWater = true;
   config.hasBiomes = true;
+  config.waterLine = 0;
+  config.uplandThreshold = 4;
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
   builder.generateMap(context);
 
@@ -245,90 +247,16 @@ test('shoreline', () => {
     expect(builder.terrainTypeAt(4, y)).toBe(WT.TerrainType.Water);
   }
   for (let x = 1; x < width - 1; ++x) {
-    expect(builder.terrainTypeAt(x, 1)).toBe(WT.TerrainType.Sand);
-    expect(builder.biomeAt(x, 1)).toBe(WT.Biome.Beach);
+    expect(builder.terrainTypeAt(x, 1)).toBe(WT.TerrainType.Lowland0);
     expect(builder.hasFeature(x, 1, WT.TerrainFeature.ShorelineNorth)).toBe(true);
-    expect(builder.terrainTypeAt(x, 3)).toBe(WT.TerrainType.Sand);
-    expect(builder.biomeAt(x, 3)).toBe(WT.Biome.Beach);
+    expect(builder.terrainTypeAt(x, 3)).toBe(WT.TerrainType.Lowland0);
     expect(builder.hasFeature(x, 3, WT.TerrainFeature.ShorelineSouth)).toBe(true);
   }
   for (let y = 1; y < depth - 1; ++y) {
-    expect(builder.terrainTypeAt(1, y)).toBe(WT.TerrainType.Sand);
-    expect(builder.biomeAt(1, y)).toBe(WT.Biome.Beach);
+    expect(builder.terrainTypeAt(1, y)).toBe(WT.TerrainType.Lowland0);
     expect(builder.hasFeature(1, y, WT.TerrainFeature.ShorelineWest)).toBe(true);
-    expect(builder.terrainTypeAt(3, y)).toBe(WT.TerrainType.Sand);
-    expect(builder.biomeAt(3, y)).toBe(WT.Biome.Beach);
+    expect(builder.terrainTypeAt(3, y)).toBe(WT.TerrainType.Lowland0);
     expect(builder.hasFeature(3, y, WT.TerrainFeature.ShorelineEast)).toBe(true);
   }
 });
 
-test('rain northwards', () => {
-  const dims = new WT.Dimensions(5, 5, 5);
-  const width = 11;
-  const depth = 11;
-  const numTerraces = 3;
-  const worldDims = new WT.Dimensions(dims.width * width,
-                                      dims.depth * depth,
-                                      dims.height * (numTerraces + 1));
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
-  const heightMap = [ [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-                      [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 ],
-                      [ 0, 1, 2, 2, 2, 2, 1, 1, 1, 1, 0 ],
-                      [ 0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0 ],
-                      [ 0, 1, 2, 3, 3, 4, 3, 2, 2, 1, 0 ],
-                      [ 0, 1, 2, 3, 4, 6, 4, 2, 2, 1, 0 ],
-                      [ 0, 1, 2, 3, 4, 4, 3, 2, 2, 1, 0 ],
-                      [ 0, 1, 2, 3, 3, 2, 2, 2, 2, 1, 0 ],
-                      [ 0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0 ],
-                      [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 ],
-                      [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ];
-  for (let type of types) {
-    for (let shape of shapes) {
-      addDummyGraphic(dummySheet, type, shape);
-    }
-  }
-  let config = new WT.TerrainBuilderConfig(numTerraces,
-                                           WT.TerrainType.Rock,
-                                           WT.TerrainType.Rock);
-  config.hasRamps = true;
-  config.hasWater = true;
-  config.waterLine = 0;
-  config.rainfall = 30;
-  config.rainDirection = WT.Direction.North;
-
-  let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
-  builder.generateMap(context);
-
-  // No 'moisture' over the surrounding water.
-  for (let x = 0; x < width; ++x) {
-    expect(builder.moistureAt(x, 0)).toBe(0);
-    expect(builder.moistureAt(x, depth - 1)).toBe(0);
-  }
-  for (let y = 0; y < depth; ++y) {
-    expect(builder.moistureAt(0, y)).toBe(0);
-    expect(builder.moistureAt(width - 1, y)).toBe(0);
-  }
-  // Check first row of rainfall
-  let y = depth - 2;
-  expect(Math.round(builder.moistureAt(1, y))).toBe(2);
-  expect(Math.round(builder.moistureAt(2, y))).toBe(2);
-  expect(Math.round(builder.moistureAt(3, y))).toBe(3);
-  expect(Math.round(builder.moistureAt(4, y))).toBe(3);
-  expect(Math.round(builder.moistureAt(5, y))).toBe(3);
-  expect(Math.round(builder.moistureAt(6, y))).toBe(3);
-  expect(Math.round(builder.moistureAt(7, y))).toBe(3);
-  expect(Math.round(builder.moistureAt(8, y))).toBe(2);
-  expect(Math.round(builder.moistureAt(9, y))).toBe(2);
-
-  // Check second row of rainfall
-  y = depth - 3;
-  expect(Math.round(builder.moistureAt(1, y))).toBe(1);
-  expect(Math.round(builder.moistureAt(2, y))).toBe(4);
-  expect(Math.round(builder.moistureAt(3, y))).toBe(3);
-  expect(Math.round(builder.moistureAt(4, y))).toBe(3);
-  expect(Math.round(builder.moistureAt(5, y))).toBe(4);
-  expect(Math.round(builder.moistureAt(6, y))).toBe(3);
-  expect(Math.round(builder.moistureAt(7, y))).toBe(3);
-  expect(Math.round(builder.moistureAt(8, y))).toBe(4);
-  expect(Math.round(builder.moistureAt(9, y))).toBe(1);
-});

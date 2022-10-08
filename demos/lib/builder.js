@@ -250,6 +250,7 @@ export class TerrainBuilderConfig {
     set waterLine(level) { this._waterLine = level; }
     set wetLimit(level) { this._wetLimit = level; }
     set rainfall(level) { this._rainfall = level; }
+    set uplandThreshold(level) { this._uplandThreshold = level; }
     set rainDirection(direction) { this._rainDirection = direction; }
     set dryLimit(level) { this._dryLimit = level; }
     set hasWater(enable) { this._hasWater = enable; }
@@ -606,12 +607,12 @@ export class TerrainBuilder {
                 let terrain = TerrainType.Water;
                 let moisturePercent = Math.min(1, surface.moisture / moistureRange);
                 let moistureScaled = Math.floor(5 * moisturePercent);
-                console.log('surface moisture scaled', surface.moisture, moistureScaled);
                 if (surface.height <= this.config.waterLine) {
                     biome = Biome.Water;
                     terrain = TerrainType.Water;
                 }
                 else if (surface.height >= this.config.uplandThreshold) {
+                    console.log("height, threshold", surface.height, this.config.uplandThreshold);
                     switch (moistureScaled) {
                         default:
                             console.error('unhandled moisture scale');
@@ -688,31 +689,29 @@ export class TerrainBuilder {
             for (let x = 0; x < this.surface.width; x++) {
                 let surface = this.surface.at(x, y);
                 if (isFlat(surface.shape)) {
-                    if (surface.biome == Biome.Beach) {
-                        let neighbours = this.surface.getNeighbours(surface.x, surface.y);
-                        for (let neighbour of neighbours) {
-                            if (neighbour.biome != Biome.Water) {
-                                continue;
-                            }
-                            switch (getDirectionFromPoints(surface.pos, neighbour.pos)) {
-                                default:
-                                    break;
-                                case Direction.North:
-                                    surface.features |= TerrainFeature.ShorelineNorth;
-                                    break;
-                                case Direction.East:
-                                    surface.features |= TerrainFeature.ShorelineEast;
-                                    break;
-                                case Direction.South:
-                                    surface.features |= TerrainFeature.ShorelineSouth;
-                                    break;
-                                case Direction.West:
-                                    surface.features |= TerrainFeature.ShorelineWest;
-                                    break;
-                            }
+                    let neighbours = this.surface.getNeighbours(surface.x, surface.y);
+                    for (let neighbour of neighbours) {
+                        if (neighbour.biome != Biome.Water) {
+                            continue;
+                        }
+                        switch (getDirectionFromPoints(surface.pos, neighbour.pos)) {
+                            default:
+                                break;
+                            case Direction.North:
+                                surface.features |= TerrainFeature.ShorelineNorth;
+                                break;
+                            case Direction.East:
+                                surface.features |= TerrainFeature.ShorelineEast;
+                                break;
+                            case Direction.South:
+                                surface.features |= TerrainFeature.ShorelineSouth;
+                                break;
+                            case Direction.West:
+                                surface.features |= TerrainFeature.ShorelineWest;
+                                break;
                         }
                     }
-                    else if (surface.biome == Biome.Marshland) {
+                    if (surface.biome == Biome.Marshland) {
                         surface.features |= TerrainFeature.Mud;
                         surface.features |= TerrainFeature.WetGrass;
                     }

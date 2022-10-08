@@ -37,7 +37,6 @@ export class SpriteSheet {
       this.canvas.width = this.width;
       this.canvas.height = this.height;
       this.canvas.getContext('2d')!.drawImage(this.image, 0, 0, this.width, this.height);
-      console.log("loaded spritesheet (WxH):", this.width, this.height);
       this.loaded = true;
       for (let sprite of this._toValidate) {
         sprite.validate();

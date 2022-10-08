@@ -111,7 +111,7 @@ window.onload = (event) => {
   config.hasRamps = true;
   config.rainfall = 30;
   config.rainDirection = WT.Direction.North;
-  config.uplandLimit = 4;
+  config.uplandThreshold = 4;
 
   // Use the height map to construct a terrain.
   let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,
