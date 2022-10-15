@@ -18,15 +18,13 @@ import { ContextImpl } from "./context.js"
 
 export enum Biome {
   Water,
-  Beach,
-  Rock,
-  Marshland,
   Desert,
   Grassland,
   Shrubland,
   MoistForest,
   WetForest,
   RainForest,
+  Rock,
   Tundra,
   AlpineGrassland,
   AlpineMeadow,
@@ -40,10 +38,6 @@ export function getBiomeName(biome: Biome): string {
     console.error("unhandled biome type:", biome);
   case Biome.Water:
     return "water";
-  case Biome.Beach:
-    return "beach";
-  case Biome.Marshland:
-    return "marshland";
   case Biome.Desert:
     return "desert";
   case Biome.Grassland:
@@ -613,11 +607,13 @@ export class TerrainBuilder {
         // If we don't support edge, try the basic wall tile and use the
         // default wall type.
         if (isFlat(shapeType) && isEdge(shapeType)) {
+          // if we not having biomes, use the default wall type.
+          if (!this.config.biomes) {
+            centre.type = this.config.wall;
+          }
           if (!Terrain.isSupportedShape(centre.type, shapeType)) {
-
             switch (shapeType) {
             default:
-              //centre.type = this.config.wall;
               shapeType = TerrainShape.Wall;
               break;
             case TerrainShape.FlatNorthOut:
@@ -821,10 +817,7 @@ export class TerrainBuilder {
               break;
             }
           }
-          if (surface.biome == Biome.Marshland) {
-            surface.features |= TerrainFeature.Mud;
-            surface.features |= TerrainFeature.WetGrass;
-          } else if (surface.biome == Biome.Grassland) {
+          if (surface.biome == Biome.Grassland) {
             surface.features |= TerrainFeature.DryGrass;
           } else if (surface.biome == Biome.Tundra) {
             surface.features |= TerrainFeature.DryGrass;

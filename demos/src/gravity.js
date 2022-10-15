@@ -58,13 +58,20 @@ class Droid extends WT.Actor {
 
 const spriteWidth = 322;
 const spriteHeight = 270;
-const sheet = new WT.SpriteSheet("../graphics/png/outside-terrain-tiles");
+const sheet = new WT.SpriteSheet("../graphics/png/outside-terrain-tiles-muted-textured");
 const tileRows = [
-  WT.TerrainType.Rock,
-  WT.TerrainType.DryGrass,
-  WT.TerrainType.WetGrass,
-  WT.TerrainType.Mud,
-  WT.TerrainType.Sand,
+  WT.TerrainType.Lowland5,
+  WT.TerrainType.Lowland4,
+  WT.TerrainType.Lowland3,
+  WT.TerrainType.Lowland2,
+  WT.TerrainType.Lowland1,
+  WT.TerrainType.Lowland0,
+  WT.TerrainType.Upland5,
+  WT.TerrainType.Upland4,
+  WT.TerrainType.Upland3,
+  WT.TerrainType.Upland2,
+  WT.TerrainType.Upland1,
+  WT.TerrainType.Upland0,
   WT.TerrainType.Water,
 ];
 
@@ -81,6 +88,7 @@ const tileColumns = [
   WT.TerrainShape.FlatSouthWest,
   WT.TerrainShape.FlatNorthEast,
   WT.TerrainShape.FlatNorth,
+  WT.TerrainShape.FlatEastOut,
   WT.TerrainShape.FlatEast,
 ];
 
@@ -97,11 +105,6 @@ function addGraphic(column, row) {
 }
 
 for (let row in tileRows) {
-  if (tileRows[row] == WT.TerrainType.Sand || tileRows[row] == WT.TerrainType.Water) {
-    // Only supporting flat water and sand tiles.
-    addGraphic(tileColumns[0], row);
-    continue;
-  }
   for (let column in tileColumns) {
     addGraphic(column, row);
   }
@@ -133,8 +136,8 @@ window.onload = (event) => {
   let context = WT.createContext(canvas, worldDims, WT.Perspective.TwoByOneIsometric);
 
   const config = new WT.TerrainBuilderConfig(numTerraces,
-                                             WT.TerrainType.DryGrass,
-                                             WT.TerrainType.DryGrass);
+                                             WT.TerrainType.Upland4,
+                                             WT.TerrainType.Upland3);
   config.hasRamps = true;
   // Use the height map to construct a terrain.
   let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,

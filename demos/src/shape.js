@@ -1,7 +1,7 @@
 import * as WT from "../lib/world-tree.js";
 const spriteWidth = 322;
 const spriteHeight = 270;
-const sheet = new WT.SpriteSheet("../graphics/png/outside-terrain-tiles-muted");
+const sheet = new WT.SpriteSheet("../graphics/png/outside-terrain-tiles-muted-textured");
 const tileRows = [
   WT.TerrainType.Lowland5,
   WT.TerrainType.Lowland4,
@@ -56,27 +56,6 @@ for (let row in tileRows) {
     addGraphic(column, row);
   }
 }
-
-// Add graphical features: Waves.
-/*
-const waveSheet = new WT.SpriteSheet("../graphics/png/waves");
-const features = [ WT.TerrainFeature.ShorelineNorth,
-                   WT.TerrainFeature.ShorelineWest,
-                   WT.TerrainFeature.ShorelineEast,
-                   WT.TerrainFeature.ShorelineSouth ];
-for (let y in features) {
-  let waveSprites = new Array();
-  for (let x = 0; x < 3; x++) {
-    waveSprites.push(new WT.Sprite(waveSheet,
-                     x * spriteWidth,
-                     y * spriteHeight,
-                     spriteWidth, spriteHeight));
-  }
-  const waves = new WT.OssilateGraphicComponent(waveSprites, 500);
-  const feature = features[y];
-  WT.Terrain.addFeatureGraphics(feature, waves);
-}
-*/
 
 const cellsX = 11;
 const cellsY = 11;

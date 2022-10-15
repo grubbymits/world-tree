@@ -1,13 +1,20 @@
 import * as WT from "../lib/world-tree.js";
 const spriteWidth = 322;
 const spriteHeight = 270;
-const sheet = new WT.SpriteSheet("../graphics/png/outside-terrain-tiles");
+const sheet = new WT.SpriteSheet("../graphics/png/outside-terrain-tiles-muted-textured");
 const tileRows = [
-  WT.TerrainType.Rock,
-  WT.TerrainType.DryGrass,
-  WT.TerrainType.WetGrass,
-  WT.TerrainType.Mud,
-  WT.TerrainType.Sand,
+  WT.TerrainType.Lowland5,
+  WT.TerrainType.Lowland4,
+  WT.TerrainType.Lowland3,
+  WT.TerrainType.Lowland2,
+  WT.TerrainType.Lowland1,
+  WT.TerrainType.Lowland0,
+  WT.TerrainType.Upland5,
+  WT.TerrainType.Upland4,
+  WT.TerrainType.Upland3,
+  WT.TerrainType.Upland2,
+  WT.TerrainType.Upland1,
+  WT.TerrainType.Upland0,
   WT.TerrainType.Water,
 ];
 const tileColumns = [
@@ -21,6 +28,10 @@ const tileColumns = [
   WT.TerrainShape.FlatWestOut,
   WT.TerrainShape.FlatSouthOut,
   WT.TerrainShape.FlatSouthWest,
+  WT.TerrainShape.FlatNorthEast,
+  WT.TerrainShape.FlatNorth,
+  WT.TerrainShape.FlatEastOut,
+  WT.TerrainShape.FlatEast,
 ];
 
 function addGraphic(column, row) {
@@ -36,7 +47,7 @@ function addGraphic(column, row) {
 }
 
 for (let row in tileRows) {
-  if (tileRows[row] == WT.TerrainType.Sand || tileRows[row] == WT.TerrainType.Water) {
+  if (tileRows[row] == WT.TerrainType.Water) {
     // Only supporting flat water and sand tiles.
     addGraphic(tileColumns[0], row);
     continue;
@@ -44,25 +55,6 @@ for (let row in tileRows) {
   for (let column in tileColumns) {
     addGraphic(column, row);
   }
-}
-
-// Add graphical features: Waves.
-const waveSheet = new WT.SpriteSheet("../graphics/png/waves");
-const features = [ WT.TerrainFeature.ShorelineNorth,
-                   WT.TerrainFeature.ShorelineWest,
-                   WT.TerrainFeature.ShorelineEast,
-                   WT.TerrainFeature.ShorelineSouth ];
-for (let y in features) {
-  let waveSprites = new Array();
-  for (let x = 0; x < 3; x++) {
-    waveSprites.push(new WT.Sprite(waveSheet,
-                     x * spriteWidth,
-                     y * spriteHeight,
-                     spriteWidth, spriteHeight));
-  }
-  const waves = new WT.OssilateGraphicComponent(waveSprites, 500);
-  const feature = features[y];
-  WT.Terrain.addFeatureGraphics(feature, waves);
 }
 
 const cellsX = 11;
@@ -102,6 +94,12 @@ function addTrees(totalTrees, terrainDims, context, builder) {
   let insertedAt = new Map();
   let attempts = 0;
   const maxAttempts = 1000;
+  let waterOrTooDry = function(biome) {
+    return biome == WT.Biome.Water ||
+           biome == WT.Biome.Desert ||
+           biome == WT.Biome.Rock ||
+           biome == WT.Biome.Tundra;
+  };
   while (inserted < totalTrees && attempts < maxAttempts) {
     // Choose a random spot on the map and check whether it seems wet
     // enough to support a tree.
@@ -110,7 +108,7 @@ function addTrees(totalTrees, terrainDims, context, builder) {
     const y = Math.floor(Math.random() * cellsY);
     const biome = builder.biomeAt(x, y);
     // Don't place a tree where it would be out of place.
-    if (biome == WT.Biome.Beach || biome == WT.Biome.Water) {
+    if (waterOrTooDry(biome)) {
       continue;
     }
     // Don't place on a ramp.
@@ -154,8 +152,8 @@ window.onload = (event) => {
   let canvas = document.getElementById("demoCanvas");
   let context = new WT.createContext(canvas, worldDims,
                                      WT.Perspective.TwoByOneIsometric);
-  const defaultFloor = WT.TerrainType.DryGrass;
-  const defaultWall = WT.TerrainType.DryGrass;
+  const defaultFloor = WT.TerrainType.Lowland3;
+  const defaultWall = WT.TerrainType.Lowland2;
   // Use the height map to construct a terrain.
   const config = new WT.TerrainBuilderConfig(numTerraces,
                                              defaultFloor,
@@ -163,11 +161,8 @@ window.onload = (event) => {
   config.hasWater = true;
   config.hasBiomes = true;
   config.hasRamps = true;
-  config.rainfall = 30;
-  config.dryLimit = 0.2;
-  config.treeLimit = 4;
-  config.wetLimit = 1;
   config.waterLine = 0;
+  config.rainfall = 30;
   config.rainDirection = WT.Direction.North;
 
   let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,

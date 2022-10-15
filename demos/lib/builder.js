@@ -6,20 +6,18 @@ import { Point2D } from "./geometry.js";
 export var Biome;
 (function (Biome) {
     Biome[Biome["Water"] = 0] = "Water";
-    Biome[Biome["Beach"] = 1] = "Beach";
-    Biome[Biome["Rock"] = 2] = "Rock";
-    Biome[Biome["Marshland"] = 3] = "Marshland";
-    Biome[Biome["Desert"] = 4] = "Desert";
-    Biome[Biome["Grassland"] = 5] = "Grassland";
-    Biome[Biome["Shrubland"] = 6] = "Shrubland";
-    Biome[Biome["MoistForest"] = 7] = "MoistForest";
-    Biome[Biome["WetForest"] = 8] = "WetForest";
-    Biome[Biome["RainForest"] = 9] = "RainForest";
-    Biome[Biome["Tundra"] = 10] = "Tundra";
-    Biome[Biome["AlpineGrassland"] = 11] = "AlpineGrassland";
-    Biome[Biome["AlpineMeadow"] = 12] = "AlpineMeadow";
-    Biome[Biome["AlpineForest"] = 13] = "AlpineForest";
-    Biome[Biome["Taiga"] = 14] = "Taiga";
+    Biome[Biome["Desert"] = 1] = "Desert";
+    Biome[Biome["Grassland"] = 2] = "Grassland";
+    Biome[Biome["Shrubland"] = 3] = "Shrubland";
+    Biome[Biome["MoistForest"] = 4] = "MoistForest";
+    Biome[Biome["WetForest"] = 5] = "WetForest";
+    Biome[Biome["RainForest"] = 6] = "RainForest";
+    Biome[Biome["Rock"] = 7] = "Rock";
+    Biome[Biome["Tundra"] = 8] = "Tundra";
+    Biome[Biome["AlpineGrassland"] = 9] = "AlpineGrassland";
+    Biome[Biome["AlpineMeadow"] = 10] = "AlpineMeadow";
+    Biome[Biome["AlpineForest"] = 11] = "AlpineForest";
+    Biome[Biome["Taiga"] = 12] = "Taiga";
 })(Biome || (Biome = {}));
 export function getBiomeName(biome) {
     switch (biome) {
@@ -27,10 +25,6 @@ export function getBiomeName(biome) {
             console.error("unhandled biome type:", biome);
         case Biome.Water:
             return "water";
-        case Biome.Beach:
-            return "beach";
-        case Biome.Marshland:
-            return "marshland";
         case Biome.Desert:
             return "desert";
         case Biome.Grassland:
@@ -519,6 +513,9 @@ export class TerrainBuilder {
                     shapeType = TerrainShape.Wall;
                 }
                 if (isFlat(shapeType) && isEdge(shapeType)) {
+                    if (!this.config.biomes) {
+                        centre.type = this.config.wall;
+                    }
                     if (!Terrain.isSupportedShape(centre.type, shapeType)) {
                         switch (shapeType) {
                             default:
@@ -711,11 +708,7 @@ export class TerrainBuilder {
                                 break;
                         }
                     }
-                    if (surface.biome == Biome.Marshland) {
-                        surface.features |= TerrainFeature.Mud;
-                        surface.features |= TerrainFeature.WetGrass;
-                    }
-                    else if (surface.biome == Biome.Grassland) {
+                    if (surface.biome == Biome.Grassland) {
                         surface.features |= TerrainFeature.DryGrass;
                     }
                     else if (surface.biome == Biome.Tundra) {

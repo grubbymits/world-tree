@@ -58,50 +58,36 @@ class Droid extends WT.Actor {
 
 const spriteWidth = 322;
 const spriteHeight = 270;
-const sheet = new WT.SpriteSheet("../graphics/png/outside-terrain-tiles");
+const sheet = new WT.SpriteSheet("../graphics/png/outside-terrain-tiles-muted-textured");
 const tileRows = [
-  WT.TerrainType.Rock,
-  WT.TerrainType.DryGrass,
-  WT.TerrainType.WetGrass,
-  WT.TerrainType.Mud,
-  WT.TerrainType.Sand,
-  WT.TerrainType.Water,
+  WT.TerrainType.Upland5,
+  WT.TerrainType.Upland4,
+  WT.TerrainType.Upland3,
+  WT.TerrainType.Upland2,
+  WT.TerrainType.Upland1,
+  WT.TerrainType.Upland0,
 ];
 
-const tileColumns = [
-  WT.TerrainShape.Flat,
-  WT.TerrainShape.RampUpSouth,
-  WT.TerrainShape.RampUpWest,
-  WT.TerrainShape.RampUpEast,
-  WT.TerrainShape.RampUpNorth,
-  WT.TerrainShape.Wall,
-  WT.TerrainShape.FlatAloneOut,
-  WT.TerrainShape.FlatWestOut,
-  WT.TerrainShape.FlatSouthOut,
-  WT.TerrainShape.FlatSouthWest,
-];
-
-function addGraphic(column, row) {
-  const shape = WT.TerrainShape.Flat;
+function addGraphic(row) {
   const type = tileRows[row];
   WT.Terrain.addGraphic(/*terrainType*/type,
-                        /*terrainShape*/shape,
+                        WT.TerrainShape.Flat,
                         /*spriteSheet*/sheet,
-                        /*coord.x*/spriteWidth * column,
+                        /*coord.x*/spriteWidth * 0,
+                        /*coord.y*/spriteHeight * row,
+                        /*width*/spriteWidth,
+                        /*height*/spriteHeight);
+  WT.Terrain.addGraphic(/*terrainType*/type,
+                        WT.TerrainShape.Wall,
+                        /*spriteSheet*/sheet,
+                        /*coord.x*/spriteWidth * 5,
                         /*coord.y*/spriteHeight * row,
                         /*width*/spriteWidth,
                         /*height*/spriteHeight);
 }
 
 for (let row in tileRows) {
-  if (tileRows[row] == WT.TerrainType.Sand || tileRows[row] == WT.TerrainType.Water) {
-    // Only supporting flat water and sand tiles.
-    addGraphic(tileColumns[0], row);
-    continue;
-  }
-  for (let column in tileColumns) {
-    addGraphic(column, row);
-  }
+  addGraphic(row);
 }
 
 const cellsX = 9;
@@ -124,8 +110,8 @@ window.onload = (event) => {
                                       physicalDims.depth * cellsY,
                                       physicalDims.height * (2 + numTerraces));
   const config = new WT.TerrainBuilderConfig(numTerraces,
-                                             WT.TerrainType.DryGrass,
-                                             WT.TerrainType.Rock);
+                                             WT.TerrainType.Upland0,
+                                             WT.TerrainType.Upland1);
   // Use the height map to construct a terrain.
   let builder = new WT.TerrainBuilder(cellsX, cellsY, heightMap,
                                       config, physicalDims);
