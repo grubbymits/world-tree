@@ -22,7 +22,7 @@
     "src/events.ts",
     "src/geometry.ts",
     "src/graphics.ts",
-    "src/map.ts",
+    "src/navigation.ts",
     "src/physics.ts",
     "src/plant.ts",
     "src/scene.ts",

@@ -1,15 +1,13 @@
 import { Actor } from "./entity.js"
 import { EntityEvent } from "./events.js"
-import { Direction,
-         getDirectionName,
-         BoundingCuboid,
+import { Direction } from "./navigation.js"
+import { BoundingCuboid,
          CollisionDetector,
          CollisionInfo } from "./physics.js"
 import { Point3D,
          Vector3D,
          Geometry } from "./geometry.js"
 import { Octree } from "./tree.js"
-import { SquareGrid  } from "./map.js"
 
 export abstract class Action {
   constructor(protected _actor: Actor) { }
@@ -165,8 +163,7 @@ export class Navigate extends Action {
 
   constructor(actor: Actor,
               private readonly _step: number,
-              private readonly _destination: Point3D,
-              private readonly _map: SquareGrid) {
+              private readonly _destination: Point3D) {
     super(actor);
     this._waypoints = this.findPath();
     if (this._waypoints.length != 0) {

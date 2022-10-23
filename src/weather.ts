@@ -1,6 +1,5 @@
 import { Direction,
-         getDirectionName,
-         getAdjacentCoord } from "./physics.js"
+         Navigation } from "./navigation.js"
 import { Surface } from "./builder.js"
 import { Point2D } from "./geometry.js"
 
@@ -31,7 +30,7 @@ class Cloud {
   move(): void {
     // Cloud may have left the map.
     while (this.surface.inbounds(this.pos)) {
-      let nextCoord = getAdjacentCoord(this.pos, this.direction);
+      let nextCoord = Navigation.getAdjacentCoord(this.pos, this.direction);
       if (!this.surface.inbounds(nextCoord)) {
         this.dropMoisture(1);
         return;

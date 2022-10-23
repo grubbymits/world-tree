@@ -1,6 +1,6 @@
 import { Point2D } from "./geometry.js"
-import { getDirectionName,
-         Direction } from "./physics.js"
+import { Navigation,
+         Direction } from "./navigation.js"
 
 export var DummySpriteSheet = {
   addForValidation: function(sprite: Sprite): boolean { return true; }
@@ -298,7 +298,8 @@ export class DirectionalGraphicComponent extends GraphicComponent {
       const spriteId = component.update();
       return spriteId;
     }
-    console.error("unhandled stationary graphic:", getDirectionName(this.direction));
+    console.error("unhandled stationary graphic:", 
+                  Navigation.getDirectionName(this.direction));
     return 0;
   }
 }
@@ -334,9 +335,11 @@ export class AnimatedDirectionalGraphicComponent extends GraphicComponent {
       return spriteId;
     }
     if (this.stationary) {
-      console.error("unhandled stationary graphic:", getDirectionName(this.direction));
+      console.error("unhandled stationary graphic:",
+                    Navigation.getDirectionName(this.direction));
     } else {
-      console.error("unhandled movement graphic:", getDirectionName(this.direction));
+      console.error("unhandled movement graphic:",
+                    Navigation.getDirectionName(this.direction));
     }
     return 0;
   }

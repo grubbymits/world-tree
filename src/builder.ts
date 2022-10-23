@@ -1,18 +1,12 @@
-
-import { SquareGrid } from "./map.js"
 import { Terrain,
          TerrainShape,
          TerrainType,
          TerrainFeature,
-         isFlat,
-         isEdge,
-         getTypeName,
-         getShapeName } from "./terrain.js"
+         TerrainGrid } from "./terrain.js"
 import { Rain } from "./weather.js"
-import { Dimensions,
-         Direction,
-         getDirectionFromPoints,
-         getDirectionName } from "./physics.js"
+import { Dimensions } from "./physics.js"
+import { Direction,
+         Navigation } from "./navigation.js"
 import { Point2D } from "./geometry.js"
 import { ContextImpl } from "./context.js"
 
@@ -403,7 +397,7 @@ export class TerrainBuilder {
   isFlatAt(x: number, y: number): boolean {
     console.assert(x >= 0 && x < this.surface.width &&
                    y >= 0 && y < this.surface.depth);
-    return isFlat(this.surface.at(x, y).shape);
+    return Terrain.isFlat(this.surface.at(x, y).shape);
   }
 
   biomeAt(x: number, y: number): Biome {
@@ -431,8 +425,8 @@ export class TerrainBuilder {
     this.setEdges();
     this.setFeatures();
 
-    let map =
-      new SquareGrid(context, this.surface.width, this.surface.depth);
+    let grid =
+      new TerrainGrid(context, this.surface.width, this.surface.depth);
 
     for (let y = 0; y < this.surface.depth; y++) {
       for (let x = 0; x < this.surface.width; x++) {
@@ -440,9 +434,9 @@ export class TerrainBuilder {
         // Add terrain objects that will be visible.
         console.assert(surface.terrace <= this.config.numTerraces && surface.terrace >= 0,
                        "terrace out-of-range", surface.terrace);
-        map.addSurfaceTerrain(x, y, surface.terrace,
-                              surface.type, surface.shape,
-                              surface.features);
+        grid.addSurfaceTerrain(x, y, surface.terrace,
+                               surface.type, surface.shape,
+                               surface.features);
       }
     }
 
@@ -451,14 +445,14 @@ export class TerrainBuilder {
       for (let x = 0; x < this.surface.width; x++) {
         let z = this.surface.at(x, y).terrace;
         let zStop = z - this.calcRelativeHeight(x, y);
-        let terrain = map.getSurfaceTerrainAt(x, y)!;
+        let terrain = grid.getSurfaceTerrainAt(x, y)!;
         if (terrain == null) {
           console.error("didn't find terrain in map at", x, y, z);
         }
-        const shape = isFlat(terrain.shape) ? terrain.shape : TerrainShape.Flat;
+        const shape = Terrain.isFlat(terrain.shape) ? terrain.shape : TerrainShape.Flat;
         while (z > zStop) {
           z--;
-          map.addSubSurfaceTerrain(x, y, z, terrain.type, shape);
+          grid.addSubSurfaceTerrain(x, y, z, terrain.type, shape);
         }
       }
     }
@@ -486,7 +480,7 @@ export class TerrainBuilder {
     for (let y = this.surface.depth - 3; y > 1 ;y--) {
       for (let x = 2; x < this.surface.width - 2; x++) {
         let centre: TerrainAttributes = this.surface.at(x, y);
-        if (!isFlat(centre.shape)) {
+        if (!Terrain.isFlat(centre.shape)) {
           continue;
         }
 
@@ -540,7 +534,7 @@ export class TerrainBuilder {
           }
           // we may have an edge against a ramp, though it is in the same terrace.
           if (neighbour.terrace == centre.terrace &&
-             (isFlat(centre.shape) == isFlat(neighbour.shape))) {
+             (Terrain.isFlat(centre.shape) == Terrain.isFlat(neighbour.shape))) {
             continue;
           }
 
@@ -606,7 +600,7 @@ export class TerrainBuilder {
 
         // If we don't support edge, try the basic wall tile and use the
         // default wall type.
-        if (isFlat(shapeType) && isEdge(shapeType)) {
+        if (Terrain.isFlat(shapeType) && Terrain.isEdge(shapeType)) {
           // if we not having biomes, use the default wall type.
           if (!this.config.biomes) {
             centre.type = this.config.wall;
@@ -651,7 +645,7 @@ export class TerrainBuilder {
 
         // If we have a unsupported shape, such as a ramp, check whether we have
         // the ramp shape for a default terrain type.
-        if (!isFlat(shapeType) && !Terrain.isSupportedShape(centre.type, shapeType)) {
+        if (!Terrain.isFlat(shapeType) && !Terrain.isSupportedShape(centre.type, shapeType)) {
           if (Terrain.isSupportedShape(this.config.floor, shapeType)) {
             centre.type = this.config.floor;
           } else if (Terrain.isSupportedShape(this.config.wall, shapeType)) {
@@ -781,7 +775,8 @@ export class TerrainBuilder {
         if (Terrain.isSupportedType(terrain)) {
           surface.type = terrain;
         } else {
-          console.log("unsupported biome terrain type:", getTypeName(terrain));
+          console.log("unsupported biome terrain type:",
+                      Terrain.getTypeName(terrain));
         }
         surface.biome = biome;
       }
@@ -794,13 +789,13 @@ export class TerrainBuilder {
 
         let surface = this.surface.at(x, y);
         // Add shoreline features on beach tiles.
-        if (isFlat(surface.shape)) {
+        if (Terrain.isFlat(surface.shape)) {
           let neighbours = this.surface.getNeighbours(surface.x, surface.y);
           for (let neighbour of neighbours) {
             if (neighbour.biome != Biome.Water) {
               continue;
             }
-            switch (getDirectionFromPoints(surface.pos, neighbour.pos)) {
+            switch (Navigation.getDirectionFromPoints(surface.pos, neighbour.pos)) {
             default:
               break;
             case Direction.North:

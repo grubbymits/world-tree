@@ -1,4 +1,4 @@
-export * from "./map.js"
+export * from "./navigation.js"
 export * from "./graphics.js"
 export * from "./scene.js"
 export * from "./terrain.js"

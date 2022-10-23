@@ -1,12 +1,13 @@
-import { Direction,
-         Dimensions } from "./physics.js"
+import { Direction } from "./navigation.js"
+import { Dimensions } from "./physics.js"
 import { PhysicalEntity } from "./entity.js"
 import { SpriteSheet,
          Sprite,
          GraphicComponent,
          StaticGraphicComponent } from "./graphics.js"
 import { ContextImpl } from "./context.js"
-import { Point3D,
+import { Point2D,
+         Point3D,
          Geometry,
          CuboidGeometry,
          RampUpWestGeometry,
@@ -93,17 +94,20 @@ export class Terrain extends PhysicalEntity {
   static graphics(terrainType: TerrainType,
                   shape: TerrainShape): GraphicComponent {
     if (!this._terrainGraphics.has(terrainType)) {
-      console.error("missing graphics for TerrainType", getTypeName(terrainType));
+      console.error("missing graphics for TerrainType",
+                    Terrain.getTypeName(terrainType));
     }
     if (!this._terrainGraphics.get(terrainType)!.has(shape)) {
-      console.error("missing graphics for TerrainShape:", getShapeName(shape));
+      console.error("missing graphics for TerrainShape:",
+                    Terrain.getShapeName(shape));
     }
     return this._terrainGraphics.get(terrainType)!.get(shape)!;
   }
 
   static featureGraphics(terrainFeature: TerrainFeature): GraphicComponent {
     console.assert(this._featureGraphics.has(terrainFeature),
-                   "missing terrain feature", getFeatureName(terrainFeature));
+                   "missing terrain feature",
+                   Terrain.getFeatureName(terrainFeature));
     return this._featureGraphics.get(terrainFeature)!;
   }
 
@@ -159,7 +163,7 @@ export class Terrain extends PhysicalEntity {
     return new Terrain(context, x, y, z, this._dimensions, type, shape, feature);
   }
 
-  static function getFeatureName(feature: TerrainFeature): string {
+  static getFeatureName(feature: TerrainFeature): string {
     switch (feature) {
     default:
       break;
@@ -179,7 +183,7 @@ export class Terrain extends PhysicalEntity {
     return "None";
   }
   
-  static function getShapeName(terrain: TerrainShape): string {
+  static getShapeName(terrain: TerrainShape): string {
     switch (terrain) {
     default:
       console.error("unhandled terrain shape:", terrain);
@@ -232,7 +236,7 @@ export class Terrain extends PhysicalEntity {
     }
   }
   
-  static function getTypeName(terrain: TerrainType): string {
+  static getTypeName(terrain: TerrainType): string {
     switch (terrain) {
     default:
       console.error("unhandled terrain type:", terrain);
@@ -265,7 +269,7 @@ export class Terrain extends PhysicalEntity {
     }
   }
   
-  static function isFlat(terrain: TerrainShape): boolean {
+  static isFlat(terrain: TerrainShape): boolean {
     switch (terrain) {
     default:
       break;
@@ -289,7 +293,7 @@ export class Terrain extends PhysicalEntity {
     return false;
   }
   
-  static function isEdge(terrain: TerrainShape): boolean {
+  static isEdge(terrain: TerrainShape): boolean {
     switch (terrain) {
     default:
       break;
@@ -316,7 +320,7 @@ export class Terrain extends PhysicalEntity {
     return false;
   }
   
-  static function isRampUp(shape: TerrainShape, direction: Direction): boolean {
+  static isRampUp(shape: TerrainShape, direction: Direction): boolean {
     switch (direction) {
     default:
       break;
@@ -355,7 +359,7 @@ export class Terrain extends PhysicalEntity {
     this.addGraphic(Terrain.graphics(_type, _shape));
 
     // Pre-calculate the angle of the ramp.
-    if (!isFlat(_shape)) {
+    if (!Terrain.isFlat(_shape)) {
       let theta = Math.atan(this.height / this.depth) * 180 / Math.PI;
       this._tanTheta = Math.tan(theta);
     } else {
@@ -406,7 +410,7 @@ export class Terrain extends PhysicalEntity {
     if (!this.bounds.contains(location)) {
       return null;
     }
-    if (isFlat(this._shape)) {
+    if (Terrain.isFlat(this._shape)) {
       return this.z + this.height;
     }
     return this.z + (location.y * this._tanTheta);

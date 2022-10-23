@@ -1,7 +1,6 @@
 import { PhysicalEntity,
          MovableEntity } from "./entity.js"
 import { TerrainType, TerrainShape, Terrain } from "./terrain.js"
-import { SquareGrid } from "./map.js"
 import { Point2D,
          Point3D,
          Vector2D,

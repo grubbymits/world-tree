@@ -1,5 +1,5 @@
-import { Direction,
-         Dimensions,
+import { Direction } from "navigation.js"
+import { Dimensions,
          BoundingCuboid } from "./physics.js"
 import { Point2D,
          Segment2D,

@@ -17,7 +17,7 @@ export enum Direction {
 
 export class Navigation {
 
-  static function getDirectionName(direction: Direction): string {
+  static getDirectionName(direction: Direction): string {
     switch (direction) {
     default:
       break;
@@ -42,7 +42,7 @@ export class Navigation {
     return "error";
   }
 
-  static function getVector2D(direction: Direction): Vector2D {
+  static getVector2D(direction: Direction): Vector2D {
     let xDiff: number = 0;
     let yDiff: number = 0;
     switch(direction) {
@@ -81,17 +81,17 @@ export class Navigation {
     return new Vector2D(xDiff, yDiff);
   }
 
-  static function getAdjacentCoord(p: Point2D,
-                                   direction: Direction): Point2D {
-    let v = Naviate.getVector2D(direction);
+  static getAdjacentCoord(p: Point2D,
+                          direction: Direction): Point2D {
+    let v = this.getVector2D(direction);
     return p.add(v);
   }
 
-  static function getDirectionFromPoints(from: Point2D, to: Point2D): Direction {
-    return getDirectionFromVector(to.diff(from));
+  static getDirectionFromPoints(from: Point2D, to: Point2D): Direction {
+    return this.getDirectionFromVector(to.diff(from));
   }
 
-  static function getDirectionFromVector(w: Vector2D): Direction {
+  static getDirectionFromVector(w: Vector2D): Direction {
     let mag = w.mag();
     let u = new Vector2D(0, -mag);  // 'north'
     let theta = 180 * u.angle(w) / Math.PI;
@@ -103,7 +103,7 @@ export class Navigation {
     return <Direction>direction;
   }
   
-  static function getOppositeDirection(direction: Direction): Direction {
+  static getOppositeDirection(direction: Direction): Direction {
     return (direction + (Direction.Max / 2)) % Direction.Max;
   }
 }
@@ -146,10 +146,13 @@ export class PathFinder {
 
     for (let y = 0; y < grid.depth; y++) {
       for (let x = 0; x < grid.width; x++) {
+        let centre = grid.getSurfaceTerrainAt(x, y)!;
         this.addNeighbours(centre, grid);
       }
     }
   }
+
+  get graph(): Array<Array<PathNode>> { return this._graph; }
 
   addNode(x: number, y: number, terrain: Terrain): void {
     this._graph[y][x] = new PathNode(terrain);
@@ -165,7 +168,7 @@ export class PathFinder {
     for (let neighbour of neighbours) {
       let cost = this.getNeighbourCost(centre, neighbour);
       let succ = this.getNode(neighbour.x, neighbour.y);
-      parentNode.addSuccessor(succ, cost);
+      centreNode.addSuccessor(succ, cost);
     }
   }
 
@@ -200,9 +203,9 @@ export class PathFinder {
       if (to.z == centre.z) {
         return true;
       } else if (to.z > centre.z) {
-        return !Terrain.isRampUp(centre.shape, direction) && Terrain.isRampUp(to.shape, direction);
+        return Terrain.isRampUp(to.shape, direction);
       } else if (to.z < centre.z) {
-        return !Terrain.isRampUp(centre.shape, oppositeDir) && Terrain.isRampUp(to.shape, oppositeDir);
+        return Terrain.isRampUp(to.shape, oppositeDir);
       }
       return false;
     });
@@ -224,26 +227,27 @@ export class PathFinder {
   }
 
   findPath() {
-    let frontier = new MaxPriorityQueue<PathNode, number>();
-    frontier.insert(startNode, 0);
-    came_from: Map<PathNode, PathNode> = new Map<PathNode, PathNode>();
-    cost_so_far: Map<PathNode, number> = new Map<PathNode, number>();
+    //let frontier = new MaxPriorityQueue<PathNode, number>();
+    //frontier.insert(startNode, 0);
+    //came_from = new Map<PathNode, PathNode>();
+    //cost_so_far = new Map<PathNode, number>();
 
-    //came_from.set(start, null);
-    cost_so_far.set(start, 0);
-    
-    while not frontier.empty():
-       let current: PathNode = frontier.pop();
-    
-       if current == goal:
-          break
-       
-       for next in graph.neighbors(current):
-          new_cost = cost_so_far[current] + graph.cost(current, next)
-          if next not in cost_so_far or new_cost < cost_so_far[next]:
-             cost_so_far[next] = new_cost
-             priority = new_cost + heuristic(goal, next)
-             frontier.put(next, priority)
-             came_from[next] = current
-   } 
+    ////came_from.set(start, null);
+    //cost_so_far.set(start, 0);
+    //
+    //while (!frontier.empty()) {
+    //   let current: PathNode = frontier.pop();
+    //
+    //   if current == goal:
+    //      break
+    //   
+    //   for next in graph.neighbors(current):
+    //      new_cost = cost_so_far[current] + graph.cost(current, next)
+    //      if next not in cost_so_far or new_cost < cost_so_far[next]:
+    //         cost_so_far[next] = new_cost
+    //         priority = new_cost + heuristic(goal, next)
+    //         frontier.put(next, priority)
+    //         came_from[next] = current
+    //}
+  }
 }
