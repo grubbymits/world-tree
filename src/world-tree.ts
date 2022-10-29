@@ -1,4 +1,5 @@
 export * from "./navigation.js"
+export * from "./queue.js"
 export * from "./graphics.js"
 export * from "./scene.js"
 export * from "./terrain.js"

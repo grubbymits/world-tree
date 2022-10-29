@@ -2,8 +2,8 @@
 export interface PriorityQueue<T> {
   insert(x: T, k: number): void;
   first(): T;
-  pop(): T;
-  setKey(x: T, k: number);
+  readonly pop: T;
+  setKey(x: T, k: number): void;
 }
 
 class QueueItem <T> {
@@ -31,7 +31,7 @@ export class MinPriorityQueue<T> implements PriorityQueue<T> {
   get pop(): T {
     let min = this.first;
     this.items.splice(0, 1);
-    this.items.heapify(0);
+    this.heapify(0);
     return min;
   }
   parentIdx(i: number): number {
@@ -48,13 +48,13 @@ export class MinPriorityQueue<T> implements PriorityQueue<T> {
     return item.key;
   }
   insert(x: T, k: number): void {
-    console.assert(!this.items.has(x));
+    console.assert(!this.indices.has(x));
     this.items.push(new QueueItem(x, Number.MAX_VALUE));
     this.setKey(x, k);
   }
   setKey(x: T, k: number): void {
     console.assert(this.indices.has(x));
-    let i = this.indices.get(x);
+    let i: number = this.indices.get(x)!;
     let item = this.items[i];
     console.assert(k <= item.key);
     item.key = k;
@@ -69,8 +69,8 @@ export class MinPriorityQueue<T> implements PriorityQueue<T> {
     let itemB = this.items[idxB];
     this.items[idxA] = itemB;
     this.items[idxB] = itemA;
-    this.indices.set(itemA, idxB);
-    this.indices.set(itemB, idxA);
+    this.indices.set(itemA.element, idxB);
+    this.indices.set(itemB.element, idxA);
   }
   build(): void {
     // Bottom half of heap are leaves, so don't process them here.
