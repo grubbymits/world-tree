@@ -1,5 +1,12 @@
 import { EntityEvent } from "./events.js";
 import { CollisionDetector } from "./physics.js";
+function getAllSegments(node) {
+    let allSegments = new Array();
+    node.topSegments.forEach(segment => allSegments.push(segment));
+    node.baseSegments.forEach(segment => allSegments.push(segment));
+    node.sideSegments.forEach(segment => allSegments.push(segment));
+    return allSegments;
+}
 export class MovableEntityDebug {
     constructor(movable, camera, debugCollision) {
         if (debugCollision) {
@@ -19,7 +26,8 @@ export class MovableEntityDebug {
                 if (scene.ctx != null) {
                     scene.ctx.strokeStyle = "Green";
                     for (let entity of missedEntities) {
-                        for (const segment of scene.getNode(entity.id).allSegments) {
+                        let sceneNode = scene.getNode(entity.id);
+                        for (const segment of getAllSegments(sceneNode)) {
                             scene.ctx.beginPath();
                             let drawP0 = camera.getDrawCoord(segment.p0);
                             let drawP1 = camera.getDrawCoord(segment.p1);
@@ -48,7 +56,7 @@ export class MovableEntityDebug {
                 if (scene.ctx != null) {
                     let ctx = scene.ctx;
                     ctx.strokeStyle = "Green";
-                    for (const segment of scene.getNode(movable.id).allSegments) {
+                    for (const segment of getAllSegments(scene.getNode(movable.id))) {
                         ctx.beginPath();
                         let drawP0 = camera.getDrawCoord(segment.p0);
                         let drawP1 = camera.getDrawCoord(segment.p1);
@@ -57,7 +65,7 @@ export class MovableEntityDebug {
                         ctx.stroke();
                     }
                     ctx.strokeStyle = "Orange";
-                    for (const segment of scene.getNode(collidedEntity.id).allSegments) {
+                    for (const segment of getAllSegments(scene.getNode(collidedEntity.id))) {
                         ctx.beginPath();
                         let drawP0 = camera.getDrawCoord(segment.p0);
                         let drawP1 = camera.getDrawCoord(segment.p1);

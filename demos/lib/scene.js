@@ -9,14 +9,15 @@ export var RenderOrder;
     RenderOrder[RenderOrder["After"] = 1] = "After";
 })(RenderOrder || (RenderOrder = {}));
 export class SceneNode {
-    constructor(_entity, _drawCoord) {
+    constructor(_entity, _minDrawCoord) {
         this._entity = _entity;
-        this._drawCoord = _drawCoord;
+        this._minDrawCoord = _minDrawCoord;
         this._preds = new Array();
         this._succs = new Array();
         this._topOutlineSegments = new Array();
         this._sideOutlineSegments = new Array();
         this._baseOutlineSegments = new Array();
+        this.drawCoord = _minDrawCoord;
     }
     overlapX(other) {
         return (this.entity.bounds.minX >= other.entity.bounds.minX &&
@@ -36,17 +37,25 @@ export class SceneNode {
             (this.entity.bounds.maxZ > other.entity.bounds.minZ &&
                 this.entity.bounds.maxZ <= other.entity.bounds.maxZ);
     }
+    updateSegments(diff) {
+        this.topSegments[0] = this.topSegments[0].add(diff);
+        this.topSegments[1] = this.topSegments[1].add(diff);
+        this.baseSegments[0] = this.baseSegments[0].add(diff);
+        this.baseSegments[1] = this.baseSegments[1].add(diff);
+        this.sideSegments[0] = this.sideSegments[0].add(diff);
+        this.sideSegments[1] = this.sideSegments[1].add(diff);
+        this.drawCoord = this.drawCoord.add(diff);
+        this.minDrawCoord = this.minDrawCoord.add(diff);
+    }
     intersectsTop(other) {
         for (let otherTop of other.topSegments) {
-            for (let baseSegment of this.baseSegments) {
-                if (baseSegment.intersects(otherTop)) {
-                    return true;
-                }
+            if (this.baseSegments[0].intersects(otherTop) ||
+                this.baseSegments[1].intersects(otherTop)) {
+                return true;
             }
-            for (let sideSegment of this.sideSegments) {
-                if (sideSegment.intersects(otherTop)) {
-                    return true;
-                }
+            if (this.sideSegments[0].intersects(otherTop) ||
+                this.sideSegments[1].intersects(otherTop)) {
+                return true;
             }
         }
         return false;
@@ -68,16 +77,10 @@ export class SceneNode {
     }
     get id() { return this._entity.id; }
     get drawCoord() { return this._drawCoord; }
+    get minDrawCoord() { return this._minDrawCoord; }
     get topSegments() { return this._topOutlineSegments; }
     get baseSegments() { return this._baseOutlineSegments; }
     get sideSegments() { return this._sideOutlineSegments; }
-    get allSegments() {
-        let outline = new Array();
-        this.topSegments.forEach(segment => outline.push(segment));
-        this.sideSegments.forEach(segment => outline.push(segment));
-        this.baseSegments.forEach(segment => outline.push(segment));
-        return outline;
-    }
     get entity() { return this._entity; }
     get succs() { return this._succs; }
     get level() { return this._level; }
@@ -85,6 +88,7 @@ export class SceneNode {
     get maxZ() { return this._entity.bounds.maxZ; }
     set level(level) { this._level = level; }
     set drawCoord(coord) { this._drawCoord = coord; }
+    set minDrawCoord(coord) { this._minDrawCoord = coord; }
     get isRoot() { return this._preds.length == 0; }
 }
 export class SceneLevel {
@@ -185,7 +189,14 @@ export class SceneGraph {
         this._prevCameraLower = new Point2D(0, 0);
         this._prevCameraUpper = new Point2D(0, 0);
     }
-    setDrawCoords(node) {
+    updateDrawOutline(node) {
+        const entity = node.entity;
+        const min = entity.bounds.minLocation;
+        let minDraw = this.getDrawCoord(min);
+        let diff = minDraw.diff(node.minDrawCoord);
+        node.updateSegments(diff);
+    }
+    setDrawOutline(node) {
         const entity = node.entity;
         const min = entity.bounds.minLocation;
         const max = entity.bounds.maxLocation;
@@ -219,7 +230,7 @@ export class SceneGraph {
         if (!this.initialised) {
             return;
         }
-        this.setDrawCoords(node);
+        this.updateDrawOutline(node);
         console.assert(node.level != null, "node with id:", node.entity.id, "isn't assigned a level!");
         let level = node.level;
         if (level.inrange(node.entity)) {
@@ -240,7 +251,7 @@ export class SceneGraph {
         this.levels.push(new SceneLevel(node));
     }
     insertNode(node) {
-        this.setDrawCoords(node);
+        this.setDrawOutline(node);
         if (this.initialised) {
             this.insertIntoLevel(node);
         }
@@ -249,7 +260,7 @@ export class SceneGraph {
         let nodeList = new Array();
         for (let node of nodes.values()) {
             nodeList.push(node);
-            this.setDrawCoords(node);
+            this.setDrawOutline(node);
         }
         nodeList.sort((a, b) => {
             if (a.minZ < b.minZ)

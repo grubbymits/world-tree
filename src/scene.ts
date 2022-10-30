@@ -51,29 +51,25 @@ export class SceneNode {
   }
 
   updateSegments(diff: Vector2D): void {
-    console.assert(this.topSegments.length == 2);
-    console.assert(this.baseSegments.length == 2);
-    console.assert(this.sideSegments.length == 2);
-    this.topSegments[0].update(diff);
-    this.topSegments[1].update(diff);
-    this.baseSegments[0].update(diff);
-    this.baseSegments[1].update(diff);
-    this.sideSegments[0].update(diff);
-    this.sideSegments[1].update(diff);
-    this.drawCoord.add(diff);
+    this.topSegments[0] = this.topSegments[0].add(diff);
+    this.topSegments[1] = this.topSegments[1].add(diff);
+    this.baseSegments[0] = this.baseSegments[0].add(diff);
+    this.baseSegments[1] = this.baseSegments[1].add(diff);
+    this.sideSegments[0] = this.sideSegments[0].add(diff);
+    this.sideSegments[1] = this.sideSegments[1].add(diff);
+    this.drawCoord = this.drawCoord.add(diff);
+    this.minDrawCoord = this.minDrawCoord.add(diff);
   }
 
   intersectsTop(other: SceneNode): boolean {
     for (let otherTop of other.topSegments) {
-      for (let baseSegment of this.baseSegments) {
-        if (baseSegment.intersects(otherTop)) {
-          return true;
-        }
+      if (this.baseSegments[0].intersects(otherTop) ||
+          this.baseSegments[1].intersects(otherTop)) {
+        return true;
       }
-      for (let sideSegment of this.sideSegments) {
-        if (sideSegment.intersects(otherTop)) {
-          return true;
-        }
+      if (this.sideSegments[0].intersects(otherTop) ||
+          this.sideSegments[1].intersects(otherTop)) {
+        return true;
       }
     }
     return false;
