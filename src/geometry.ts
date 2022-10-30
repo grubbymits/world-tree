@@ -77,9 +77,10 @@ export class Segment2D {
            p.y >= Math.min(this.p0.y, this.p1.y);
   }
 
-  update(diff: Vector2D): void {
-    this.p0.add(diff);
-    this.p1.add(diff);
+  add(diff: Vector2D): Segment2D {
+    let p0 = this.p0.add(diff);
+    let p1 = this.p1.add(diff);
+    return new Segment2D(p0, p1);
   }
 
   on(p: Point2D): boolean {
