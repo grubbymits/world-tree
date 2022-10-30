@@ -37,7 +37,7 @@ test('scene nodes row overlapping', () => {
     let minLocation = new WT.Point3D(i * entityDimensions.width, 0, 0);
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, drawCoord(entity));
-    scene.setDrawCoords(node);
+    scene.setDrawOutline(node);
     nodes.push(node);
   }
   expect(nodes[0].overlapX(nodes[1])).toBe(false);
@@ -58,7 +58,7 @@ test('scene nodes row intersecting', () => {
     let minLocation = new WT.Point3D(i * entityDimensions.width, 0, 0);
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, drawCoord(entity));
-    scene.setDrawCoords(node);
+    scene.setDrawOutline(node);
     nodes.push(node);
   }
   expect(nodes[0].intersectsTop(nodes[1])).toBe(false);
@@ -75,7 +75,7 @@ test('scene nodes row intersecting with unaligned y and z-axis', () => {
     let minLocation = new WT.Point3D(i * entityDimensions.width, i, i);
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, drawCoord(entity));
-    scene.setDrawCoords(node);
+    scene.setDrawOutline(node);
     nodes.push(node);
   }
   expect(nodes[0].intersectsTop(nodes[1])).toBe(false);
@@ -92,7 +92,7 @@ test('scene nodes column overlapping', () => {
     let minLocation = new WT.Point3D(0, i * entityDimensions.depth, 0);
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, drawCoord(entity));
-    scene.setDrawCoords(node);
+    scene.setDrawOutline(node);
     nodes.push(node);
   }
   expect(nodes[0].overlapX(nodes[1])).toBe(true);
@@ -113,7 +113,7 @@ test('scene nodes column intersecting with unaligned x and z axis', () => {
     let minLocation = new WT.Point3D(i, i * entityDimensions.depth, i);
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, drawCoord(entity));
-    scene.setDrawCoords(node);
+    scene.setDrawOutline(node);
     nodes.push(node);
   }
   expect(nodes[0].intersectsTop(nodes[1])).toBe(false);
@@ -133,7 +133,7 @@ test('scene nodes column intersecting', () => {
     let minLocation = new WT.Point3D(0, i * entityDimensions.depth, 0);
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, drawCoord(entity));
-    scene.setDrawCoords(node);
+    scene.setDrawOutline(node);
     nodes.push(node);
   }
   expect(nodes[0].intersectsTop(nodes[1])).toBe(false);
@@ -154,7 +154,7 @@ test('diagonal scene nodes overlapping', () => {
                                      i * entityDimensions.depth, 0);
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, drawCoord(entity));
-    scene.setDrawCoords(node);
+    scene.setDrawOutline(node);
     nodes.push(node);
   }
   expect(nodes[0].overlapX(nodes[1])).toBe(false);
@@ -176,7 +176,7 @@ test('diagonal scene nodes intersecting', () => {
                                      i * entityDimensions.depth, 0);
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, drawCoord(entity));
-    scene.setDrawCoords(node);
+    scene.setDrawOutline(node);
     nodes.push(node);
   }
   expect(nodes[0].intersectsTop(nodes[1])).toBe(false);
@@ -196,7 +196,7 @@ test('draw order of single row', () => {
     let minLocation = new WT.Point3D(i * entityDimensions.width, 0, 0);
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, drawCoord(entity));
-    scene.setDrawCoords(node);
+    scene.setDrawOutline(node);
     nodes.push(node);
   }
   expect(drawOrder(nodes[0], nodes[1])).toBe(WT.RenderOrder.After);
@@ -217,7 +217,7 @@ test('draw order of single column', () => {
     let minLocation = new WT.Point3D(0, i * entityDimensions.depth, 0);
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, drawCoord(entity));
-    scene.setDrawCoords(node);
+    scene.setDrawOutline(node);
     nodes.push(node);
   }
   expect(drawOrder(nodes[0], nodes[1])).toBe(WT.RenderOrder.Before);

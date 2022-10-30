@@ -42,6 +42,7 @@ class WorldConfig {
     this._context = WT.createTestContext(this._worldDims, WT.Perspective.TwoByOneIsometric);
     this._camera = new WT.Camera(this.scene, 1024, 1024);
     this._camera.location = new WT.Point3D(0, 0, 0);
+    this._entities = new Array();
 
     for (let y = 0; y < this._cellsY; ++y) {
       for (let x = 0; x < this._cellsX; ++x) {
@@ -50,13 +51,14 @@ class WorldConfig {
           const minLocation = new WT.Point3D(this._tileDims.width * x,
                                              this._tileDims.depth * y,
                                              this._tileDims.height * terrace);
-          new WT.PhysicalEntity(this._context, minLocation, this._tileDims);
+          this._entities.push(new WT.PhysicalEntity(this._context, minLocation, this._tileDims));
         }
       }
     }
   }
   get scene() { return this._context.scene; }
   get camera() { return this._camera; }
+  get entities() { return this._entities; }
 }
 
 
@@ -65,7 +67,7 @@ export function benchmark_draw_coords() {
   let world = new WorldConfig();
   const startTime = performance.now();
   for (let node of world.scene.nodes.values()) {
-    world.scene.graph.setDrawCoords(node);
+    world.scene.graph.setDrawOutline(node);
   }
   const endTime = performance.now();
   return endTime - startTime;
@@ -84,3 +86,12 @@ export function benchmark_build_levels() {
   return (endTime - startTime) / N;
 }
 
+export function benchmark_update_everything() {
+  let world = new WorldConfig();
+  const force = true;
+  const startTime = performance.now();
+  world.entities.forEach(entity => world.scene.updateEntity(entity));
+  world.scene.render(world.camera, force);
+  const endTime = performance.now();
+  return (endTime - startTime);
+}
