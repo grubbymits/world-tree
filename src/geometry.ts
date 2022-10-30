@@ -77,6 +77,11 @@ export class Segment2D {
            p.y >= Math.min(this.p0.y, this.p1.y);
   }
 
+  update(diff: Vector2D): void {
+    this.p0.add(diff);
+    this.p1.add(diff);
+  }
+
   on(p: Point2D): boolean {
     const dxc = p.x - this.p0.x;
     const dyc = p.y - this.p0.y;

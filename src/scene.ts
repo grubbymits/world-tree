@@ -2,7 +2,8 @@ import { PhysicalEntity } from "./entity.js"
 import { Camera } from "./camera.js"
 import { Point2D,
          Point3D,
-         Segment2D } from "./geometry.js"
+         Segment2D,
+         Vector2D } from "./geometry.js"
 import { Sprite,
          GraphicComponent } from "./graphics.js"
 import { Dimensions } from "./physics.js"
@@ -21,9 +22,12 @@ export class SceneNode {
   private _topOutlineSegments: Array<Segment2D> = new Array<Segment2D>();
   private _sideOutlineSegments: Array<Segment2D> = new Array<Segment2D>();
   private _baseOutlineSegments: Array<Segment2D> = new Array<Segment2D>();
+  private _drawCoord: Point2D;
 
   constructor(private readonly _entity: PhysicalEntity,
-              private _drawCoord: Point2D) { }
+              private _minDrawCoord: Point2D) {
+    this.drawCoord = _minDrawCoord;
+  }
 
   overlapX(other: SceneNode): boolean {
     return (this.entity.bounds.minX >= other.entity.bounds.minX &&
@@ -44,6 +48,19 @@ export class SceneNode {
             this.entity.bounds.minZ < other.entity.bounds.maxZ) ||
            (this.entity.bounds.maxZ > other.entity.bounds.minZ &&
             this.entity.bounds.maxZ <= other.entity.bounds.maxZ);
+  }
+
+  updateSegments(diff: Vector2D): void {
+    console.assert(this.topSegments.length == 2);
+    console.assert(this.baseSegments.length == 2);
+    console.assert(this.sideSegments.length == 2);
+    this.topSegments[0].update(diff);
+    this.topSegments[1].update(diff);
+    this.baseSegments[0].update(diff);
+    this.baseSegments[1].update(diff);
+    this.sideSegments[0].update(diff);
+    this.sideSegments[1].update(diff);
+    this.drawCoord.add(diff);
   }
 
   intersectsTop(other: SceneNode): boolean {
@@ -78,16 +95,10 @@ export class SceneNode {
 
   get id(): number { return this._entity.id; }
   get drawCoord(): Point2D { return this._drawCoord; }
+  get minDrawCoord(): Point2D { return this._minDrawCoord; }
   get topSegments(): Array<Segment2D> { return this._topOutlineSegments; }
   get baseSegments(): Array<Segment2D> { return this._baseOutlineSegments; }
   get sideSegments(): Array<Segment2D> { return this._sideOutlineSegments; }
-  get allSegments(): Array<Segment2D> {
-    let outline = new Array<Segment2D>();
-    this.topSegments.forEach(segment => outline.push(segment));
-    this.sideSegments.forEach(segment => outline.push(segment));
-    this.baseSegments.forEach(segment => outline.push(segment));
-    return outline;
-  }
   get entity(): PhysicalEntity { return this._entity; }
   get succs(): Array<SceneNode> { return this._succs; }
   get level(): SceneLevel|null { return this._level; }
@@ -95,6 +106,7 @@ export class SceneNode {
   get maxZ(): number { return this._entity.bounds.maxZ; }
   set level(level: SceneLevel|null) { this._level = level; }
   set drawCoord(coord: Point2D) { this._drawCoord = coord; }
+  set minDrawCoord(coord: Point2D) { this._minDrawCoord = coord; }
   get isRoot(): boolean { return this._preds.length == 0; }
 }
 
@@ -226,7 +238,15 @@ export abstract class SceneGraph {
 
   constructor() { }
 
-  setDrawCoords(node: SceneNode): void {
+  updateDrawOutline(node: SceneNode): void {
+    const entity: PhysicalEntity = node.entity;
+    const min: Point3D = entity.bounds.minLocation;
+    let minDraw: Point2D = this.getDrawCoord(min);
+    let diff: Vector2D = minDraw.diff(node.minDrawCoord);
+    node.updateSegments(diff);
+  }
+
+  setDrawOutline(node: SceneNode): void {
     const entity: PhysicalEntity = node.entity;
     const min: Point3D = entity.bounds.minLocation;
     const max: Point3D = entity.bounds.maxLocation;
@@ -267,7 +287,7 @@ export abstract class SceneGraph {
     if (!this.initialised) {
       return;
     }
-    this.setDrawCoords(node);
+    this.updateDrawOutline(node);
     console.assert(node.level != null, "node with id:", node.entity.id,
                    "isn't assigned a level!");
     let level: SceneLevel = node.level!;
@@ -290,7 +310,7 @@ export abstract class SceneGraph {
   }
 
   insertNode(node: SceneNode): void {
-    this.setDrawCoords(node);
+    this.setDrawOutline(node);
     //this._numEntities++;
     if (this.initialised) {
       this.insertIntoLevel(node);
@@ -301,7 +321,7 @@ export abstract class SceneGraph {
     let nodeList = new Array<SceneNode>();
     for (let node of nodes.values()) {
       nodeList.push(node);
-      this.setDrawCoords(node);
+      this.setDrawOutline(node);
     }
     nodeList.sort((a, b) => {
                   if (a.minZ < b.minZ)
@@ -680,9 +700,6 @@ export class TwoByOneIsometric extends SceneGraph {
     1 / Math.cos(Math.atan(0.5));
 
   static getDrawCoord(loc: Point3D): Point2D {
-    // We're allowing the height to vary, so its a cuboid, not a cube, but with
-    // a square top.
-
     // Tiles are placed overlapping each other by half.
     // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
     const dx = Math.round((loc.x + loc.y) * 2 * this._oneOverMagicRatio);
@@ -692,6 +709,8 @@ export class TwoByOneIsometric extends SceneGraph {
 
   static getDimensions(spriteWidth: number,
                        spriteHeight: number): Dimensions {
+    // We're allowing the height to vary, so its a cuboid, not a cube, but with
+    // a square top.
     const oneUnit = spriteWidth * 0.25;
     const twoUnits = spriteWidth * 0.5;
     const width = oneUnit * this._magicRatio;

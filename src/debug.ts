@@ -5,11 +5,21 @@ import { EntityEvent } from "./events.js"
 import { CollisionDetector,
          CollisionInfo } from "./physics.js"
 import { Point2D,
+         Segment2D,
          Vertex3D,
          Face3D,
          IntersectInfo } from "./geometry.js"
 import { Camera } from "./camera.js"
-import { SceneRenderer } from "./scene.js"
+import { SceneNode,
+         SceneRenderer } from "./scene.js"
+
+function getAllSegments(node: SceneNode): Array<Segment2D> {
+  let allSegments = new Array<Segment2D>();
+  node.topSegments.forEach(segment => allSegments.push(segment));
+  node.baseSegments.forEach(segment => allSegments.push(segment));
+  node.sideSegments.forEach(segment => allSegments.push(segment));
+  return allSegments;
+}
 
 export class MovableEntityDebug {
   constructor(movable: MovableEntity,
@@ -36,7 +46,9 @@ export class MovableEntityDebug {
           // outline the movable in green
           scene.ctx!.strokeStyle = "Green";
           for (let entity of missedEntities) {
-            for (const segment of scene.getNode(entity.id).allSegments) {
+            let sceneNode = scene.getNode(entity.id);
+
+            for (const segment of getAllSegments(sceneNode)) {
               scene.ctx!.beginPath();
               let drawP0 = camera.getDrawCoord(segment.p0);
               let drawP1 = camera.getDrawCoord(segment.p1);
@@ -71,7 +83,7 @@ export class MovableEntityDebug {
           // outline the movable in green
           let ctx = scene.ctx!;
           ctx.strokeStyle = "Green";
-          for (const segment of scene.getNode(movable.id).allSegments) {
+          for (const segment of getAllSegments(scene.getNode(movable.id))) {
             ctx.beginPath();
             let drawP0 = camera.getDrawCoord(segment.p0);
             let drawP1 = camera.getDrawCoord(segment.p1);
@@ -82,7 +94,7 @@ export class MovableEntityDebug {
 
           // outline the entity that it collided with in orange.
           ctx.strokeStyle = "Orange";
-          for (const segment of scene.getNode(collidedEntity.id).allSegments) {
+          for (const segment of getAllSegments(scene.getNode(collidedEntity.id))) {
             ctx.beginPath();
             let drawP0 = camera.getDrawCoord(segment.p0);
             let drawP1 = camera.getDrawCoord(segment.p1);
