@@ -2251,7 +2251,7 @@ class SceneNode {
         this.minDrawCoord = this.minDrawCoord.add(diff);
     }
     intersectsTop(other) {
-        for (let otherTop of other.topSegments){
+        for (const otherTop of other.topSegments){
             if (this.baseSegments[0].intersects(otherTop) || this.baseSegments[1].intersects(otherTop)) {
                 return true;
             }
@@ -2265,12 +2265,12 @@ class SceneNode {
         this._succs = [];
     }
     addSucc(succ) {
-        let idx = this._succs.indexOf(succ);
+        const idx = this._succs.indexOf(succ);
         if (idx != -1) return;
         this._succs.push(succ);
     }
     removeSucc(succ) {
-        let idx = this._succs.indexOf(succ);
+        const idx = this._succs.indexOf(succ);
         if (idx == -1) return;
         this._succs.splice(idx, 1);
     }
@@ -2280,8 +2280,14 @@ class SceneNode {
     get drawCoord() {
         return this._drawCoord;
     }
+    set drawCoord(coord) {
+        this._drawCoord = coord;
+    }
     get minDrawCoord() {
         return this._minDrawCoord;
+    }
+    set minDrawCoord(coord) {
+        this._minDrawCoord = coord;
     }
     get topSegments() {
         return this._topOutlineSegments;
@@ -2301,20 +2307,14 @@ class SceneNode {
     get level() {
         return this._level;
     }
+    set level(level) {
+        this._level = level;
+    }
     get minZ() {
         return this._entity.bounds.minZ;
     }
     get maxZ() {
         return this._entity.bounds.maxZ;
-    }
-    set level(level) {
-        this._level = level;
-    }
-    set drawCoord(coord) {
-        this._drawCoord = coord;
-    }
-    set minDrawCoord(coord) {
-        this._minDrawCoord = coord;
     }
     get isRoot() {
         return this._preds.length == 0;
@@ -2340,6 +2340,9 @@ class SceneLevel {
     get order() {
         return this._order;
     }
+    set order(o) {
+        this._order = o;
+    }
     get minZ() {
         return this._minZ;
     }
@@ -2352,9 +2355,6 @@ class SceneLevel {
     set dirty(d) {
         this._dirty = d;
     }
-    set order(o) {
-        this._order = o;
-    }
     inrange(entity) {
         return entity.bounds.minZ >= this._minZ && entity.bounds.minZ < this._maxZ;
     }
@@ -2366,7 +2366,7 @@ class SceneLevel {
     }
     remove(node) {
         this.dirty = true;
-        let idx = this._nodes.indexOf(node);
+        const idx = this._nodes.indexOf(node);
         console.assert(idx != -1);
         this._nodes.splice(idx, 1);
         this._nodes.forEach((pred)=>pred.removeSucc(node));
@@ -2374,7 +2374,7 @@ class SceneLevel {
     update(node, graph) {
         node.clear();
         for(let i = 0; i < this._nodes.length; i++){
-            let existing = this._nodes[i];
+            const existing = this._nodes[i];
             if (existing.id == node.id) {
                 continue;
             }
@@ -2406,18 +2406,18 @@ class SceneLevel {
         const toDraw = this._nodes.filter((node)=>this.shouldDraw(node, camera));
         toDraw.sort((a, b)=>graph.drawOrder(a, b));
         this.order = [];
-        let discovered = new Set();
-        let topoSort = (node)=>{
+        const discovered = new Set();
+        const topoSort = (node)=>{
             if (discovered.has(node)) {
                 return;
             }
             discovered.add(node);
-            for (let succ of node.succs){
+            for (const succ of node.succs){
                 topoSort(succ);
             }
             this.order.push(node);
         };
-        for(let i in toDraw){
+        for(const i in toDraw){
             if (discovered.has(toDraw[i])) {
                 continue;
             }
@@ -2435,17 +2435,14 @@ class SceneGraph {
     updateDrawOutline(node) {
         const entity = node.entity;
         const min = entity.bounds.minLocation;
-        let minDraw = this.getDrawCoord(min);
-        let diff = minDraw.diff(node.minDrawCoord);
+        const minDraw = this.getDrawCoord(min);
+        const diff = minDraw.diff(node.minDrawCoord);
         node.updateSegments(diff);
     }
     setDrawOutline(node) {
         const entity = node.entity;
         const min = entity.bounds.minLocation;
         const max = entity.bounds.maxLocation;
-        entity.bounds.width;
-        entity.bounds.depth;
-        entity.bounds.height;
         node.topSegments.length = 0;
         node.baseSegments.length = 0;
         node.sideSegments.length = 0;
@@ -2481,7 +2478,7 @@ class SceneGraph {
         }
         this.updateDrawOutline(node);
         console.assert(node.level != null, "node with id:", node.entity.id, "isn't assigned a level!");
-        let level = node.level;
+        const level = node.level;
         if (level.inrange(node.entity)) {
             level.update(node, this);
         } else {
@@ -2490,7 +2487,7 @@ class SceneGraph {
         }
     }
     insertIntoLevel(node) {
-        for (let level of this.levels){
+        for (const level of this.levels){
             if (level.inrange(node.entity)) {
                 level.add(node, this);
                 return;
@@ -2505,8 +2502,8 @@ class SceneGraph {
         }
     }
     initialise(nodes) {
-        let nodeList = new Array();
-        for (let node of nodes.values()){
+        const nodeList = new Array();
+        for (const node of nodes.values()){
             nodeList.push(node);
             this.setDrawOutline(node);
         }
@@ -2553,7 +2550,7 @@ class BaseSceneRenderer {
         return null;
     }
     insertEntity(entity) {
-        let node = new SceneNode(entity, this.graph.getDrawCoord(entity.bounds.minLocation));
+        const node = new SceneNode(entity, this.graph.getDrawCoord(entity.bounds.minLocation));
         this.nodes.set(node.id, node);
         if (this.graph.initialised) {
             this.graph.insertNode(node);
@@ -2562,36 +2559,36 @@ class BaseSceneRenderer {
     }
     updateEntity(entity) {
         console.assert(this._nodes.has(entity.id));
-        let node = this._nodes.get(entity.id);
+        const node = this._nodes.get(entity.id);
         this.graph.updateNode(node);
     }
     getNode(id) {
         console.assert(this.nodes.has(id));
         return this.nodes.get(id);
     }
-    getLocationAt(x, y, camera) {
+    getLocationAt(_x, _y, _camera) {
         return null;
     }
-    getEntityDrawnAt(x, y, camera) {
+    getEntityDrawnAt(_x, _y, _camera) {
         return null;
     }
-    render(camera, force) {
+    render(_camera, _force) {
         return 0;
     }
-    addTimedEvent(callback) {}
+    addTimedEvent(_callback) {}
     verifyRenderer(entities) {
         if (this.graph.numNodes != entities.length) {
             console.error("top-level comparison between scene node and entities failed");
         }
         let counted = 0;
-        let levelNodeIds = new Array();
-        let nodeIds = new Array();
-        let entityIds = new Array();
-        for (let level of this.graph.levels){
+        const levelNodeIds = new Array();
+        const nodeIds = new Array();
+        const entityIds = new Array();
+        for (const level of this.graph.levels){
             counted += level.nodes.length;
             level.nodes.forEach((node)=>levelNodeIds.push(node.id));
         }
-        for (let node of this.nodes.values()){
+        for (const node of this.nodes.values()){
             nodeIds.push(node.id);
         }
         entities.forEach((entity)=>entityIds.push(entity.id));
@@ -2683,7 +2680,7 @@ class OnscreenSceneRenderer extends BaseSceneRenderer {
         this._handler.add(callback);
     }
     getLocationAt(x, y, camera) {
-        let entity = this.getEntityDrawnAt(x, y, camera);
+        const entity = this.getEntityDrawnAt(x, y, camera);
         if (entity != null) {
             return entity.bounds.minLocation;
         }
@@ -2701,8 +2698,8 @@ class OnscreenSceneRenderer extends BaseSceneRenderer {
                 if (!camera.isOnScreen(node.drawCoord, entity.width, entity.depth)) {
                     continue;
                 }
-                let onScreenCoord = camera.getDrawCoord(node.drawCoord);
-                let graphic = entity.graphic;
+                const onScreenCoord = camera.getDrawCoord(node.drawCoord);
+                const graphic = entity.graphic;
                 if (x < onScreenCoord.x || y < onScreenCoord.y || x > onScreenCoord.x + graphic.width || y > onScreenCoord.y + graphic.height) {
                     continue;
                 }
@@ -2749,17 +2746,17 @@ class IsometricPhysicalDimensions extends Dimensions {
         return Math.round(spriteWidth * this._oneOverSqrt3);
     }
     static physicalDepth(physicalWidth, relativeDims) {
-        let depthRatio = relativeDims.depth / relativeDims.width;
+        const depthRatio = relativeDims.depth / relativeDims.width;
         return Math.round(physicalWidth * depthRatio);
     }
     static physicalHeight(physicalWidth, relativeDims) {
-        let heightRatio = relativeDims.height / relativeDims.width;
+        const heightRatio = relativeDims.height / relativeDims.width;
         return Math.round(physicalWidth * heightRatio);
     }
     constructor(spriteWidth, relativeDims){
-        let width = IsometricPhysicalDimensions.physicalWidth(spriteWidth);
-        let depth = IsometricPhysicalDimensions.physicalDepth(width, relativeDims);
-        let height = IsometricPhysicalDimensions.physicalHeight(width, relativeDims);
+        const width = IsometricPhysicalDimensions.physicalWidth(spriteWidth);
+        const depth = IsometricPhysicalDimensions.physicalDepth(width, relativeDims);
+        const height = IsometricPhysicalDimensions.physicalHeight(width, relativeDims);
         super(width, depth, height);
     }
 }
@@ -3019,6 +3016,7 @@ function getBiomeName(biome) {
     switch(biome){
         default:
             console.error("unhandled biome type:", biome);
+            return "invalid biome";
         case Biome.Water:
             return "water";
         case Biome.Desert:
@@ -3048,8 +3046,8 @@ function getBiomeName(biome) {
 function mean(grid) {
     let total = 0;
     let numElements = 0;
-    for (let row of grid){
-        let acc = row.reduce(function(acc, value) {
+    for (const row of grid){
+        const acc = row.reduce(function(acc, value) {
             return acc + value;
         }, 0);
         total += acc;
@@ -3059,30 +3057,30 @@ function mean(grid) {
 }
 function meanWindow(grid, centreX, centreY, offsets) {
     let total = 0;
-    let numElements = offsets.length * offsets.length;
-    for(let dy in offsets){
-        let y = centreY + offsets[dy];
-        for(let dx in offsets){
-            let x = centreX + offsets[dx];
+    const numElements = offsets.length * offsets.length;
+    for(const dy in offsets){
+        const y = centreY + offsets[dy];
+        for(const dx in offsets){
+            const x = centreX + offsets[dx];
             total += grid[y][x];
         }
     }
     return total / numElements;
 }
 function standardDevWindow(grid, centreX, centreY, offsets) {
-    let avg = meanWindow(grid, centreX, centreY, offsets);
+    const avg = meanWindow(grid, centreX, centreY, offsets);
     if (avg == 0) {
         return 0;
     }
-    let diffsSquared = new Array();
-    let size = offsets.length;
-    for(let dy in offsets){
-        let y = centreY + offsets[dy];
-        let row = new Float32Array(size);
+    const diffsSquared = new Array();
+    const size = offsets.length;
+    for(const dy in offsets){
+        const y = centreY + offsets[dy];
+        const row = new Float32Array(size);
         let wx = 0;
-        for(let dx in offsets){
-            let x = centreX + offsets[dx];
-            let diff = grid[y][x] - avg;
+        for(const dx in offsets){
+            const x = centreX + offsets[dx];
+            const diff = grid[y][x] - avg;
             row[wx] = diff * diff;
             wx++;
         }
@@ -3106,14 +3104,14 @@ function gaussianBlur(grid, width, depth) {
         1,
         4
     ];
-    let result = new Array();
+    const result = new Array();
     for(let y = 0; y < halfSize; y++){
         result[y] = grid[y];
     }
     for(let y1 = depth - halfSize; y1 < depth; y1++){
         result[y1] = grid[y1];
     }
-    let filter = new Float32Array(5);
+    const filter = new Float32Array(5);
     for(let y2 = halfSize; y2 < depth - halfSize; y2++){
         result[y2] = new Float32Array(width);
         for(let x = 0; x < halfSize; x++){
@@ -3123,15 +3121,15 @@ function gaussianBlur(grid, width, depth) {
             result[y2][x1] = grid[y2][x1];
         }
         for(let x2 = halfSize; x2 < width - halfSize; x2++){
-            let sigma = standardDevWindow(grid, x2, y2, offsets);
+            const sigma = standardDevWindow(grid, x2, y2, offsets);
             if (sigma == 0) {
                 continue;
             }
-            let sigmaSquared = sigma * sigma;
+            const sigmaSquared = sigma * sigma;
             const denominator = Math.sqrt(2 * Math.PI * sigmaSquared);
             let sum = 0;
-            for(let i in distancesSquared){
-                let numerator = Math.exp(-(distancesSquared[i] / (2 * sigmaSquared)));
+            for(const i in distancesSquared){
+                const numerator = Math.exp(-(distancesSquared[i] / (2 * sigmaSquared)));
                 filter[i] = numerator / denominator;
                 sum += filter[i];
             }
@@ -3139,12 +3137,12 @@ function gaussianBlur(grid, width, depth) {
                 coeff /= sum;
             }
             let blurred = 0;
-            for(let i1 in offsets){
-                let dx = offsets[i1];
+            for(const i1 in offsets){
+                const dx = offsets[i1];
                 blurred += grid[y2][x2 + dx] * filter[i1];
             }
-            for(let i2 in offsets){
-                let dy = offsets[i2];
+            for(const i2 in offsets){
+                const dy = offsets[i2];
                 blurred += grid[y2 + dy][x2] * filter[i2];
             }
             result[y2][x2] = blurred;
@@ -3187,41 +3185,41 @@ class TerrainAttributes {
     get terrace() {
         return this._terrace;
     }
-    get type() {
-        return this._type;
-    }
-    get shape() {
-        return this._shape;
-    }
-    get features() {
-        return this._features;
-    }
-    get moisture() {
-        return this._moisture;
-    }
-    get biome() {
-        return this._biome;
-    }
-    get fixed() {
-        return this._fixed;
-    }
-    set moisture(m) {
-        this._moisture = m;
-    }
     set terrace(t) {
         this._terrace = t;
+    }
+    get type() {
+        return this._type;
     }
     set type(t) {
         this._type = t;
     }
+    get shape() {
+        return this._shape;
+    }
     set shape(s) {
         this._shape = s;
+    }
+    get features() {
+        return this._features;
     }
     set features(f) {
         this._features |= f;
     }
+    get moisture() {
+        return this._moisture;
+    }
+    set moisture(m) {
+        this._moisture = m;
+    }
+    get biome() {
+        return this._biome;
+    }
     set biome(b) {
         this._biome = b;
+    }
+    get fixed() {
+        return this._fixed;
     }
     set fixed(f) {
         this._fixed = f;
@@ -3247,7 +3245,7 @@ class Surface {
         for(let y = 0; y < this._depth; y++){
             this._surface.push(new Array());
             for(let x = 0; x < this._width; x++){
-                let height = heightMap[y][x];
+                const height = heightMap[y][x];
                 this._surface[y].push(new TerrainAttributes(x, y, height));
             }
         }
@@ -3260,14 +3258,14 @@ class Surface {
         return this._surface[y][x];
     }
     getNeighbours(centreX, centreY) {
-        let neighbours = new Array();
+        const neighbours = new Array();
         for(let yDiff = -1; yDiff < 2; yDiff++){
-            let y = centreY + yDiff;
+            const y = centreY + yDiff;
             if (y < 0 || y >= this._depth) {
                 continue;
             }
             for(let xDiff = -1; xDiff < 2; xDiff++){
-                let x = centreX + xDiff;
+                const x = centreX + xDiff;
                 if (x < 0 || x >= this._width) {
                     continue;
                 }
@@ -3307,23 +3305,44 @@ class TerrainBuilderConfig {
         this._rainDirection = Direction.North;
         console.assert(_numTerraces > 0);
     }
+    get waterLine() {
+        return this._waterLine;
+    }
     set waterLine(level) {
         this._waterLine = level;
+    }
+    get wetLimit() {
+        return this._wetLimit;
     }
     set wetLimit(level) {
         this._wetLimit = level;
     }
+    get rainfall() {
+        return this._rainfall;
+    }
     set rainfall(level) {
         this._rainfall = level;
+    }
+    get uplandThreshold() {
+        return this._uplandThreshold;
     }
     set uplandThreshold(level) {
         this._uplandThreshold = level;
     }
+    get rainDirection() {
+        return this._rainDirection;
+    }
     set rainDirection(direction) {
         this._rainDirection = direction;
     }
+    get dryLimit() {
+        return this._dryLimit;
+    }
     set dryLimit(level) {
         this._dryLimit = level;
+    }
+    get hasWater() {
+        return this._hasWater;
     }
     set hasWater(enable) {
         this._hasWater = enable;
@@ -3337,38 +3356,17 @@ class TerrainBuilderConfig {
     get numTerraces() {
         return this._numTerraces;
     }
-    get uplandThreshold() {
-        return this._uplandThreshold;
-    }
-    get hasWater() {
-        return this._hasWater;
-    }
     get floor() {
         return this._defaultFloor;
     }
     get wall() {
         return this._defaultWall;
     }
-    get waterLine() {
-        return this._waterLine;
-    }
-    get wetLimit() {
-        return this._wetLimit;
-    }
-    get dryLimit() {
-        return this._dryLimit;
-    }
     get ramps() {
         return this._hasRamps;
     }
     get biomes() {
         return this._hasBiomes;
-    }
-    get rainfall() {
-        return this._rainfall;
-    }
-    get rainDirection() {
-        return this._rainDirection;
     }
     _numTerraces;
     _defaultFloor;
@@ -3383,11 +3381,11 @@ class TerrainBuilder {
         let minHeight = 0;
         let maxHeight = 0;
         for(let y = 0; y < depth; y++){
-            let row = heightMap[y];
-            let max = row.reduce(function(a, b) {
+            const row = heightMap[y];
+            const max = row.reduce(function(a, b) {
                 return Math.max(a, b);
             });
-            let min = row.reduce(function(a, b) {
+            const min = row.reduce(function(a, b) {
                 return Math.min(a, b);
             });
             minHeight = Math.min(minHeight, min);
@@ -3407,7 +3405,7 @@ class TerrainBuilder {
         this.surface.init(heightMap);
         for(let y2 = 0; y2 < this.surface.depth; y2++){
             for(let x1 = 0; x1 < this.surface.width; x1++){
-                let surface = this.surface.at(x1, y2);
+                const surface = this.surface.at(x1, y2);
                 surface.terrace = Math.floor(surface.height / this._terraceSpacing);
                 surface.shape = TerrainShape.Flat;
                 surface.type = this.config.floor;
@@ -3464,10 +3462,10 @@ class TerrainBuilder {
         }
         this.setEdges();
         this.setFeatures();
-        let grid = new TerrainGrid(context, this.surface.width, this.surface.depth);
+        const grid = new TerrainGrid(context, this.surface.width, this.surface.depth);
         for(let y = 0; y < this.surface.depth; y++){
             for(let x = 0; x < this.surface.width; x++){
-                let surface = this.surface.at(x, y);
+                const surface = this.surface.at(x, y);
                 console.assert(surface.terrace <= this.config.numTerraces && surface.terrace >= 0, "terrace out-of-range", surface.terrace);
                 grid.addSurfaceTerrain(x, y, surface.terrace, surface.type, surface.shape, surface.features);
             }
@@ -3475,8 +3473,8 @@ class TerrainBuilder {
         for(let y1 = 0; y1 < this.surface.depth; y1++){
             for(let x1 = 0; x1 < this.surface.width; x1++){
                 let z = this.surface.at(x1, y1).terrace;
-                let zStop = z - this.calcRelativeHeight(x1, y1);
-                let terrain = grid.getSurfaceTerrainAt(x1, y1);
+                const zStop = z - this.calcRelativeHeight(x1, y1);
+                const terrain = grid.getSurfaceTerrainAt(x1, y1);
                 if (terrain == null) {
                     console.error("didn't find terrain in map at", x1, y1, z);
                 }
@@ -3504,18 +3502,18 @@ class TerrainBuilder {
         let totalRamps = 0;
         for(let y = this.surface.depth - 3; y > 1; y--){
             for(let x = 2; x < this.surface.width - 2; x++){
-                let centre = this.surface.at(x, y);
+                const centre = this.surface.at(x, y);
                 if (!Terrain.isFlat(centre.shape)) {
                     continue;
                 }
-                let roundUpHeight = centre.height + this.terraceSpacing / 2;
+                const roundUpHeight = centre.height + this.terraceSpacing / 2;
                 if (roundUpHeight != (centre.terrace + 1) * this.terraceSpacing) {
                     continue;
                 }
-                for(let i in coordOffsets){
-                    let offset = coordOffsets[i];
-                    let neighbour = this.surface.at(centre.x + offset.x, centre.y + offset.y);
-                    let nextNeighbour = this.surface.at(neighbour.x + offset.x, neighbour.y + offset.y);
+                for(const i in coordOffsets){
+                    const offset = coordOffsets[i];
+                    const neighbour = this.surface.at(centre.x + offset.x, centre.y + offset.y);
+                    const nextNeighbour = this.surface.at(neighbour.x + offset.x, neighbour.y + offset.y);
                     if (!neighbour.fixed && !nextNeighbour.fixed && neighbour.terrace == centre.terrace + 1 && neighbour.terrace == nextNeighbour.terrace) {
                         neighbour.shape = ramps[i];
                         neighbour.fixed = true;
@@ -3529,17 +3527,17 @@ class TerrainBuilder {
     setEdges() {
         for(let y = 0; y < this.surface.depth; y++){
             for(let x = 0; x < this.surface.width; x++){
-                let centre = this.surface.at(x, y);
+                const centre = this.surface.at(x, y);
                 if (centre.type == TerrainType.Water) {
                     continue;
                 }
-                let neighbours = this.surface.getNeighbours(x, y);
+                const neighbours = this.surface.getNeighbours(x, y);
                 let shapeType = centre.shape;
                 let northEdge = false;
                 let eastEdge = false;
                 let southEdge = false;
                 let westEdge = false;
-                for (let neighbour of neighbours){
+                for (const neighbour of neighbours){
                     if (neighbour.terrace > centre.terrace) {
                         continue;
                     }
@@ -3659,10 +3657,10 @@ class TerrainBuilder {
         }
     }
     calcRelativeHeight(x, y) {
-        let neighbours = this.surface.getNeighbours(x, y);
+        const neighbours = this.surface.getNeighbours(x, y);
         let relativeHeight = 0;
-        let centre = this.surface.at(x, y);
-        for (let neighbour of neighbours){
+        const centre = this.surface.at(x, y);
+        for (const neighbour of neighbours){
             console.assert(neighbour.terrace >= 0, "Found neighbour with negative terrace!", neighbour.terrace);
             const height = centre.terrace - neighbour.terrace;
             relativeHeight = Math.max(height, relativeHeight);
@@ -3671,12 +3669,12 @@ class TerrainBuilder {
         return relativeHeight;
     }
     addRain(towards, water, waterLine) {
-        let rain = new Rain(this.surface, waterLine, water, towards);
+        const rain = new Rain(this.surface, waterLine, water, towards);
         rain.run();
-        let blurred = gaussianBlur(rain.moistureGrid, this.surface.width, this.surface.depth);
+        const blurred = gaussianBlur(rain.moistureGrid, this.surface.width, this.surface.depth);
         for(let y = 0; y < this.surface.depth; y++){
             for(let x = 0; x < this.surface.width; x++){
-                let surface = this.surface.at(x, y);
+                const surface = this.surface.at(x, y);
                 surface.moisture = blurred[y][x];
             }
         }
@@ -3684,11 +3682,11 @@ class TerrainBuilder {
     setBiomes() {
         for(let y = 0; y < this.surface.depth; y++){
             for(let x = 0; x < this.surface.width; x++){
-                let surface = this.surface.at(x, y);
+                const surface = this.surface.at(x, y);
                 let biome = Biome.Water;
                 let terrain = TerrainType.Water;
-                let moisturePercent = Math.min(1, surface.moisture / 6);
-                let moistureScaled = Math.floor(5 * moisturePercent);
+                const moisturePercent = Math.min(1, surface.moisture / 6);
+                const moistureScaled = Math.floor(5 * moisturePercent);
                 if (surface.height <= this.config.waterLine) {
                     biome = Biome.Water;
                     terrain = TerrainType.Water;
@@ -3766,10 +3764,10 @@ class TerrainBuilder {
     setFeatures() {
         for(let y = 0; y < this.surface.depth; y++){
             for(let x = 0; x < this.surface.width; x++){
-                let surface = this.surface.at(x, y);
+                const surface = this.surface.at(x, y);
                 if (Terrain.isFlat(surface.shape)) {
-                    let neighbours = this.surface.getNeighbours(surface.x, surface.y);
-                    for (let neighbour of neighbours){
+                    const neighbours = this.surface.getNeighbours(surface.x, surface.y);
+                    for (const neighbour of neighbours){
                         if (neighbour.biome != Biome.Water) {
                             continue;
                         }
@@ -4013,7 +4011,7 @@ class ContextImpl {
     _updateables = new Array();
     _movables = new Array();
     _controllers = new Array();
-    _octree;
+    _spatialGraph;
     _totalEntities = 0;
     static reset() {
         PhysicalEntity.reset();
@@ -4021,26 +4019,29 @@ class ContextImpl {
         SpriteSheet.reset();
     }
     constructor(worldDims){
-        this._octree = new Octree(worldDims);
-        CollisionDetector.init(this._octree);
+        this._spatialGraph = new Octree(worldDims);
+        CollisionDetector.init(this._spatialGraph);
     }
     get scene() {
         return this._scene;
+    }
+    set scene(s) {
+        this._scene = s;
     }
     get entities() {
         return this._entities;
     }
     get bounds() {
-        return this._octree.bounds;
+        return this._spatialGraph.bounds;
     }
     get spatial() {
-        return this._octree;
+        return this._spatialGraph;
     }
     get controllers() {
         return this._controllers;
     }
     verify() {
-        return this.entities.length == PhysicalEntity.getNumEntities() && this.entities.length == this._totalEntities && this._octree.verify(this.entities) && this.scene.verifyRenderer(this.entities);
+        return this.entities.length == PhysicalEntity.getNumEntities() && this.entities.length == this._totalEntities && this.spatial.verify(this.entities) && this.scene.verifyRenderer(this.entities);
     }
     addOnscreenRenderer(canvas, perspective) {
         switch(perspective){
@@ -4048,18 +4049,16 @@ class ContextImpl {
                 console.error("unhandled perspective");
                 break;
             case Perspective.TrueIsometric:
-                this._scene = new OnscreenSceneRenderer(canvas, new TrueIsometric());
+                this.scene = new OnscreenSceneRenderer(canvas, new TrueIsometric());
                 break;
             case Perspective.TwoByOneIsometric:
-                this._scene = new OnscreenSceneRenderer(canvas, new TwoByOneIsometric());
+                this.scene = new OnscreenSceneRenderer(canvas, new TwoByOneIsometric());
                 break;
         }
-        this._entities.forEach((entity)=>this._scene.insertEntity(entity));
-        let scene = this._scene;
-        let spatialGraph = this._octree;
-        this._movables.forEach((entity)=>entity.addEventListener(EntityEvent.Moving, function() {
-                spatialGraph.update(entity);
-                scene.updateEntity(entity);
+        this.entities.forEach((entity)=>this.scene.insertEntity(entity));
+        this._movables.forEach((entity)=>entity.addEventListener(EntityEvent.Moving, ()=>{
+                this.spatial.update(entity);
+                this.scene.updateEntity(entity);
             }));
     }
     addOffscreenRenderer(perspective) {
@@ -4068,36 +4067,34 @@ class ContextImpl {
                 console.error("unhandled perspective");
                 break;
             case Perspective.TrueIsometric:
-                this._scene = new OffscreenSceneRenderer(new TrueIsometric());
+                this.scene = new OffscreenSceneRenderer(new TrueIsometric());
                 break;
             case Perspective.TwoByOneIsometric:
-                this._scene = new OffscreenSceneRenderer(new TwoByOneIsometric());
+                this.scene = new OffscreenSceneRenderer(new TwoByOneIsometric());
                 break;
         }
-        this._entities.forEach((entity)=>this._scene.insertEntity(entity));
-        let scene = this._scene;
-        let spatialGraph = this._octree;
-        this._movables.forEach((entity)=>entity.addEventListener(EntityEvent.Moving, function() {
-                spatialGraph.update(entity);
-                scene.updateEntity(entity);
+        this.entities.forEach((entity)=>this.scene.insertEntity(entity));
+        this._movables.forEach((entity)=>entity.addEventListener(EntityEvent.Moving, ()=>{
+                this.spatial.update(entity);
+                this.scene.updateEntity(entity);
             }));
     }
     addController(controller) {
         this._controllers.push(controller);
     }
     addEntity(entity) {
-        if (this._entities.length == 0) {
+        if (this.entities.length == 0) {
             if (entity.id != 0) {
                 console.error("Adding entity with unexpected id:", entity.id);
             }
-        } else if (this._entities.length > 0) {
-            if (entity.id != this._entities[this._entities.length - 1].id + 1) {
+        } else if (this.entities.length > 0) {
+            if (entity.id != this.entities[this.entities.length - 1].id + 1) {
                 console.error("Adding entity with unexpected id:", entity.id);
             }
         }
-        this._entities.push(entity);
-        this._octree.insert(entity);
-        this._scene.insertEntity(entity);
+        this.entities.push(entity);
+        this.spatial.insert(entity);
+        this.scene.insertEntity(entity);
         this._totalEntities++;
     }
     addUpdateableEntity(entity) {
@@ -4105,11 +4102,9 @@ class ContextImpl {
     }
     addMovableEntity(entity) {
         this._movables.push(entity);
-        let spatialGraph = this._octree;
-        let scene = this._scene;
-        entity.addEventListener(EntityEvent.Moving, function() {
-            spatialGraph.update(entity);
-            scene.updateEntity(entity);
+        entity.addEventListener(EntityEvent.Moving, ()=>{
+            this.spatial.update(entity);
+            this.scene.updateEntity(entity);
         });
     }
     update(camera) {
@@ -4125,13 +4120,13 @@ class ContextImpl {
     }
 }
 function createContext(canvas, worldDims, perspective) {
-    let context = new ContextImpl(worldDims);
+    const context = new ContextImpl(worldDims);
     context.addOnscreenRenderer(canvas, perspective);
     return context;
 }
 function createTestContext(worldDims, perspective) {
     ContextImpl.reset();
-    let context = new ContextImpl(worldDims);
+    const context = new ContextImpl(worldDims);
     context.addOffscreenRenderer(perspective);
     return context;
 }
@@ -4179,6 +4174,17 @@ class Camera {
     get location() {
         return this._surfaceLocation;
     }
+    set location(newLocation) {
+        if (newLocation == undefined) {
+            console.log("undefined camera surface location");
+            return;
+        }
+        const newPoint = this._scene.graph.getDrawCoord(newLocation);
+        this.x = newPoint.x;
+        this.y = newPoint.y;
+        this._handler.post(InputEvent.CameraMove);
+        this._surfaceLocation = newLocation;
+    }
     set x(x) {
         this._lowerX = x - Math.floor(this.width / 2);
         this._upperX = x + Math.floor(this.width / 2);
@@ -4199,17 +4205,6 @@ class Camera {
     removeEventListener(event, callback) {
         this._handler.removeEventListener(event, callback);
     }
-    set location(newLocation) {
-        if (newLocation == undefined) {
-            console.log("undefined camera surface location");
-            return;
-        }
-        const newPoint = this._scene.graph.getDrawCoord(newLocation);
-        this.x = newPoint.x;
-        this.y = newPoint.y;
-        this._handler.post(InputEvent.CameraMove);
-        this._surfaceLocation = newLocation;
-    }
     _scene;
 }
 class MouseCamera extends Camera {
@@ -4221,7 +4216,7 @@ class MouseCamera extends Camera {
             }
         });
         canvas.addEventListener('touchstart', (e)=>{
-            let touch = e.touches[0];
+            const touch = e.touches[0];
             this.location = scene.getLocationAt(touch.pageX, touch.pageY, this);
         });
     }
@@ -4230,9 +4225,8 @@ class TrackerCamera extends Camera {
     constructor(scene, width, height, movable){
         super(scene, width, height);
         this.location = movable.centre;
-        var camera = this;
-        movable.addEventListener(EntityEvent.Moving, function() {
-            camera.location = movable.centre;
+        movable.addEventListener(EntityEvent.Moving, ()=>{
+            this.location = movable.centre;
         });
     }
 }
@@ -4256,9 +4250,9 @@ class MoveAction extends Action {
         super(actor);
     }
     obstructed(from, to) {
-        let bounds = this._actor.bounds;
-        let path = to.vec_diff(from);
-        let area = new BoundingCuboid(to, bounds.dimensions);
+        const bounds = this._actor.bounds;
+        const path = to.vec_diff(from);
+        const area = new BoundingCuboid(to, bounds.dimensions);
         area.insert(bounds);
         return CollisionDetector.detectInArea(this._actor, path, area);
     }
@@ -4299,16 +4293,16 @@ class MoveDestination extends MoveAction {
         this._destination = _destination;
         this.destination = _destination;
     }
-    get destination() {
-        return this._destination;
-    }
     set speed(speed) {
         this._step = speed;
     }
+    get destination() {
+        return this._destination;
+    }
     set destination(destination) {
         this._destination = destination;
-        let currentPos = this.actor.bounds.minLocation;
-        let maxD = destination.vec_diff(currentPos);
+        const currentPos = this.actor.bounds.minLocation;
+        const maxD = destination.vec_diff(currentPos);
         console.assert(maxD.x == 0 || maxD.y == 0 || maxD.z == 0, "can only change distance along two axes simultaneously");
         let dx = 0;
         let dy = 0;
@@ -4340,9 +4334,9 @@ class MoveDestination extends MoveAction {
                 adjacent = maxD.z > 0 ? maxD.x : maxD.z;
                 opposite = maxD.z > 0 ? maxD.z : maxD.x;
             }
-            let theta = Math.atan(opposite / adjacent) * 180 / Math.PI;
-            let oppDiff = Math.sin(theta) * this._step;
-            let adjDiff = Math.cos(theta) * this._step;
+            const theta = Math.atan(opposite / adjacent) * 180 / Math.PI;
+            const oppDiff = Math.sin(theta) * this._step;
+            const adjDiff = Math.cos(theta) * this._step;
             if (maxD.z == 0) {
                 dx = adjacent == maxD.y ? oppDiff : adjDiff;
                 dy = adjacent == maxD.y ? adjDiff : oppDiff;
@@ -4358,10 +4352,10 @@ class MoveDestination extends MoveAction {
     }
     perform() {
         console.log("perform action");
-        let bounds = this.actor.bounds;
-        let location = bounds.minLocation;
-        let maxD = this.destination.vec_diff(location);
-        let minD = maxD.absMin(this._d);
+        const bounds = this.actor.bounds;
+        const location = bounds.minLocation;
+        const maxD = this.destination.vec_diff(location);
+        const minD = maxD.absMin(this._d);
         this.actor.updatePosition(minD);
         this.actor.postEvent(EntityEvent.Moving);
         return bounds.minLocation.isSameAsRounded(this.destination);
@@ -4387,7 +4381,7 @@ class Navigate extends Action {
         if (this._waypoints.length == 0) {
             return true;
         }
-        let finishedStep = this._currentStep.perform();
+        const finishedStep = this._currentStep.perform();
         if (!finishedStep) {
             return false;
         }
@@ -4404,12 +4398,12 @@ class Navigate extends Action {
         if (this._index == this._waypoints.length) {
             return true;
         }
-        let nextLocation = this._waypoints[this._index];
+        const nextLocation = this._waypoints[this._index];
         this._currentStep = new MoveDestination(this._actor, this._step, nextLocation);
         return false;
     }
     findPath() {
-        let path = new Array();
+        const path = new Array();
         return path;
     }
     _step;

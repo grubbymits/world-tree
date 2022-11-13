@@ -2,8 +2,7 @@ import { PhysicalEntity,
          MovableEntity } from "./entity.ts"
 import { Terrain } from "./terrain.ts"
 import { EntityEvent } from "./events.ts"
-import { SceneGraph,
-         SceneRenderer,
+import { SceneRenderer,
          OnscreenSceneRenderer,
          OffscreenSceneRenderer,
          Perspective,
@@ -35,8 +34,8 @@ export class ContextImpl implements Context {
   private _updateables: Array<PhysicalEntity> = new Array<PhysicalEntity>();
   private _movables: Array<MovableEntity> = new Array<MovableEntity>();
   private _controllers: Array<Controller> = new Array<Controller>();
-  private _octree: Octree;
-  private _totalEntities: number = 0;
+  private _spatialGraph: Octree;
+  private _totalEntities = 0;
 
   static reset(): void {
     PhysicalEntity.reset();
@@ -45,20 +44,21 @@ export class ContextImpl implements Context {
   }
 
   constructor(worldDims: Dimensions) {
-    this._octree = new Octree(worldDims);
-    CollisionDetector.init(this._octree);
+    this._spatialGraph = new Octree(worldDims);
+    CollisionDetector.init(this._spatialGraph);
   }
 
   get scene(): SceneRenderer { return this._scene; }
+  set scene(s: SceneRenderer) { this._scene = s; }
   get entities(): Array<PhysicalEntity> { return this._entities; }
-  get bounds(): BoundingCuboid { return this._octree.bounds; }
-  get spatial(): Octree { return this._octree; }
+  get bounds(): BoundingCuboid { return this._spatialGraph.bounds; }
+  get spatial(): Octree { return this._spatialGraph; }
   get controllers(): Array<Controller> { return this._controllers; }
 
   verify(): boolean {
     return this.entities.length == PhysicalEntity.getNumEntities() &&
            this.entities.length == this._totalEntities &&
-           this._octree.verify(this.entities) &&
+           this.spatial.verify(this.entities) &&
            this.scene.verifyRenderer(this.entities);
   }
 
@@ -69,19 +69,17 @@ export class ContextImpl implements Context {
       console.error("unhandled perspective");
       break;
     case Perspective.TrueIsometric:
-      this._scene = new OnscreenSceneRenderer(canvas, new TrueIsometric());
+      this.scene = new OnscreenSceneRenderer(canvas, new TrueIsometric());
       break;
     case Perspective.TwoByOneIsometric:
-      this._scene = new OnscreenSceneRenderer(canvas, new TwoByOneIsometric());
+      this.scene = new OnscreenSceneRenderer(canvas, new TwoByOneIsometric());
       break;
     }
-    this._entities.forEach(entity => this._scene.insertEntity(entity));
-    let scene = this._scene;
-    let spatialGraph = this._octree;
+    this.entities.forEach(entity => this.scene.insertEntity(entity));
     this._movables.forEach(entity => 
-      entity.addEventListener(EntityEvent.Moving, function() {
-        spatialGraph.update(entity);
-        scene.updateEntity(entity);
+      entity.addEventListener(EntityEvent.Moving, () => {
+        this.spatial.update(entity);
+        this.scene.updateEntity(entity);
     }));
   }
 
@@ -91,19 +89,17 @@ export class ContextImpl implements Context {
       console.error("unhandled perspective");
       break;
     case Perspective.TrueIsometric:
-      this._scene = new OffscreenSceneRenderer(new TrueIsometric());
+      this.scene = new OffscreenSceneRenderer(new TrueIsometric());
       break;
     case Perspective.TwoByOneIsometric:
-      this._scene = new OffscreenSceneRenderer(new TwoByOneIsometric());
+      this.scene = new OffscreenSceneRenderer(new TwoByOneIsometric());
       break;
     }
-    this._entities.forEach(entity => this._scene.insertEntity(entity));
-    let scene = this._scene;
-    let spatialGraph = this._octree;
+    this.entities.forEach(entity => this.scene.insertEntity(entity));
     this._movables.forEach(entity => 
-      entity.addEventListener(EntityEvent.Moving, function() {
-        spatialGraph.update(entity);
-        scene.updateEntity(entity);
+      entity.addEventListener(EntityEvent.Moving, () => {
+        this.spatial.update(entity);
+        this.scene.updateEntity(entity);
     }));
   }
 
@@ -112,18 +108,18 @@ export class ContextImpl implements Context {
   }
 
   addEntity(entity: PhysicalEntity): void {
-    if (this._entities.length == 0) {
+    if (this.entities.length == 0) {
       if (entity.id != 0) {
         console.error("Adding entity with unexpected id:", entity.id);
       }
-    } else if (this._entities.length > 0) {
-      if (entity.id != this._entities[this._entities.length - 1].id + 1) {
+    } else if (this.entities.length > 0) {
+      if (entity.id != this.entities[this.entities.length - 1].id + 1) {
         console.error("Adding entity with unexpected id:", entity.id);
       }
     }
-    this._entities.push(entity);
-    this._octree.insert(entity);
-    this._scene.insertEntity(entity);
+    this.entities.push(entity);
+    this.spatial.insert(entity);
+    this.scene.insertEntity(entity);
     this._totalEntities++;
   }
 
@@ -133,11 +129,9 @@ export class ContextImpl implements Context {
 
   addMovableEntity(entity: MovableEntity): void {
     this._movables.push(entity);
-    let spatialGraph = this._octree;
-    let scene = this._scene;
-    entity.addEventListener(EntityEvent.Moving, function() {
-      spatialGraph.update(entity);
-      scene.updateEntity(entity);
+    entity.addEventListener(EntityEvent.Moving, () => {
+      this.spatial.update(entity);
+      this.scene.updateEntity(entity);
     });
   }
 
@@ -160,7 +154,7 @@ export class ContextImpl implements Context {
 export function createContext(canvas: HTMLCanvasElement,
                               worldDims: Dimensions,
                               perspective: Perspective): Context {
-  let context = new ContextImpl(worldDims);
+  const context = new ContextImpl(worldDims);
   context.addOnscreenRenderer(canvas, perspective);
   return context;
 }
@@ -168,7 +162,7 @@ export function createContext(canvas: HTMLCanvasElement,
 export function createTestContext(worldDims: Dimensions,
                                   perspective: Perspective): Context {
   ContextImpl.reset();
-  let context = new ContextImpl(worldDims);
+  const context = new ContextImpl(worldDims);
   context.addOffscreenRenderer(perspective);
   return context;
 }
