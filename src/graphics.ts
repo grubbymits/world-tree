@@ -2,8 +2,8 @@ import { Point2D } from "./geometry.ts"
 import { Navigation,
          Direction } from "./navigation.ts"
 
-export var DummySpriteSheet = {
-  addForValidation: function(sprite: Sprite): boolean { return true; }
+export const DummySpriteSheet = {
+  addForValidation: function(_sprite: Sprite): boolean { return true; }
 }
 
 export class SpriteSheet {
@@ -19,7 +19,7 @@ export class SpriteSheet {
 
   private _image: HTMLImageElement;
   private _canvas: HTMLCanvasElement;
-  private _loaded: boolean = false;
+  private _loaded = false;
   private _toValidate: Array<Sprite> = new Array<Sprite>();
 
   constructor(name: string) {
@@ -38,7 +38,7 @@ export class SpriteSheet {
       this.canvas.height = this.height;
       this.canvas.getContext('2d')!.drawImage(this.image, 0, 0, this.width, this.height);
       this.loaded = true;
-      for (let sprite of this._toValidate) {
+      for (const sprite of this._toValidate) {
         sprite.validate();
       }
     };
@@ -54,7 +54,7 @@ export class SpriteSheet {
   set canvas(c: HTMLCanvasElement) { this._canvas = c; }
 
   isTransparentAt(x: number, y: number): boolean {
-    let data = this.canvas.getContext('2d')!.getImageData(x, y, 1, 1).data;
+    const data = this.canvas.getContext('2d')!.getImageData(x, y, 1, 1).data;
     return data[3] == 0;
   }
 
@@ -136,7 +136,7 @@ export class Sprite {
 export function generateSprites(sheet: SpriteSheet, width: number, height: number,
                                 xBegin: number, yBegin: number,
                                 columns: number, rows: number): Array<Sprite> {
-  var sprites = new Array<Sprite>();
+  const sprites = new Array<Sprite>();
   const xEnd = xBegin + columns;
   const yEnd = yBegin + rows;
   for (let y = yBegin; y < yEnd; y++) {
@@ -187,7 +187,7 @@ export function generateStaticGraphics(
   xBegin: number, yBegin: number,
   columns: number, rows: number): Array<StaticGraphicComponent> {
 
-  var graphics = new Array<StaticGraphicComponent>();
+  const graphics = new Array<StaticGraphicComponent>();
   const xEnd = xBegin + columns;
   const yEnd = yBegin + rows;
   for (let y = yBegin; y < yEnd; y++) {
@@ -200,14 +200,14 @@ export function generateStaticGraphics(
 }
 
 export class AnimatedGraphicComponent extends GraphicComponent {
-  protected _nextUpdate: number = 0;
-  protected _currentSpriteIdx: number = 0;
+  protected _nextUpdate = 0;
+  protected _currentSpriteIdx = 0;
   protected _spriteIds: Array<number> = new Array<number>();
 
   constructor(sprites: Array<Sprite>,
               protected readonly _interval: number) {
     super(sprites[0].id);
-    for (let i in sprites) {
+    for (const i in sprites) {
       this._spriteIds.push(sprites[i].id);
     }
     this._nextUpdate = Date.now() + _interval;
@@ -230,7 +230,7 @@ export class AnimatedGraphicComponent extends GraphicComponent {
 
 export class OssilateGraphicComponent extends AnimatedGraphicComponent {
 
-  private _increase: boolean = true;
+  private _increase = true;
 
   constructor(sprites: Array<Sprite>, interval: number) {
     super(sprites, interval);
@@ -305,7 +305,7 @@ export class DirectionalGraphicComponent extends GraphicComponent {
 }
 
 export class AnimatedDirectionalGraphicComponent extends GraphicComponent {
-  protected _stationary: boolean = true;
+  protected _stationary = true;
   protected _direction: Direction = Direction.North;
 
   constructor(protected _staticGraphics: Map<Direction, GraphicComponent>,
@@ -314,8 +314,8 @@ export class AnimatedDirectionalGraphicComponent extends GraphicComponent {
   }
 
   get stationary(): boolean { return this._stationary; }
-  get direction(): Direction { return this._direction; }
   set stationary(stationary: boolean) { this._stationary = stationary; }
+  get direction(): Direction { return this._direction; }
   set direction(direction: Direction) {
     if (this._staticGraphics.has(direction) && this._movementGraphics.has(direction)) {
       this._direction = direction;

@@ -25,8 +25,8 @@ export class Vector2D {
   }
 
   angle(other: Vector2D): number {
-    let x = this.x * other.y - other.x * this.y;
-    let y = this.dot(other);
+    const x = this.x * other.y - other.x * this.y;
+    const y = this.dot(other);
     return Math.atan2(x, y);
   }
 }
@@ -78,8 +78,8 @@ export class Segment2D {
   }
 
   add(diff: Vector2D): Segment2D {
-    let p0 = this.p0.add(diff);
-    let p1 = this.p1.add(diff);
+    const p0 = this.p0.add(diff);
+    const p1 = this.p1.add(diff);
     return new Segment2D(p0, p1);
   }
 
@@ -239,8 +239,8 @@ export class Vector3D {
 
   angle(other: Vector3D): number {
     // https://www.jwwalker.com/pages/angle-between-vectors.html
-    let x = this.cross(other).mag();
-    let y = this.dot(other);
+    const x = this.cross(other).mag();
+    const y = this.dot(other);
     return Math.atan2(x, y);
   }
 
@@ -338,8 +338,8 @@ class TriangleFace3D extends Face3D {
 
   constructor(vertex: Vertex3D) {
     super(vertex);
-    let u = this.vertex.u;
-    let v = this.vertex.v;
+    const u = this.vertex.u;
+    const v = this.vertex.v;
     this._uDotv = u.dot(v);
     this._uDotu = u.dot(u);
     this._vDotv = v.dot(v);
@@ -356,13 +356,13 @@ class TriangleFace3D extends Face3D {
   intersects(i: Point3D): boolean {
     // Given that a segment intersects the plane, at i, of this face, calculate
     // whether the intersection point is within the triangle.
-    let w = i.vec_diff(this.vertex.point);
-    let u = this.vertex.u;
-    let v = this.vertex.v;
-    let wDotv = w.dot(v);
-    let wDotu = w.dot(u);
-    let s1 = (this._uDotv * wDotv - this._vDotv * wDotu) * this._denominator;
-    let t1 = (this._uDotv * wDotu - this._uDotu * wDotv) * this._denominator;
+    const w = i.vec_diff(this.vertex.point);
+    const u = this.vertex.u;
+    const v = this.vertex.v;
+    const wDotv = w.dot(v);
+    const wDotu = w.dot(u);
+    const s1 = (this._uDotv * wDotv - this._vDotv * wDotu) * this._denominator;
+    const t1 = (this._uDotv * wDotu - this._uDotu * wDotv) * this._denominator;
     return s1 >= 0 && t1 >= 0 && s1 + t1 <= 1;
   }
 }
@@ -431,18 +431,18 @@ export class Geometry {
   get name(): string { return this._name; }
 
   transform(d: Vector3D): void {
-    for (let face of this._faces) {
+    for (const face of this._faces) {
       face.transform(d);
     }
   }
 
   obstructs(begin: Point3D, end: Point3D): IntersectInfo|null {
-    for (let face of this._faces) {
-      let i = face.intersectsPlane(begin, end);
+    for (const face of this._faces) {
+      const i = face.intersectsPlane(begin, end);
       if (i != null && face.intersects(i)) {
-        let v0 = i.vec_diff(begin);
-        let v1 = face.plane.normal;
-        let theta = v0.angle(v1);
+        const v0 = i.vec_diff(begin);
+        const v1 = face.plane.normal;
+        const theta = v0.angle(v1);
         return new IntersectInfo(face, begin, end, i, theta);
       }
     }
@@ -455,7 +455,7 @@ export class NoGeometry extends Geometry {
     super(bounds);
     this._name = "NoGeometry";
   }
-  obstructs(begin: Point3D, end: Point3D): IntersectInfo|null { return null; }
+  obstructs(_begin: Point3D, _end: Point3D): IntersectInfo|null { return null; }
 }
 
 export class CuboidGeometry extends Geometry {
@@ -484,33 +484,33 @@ export class CuboidGeometry extends Geometry {
     ];
 
     // left
-    let v0 = new Vertex3D(p[2], p[6], p[0]);
-    let v1 = new Vertex3D(p[1], p[0], p[6]);
+    const v0 = new Vertex3D(p[2], p[6], p[0]);
+    const v1 = new Vertex3D(p[1], p[0], p[6]);
     this._faces.push(new QuadFace3D(v0, v1));
 
     // front
-    let v2 = new Vertex3D(p[4], p[7], p[2]);
-    let v3 = new Vertex3D(p[6], p[2], p[7]);
+    const v2 = new Vertex3D(p[4], p[7], p[2]);
+    const v3 = new Vertex3D(p[6], p[2], p[7]);
     this._faces.push(new QuadFace3D(v2, v3));
 
     // right
-    let v4 = new Vertex3D(p[3], p[5], p[4]);
-    let v5 = new Vertex3D(p[7], p[4], p[5]);
+    const v4 = new Vertex3D(p[3], p[5], p[4]);
+    const v5 = new Vertex3D(p[7], p[4], p[5]);
     this._faces.push(new QuadFace3D(v4, v5));
 
     // top
-    let v6 = new Vertex3D(p[5], p[1], p[7]);
-    let v7 = new Vertex3D(p[6], p[7], p[1]);
+    const v6 = new Vertex3D(p[5], p[1], p[7]);
+    const v7 = new Vertex3D(p[6], p[7], p[1]);
     this._faces.push(new QuadFace3D(v6, v7));
 
     // bottom
-    let v8 = new Vertex3D(p[0], p[3], p[2]);
-    let v9 = new Vertex3D(p[4], p[2], p[3]);
+    const v8 = new Vertex3D(p[0], p[3], p[2]);
+    const v9 = new Vertex3D(p[4], p[2], p[3]);
     this._faces.push(new QuadFace3D(v8, v9));
 
     // back
-    let v10 = new Vertex3D(p[0], p[1], p[3]);
-    let v11 = new Vertex3D(p[5], p[3], p[1]);
+    const v10 = new Vertex3D(p[0], p[1], p[3]);
+    const v11 = new Vertex3D(p[5], p[3], p[1]);
     this._faces.push(new QuadFace3D(v10, v11));
   }
 }
@@ -554,6 +554,7 @@ export class RampUpWestGeometry extends Geometry {
     // bottom
     const v4 = new Vertex3D(p[3], p[1], p[2]);
     const v5 = new Vertex3D(p[0], p[2], p[1]);
+    this._faces.push(new QuadFace3D(v4, v5));
 
     // back
     this._faces.push(new TriangleFace3D(new Vertex3D(p[0], p[4], p[2])));

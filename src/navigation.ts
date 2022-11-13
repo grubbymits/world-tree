@@ -43,8 +43,8 @@ export class Navigation {
   }
 
   static getVector2D(direction: Direction): Vector2D {
-    let xDiff: number = 0;
-    let yDiff: number = 0;
+    let xDiff = 0;
+    let yDiff = 0;
     switch(direction) {
     default:
       console.error("unhandled direction");
@@ -83,7 +83,7 @@ export class Navigation {
 
   static getAdjacentCoord(p: Point2D,
                           direction: Direction): Point2D {
-    let v = this.getVector2D(direction);
+    const v = this.getVector2D(direction);
     return p.add(v);
   }
 
@@ -92,11 +92,11 @@ export class Navigation {
   }
 
   static getDirectionFromVector(w: Vector2D): Direction {
-    let mag = w.mag();
-    let u = new Vector2D(0, -mag);  // 'north'
+    const mag = w.mag();
+    const u = new Vector2D(0, -mag);  // 'north'
     let theta = 180 * u.angle(w) / Math.PI;
     if (theta < 0) {
-      let rotate = 180 + theta;
+      const rotate = 180 + theta;
       theta = 180 + rotate;
     }
     const direction = Math.round(theta / 45);
@@ -139,14 +139,14 @@ export class PathFinder {
     for (let y = 0; y < grid.depth; y++) {
       this.graph[y] = new Array<PathNode>();
       for (let x = 0; x < grid.width; x++) {
-        let centre = grid.getSurfaceTerrainAt(x, y)!;
+        const centre = grid.getSurfaceTerrainAt(x, y)!;
         this.addNode(x, y, centre);
       }
     }
 
     for (let y = 0; y < grid.depth; y++) {
       for (let x = 0; x < grid.width; x++) {
-        let centre = grid.getSurfaceTerrainAt(x, y)!;
+        const centre = grid.getSurfaceTerrainAt(x, y)!;
         this.addNeighbours(centre, grid);
       }
     }
@@ -163,11 +163,11 @@ export class PathFinder {
   }
 
   addNeighbours(centre: Terrain, grid: TerrainGrid): void {
-    let neighbours = this.getAccessibleNeighbours(centre, grid);
-    let centreNode = this.getNode(centre.x, centre.y);
-    for (let neighbour of neighbours) {
-      let cost = this.getNeighbourCost(centre, neighbour);
-      let succ = this.getNode(neighbour.x, neighbour.y);
+    const neighbours = this.getAccessibleNeighbours(centre, grid);
+    const centreNode = this.getNode(centre.x, centre.y);
+    for (const neighbour of neighbours) {
+      const cost = this.getNeighbourCost(centre, neighbour);
+      const succ = this.getNode(neighbour.x, neighbour.y);
       centreNode.addSuccessor(succ, cost);
     }
   }
@@ -187,19 +187,19 @@ export class PathFinder {
     // south,     RampUpNorth
     // west,      RampUpEast
 
-    let neighbours = grid.getNeighbours(centre);
-    let centrePoint: Point2D = new Point2D(centre.x, centre.y);
+    const neighbours = grid.getNeighbours(centre);
+    const centrePoint: Point2D = new Point2D(centre.x, centre.y);
     return neighbours.filter(function(to: Terrain) {
       console.assert(Math.abs(centre.z - to.z) <= 1,
                      "can only handle neighbours separated by 1 terrace max");
 
-      let toPoint: Point2D = new Point2D(to.x, to.y);
-      let direction: Direction = Navigation.getDirectionFromPoints(centrePoint, toPoint);
+      const toPoint: Point2D = new Point2D(to.x, to.y);
+      const direction: Direction = Navigation.getDirectionFromPoints(centrePoint, toPoint);
       console.assert(direction == Direction.North ||
                      direction == Direction.East ||
                      direction == Direction.South ||
                      direction == Direction.West);
-      let oppositeDir: Direction = Navigation.getOppositeDirection(direction);
+      const oppositeDir: Direction = Navigation.getOppositeDirection(direction);
       if (to.z == centre.z) {
         return true;
       } else if (to.z > centre.z) {
@@ -214,7 +214,7 @@ export class PathFinder {
   getNeighbourCost(centre: Terrain, to: Terrain): number {
     // If a horizontal, or vertical, move cost 1 then a diagonal move would be
     // 1.444... So scale by 2 and round. Double the cost of changing height.
-    let cost: number = centre.x == to.x || centre.y == to.y ? 2 : 3;
+    const cost = centre.x == to.x || centre.y == to.y ? 2 : 3;
     if (Terrain.isFlat(centre.shape) && Terrain.isFlat(to.shape)) {
       return cost;
     }
@@ -222,7 +222,7 @@ export class PathFinder {
   }
   
   isAccessible(centre: PathNode, dx: number, dy: number): boolean {
-    let succ: PathNode = this.getNode(centre.x + dx, centre.y + dy);
+    const succ: PathNode = this.getNode(centre.x + dx, centre.y + dy);
     return centre.hasSuccessor(succ);
   }
 

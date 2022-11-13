@@ -29,8 +29,8 @@ class Vector2D {
         return this.dot(this);
     }
     angle(other) {
-        let x = this.x * other.y - other.x * this.y;
-        let y = this.dot(other);
+        const x = this.x * other.y - other.x * this.y;
+        const y = this.dot(other);
         return Math.atan2(x, y);
     }
     _x;
@@ -82,8 +82,8 @@ class Segment2D {
         return p.x <= Math.max(this.p0.x, this.p1.x) && p.x >= Math.min(this.p0.x, this.p1.x) && p.y <= Math.max(this.p0.y, this.p1.y) && p.y >= Math.min(this.p0.y, this.p1.y);
     }
     add(diff) {
-        let p0 = this.p0.add(diff);
-        let p1 = this.p1.add(diff);
+        const p0 = this.p0.add(diff);
+        const p1 = this.p1.add(diff);
         return new Segment2D(p0, p1);
     }
     on(p) {
@@ -224,8 +224,8 @@ class Vector3D {
         return Math.sqrt(this.dot(this));
     }
     angle(other) {
-        let x = this.cross(other).mag();
-        let y = this.dot(other);
+        const x = this.cross(other).mag();
+        const y = this.dot(other);
         return Math.atan2(x, y);
     }
     absMin(other) {
@@ -315,8 +315,8 @@ class TriangleFace3D extends Face3D {
     _denominator;
     constructor(vertex){
         super(vertex);
-        let u = this.vertex.u;
-        let v = this.vertex.v;
+        const u = this.vertex.u;
+        const v = this.vertex.v;
         this._uDotv = u.dot(v);
         this._uDotu = u.dot(u);
         this._vDotv = v.dot(v);
@@ -331,13 +331,13 @@ class TriangleFace3D extends Face3D {
         this.vertex.transform(d);
     }
     intersects(i) {
-        let w = i.vec_diff(this.vertex.point);
-        let u = this.vertex.u;
-        let v = this.vertex.v;
-        let wDotv = w.dot(v);
-        let wDotu = w.dot(u);
-        let s1 = (this._uDotv * wDotv - this._vDotv * wDotu) * this._denominator;
-        let t1 = (this._uDotv * wDotu - this._uDotu * wDotv) * this._denominator;
+        const w = i.vec_diff(this.vertex.point);
+        const u = this.vertex.u;
+        const v = this.vertex.v;
+        const wDotv = w.dot(v);
+        const wDotu = w.dot(u);
+        const s1 = (this._uDotv * wDotv - this._vDotv * wDotu) * this._denominator;
+        const t1 = (this._uDotv * wDotu - this._uDotu * wDotv) * this._denominator;
         return s1 >= 0 && t1 >= 0 && s1 + t1 <= 1;
     }
 }
@@ -428,17 +428,17 @@ class Geometry {
         return this._name;
     }
     transform(d) {
-        for (let face of this._faces){
+        for (const face of this._faces){
             face.transform(d);
         }
     }
     obstructs(begin, end) {
-        for (let face of this._faces){
-            let i = face.intersectsPlane(begin, end);
+        for (const face of this._faces){
+            const i = face.intersectsPlane(begin, end);
             if (i != null && face.intersects(i)) {
-                let v0 = i.vec_diff(begin);
-                let v1 = face.plane.normal;
-                let theta = v0.angle(v1);
+                const v0 = i.vec_diff(begin);
+                const v1 = face.plane.normal;
+                const theta = v0.angle(v1);
                 return new IntersectInfo(face, begin, end, i, theta);
             }
         }
@@ -451,7 +451,7 @@ class NoGeometry extends Geometry {
         super(bounds);
         this._name = "NoGeometry";
     }
-    obstructs(begin, end) {
+    obstructs(_begin, _end) {
         return null;
     }
 }
@@ -469,23 +469,23 @@ class CuboidGeometry extends Geometry {
             this.bounds.maxLocation.sub(this.widthVec3D),
             this.bounds.maxLocation
         ];
-        let v0 = new Vertex3D(p[2], p[6], p[0]);
-        let v1 = new Vertex3D(p[1], p[0], p[6]);
+        const v0 = new Vertex3D(p[2], p[6], p[0]);
+        const v1 = new Vertex3D(p[1], p[0], p[6]);
         this._faces.push(new QuadFace3D(v0, v1));
-        let v2 = new Vertex3D(p[4], p[7], p[2]);
-        let v3 = new Vertex3D(p[6], p[2], p[7]);
+        const v2 = new Vertex3D(p[4], p[7], p[2]);
+        const v3 = new Vertex3D(p[6], p[2], p[7]);
         this._faces.push(new QuadFace3D(v2, v3));
-        let v4 = new Vertex3D(p[3], p[5], p[4]);
-        let v5 = new Vertex3D(p[7], p[4], p[5]);
+        const v4 = new Vertex3D(p[3], p[5], p[4]);
+        const v5 = new Vertex3D(p[7], p[4], p[5]);
         this._faces.push(new QuadFace3D(v4, v5));
-        let v6 = new Vertex3D(p[5], p[1], p[7]);
-        let v7 = new Vertex3D(p[6], p[7], p[1]);
+        const v6 = new Vertex3D(p[5], p[1], p[7]);
+        const v7 = new Vertex3D(p[6], p[7], p[1]);
         this._faces.push(new QuadFace3D(v6, v7));
-        let v8 = new Vertex3D(p[0], p[3], p[2]);
-        let v9 = new Vertex3D(p[4], p[2], p[3]);
+        const v8 = new Vertex3D(p[0], p[3], p[2]);
+        const v9 = new Vertex3D(p[4], p[2], p[3]);
         this._faces.push(new QuadFace3D(v8, v9));
-        let v10 = new Vertex3D(p[0], p[1], p[3]);
-        let v11 = new Vertex3D(p[5], p[3], p[1]);
+        const v10 = new Vertex3D(p[0], p[1], p[3]);
+        const v11 = new Vertex3D(p[5], p[3], p[1]);
         this._faces.push(new QuadFace3D(v10, v11));
     }
 }
@@ -508,8 +508,9 @@ class RampUpWestGeometry extends Geometry {
         const v2 = new Vertex3D(p[2], p[4], p[3]);
         const v3 = new Vertex3D(p[5], p[3], p[4]);
         this._faces.push(new QuadFace3D(v2, v3));
-        new Vertex3D(p[3], p[1], p[2]);
-        new Vertex3D(p[0], p[2], p[1]);
+        const v4 = new Vertex3D(p[3], p[1], p[2]);
+        const v5 = new Vertex3D(p[0], p[2], p[1]);
+        this._faces.push(new QuadFace3D(v4, v5));
         this._faces.push(new TriangleFace3D(new Vertex3D(p[0], p[4], p[2])));
     }
 }
@@ -640,12 +641,12 @@ class EventHandler {
         this._events.add(event);
     }
     service() {
-        for (let event of this._events){
+        for (const event of this._events){
             if (!this._listeners.has(event)) {
                 continue;
             }
-            let callbacks = this._listeners.get(event);
-            for (let callback of callbacks){
+            const callbacks = this._listeners.get(event);
+            for (const callback of callbacks){
                 callback();
             }
         }
@@ -655,8 +656,8 @@ class EventHandler {
         if (!this._listeners.has(event)) {
             this._listeners.set(event, new Array());
         } else {
-            let callbacks = this._listeners.get(event);
-            for(let i in callbacks){
+            const callbacks = this._listeners.get(event);
+            for(const i in callbacks){
                 if (callbacks[i] === callback) {
                     return;
                 }
@@ -668,7 +669,7 @@ class EventHandler {
         if (!this._listeners.has(event)) {
             return;
         }
-        let callbacks = this._listeners.get(event);
+        const callbacks = this._listeners.get(event);
         const index = callbacks.indexOf(callback, 0);
         if (index > -1) {
             callbacks.splice(index, 1);
@@ -749,9 +750,6 @@ class BoundingCuboid {
     get maxZ() {
         return this.maxLocation.z;
     }
-    get centre() {
-        return this._centre;
-    }
     get bottomCentre() {
         return this._bottomCentre;
     }
@@ -767,11 +765,14 @@ class BoundingCuboid {
     get dimensions() {
         return this._dimensions;
     }
+    get centre() {
+        return this._centre;
+    }
     set centre(centre) {
         this._centre = centre;
-        let width = this.width / 2;
-        let depth = this.depth / 2;
-        let height = this.height / 2;
+        const width = this.width / 2;
+        const depth = this.depth / 2;
+        const height = this.height / 2;
         let x = centre.x - width;
         let y = centre.y - depth;
         let z = centre.z - height;
@@ -806,12 +807,12 @@ class BoundingCuboid {
         if (this.containsBounds(other)) {
             return;
         }
-        let minX = other.minLocation.x < this.minLocation.x ? other.minLocation.x : this.minLocation.x;
-        let minY = other.minLocation.y < this.minLocation.y ? other.minLocation.y : this.minLocation.y;
-        let minZ = other.minLocation.z < this.minLocation.z ? other.minLocation.z : this.minLocation.z;
-        let maxX = other.maxLocation.x > this.maxLocation.x ? other.maxLocation.x : this.maxLocation.x;
-        let maxY = other.maxLocation.y > this.maxLocation.y ? other.maxLocation.y : this.maxLocation.y;
-        let maxZ = other.maxLocation.z > this.maxLocation.z ? other.maxLocation.z : this.maxLocation.z;
+        const minX = other.minLocation.x < this.minLocation.x ? other.minLocation.x : this.minLocation.x;
+        const minY = other.minLocation.y < this.minLocation.y ? other.minLocation.y : this.minLocation.y;
+        const minZ = other.minLocation.z < this.minLocation.z ? other.minLocation.z : this.minLocation.z;
+        const maxX = other.maxLocation.x > this.maxLocation.x ? other.maxLocation.x : this.maxLocation.x;
+        const maxY = other.maxLocation.y > this.maxLocation.y ? other.maxLocation.y : this.maxLocation.y;
+        const maxZ = other.maxLocation.z > this.maxLocation.z ? other.maxLocation.z : this.maxLocation.z;
         this._dimensions = new Dimensions(maxX - minX, maxY - minY, maxZ - minZ);
         const min = new Point3D(minX, minY, minZ);
         const max = new Point3D(maxX, maxY, maxZ);
@@ -898,16 +899,16 @@ class CollisionDetector {
             bounds.maxLocation.sub(widthVec3D),
             bounds.maxLocation
         ];
-        let misses = new Array();
+        const misses = new Array();
         const entities = this._spatialInfo.getEntities(area);
-        for (let entity of entities){
+        for (const entity of entities){
             if (entity.id == movable.id) {
                 continue;
             }
             const geometry = entity.geometry;
             for (const beginPoint of beginPoints){
                 const endPoint = beginPoint.add(path);
-                let intersectInfo = geometry.obstructs(beginPoint, endPoint);
+                const intersectInfo = geometry.obstructs(beginPoint, endPoint);
                 if (intersectInfo != null) {
                     const collision = new CollisionInfo(entity, true, intersectInfo);
                     this._collisionInfo.set(movable, collision);
@@ -939,8 +940,8 @@ class Gravity {
         if (this._force < 0) {
             const path = new Vector3D(0, 0, this._force);
             entities.forEach((movable)=>{
-                let bounds = movable.bounds;
-                let area = new BoundingCuboid(bounds.centre.add(path), bounds.dimensions);
+                const bounds = movable.bounds;
+                const area = new BoundingCuboid(bounds.centre.add(path), bounds.dimensions);
                 area.insert(bounds);
                 const collision = CollisionDetector.detectInArea(movable, path, area);
                 if (collision == null) {
@@ -984,9 +985,6 @@ class PhysicalEntity {
         this._geometry = new CuboidGeometry(bounds);
         this._context.addEntity(this);
     }
-    set visible(visible) {
-        this._visible = visible;
-    }
     get context() {
         return this._context;
     }
@@ -1025,6 +1023,9 @@ class PhysicalEntity {
     }
     get visible() {
         return this._visible;
+    }
+    set visible(visible) {
+        this._visible = visible;
     }
     get drawable() {
         return this._drawable;
@@ -1101,17 +1102,17 @@ class Actor extends MovableEntity {
     }
 }
 function createGraphicalEntity(context, location, dimensions, graphicComponent) {
-    let entity = new PhysicalEntity(context, location, dimensions);
+    const entity = new PhysicalEntity(context, location, dimensions);
     entity.addGraphic(graphicComponent);
     return entity;
 }
 function createGraphicalMovableEntity(context, location, dimensions, graphicComponent) {
-    let entity = new MovableEntity(context, location, dimensions);
+    const entity = new MovableEntity(context, location, dimensions);
     entity.addGraphic(graphicComponent);
     return entity;
 }
 function createGraphicalActor(context, location, dimensions, graphicComponent) {
-    let actor = new Actor(context, location, dimensions);
+    const actor = new Actor(context, location, dimensions);
     actor.addGraphic(graphicComponent);
     return actor;
 }
@@ -1123,8 +1124,8 @@ export { createGraphicalMovableEntity as createGraphicalMovableEntity };
 export { createGraphicalActor as createGraphicalActor };
 var Direction;
 var TerrainShape;
-var DummySpriteSheet = {
-    addForValidation: function(sprite) {
+const DummySpriteSheet = {
+    addForValidation: function(_sprite) {
         return true;
     }
 };
@@ -1203,18 +1204,18 @@ class Navigation {
         return new Vector2D(xDiff, yDiff);
     }
     static getAdjacentCoord(p, direction) {
-        let v = this.getVector2D(direction);
+        const v = this.getVector2D(direction);
         return p.add(v);
     }
     static getDirectionFromPoints(from, to) {
         return this.getDirectionFromVector(to.diff(from));
     }
     static getDirectionFromVector(w) {
-        let mag = w.mag();
-        let u = new Vector2D(0, -mag);
+        const mag = w.mag();
+        const u = new Vector2D(0, -mag);
         let theta = 180 * u.angle(w) / Math.PI;
         if (theta < 0) {
-            let rotate = 180 + theta;
+            const rotate = 180 + theta;
             theta = 180 + rotate;
         }
         const direction = Math.round(theta / 45);
@@ -1271,7 +1272,7 @@ class SpriteSheet {
             this.canvas.height = this.height;
             this.canvas.getContext('2d').drawImage(this.image, 0, 0, this.width, this.height);
             this.loaded = true;
-            for (let sprite of this._toValidate){
+            for (const sprite of this._toValidate){
                 sprite.validate();
             }
         };
@@ -1301,7 +1302,7 @@ class SpriteSheet {
         this._canvas = c;
     }
     isTransparentAt(x, y) {
-        let data = this.canvas.getContext('2d').getImageData(x, y, 1, 1).data;
+        const data = this.canvas.getContext('2d').getImageData(x, y, 1, 1).data;
         return data[3] == 0;
     }
     addForValidation(sprite) {
@@ -1374,7 +1375,7 @@ class Sprite {
 }
 export { Sprite as Sprite };
 function generateSprites(sheet, width, height, xBegin, yBegin, columns, rows) {
-    var sprites = new Array();
+    const sprites = new Array();
     const xEnd = xBegin + columns;
     const yEnd = yBegin + rows;
     for(let y = yBegin; y < yEnd; y++){
@@ -1794,13 +1795,13 @@ class PathFinder {
         for(let y = 0; y < grid.depth; y++){
             this.graph[y] = new Array();
             for(let x = 0; x < grid.width; x++){
-                let centre = grid.getSurfaceTerrainAt(x, y);
+                const centre = grid.getSurfaceTerrainAt(x, y);
                 this.addNode(x, y, centre);
             }
         }
         for(let y1 = 0; y1 < grid.depth; y1++){
             for(let x1 = 0; x1 < grid.width; x1++){
-                let centre1 = grid.getSurfaceTerrainAt(x1, y1);
+                const centre1 = grid.getSurfaceTerrainAt(x1, y1);
                 this.addNeighbours(centre1, grid);
             }
         }
@@ -1815,23 +1816,23 @@ class PathFinder {
         return this._graph[y][x];
     }
     addNeighbours(centre, grid) {
-        let neighbours = this.getAccessibleNeighbours(centre, grid);
-        let centreNode = this.getNode(centre.x, centre.y);
-        for (let neighbour of neighbours){
-            let cost = this.getNeighbourCost(centre, neighbour);
-            let succ = this.getNode(neighbour.x, neighbour.y);
+        const neighbours = this.getAccessibleNeighbours(centre, grid);
+        const centreNode = this.getNode(centre.x, centre.y);
+        for (const neighbour of neighbours){
+            const cost = this.getNeighbourCost(centre, neighbour);
+            const succ = this.getNode(neighbour.x, neighbour.y);
             centreNode.addSuccessor(succ, cost);
         }
     }
     getAccessibleNeighbours(centre, grid) {
-        let neighbours = grid.getNeighbours(centre);
-        let centrePoint = new Point2D(centre.x, centre.y);
+        const neighbours = grid.getNeighbours(centre);
+        const centrePoint = new Point2D(centre.x, centre.y);
         return neighbours.filter(function(to) {
             console.assert(Math.abs(centre.z - to.z) <= 1, "can only handle neighbours separated by 1 terrace max");
-            let toPoint = new Point2D(to.x, to.y);
-            let direction = Navigation.getDirectionFromPoints(centrePoint, toPoint);
+            const toPoint = new Point2D(to.x, to.y);
+            const direction = Navigation.getDirectionFromPoints(centrePoint, toPoint);
             console.assert(direction == Direction.North || direction == Direction.East || direction == Direction.South || direction == Direction.West);
-            let oppositeDir = Navigation.getOppositeDirection(direction);
+            const oppositeDir = Navigation.getOppositeDirection(direction);
             if (to.z == centre.z) {
                 return true;
             } else if (to.z > centre.z) {
@@ -1843,14 +1844,14 @@ class PathFinder {
         });
     }
     getNeighbourCost(centre, to) {
-        let cost = centre.x == to.x || centre.y == to.y ? 2 : 3;
+        const cost = centre.x == to.x || centre.y == to.y ? 2 : 3;
         if (Terrain.isFlat(centre.shape) && Terrain.isFlat(to.shape)) {
             return cost;
         }
         return centre.z == to.z ? cost : cost * 2;
     }
     isAccessible(centre, dx, dy) {
-        let succ = this.getNode(centre.x + dx, centre.y + dy);
+        const succ = this.getNode(centre.x + dx, centre.y + dy);
         return centre.hasSuccessor(succ);
     }
     findPath() {}
@@ -1927,7 +1928,7 @@ class TerrainGrid {
     _depth;
 }
 function generateStaticGraphics(sheet, width, height, xBegin, yBegin, columns, rows) {
-    var graphics = new Array();
+    const graphics = new Array();
     const xEnd = xBegin + columns;
     const yEnd = yBegin + rows;
     for(let y = yBegin; y < yEnd; y++){
@@ -1948,7 +1949,7 @@ class AnimatedGraphicComponent extends GraphicComponent {
         this._nextUpdate = 0;
         this._currentSpriteIdx = 0;
         this._spriteIds = new Array();
-        for(let i in sprites){
+        for(const i in sprites){
             this._spriteIds.push(sprites[i].id);
         }
         this._nextUpdate = Date.now() + _interval;
@@ -2048,11 +2049,11 @@ class AnimatedDirectionalGraphicComponent extends GraphicComponent {
     get stationary() {
         return this._stationary;
     }
-    get direction() {
-        return this._direction;
-    }
     set stationary(stationary) {
         this._stationary = stationary;
+    }
+    get direction() {
+        return this._direction;
     }
     set direction(direction) {
         if (this._staticGraphics.has(direction) && this._movementGraphics.has(direction)) {

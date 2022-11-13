@@ -1,9 +1,6 @@
 import { PhysicalEntity,
          MovableEntity } from "./entity.ts"
-import { TerrainType, TerrainShape, Terrain } from "./terrain.ts"
-import { Point2D,
-         Point3D,
-         Vector2D,
+import { Point3D,
          Vector3D,
          Geometry,
          IntersectInfo } from "./geometry.ts"
@@ -42,18 +39,18 @@ export class BoundingCuboid {
   get maxX(): number { return this.maxLocation.x; }
   get maxY(): number { return this.maxLocation.y; }
   get maxZ(): number { return this.maxLocation.z; }
-  get centre(): Point3D { return this._centre; }
   get bottomCentre(): Point3D { return this._bottomCentre; }
   get width(): number { return this._dimensions.width; }
   get depth(): number { return this._dimensions.depth; }
   get height(): number { return this._dimensions.height; }
   get dimensions(): Dimensions { return this._dimensions; }
 
+  get centre(): Point3D { return this._centre; }
   set centre(centre: Point3D) {
     this._centre = centre;
-    let width = this.width / 2;
-    let depth = this.depth / 2;
-    let height = this.height / 2;
+    const width = this.width / 2;
+    const depth = this.depth / 2;
+    const height = this.height / 2;
 
     let x = centre.x - width;
     let y = centre.y - depth;
@@ -114,17 +111,17 @@ export class BoundingCuboid {
       return; // nothing to do.
     }
 
-    let minX = other.minLocation.x < this.minLocation.x ?
+    const minX = other.minLocation.x < this.minLocation.x ?
       other.minLocation.x : this.minLocation.x;
-    let minY = other.minLocation.y < this.minLocation.y ?
+    const minY = other.minLocation.y < this.minLocation.y ?
       other.minLocation.y : this.minLocation.y;
-    let minZ = other.minLocation.z < this.minLocation.z ?
+    const minZ = other.minLocation.z < this.minLocation.z ?
       other.minLocation.z : this.minLocation.z;
-    let maxX = other.maxLocation.x > this.maxLocation.x ?
+    const maxX = other.maxLocation.x > this.maxLocation.x ?
       other.maxLocation.x : this.maxLocation.x;
-    let maxY = other.maxLocation.y > this.maxLocation.y ?
+    const maxY = other.maxLocation.y > this.maxLocation.y ?
       other.maxLocation.y : this.maxLocation.y;
-    let maxZ = other.maxLocation.z > this.maxLocation.z ?
+    const maxZ = other.maxLocation.z > this.maxLocation.z ?
       other.maxLocation.z : this.maxLocation.z;
 
     //console.assert(minX >= 0 && minY >= 0 && minZ >= 0);
@@ -229,10 +226,10 @@ export class CollisionDetector {
       bounds.maxLocation
     ];
 
-    let misses: Array<PhysicalEntity> = new Array<PhysicalEntity>();
+    const misses: Array<PhysicalEntity> = new Array<PhysicalEntity>();
     const entities: Array<PhysicalEntity> = this._spatialInfo.getEntities(area);
 
-    for (let entity of entities) {
+    for (const entity of entities) {
       if (entity.id == movable.id) {
         continue;
       }
@@ -240,7 +237,7 @@ export class CollisionDetector {
       for (const beginPoint of beginPoints) {
         const endPoint = beginPoint.add(path);
 
-        let intersectInfo = geometry.obstructs(beginPoint, endPoint);
+        const intersectInfo = geometry.obstructs(beginPoint, endPoint);
         if (intersectInfo != null) {
           const blocking = true;
           const collision =
@@ -260,8 +257,8 @@ export class CollisionDetector {
 }
 
 export class Gravity {
-  private static _enabled: boolean = false;
-  private static _force: number = 0;
+  private static _enabled = false;
+  private static _force = 0;
   private static _context: ContextImpl;
 
   static init(force: number, context: ContextImpl) {
@@ -278,9 +275,9 @@ export class Gravity {
     if (this._force < 0) {
       const path = new Vector3D(0, 0, this._force);
       entities.forEach(movable => {
-        let bounds = movable.bounds;
+        const bounds = movable.bounds;
         // Create a bounds to contain the current location and the destination.
-        let area = new BoundingCuboid(bounds.centre.add(path), bounds.dimensions);
+        const area = new BoundingCuboid(bounds.centre.add(path), bounds.dimensions);
         area.insert(bounds);
         const collision =
         CollisionDetector.detectInArea(movable, path, area);

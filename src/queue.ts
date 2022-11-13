@@ -25,11 +25,11 @@ export class MinPriorityQueue<T> implements PriorityQueue<T> {
   get size(): number { return this.items.length - 1; }
   get length(): number { return this.items.length; }
   pop(): T {
-    let minItem = this.items[0];
+    const minItem = this.items[0];
     this.items.splice(0, 1);
     this.indices.delete(minItem.element);
     for (let i = 0; i < this.items.length; ++i) {
-      let item = this.items[i];
+      const item = this.items[i];
       this.indices.set(item.element, i);
     }
     this.build();
@@ -46,7 +46,7 @@ export class MinPriorityQueue<T> implements PriorityQueue<T> {
   }
   keyAt(i: number): number {
     console.assert(i < this.length);
-    let item = this.items[i];
+    const item = this.items[i];
     return item.key;
   }
   insert(x: T, k: number): void {
@@ -57,9 +57,9 @@ export class MinPriorityQueue<T> implements PriorityQueue<T> {
   }
   setKey(x: T, k: number): void {
     console.assert(this.indices.has(x));
-    let i: number = this.indices.get(x)!;
+    const i: number = this.indices.get(x)!;
     console.assert(i < this.length);
-    let item: QueueItem<T> = this.items[i];
+    const item: QueueItem<T> = this.items[i];
     console.assert(k <= item.key);
     item.key = k;
 
@@ -71,8 +71,8 @@ export class MinPriorityQueue<T> implements PriorityQueue<T> {
   exchange(idxA: number, idxB: number): void {
     console.assert(idxA < this.length);
     console.assert(idxB < this.length);
-    let itemA = this.items[idxA];
-    let itemB = this.items[idxB];
+    const itemA = this.items[idxA];
+    const itemB = this.items[idxB];
     this.items[idxA] = itemB;
     this.items[idxB] = itemA;
     this.indices.set(itemA.element, idxB);
@@ -85,8 +85,8 @@ export class MinPriorityQueue<T> implements PriorityQueue<T> {
     }
   }
   heapify(i: number): void {
-    let left = this.leftIdx(i);
-    let right = this.rightIdx(i);
+    const left = this.leftIdx(i);
+    const right = this.rightIdx(i);
     let smallest = i;
     if (left < this.length && this.keyAt(left) < this.keyAt(i)) {
       smallest = left;
