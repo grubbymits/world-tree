@@ -62,7 +62,7 @@ export class SceneNode {
   }
 
   intersectsTop(other: SceneNode): boolean {
-    for (let otherTop of other.topSegments) {
+    for (const otherTop of other.topSegments) {
       if (this.baseSegments[0].intersects(otherTop) ||
           this.baseSegments[1].intersects(otherTop)) {
         return true;
@@ -79,30 +79,30 @@ export class SceneNode {
     this._succs = [];
   }
   addSucc(succ: SceneNode) {
-    let idx = this._succs.indexOf(succ);
+    const idx = this._succs.indexOf(succ);
     if (idx != -1) return;
     this._succs.push(succ);
   }
   removeSucc(succ: SceneNode) {
-    let idx = this._succs.indexOf(succ);
+    const idx = this._succs.indexOf(succ);
     if (idx == -1) return;
     this._succs.splice(idx, 1);
   }
 
   get id(): number { return this._entity.id; }
   get drawCoord(): Point2D { return this._drawCoord; }
+  set drawCoord(coord: Point2D) { this._drawCoord = coord; }
   get minDrawCoord(): Point2D { return this._minDrawCoord; }
+  set minDrawCoord(coord: Point2D) { this._minDrawCoord = coord; }
   get topSegments(): Array<Segment2D> { return this._topOutlineSegments; }
   get baseSegments(): Array<Segment2D> { return this._baseOutlineSegments; }
   get sideSegments(): Array<Segment2D> { return this._sideOutlineSegments; }
   get entity(): PhysicalEntity { return this._entity; }
   get succs(): Array<SceneNode> { return this._succs; }
   get level(): SceneLevel|null { return this._level; }
+  set level(level: SceneLevel|null) { this._level = level; }
   get minZ(): number { return this._entity.bounds.minZ; }
   get maxZ(): number { return this._entity.bounds.maxZ; }
-  set level(level: SceneLevel|null) { this._level = level; }
-  set drawCoord(coord: Point2D) { this._drawCoord = coord; }
-  set minDrawCoord(coord: Point2D) { this._minDrawCoord = coord; }
   get isRoot(): boolean { return this._preds.length == 0; }
 }
 
@@ -113,7 +113,7 @@ export class SceneLevel {
   private _order: Array<SceneNode> = new Array<SceneNode>();
   private readonly _minZ: number;
   private readonly _maxZ: number;
-  private _dirty: boolean = true;
+  private _dirty = true;
 
   constructor(root: SceneNode) {
     this._minZ = root.minZ;
@@ -124,11 +124,11 @@ export class SceneLevel {
 
   get nodes(): Array<SceneNode> { return this._nodes; }
   get order(): Array<SceneNode> { return this._order; }
+  set order(o: Array<SceneNode>) { this._order = o; }
   get minZ(): number { return this._minZ; }
   get maxZ(): number { return this._maxZ; }
   get dirty(): boolean { return this._dirty; }
   set dirty(d: boolean) { this._dirty = d; }
-  set order(o: Array<SceneNode>) { this._order = o; }
 
   inrange(entity: PhysicalEntity): boolean {
     return entity.bounds.minZ >= this._minZ && entity.bounds.minZ < this._maxZ;
@@ -143,7 +143,7 @@ export class SceneLevel {
 
   remove(node: SceneNode): void {
     this.dirty = true;
-    let idx = this._nodes.indexOf(node);
+    const idx = this._nodes.indexOf(node);
     console.assert(idx != -1);
     this._nodes.splice(idx, 1);
     this._nodes.forEach((pred) => pred.removeSucc(node));
@@ -151,8 +151,8 @@ export class SceneLevel {
 
   update(node: SceneNode, graph: SceneGraph): void {
     node.clear();
-    for (let i = 0; i < this._nodes.length; i++) {
-      let existing = this._nodes[i];
+    for (const i = 0; i < this._nodes.length; i++) {
+      const existing = this._nodes[i];
       if (existing.id == node.id) {
         continue;
       }
@@ -199,20 +199,20 @@ export class SceneLevel {
     toDraw.sort((a, b) => graph.drawOrder(a, b));
 
     this.order = [];
-    let discovered = new Set<SceneNode>();
+    const discovered = new Set<SceneNode>();
 
-    let topoSort = (node: SceneNode): void => {
+    const topoSort = (node: SceneNode): void => {
       if (discovered.has(node)) {
         return;
       }
       discovered.add(node);
-      for (let succ of node.succs) {
+      for (const succ of node.succs) {
         topoSort(succ);
       }
       this.order.push(node);
     }
 
-    for (let i in toDraw) {
+    for (const i in toDraw) {
       if (discovered.has(toDraw[i])) {
         continue;
       }
@@ -225,7 +225,7 @@ export class SceneLevel {
 
 export abstract class SceneGraph {
   protected _levels: Array<SceneLevel> = new Array<SceneLevel>();
-  protected _numNodes: number = 0;
+  protected _numNodes = 0;
   protected _prevCameraLower: Point2D = new Point2D(0, 0);
   protected _prevCameraUpper: Point2D = new Point2D(0, 0);
 
@@ -237,8 +237,8 @@ export abstract class SceneGraph {
   updateDrawOutline(node: SceneNode): void {
     const entity: PhysicalEntity = node.entity;
     const min: Point3D = entity.bounds.minLocation;
-    let minDraw: Point2D = this.getDrawCoord(min);
-    let diff: Vector2D = minDraw.diff(node.minDrawCoord);
+    const minDraw: Point2D = this.getDrawCoord(min);
+    const diff: Vector2D = minDraw.diff(node.minDrawCoord);
     node.updateSegments(diff);
   }
 
@@ -246,9 +246,6 @@ export abstract class SceneGraph {
     const entity: PhysicalEntity = node.entity;
     const min: Point3D = entity.bounds.minLocation;
     const max: Point3D = entity.bounds.maxLocation;
-    const width = entity.bounds.width;
-    const depth = entity.bounds.depth;
-    const height = entity.bounds.height;
 
     node.topSegments.length = 0;
     node.baseSegments.length = 0;
@@ -286,7 +283,7 @@ export abstract class SceneGraph {
     this.updateDrawOutline(node);
     console.assert(node.level != null, "node with id:", node.entity.id,
                    "isn't assigned a level!");
-    let level: SceneLevel = node.level!;
+    const level: SceneLevel = node.level!;
     if (level.inrange(node.entity)) {
       level.update(node, this);
     } else {
@@ -296,7 +293,7 @@ export abstract class SceneGraph {
   }
 
   insertIntoLevel(node: SceneNode): void {
-    for (let level of this.levels) {
+    for (const level of this.levels) {
       if (level.inrange(node.entity)) {
         level.add(node, this);
         return;
@@ -314,8 +311,8 @@ export abstract class SceneGraph {
   }
 
   initialise(nodes: Map<number, SceneNode>): void {
-    let nodeList = new Array<SceneNode>();
-    for (let node of nodes.values()) {
+    const nodeList = new Array<SceneNode>();
+    for (const node of nodes.values()) {
       nodeList.push(node);
       this.setDrawOutline(node);
     }
@@ -361,14 +358,14 @@ export interface SceneRenderer {
   getNode(id: number): SceneNode;
   getLocationAt(x: number, y: number, camera: Camera): Point3D | null;
   getEntityDrawnAt(x: number, y: number, camera: Camera): PhysicalEntity | null;
-  addTimedEvent(callback: Function): void;
+  addTimedEvent(callback): void;
   render(camera: Camera, force: boolean): number;
   verifyRenderer(entities: Array<PhysicalEntity>): boolean;
 }
 
 class BaseSceneRenderer implements SceneRenderer {
   protected _nodes: Map<number, SceneNode> = new Map<number, SceneNode>();
-  protected _numEntities: number = 0;
+  protected _numEntities = 0;
 
   constructor(protected _graph: SceneGraph) { }
 
@@ -380,7 +377,7 @@ class BaseSceneRenderer implements SceneRenderer {
   }
 
   insertEntity(entity: PhysicalEntity): void {
-    let node =
+    const node =
       new SceneNode(entity, this.graph.getDrawCoord(entity.bounds.minLocation));
     this.nodes.set(node.id, node);
     // If we haven't initialised levels yet (its done in the first call to
@@ -393,37 +390,37 @@ class BaseSceneRenderer implements SceneRenderer {
   }
   updateEntity(entity: PhysicalEntity): void {
     console.assert(this._nodes.has(entity.id));
-    let node: SceneNode = this._nodes.get(entity.id)!;
+    const node: SceneNode = this._nodes.get(entity.id)!;
     this.graph.updateNode(node);
   }
   getNode(id: number): SceneNode {
     console.assert(this.nodes.has(id));
     return this.nodes.get(id)!;
   }
-  getLocationAt(x: number, y: number, camera: Camera): Point3D | null {
+  getLocationAt(_x: number, _y: number, _camera: Camera): Point3D | null {
     return null;
   }
-  getEntityDrawnAt(x: number, y: number, camera: Camera): PhysicalEntity | null {
+  getEntityDrawnAt(_x: number, _y: number, _camera: Camera): PhysicalEntity | null {
     return null;
   }
-  render(camera: Camera, force: boolean): number { return 0; }
-  addTimedEvent(callback: Function): void { }
+  render(_camera: Camera, _force: boolean): number { return 0; }
+  addTimedEvent(_callback): void { }
 
   verifyRenderer(entities: Array<PhysicalEntity>): boolean {
     if (this.graph.numNodes != entities.length) {
       console.error("top-level comparison between scene node and entities failed");
     }
-    let counted: number = 0;
-    let levelNodeIds = new Array<number>();
-    let nodeIds = new Array<number>();
-    let entityIds = new Array<number>();
+    let counted = 0;
+    const levelNodeIds = new Array<number>();
+    const nodeIds = new Array<number>();
+    const entityIds = new Array<number>();
 
-    for (let level of this.graph.levels) {
+    for (const level of this.graph.levels) {
       counted += level.nodes.length;
       level.nodes.forEach(node => levelNodeIds.push(node.id));
     }
     
-    for (let node of this.nodes.values()) {
+    for (const node of this.nodes.values()) {
       nodeIds.push(node.id);
     }
 
@@ -486,7 +483,7 @@ export class OffscreenSceneRenderer extends BaseSceneRenderer {
   }
 
   render(camera: Camera, force: boolean): number {
-    let drawn: number = 0;
+    let drawn = 0;
     if (!this.graph.initialised) {
       this.graph.initialise(this.nodes);
     }
@@ -523,12 +520,12 @@ export class OnscreenSceneRenderer extends BaseSceneRenderer {
   get height(): number { return this._height; }
   get ctx(): CanvasRenderingContext2D|null { return this._ctx; }
 
-  addTimedEvent(callback: Function): void {
+  addTimedEvent(callback): void {
     this._handler.add(callback);
   }
 
   getLocationAt(x: number, y: number, camera: Camera): Point3D | null {
-    let entity: PhysicalEntity|null = this.getEntityDrawnAt(x, y, camera);
+    const entity: PhysicalEntity|null = this.getEntityDrawnAt(x, y, camera);
     if (entity != null) {
       return entity.bounds.minLocation;
     }
@@ -548,8 +545,8 @@ export class OnscreenSceneRenderer extends BaseSceneRenderer {
           continue;
         }
 
-        let onScreenCoord: Point2D = camera.getDrawCoord(node.drawCoord);
-        let graphic: GraphicComponent = entity.graphic;
+        const onScreenCoord: Point2D = camera.getDrawCoord(node.drawCoord);
+        const graphic: GraphicComponent = entity.graphic;
         // Check whether inbounds of the sprite.
         if (x < onScreenCoord.x || y < onScreenCoord.y ||
             x > onScreenCoord.x + graphic.width ||
@@ -571,8 +568,8 @@ export class OnscreenSceneRenderer extends BaseSceneRenderer {
     entity.graphics.forEach((component) => {
       const spriteId: number = component.update();
       Sprite.sprites[spriteId].draw(coord, this.ctx!);
-    });
-  };
+    })
+  }
 
   render(camera: Camera, force: boolean): number {
     if (!this.graph.initialised) {
@@ -585,7 +582,7 @@ export class OnscreenSceneRenderer extends BaseSceneRenderer {
         const node: SceneNode = level.order[i];
         this.renderNode(node, camera);
       }
-    });
+    })
 
     this._handler.service();
     return 0;
@@ -610,21 +607,21 @@ export class IsometricPhysicalDimensions extends Dimensions {
 
   static physicalDepth(physicalWidth: number,
                        relativeDims: Dimensions) {
-    let depthRatio: number = relativeDims.depth / relativeDims.width;
+    const depthRatio: number = relativeDims.depth / relativeDims.width;
     return Math.round(physicalWidth * depthRatio);
   }
 
   static physicalHeight(physicalWidth: number,
                         relativeDims: Dimensions): number {
-    let heightRatio: number = relativeDims.height / relativeDims.width;
+    const heightRatio: number = relativeDims.height / relativeDims.width;
     return Math.round(physicalWidth * heightRatio);
   }
 
   constructor(spriteWidth: number,
               relativeDims: Dimensions) {
-    let width = IsometricPhysicalDimensions.physicalWidth(spriteWidth);
-    let depth = IsometricPhysicalDimensions.physicalDepth(width, relativeDims);
-    let height = IsometricPhysicalDimensions.physicalHeight(width, relativeDims);
+    const width = IsometricPhysicalDimensions.physicalWidth(spriteWidth);
+    const depth = IsometricPhysicalDimensions.physicalDepth(width, relativeDims);
+    const height = IsometricPhysicalDimensions.physicalHeight(width, relativeDims);
     super(width, depth, height);
   }
 }

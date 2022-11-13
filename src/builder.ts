@@ -699,10 +699,10 @@ export class TerrainBuilder {
         let surface = this.surface.at(x, y);
         let biome: Biome = Biome.Water;
         let terrain: TerrainType = TerrainType.Water;
-        let moisturePercent =
+        const moisturePercent =
           Math.min(1, surface.moisture / moistureRange);
         // Split into six biomes based on moisture.
-        let moistureScaled = Math.floor(5 * moisturePercent);
+        const moistureScaled = Math.floor(5 * moisturePercent);
 
         if (surface.height <= this.config.waterLine) {
           biome = Biome.Water;
@@ -787,11 +787,11 @@ export class TerrainBuilder {
     for (let y = 0; y < this.surface.depth; y++) {
       for (let x = 0; x < this.surface.width; x++) {
 
-        let surface = this.surface.at(x, y);
+        const surface = this.surface.at(x, y);
         // Add shoreline features on beach tiles.
         if (Terrain.isFlat(surface.shape)) {
-          let neighbours = this.surface.getNeighbours(surface.x, surface.y);
-          for (let neighbour of neighbours) {
+          const neighbours = this.surface.getNeighbours(surface.x, surface.y);
+          for (const neighbour of neighbours) {
             if (neighbour.biome != Biome.Water) {
               continue;
             }

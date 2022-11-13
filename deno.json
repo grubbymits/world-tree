@@ -5,5 +5,10 @@
     "noImplicitAny": true,
     "removeComments": true,
     "strictPropertyInitialization": false,
+  },
+  "test": {
+    "files": {
+      "include": ["tests/"]
+    }
   }
 }
