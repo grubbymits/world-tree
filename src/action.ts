@@ -1,13 +1,13 @@
-import { Actor } from "./entity.js"
-import { EntityEvent } from "./events.js"
-import { Direction } from "./navigation.js"
+import { Actor } from "./entity.ts"
+import { EntityEvent } from "./events.ts"
+import { Direction } from "./navigation.ts"
 import { BoundingCuboid,
          CollisionDetector,
-         CollisionInfo } from "./physics.js"
+         CollisionInfo } from "./physics.ts"
 import { Point3D,
          Vector3D,
-         Geometry } from "./geometry.js"
-import { Octree } from "./tree.js"
+         Geometry } from "./geometry.ts"
+import { Octree } from "./tree.ts"
 
 export abstract class Action {
   constructor(protected _actor: Actor) { }

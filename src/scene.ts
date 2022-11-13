@@ -1,13 +1,13 @@
-import { PhysicalEntity } from "./entity.js"
-import { Camera } from "./camera.js"
+import { PhysicalEntity } from "./entity.ts"
+import { Camera } from "./camera.ts"
 import { Point2D,
          Point3D,
          Segment2D,
-         Vector2D } from "./geometry.js"
+         Vector2D } from "./geometry.ts"
 import { Sprite,
-         GraphicComponent } from "./graphics.js"
-import { Dimensions } from "./physics.js"
-import { TimedEventHandler } from "./events.js"
+         GraphicComponent } from "./graphics.ts"
+import { Dimensions } from "./physics.ts"
+import { TimedEventHandler } from "./events.ts"
 
 export enum RenderOrder {
   Before = -1,

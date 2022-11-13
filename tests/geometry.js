@@ -1,28 +1,31 @@
+import { assertEquals,
+         assertExists } from "https://deno.land/std@0.160.0/testing/asserts.ts";
+
 import * as WT from '../dist/world-tree.js';
 
-test('2D point addition and subtraction', () => {
+Deno.test('2D point addition and subtraction', () => {
   const p0 = new WT.Point2D(6, 7);
   const p1 = new WT.Point2D(10, 12);
   const add = p1.add(p0);
   const sub = p1.sub(p0);
-  expect(add.x).toBe(16);
-  expect(add.y).toBe(19);
-  expect(sub.x).toBe(4);
-  expect(sub.y).toBe(5);
+  assertEquals(add.x, 16);
+  assertEquals(add.y, 19);
+  assertEquals(sub.x, 4);
+  assertEquals(sub.y, 5);
 });
 
-test('2D point orientation', () => {
+Deno.test('2D point orientation', () => {
   const p0 = new WT.Point2D(1, 1);
   const p1 = new WT.Point2D(2, 2);
   const p2 = new WT.Point2D(1, 3);
   const p3 = new WT.Point2D(3, 3);
 
-  expect(WT.Point2D.orientation(p0, p2, p1)).toBe(WT.Orientation.Clockwise);
-  expect(WT.Point2D.orientation(p0, p1, p2)).toBe(WT.Orientation.CounterClockwise);
-  expect(WT.Point2D.orientation(p0, p1, p3)).toBe(WT.Orientation.Colinear);
+  assertEquals(WT.Point2D.orientation(p0, p2, p1), WT.Orientation.Clockwise);
+  assertEquals(WT.Point2D.orientation(p0, p1, p2), WT.Orientation.CounterClockwise);
+  assertEquals(WT.Point2D.orientation(p0, p1, p3), WT.Orientation.Colinear);
 });
 
-test('2D segment intersection (vertically parallel)', () => {
+Deno.test('2D segment intersection (vertically parallel)', () => {
   const p0 = new WT.Point2D(1, 1);
   const p1 = new WT.Point2D(1, 3);
   const p2 = new WT.Point2D(2, 1);
@@ -30,15 +33,15 @@ test('2D segment intersection (vertically parallel)', () => {
   const s0 = new WT.Segment2D(p0, p1);
   const s1 = new WT.Segment2D(p2, p3);
 
-  expect(s0.contains(p2)).toBe(false);
-  expect(s0.contains(p3)).toBe(false);
-  expect(s0.intersects(s1)).toBe(false);
-  expect(s1.contains(p0)).toBe(false);
-  expect(s1.contains(p1)).toBe(false);
-  expect(s1.intersects(s0)).toBe(false);
+  assertEquals(s0.contains(p2), false);
+  assertEquals(s0.contains(p3), false);
+  assertEquals(s0.intersects(s1), false);
+  assertEquals(s1.contains(p0), false);
+  assertEquals(s1.contains(p1), false);
+  assertEquals(s1.intersects(s0), false);
 });
 
-test('2D segment intersection (horizontally parallel)', () => {
+Deno.test('2D segment intersection (horizontally parallel)', () => {
   const p0 = new WT.Point2D(1, 1);
   const p1 = new WT.Point2D(3, 1);
   const p2 = new WT.Point2D(1, 2);
@@ -46,15 +49,15 @@ test('2D segment intersection (horizontally parallel)', () => {
   const s0 = new WT.Segment2D(p0, p1);
   const s1 = new WT.Segment2D(p2, p3);
 
-  expect(s0.contains(p2)).toBe(false);
-  expect(s0.contains(p3)).toBe(false);
-  expect(s0.intersects(s1)).toBe(false);
-  expect(s1.contains(p0)).toBe(false);
-  expect(s1.contains(p1)).toBe(false);
-  expect(s1.intersects(s0)).toBe(false);
+  assertEquals(s0.contains(p2), false);
+  assertEquals(s0.contains(p3), false);
+  assertEquals(s0.intersects(s1), false);
+  assertEquals(s1.contains(p0), false);
+  assertEquals(s1.contains(p1), false);
+  assertEquals(s1.intersects(s0), false);
 });
 
-test('2D point on 2D segment', () => {
+Deno.test('2D point on 2D segment', () => {
   const p0 = new WT.Point2D(1, 1);
   const p1 = new WT.Point2D(3, 1);
   const p2 = new WT.Point2D(1, 3);
@@ -62,24 +65,24 @@ test('2D point on 2D segment', () => {
   const p3 = new WT.Point2D(2, 1);
   const s0 = new WT.Segment2D(p0, p1);
   const s1 = new WT.Segment2D(p0, p2);
-  expect(s0.contains(p3)).toBe(true);
-  expect(s1.contains(p3)).toBe(false);
-  expect(s1.contains(p4)).toBe(true);
-  expect(s0.contains(p4)).toBe(false);
+  assertEquals(s0.contains(p3), true);
+  assertEquals(s1.contains(p3), false);
+  assertEquals(s1.contains(p4), true);
+  assertEquals(s0.contains(p4), false);
 });
 
-test('2D segment intersection with shared point', () => {
+Deno.test('2D segment intersection with shared point', () => {
   const p0 = new WT.Point2D(1, 1);
   const p1 = new WT.Point2D(3, 1);
   const p3 = new WT.Point2D(3, 2);
   const s0 = new WT.Segment2D(p0, p1);
   const s1 = new WT.Segment2D(p0, p3);
 
-  expect(s0.intersects(s1)).toBe(false);
-  expect(s1.intersects(s0)).toBe(false);
+  assertEquals(s0.intersects(s1), false);
+  assertEquals(s1.intersects(s0), false);
 });
 
-test('2D segments crossing', () => {
+Deno.test('2D segments crossing', () => {
   const p0 = new WT.Point2D(1, 1);
   const p1 = new WT.Point2D(3, 3);
   const p2 = new WT.Point2D(1, 3);
@@ -87,11 +90,11 @@ test('2D segments crossing', () => {
   const s0 = new WT.Segment2D(p0, p1);
   const s1 = new WT.Segment2D(p2, p3);
   
-  expect(s0.intersects(s1)).toBe(true);
-  expect(s1.intersects(s0)).toBe(true);
+  assertEquals(s0.intersects(s1), true);
+  assertEquals(s1.intersects(s0), true);
 });
 
-test('3D point arithmetic', () => {
+Deno.test('3D point arithmetic', () => {
   const p0 = new WT.Point3D(1, 2, 3);
   const p1 = new WT.Point3D(10, 9, 8);
   const v0 = new WT.Vector3D(2, 3, 4);
@@ -99,29 +102,29 @@ test('3D point arithmetic', () => {
   const add = p0.add(v0);
   const sub = p1.sub(v0);
 
-  expect(diff.x).toBe(-9);
-  expect(diff.y).toBe(-7);
-  expect(diff.z).toBe(-5);
-  expect(add.x).toBe(3);
-  expect(add.y).toBe(5);
-  expect(add.z).toBe(7);
-  expect(sub.x).toBe(8);
-  expect(sub.y).toBe(6);
-  expect(sub.z).toBe(4);
+  assertEquals(diff.x, -9);
+  assertEquals(diff.y, -7);
+  assertEquals(diff.z, -5);
+  assertEquals(add.x, 3);
+  assertEquals(add.y, 5);
+  assertEquals(add.z, 7);
+  assertEquals(sub.x, 8);
+  assertEquals(sub.y, 6);
+  assertEquals(sub.z, 4);
 });
 
-test('compare 3D points', () => {
+Deno.test('compare 3D points', () => {
   const p0 = new WT.Point3D(1.5, 2.5, 3.5);
   const p1 = new WT.Point3D(1.5, 2.5, 3.5);
   const p2 = new WT.Point3D(1.6, 2.2, 3.1);
   const p3 = new WT.Point3D(2, 2, 3);
-  expect(p0.isSameAs(p1)).toBe(true);
-  expect(p1.isSameAs(p2)).toBe(false);
-  expect(p2.isSameAsRounded(p0)).toBe(false);
-  expect(p2.isSameAsRounded(p3)).toBe(true);
+  assertEquals(p0.isSameAs(p1), true);
+  assertEquals(p1.isSameAs(p2), false);
+  assertEquals(p2.isSameAsRounded(p0), false);
+  assertEquals(p2.isSameAsRounded(p3), true);
 });
 
-test('vertex plane', () => {
+Deno.test('vertex plane', () => {
   const dims = new WT.Dimensions(2, 2, 2);
   const centre = new WT.Point3D(1, 1, 1);
   const widthVec = new WT.Vector3D(2, 0, 0);
@@ -137,31 +140,31 @@ test('vertex plane', () => {
 
   const v0 = new WT.Vertex3D(p3, p2, p1);
   const v1 = new WT.Vertex3D(p0, p1, p2);
-  expect(v0.normal.equal(v1.normal)).toBe(true);
+  assertEquals(v0.normal.equal(v1.normal), true);
 });
 
-test('cuboid geometry construction', () => {
+Deno.test('cuboid geometry construction', () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);
-  expect(new WT.CuboidGeometry(bounds)).not.toBeFalsy();
+  assertExists(new WT.CuboidGeometry(bounds));
 });
 
-test('ramp up west construction', () => {
+Deno.test('ramp up west construction', () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);
-  expect(new WT.RampUpWestGeometry(bounds)).not.toBeFalsy();
+  assertExists(new WT.RampUpWestGeometry(bounds));
 });
 
-test('ramp up east construction', () => {
+Deno.test('ramp up east construction', () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);
-  expect(new WT.RampUpEastGeometry(bounds)).not.toBeFalsy();
+  assertExists(new WT.RampUpEastGeometry(bounds));
 });
 
-test('cuboid obstruction', () => {
+Deno.test('cuboid obstruction', () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);
@@ -172,64 +175,64 @@ test('cuboid obstruction', () => {
   const p3 = new WT.Point3D(11, 5, 5);
   const p4 = new WT.Point3D(5, -1, 5);
   const p5 = new WT.Point3D(5, 11, 5);
-  expect(cube.obstructs(p0, p1)).not.toBe(null);
-  expect(cube.obstructs(p1, p0)).not.toBe(null);
-  expect(cube.obstructs(p2, p3)).not.toBe(null);
-  expect(cube.obstructs(p3, p2)).not.toBe(null);
-  expect(cube.obstructs(p4, p5)).not.toBe(null);
-  expect(cube.obstructs(p5, p4)).not.toBe(null);
+  assertExists(cube.obstructs(p0, p1));
+  assertExists(cube.obstructs(p1, p0));
+  assertExists(cube.obstructs(p2, p3));
+  assertExists(cube.obstructs(p3, p2));
+  assertExists(cube.obstructs(p4, p5));
+  assertExists(cube.obstructs(p5, p4));
   const p6 = new WT.Point3D(0.1, 0.1, 11);
   const p7 = new WT.Point3D(0.1, 0.1, -1);
   const p8 = new WT.Point3D(9.9, 9.9, 11);
   const p9 = new WT.Point3D(9.9, 9.9, -1);
-  expect(cube.obstructs(p6, p7)).not.toBe(null);
-  expect(cube.obstructs(p7, p6)).not.toBe(null);
-  expect(cube.obstructs(p8, p9)).not.toBe(null);
-  expect(cube.obstructs(p9, p8)).not.toBe(null);
+  assertExists(cube.obstructs(p6, p7));
+  assertExists(cube.obstructs(p7, p6));
+  assertExists(cube.obstructs(p8, p9));
+  assertExists(cube.obstructs(p9, p8));
   const p10 = new WT.Point3D(-1, 0.1, 0.1);
   const p11 = new WT.Point3D(11, 0.1, 0.1);
   const p12 = new WT.Point3D(-1, 9.9, 9.9);
   const p13 = new WT.Point3D(11, 9.9, 9.9);
-  expect(cube.obstructs(p10, p11)).not.toBe(null);
-  expect(cube.obstructs(p11, p10)).not.toBe(null);
-  expect(cube.obstructs(p12, p13)).not.toBe(null);
-  expect(cube.obstructs(p13, p12)).not.toBe(null);
+  assertExists(cube.obstructs(p10, p11));
+  assertExists(cube.obstructs(p11, p10));
+  assertExists(cube.obstructs(p12, p13));
+  assertExists(cube.obstructs(p13, p12));
   const p14 = new WT.Point3D(0.1, -1, 0.1);
   const p15 = new WT.Point3D(0.1, 11, 0.1);
   const p16 = new WT.Point3D(9.9, -1, 9.9);
   const p17 = new WT.Point3D(9.9, 11, 9.9);
-  expect(cube.obstructs(p14, p15)).not.toBe(null);
-  expect(cube.obstructs(p15, p14)).not.toBe(null);
-  expect(cube.obstructs(p16, p17)).not.toBe(null);
-  expect(cube.obstructs(p17, p16)).not.toBe(null);
+  assertExists(cube.obstructs(p14, p15));
+  assertExists(cube.obstructs(p15, p14));
+  assertExists(cube.obstructs(p16, p17));
+  assertExists(cube.obstructs(p17, p16));
 
   const p18 = new WT.Point3D(-0.1, -0.1, 11);
   const p19 = new WT.Point3D(-0.1, -0.1, -1);
   const p20 = new WT.Point3D(10.1, 10., 11);
   const p21 = new WT.Point3D(10.1, 10.1, -1);
-  expect(cube.obstructs(p18, p19)).toBe(null);
-  expect(cube.obstructs(p19, p18)).toBe(null);
-  expect(cube.obstructs(p20, p21)).toBe(null);
-  expect(cube.obstructs(p21, p20)).toBe(null);
+  assertEquals(cube.obstructs(p18, p19), null);
+  assertEquals(cube.obstructs(p19, p18), null);
+  assertEquals(cube.obstructs(p20, p21), null);
+  assertEquals(cube.obstructs(p21, p20), null);
   const p22 = new WT.Point3D(-1, -0.1, -0.1);
   const p23 = new WT.Point3D(11, -0.1, -0.1);
   const p24 = new WT.Point3D(-1, 10.1, 10.1);
   const p25 = new WT.Point3D(11, 10.1, 10.1);
-  expect(cube.obstructs(p22, p23)).toBe(null);
-  expect(cube.obstructs(p23, p22)).toBe(null);
-  expect(cube.obstructs(p24, p25)).toBe(null);
-  expect(cube.obstructs(p25, p24)).toBe(null);
+  assertEquals(cube.obstructs(p22, p23), null);
+  assertEquals(cube.obstructs(p23, p22), null);
+  assertEquals(cube.obstructs(p24, p25), null);
+  assertEquals(cube.obstructs(p25, p24), null);
   const p26 = new WT.Point3D(-0.1, -1, -0.1);
   const p27 = new WT.Point3D(-0.1, 11, -0.1);
   const p28 = new WT.Point3D(10.1, -1, 10.1);
   const p29 = new WT.Point3D(10.1, 11, 10.1);
-  expect(cube.obstructs(p26, p27)).toBe(null);
-  expect(cube.obstructs(p27, p26)).toBe(null);
-  expect(cube.obstructs(p28, p29)).toBe(null);
-  expect(cube.obstructs(p29, p28)).toBe(null);
+  assertEquals(cube.obstructs(p26, p27), null);
+  assertEquals(cube.obstructs(p27, p26), null);
+  assertEquals(cube.obstructs(p28, p29), null);
+  assertEquals(cube.obstructs(p29, p28), null);
 });
 
-test('ramp up west plane intersection', () => {
+Deno.test('ramp up west plane intersection', () => {
   const width = 10;
   const depth = 10;
   const height = 10;
@@ -253,29 +256,29 @@ test('ramp up west plane intersection', () => {
   // up/down the ramp the middle, no intersection
   const p6 = new WT.Point3D(10, 5, 0.2);
   const p7 = new WT.Point3D(0, 5, 10.1);
-  expect(v0.intersects(p6, p7)).toBe(null);
-  expect(v1.intersects(p6, p7)).toBe(null);
-  expect(v0.intersects(p7, p6)).toBe(null);
-  expect(v1.intersects(p7, p6)).toBe(null);
-  expect(face.intersectsPlane(p6, p7)).toBe(null);
-  expect(face.intersectsPlane(p7, p6)).toBe(null);
-  expect(face.intersectsPlane(p6, p7) && face.intersects(p7)).toBe(null);
-  expect(face.intersectsPlane(p7, p6) && face.intersects(p6)).toBe(null);
+  assertEquals(v0.intersects(p6, p7), null);
+  assertEquals(v1.intersects(p6, p7), null);
+  assertEquals(v0.intersects(p7, p6), null);
+  assertEquals(v1.intersects(p7, p6), null);
+  assertEquals(face.intersectsPlane(p6, p7), null);
+  assertEquals(face.intersectsPlane(p7, p6), null);
+  assertEquals(face.intersectsPlane(p6, p7) && face.intersects(p7), null);
+  assertEquals(face.intersectsPlane(p7, p6) && face.intersects(p6), null);
 
   // up/down the ramp the middle, with intersection
   const p8 = new WT.Point3D(10, 5, -1);
   const p9 = new WT.Point3D(0, 5, 10.1);
-  expect(v0.intersects(p8, p9)).not.toBe(null);
-  expect(v1.intersects(p8, p9)).not.toBe(null);
-  expect(v0.intersects(p9, p8)).not.toBe(null);
-  expect(v1.intersects(p9, p8)).not.toBe(null);
-  expect(face.intersectsPlane(p8, p9)).not.toBe(null);
-  expect(face.intersectsPlane(p9, p8)).not.toBe(null);
-  expect(face.intersects(p9)).not.toBe(null);
-  expect(face.intersects(p8)).not.toBe(null);
+  assertExists(v0.intersects(p8, p9));
+  assertExists(v1.intersects(p8, p9));
+  assertExists(v0.intersects(p9, p8));
+  assertExists(v1.intersects(p9, p8));
+  assertExists(face.intersectsPlane(p8, p9));
+  assertExists(face.intersectsPlane(p9, p8));
+  assertExists(face.intersects(p9));
+  assertExists(face.intersects(p8));
 });
 
-test('ramp up west obstruction', () => {
+Deno.test('ramp up west obstruction', () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);
@@ -284,29 +287,29 @@ test('ramp up west obstruction', () => {
   const p0 = new WT.Point3D(-1, 5, 1);
   const p1 = new WT.Point3D(15, 5, 1);
   // Through the ramp east/west.
-  expect(ramp.obstructs(p0, p1)).not.toBe(null);
-  expect(ramp.obstructs(p1, p0)).not.toBe(null);
+  assertExists(ramp.obstructs(p0, p1));
+  assertExists(ramp.obstructs(p1, p0));
 
   const p2 = new WT.Point3D(5, 0, 5.1);
   const p3 = new WT.Point3D(5, 11, 5.1);
   // Across the ramp north/south
-  expect(ramp.obstructs(p2, p3)).toBe(null);
-  expect(ramp.obstructs(p3, p2)).toBe(null);
+  assertEquals(ramp.obstructs(p2, p3), null);
+  assertEquals(ramp.obstructs(p3, p2), null);
 
   const p4 = new WT.Point3D(5, 0, 4.9);
   const p5 = new WT.Point3D(5, 11, 4.9);
   // Through the ramp north/south
-  expect(ramp.obstructs(p4, p5)).not.toBe(null);
-  expect(ramp.obstructs(p5, p4)).not.toBe(null);
+  assertExists(ramp.obstructs(p4, p5));
+  assertExists(ramp.obstructs(p5, p4));
 
   // up/down the ramp the middle
   const p6 = new WT.Point3D(10, 5, 0.2);
   const p7 = new WT.Point3D(0, 5, 10.1);
-  expect(ramp.obstructs(p6, p7)).toBe(null);
-  expect(ramp.obstructs(p7, p6)).toBe(null);
+  assertEquals(ramp.obstructs(p6, p7), null);
+  assertEquals(ramp.obstructs(p7, p6), null);
 });
 
-test('ramp up east obstruction', () => {
+Deno.test('ramp up east obstruction', () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);
@@ -315,38 +318,38 @@ test('ramp up east obstruction', () => {
   const p0 = new WT.Point3D(-1, 5, 1);
   const p1 = new WT.Point3D(15, 5, 1);
   // Through the ramp east/west.
-  expect(ramp.obstructs(p0, p1)).not.toBe(null);
-  expect(ramp.obstructs(p1, p0)).not.toBe(null);
+  assertExists(ramp.obstructs(p0, p1));
+  assertExists(ramp.obstructs(p1, p0));
 
   const p2 = new WT.Point3D(5, 0, 5.1);
   const p3 = new WT.Point3D(5, 11, 5.1);
   // Across the ramp north/south
-  expect(ramp.obstructs(p2, p3)).toBe(null);
-  expect(ramp.obstructs(p3, p2)).toBe(null);
+  assertEquals(ramp.obstructs(p2, p3), null);
+  assertEquals(ramp.obstructs(p3, p2), null);
 
   const p4 = new WT.Point3D(5, 0, 4.9);
   const p5 = new WT.Point3D(5, 11, 4.9);
   // Through the ramp north/south
-  expect(ramp.obstructs(p4, p5)).not.toBe(null);
-  expect(ramp.obstructs(p5, p4)).not.toBe(null);
+  assertExists(ramp.obstructs(p4, p5));
+  assertExists(ramp.obstructs(p5, p4));
 
   // up/down the ramp the middle.
   const p6 = new WT.Point3D(10, 5, 10.2);
-  expect(ramp.obstructs(p0, p6)).toBe(null);
-  expect(ramp.obstructs(p6, p0)).toBe(null);
+  assertEquals(ramp.obstructs(p0, p6), null);
+  assertEquals(ramp.obstructs(p6, p0), null);
 
   // up/down the ramp between min to max.
   const minLocation = bounds.minLocation;
   const maxLocation = bounds.maxLocation;
   const p9 = minLocation.add(new WT.Vector3D(0, 0, 0.1));
   const p10 = maxLocation.add(new WT.Vector3D(0, 0, 0.1));
-  expect(ramp.obstructs(p9, p10)).toBe(null);
-  expect(ramp.obstructs(p9, maxLocation)).not.toBe(null);
-  expect(ramp.obstructs(p10, minLocation)).not.toBe(null);
-  expect(ramp.obstructs(p10, p9)).toBe(null);
+  assertEquals(ramp.obstructs(p9, p10), null);
+  assertExists(ramp.obstructs(p9, maxLocation));
+  assertExists(ramp.obstructs(p10, minLocation));
+  assertEquals(ramp.obstructs(p10, p9), null);
 });
 
-test('ramp up north obstruction', () => {
+Deno.test('ramp up north obstruction', () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);
@@ -355,37 +358,37 @@ test('ramp up north obstruction', () => {
   const p0 = new WT.Point3D(-1, 5, 5.2);
   const p1 = new WT.Point3D(15, 5, 5.2);
   // Across the ramp east/west.
-  expect(ramp.obstructs(p0, p1)).toBe(null);
-  expect(ramp.obstructs(p1, p0)).toBe(null);
+  assertEquals(ramp.obstructs(p0, p1), null);
+  assertEquals(ramp.obstructs(p1, p0), null);
 
   const p2 = new WT.Point3D(5, 0, 10.1);
   const p3 = new WT.Point3D(5, 11, 0.1);
   // up/down the ramp the middle.
-  expect(ramp.obstructs(p2, p3)).toBe(null);
-  expect(ramp.obstructs(p3, p2)).toBe(null);
+  assertEquals(ramp.obstructs(p2, p3), null);
+  assertEquals(ramp.obstructs(p3, p2), null);
 
   const p4 = new WT.Point3D(5, -1, 2);
   const p5 = new WT.Point3D(5, 11, 2);
   // Blocked through the ramp south/north
-  expect(ramp.obstructs(p4, p5)).not.toBe(null);
-  expect(ramp.obstructs(p5, p4)).not.toBe(null);
+  assertExists(ramp.obstructs(p4, p5));
+  assertExists(ramp.obstructs(p5, p4));
 
   const p6 = new WT.Point3D(-1, 5, 4.9);
   const p7 = new WT.Point3D(15, 5, 4.9);
   // Through the ramp east/west.
-  expect(ramp.obstructs(p6, p7)).not.toBe(null);
-  expect(ramp.obstructs(p7, p6)).not.toBe(null);
+  assertExists(ramp.obstructs(p6, p7));
+  assertExists(ramp.obstructs(p7, p6));
 
   // up/down the ramp between min to max.
   const topCorner = bounds.minLocation.add(new WT.Vector3D(0, 0, 10.1));
   const bottomCorner = bounds.maxLocation.sub(new WT.Vector3D(0, 0, 9.9));
-  expect(ramp.obstructs(topCorner, bottomCorner)).toBe(null);
-  expect(ramp.obstructs(bottomCorner, topCorner)).toBe(null);
-  expect(ramp.obstructs(topCorner, bounds.minLocation)).not.toBe(null);
-  expect(ramp.obstructs(bottomCorner, bounds.minLocation)).not.toBe(null);
+  assertEquals(ramp.obstructs(topCorner, bottomCorner), null);
+  assertEquals(ramp.obstructs(bottomCorner, topCorner), null);
+  assertExists(ramp.obstructs(topCorner, bounds.minLocation));
+  assertExists(ramp.obstructs(bottomCorner, bounds.minLocation));
 });
 
-test('ramp up south obstruction', () => {
+Deno.test('ramp up south obstruction', () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);
@@ -394,30 +397,30 @@ test('ramp up south obstruction', () => {
   const p0 = new WT.Point3D(-1, 5, 5.2);
   const p1 = new WT.Point3D(15, 5, 5.2);
   // Across the ramp east/west.
-  expect(ramp.obstructs(p0, p1)).toBe(null);
-  expect(ramp.obstructs(p1, p0)).toBe(null);
+  assertEquals(ramp.obstructs(p0, p1), null);
+  assertEquals(ramp.obstructs(p1, p0), null);
 
   const p2 = new WT.Point3D(5, -0.5, 0.1);
   const p3 = new WT.Point3D(5, 10, 10.1);
   // up/down the ramp the middle.
-  expect(ramp.obstructs(p2, p3)).toBe(null);
-  expect(ramp.obstructs(p3, p2)).toBe(null);
+  assertEquals(ramp.obstructs(p2, p3), null);
+  assertEquals(ramp.obstructs(p3, p2), null);
 
   const p4 = new WT.Point3D(5, -1, 2);
   const p5 = new WT.Point3D(5, 11, 2);
   // Blocked through the ramp south/north
-  expect(ramp.obstructs(p4, p5)).not.toBe(null);
-  expect(ramp.obstructs(p5, p4)).not.toBe(null);
+  assertExists(ramp.obstructs(p4, p5));
+  assertExists(ramp.obstructs(p5, p4));
 
   const p6 = new WT.Point3D(-1, 5, 4.9);
   const p7 = new WT.Point3D(15, 5, 4.9);
   // Through the ramp east/west.
-  expect(ramp.obstructs(p6, p7)).not.toBe(null);
-  expect(ramp.obstructs(p7, p6)).not.toBe(null);
+  assertExists(ramp.obstructs(p6, p7));
+  assertExists(ramp.obstructs(p7, p6));
 
   // up/down the ramp between min to max.
   const topCorner = bounds.maxLocation.add(new WT.Vector3D(0, 0, 0.1));
   const bottomCorner = bounds.minLocation.add(new WT.Vector3D(0, 0, 0.1));
-  expect(ramp.obstructs(topCorner, bottomCorner)).toBe(null);
-  expect(ramp.obstructs(bottomCorner, topCorner)).toBe(null);
+  assertEquals(ramp.obstructs(topCorner, bottomCorner), null);
+  assertEquals(ramp.obstructs(bottomCorner, topCorner), null);
 });

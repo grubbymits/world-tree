@@ -1,6 +1,6 @@
-import { Point2D } from "./geometry.js"
+import { Point2D } from "./geometry.ts"
 import { Navigation,
-         Direction } from "./navigation.js"
+         Direction } from "./navigation.ts"
 
 export var DummySpriteSheet = {
   addForValidation: function(sprite: Sprite): boolean { return true; }

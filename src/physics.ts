@@ -1,15 +1,15 @@
 import { PhysicalEntity,
-         MovableEntity } from "./entity.js"
-import { TerrainType, TerrainShape, Terrain } from "./terrain.js"
+         MovableEntity } from "./entity.ts"
+import { TerrainType, TerrainShape, Terrain } from "./terrain.ts"
 import { Point2D,
          Point3D,
          Vector2D,
          Vector3D,
          Geometry,
-         IntersectInfo } from "./geometry.js"
-import { Octree } from "./tree.js"
-import { EntityEvent } from "./events.js"
-import { ContextImpl } from "./context.js"
+         IntersectInfo } from "./geometry.ts"
+import { Octree } from "./tree.ts"
+import { EntityEvent } from "./events.ts"
+import { ContextImpl } from "./context.ts"
 
 export class Dimensions {
   constructor(protected readonly _width: number,

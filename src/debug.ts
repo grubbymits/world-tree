@@ -1,17 +1,17 @@
-import { ContextImpl } from "./context.js"
+import { ContextImpl } from "./context.ts"
 import { PhysicalEntity,
-         MovableEntity } from "./entity.js"
-import { EntityEvent } from "./events.js"
+         MovableEntity } from "./entity.ts"
+import { EntityEvent } from "./events.ts"
 import { CollisionDetector,
-         CollisionInfo } from "./physics.js"
+         CollisionInfo } from "./physics.ts"
 import { Point2D,
          Segment2D,
          Vertex3D,
          Face3D,
-         IntersectInfo } from "./geometry.js"
-import { Camera } from "./camera.js"
+         IntersectInfo } from "./geometry.ts"
+import { Camera } from "./camera.ts"
 import { SceneNode,
-         SceneRenderer } from "./scene.js"
+         SceneRenderer } from "./scene.ts"
 
 function getAllSegments(node: SceneNode): Array<Segment2D> {
   let allSegments = new Array<Segment2D>();

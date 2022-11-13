@@ -1,4 +1,4 @@
-import { BoundingCuboid } from "./physics.js"
+import { BoundingCuboid } from "./physics.ts"
 
 export enum Orientation {
   Colinear,

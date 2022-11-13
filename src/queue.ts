@@ -1,15 +1,14 @@
 
 export interface PriorityQueue<T> {
   insert(x: T, k: number): void;
-  first(): T;
-  readonly pop: T;
+  build(): void;
+  pop(): T;
   setKey(x: T, k: number): void;
 }
 
 class QueueItem <T> {
   constructor(private readonly _element: T,
               private _key: number) { }
-  //get index(): T { return this._index; }
   get element(): T { return this._element; }
   get key(): number { return this._key; }
   set key(k: number) { this._key = k; }
@@ -18,53 +17,60 @@ class QueueItem <T> {
 export class MinPriorityQueue<T> implements PriorityQueue<T> {
   private _items: Array<QueueItem<T>> = new Array<QueueItem<T>>(); 
   private _indices: Map<T, number> = new Map<T, number>();
-  private _length: number = 0;
 
   constructor() { }
 
-  set length(l: number) { this._length = l; }
-  get length(): number { return this._length; }
   get indices(): Map<T, number> { return this._indices; }
   get items(): Array<QueueItem<T>> { return this._items; }
-  get size(): number { return this.items.length; }
-  get first(): T { return this.items[0].element; }
-  get pop(): T {
-    let min = this.first;
+  get size(): number { return this.items.length - 1; }
+  get length(): number { return this.items.length; }
+  pop(): T {
+    let minItem = this.items[0];
     this.items.splice(0, 1);
-    this.heapify(0);
-    return min;
+    this.indices.delete(minItem.element);
+    for (let i = 0; i < this.items.length; ++i) {
+      let item = this.items[i];
+      this.indices.set(item.element, i);
+    }
+    this.build();
+    return minItem.element;
   }
   parentIdx(i: number): number {
-    return i >> 1;
+    return (i - 1) >> 1;
   }
   leftIdx(i: number): number {
-    return 2 * i;
-  }
-  rightIdx(i: number): number {
     return 2 * i + 1;
   }
+  rightIdx(i: number): number {
+    return 2 * i + 2;
+  }
   keyAt(i: number): number {
+    console.assert(i < this.length);
     let item = this.items[i];
     return item.key;
   }
   insert(x: T, k: number): void {
     console.assert(!this.indices.has(x));
     this.items.push(new QueueItem(x, Number.MAX_VALUE));
+    this.indices.set(x, this.size);
     this.setKey(x, k);
   }
   setKey(x: T, k: number): void {
     console.assert(this.indices.has(x));
     let i: number = this.indices.get(x)!;
-    let item = this.items[i];
+    console.assert(i < this.length);
+    let item: QueueItem<T> = this.items[i];
     console.assert(k <= item.key);
     item.key = k;
 
-    while (i > 0 && this.keyAt(this.parentIdx(i)) < this.keyAt(i)) {
+    while (i > 0 && this.keyAt(this.parentIdx(i)) > this.keyAt(i)) {
       this.exchange(i, this.parentIdx(i));
       i = this.parentIdx(i);
     }
   }
   exchange(idxA: number, idxB: number): void {
+    console.assert(idxA < this.length);
+    console.assert(idxB < this.length);
     let itemA = this.items[idxA];
     let itemB = this.items[idxB];
     this.items[idxA] = itemB;
@@ -82,9 +88,10 @@ export class MinPriorityQueue<T> implements PriorityQueue<T> {
     let left = this.leftIdx(i);
     let right = this.rightIdx(i);
     let smallest = i;
-    if (left <= this.size && this.keyAt(left) < this.keyAt(i)) {
+    if (left < this.length && this.keyAt(left) < this.keyAt(i)) {
       smallest = left;
-    } else if (right <= this.size && this.keyAt(right) < this.keyAt(i)) {
+    }
+    if (right < this.length && this.keyAt(right) < this.keyAt(i)) {
       smallest = right;
     }
     if (smallest != i) {

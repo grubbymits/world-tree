@@ -2,13 +2,13 @@ import { Terrain,
          TerrainShape,
          TerrainType,
          TerrainFeature,
-         TerrainGrid } from "./terrain.js"
-import { Rain } from "./weather.js"
-import { Dimensions } from "./physics.js"
+         TerrainGrid } from "./terrain.ts"
+import { Rain } from "./weather.ts"
+import { Dimensions } from "./physics.ts"
 import { Direction,
-         Navigation } from "./navigation.js"
-import { Point2D } from "./geometry.js"
-import { ContextImpl } from "./context.js"
+         Navigation } from "./navigation.ts"
+import { Point2D } from "./geometry.ts"
+import { ContextImpl } from "./context.ts"
 
 export enum Biome {
   Water,

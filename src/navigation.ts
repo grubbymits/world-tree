@@ -1,7 +1,7 @@
 import { Point2D,
-         Vector2D } from "./geometry.js"
+         Vector2D } from "./geometry.ts"
 import { Terrain,
-         TerrainGrid } from "./terrain.js"
+         TerrainGrid } from "./terrain.ts"
 
 export enum Direction {
   North,

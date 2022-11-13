@@ -1,7 +1,7 @@
 import { Direction,
-         Navigation } from "./navigation.js"
-import { Surface } from "./builder.js"
-import { Point2D } from "./geometry.js"
+         Navigation } from "./navigation.ts"
+import { Surface } from "./builder.ts"
+import { Point2D } from "./geometry.ts"
 
 class Cloud {
   constructor(private _pos: Point2D,
@@ -68,7 +68,7 @@ export class Rain {
 
     switch (direction) {
     default:
-      console.assert('unhandled direction');
+      console.error('unhandled direction');
       break;
     case Direction.North: {
       const y = this.surface.depth - 1;

@@ -1,17 +1,17 @@
-import { Direction } from "navigation.js"
+import { Direction } from "./navigation.ts"
 import { Dimensions,
-         BoundingCuboid } from "./physics.js"
+         BoundingCuboid } from "./physics.ts"
 import { Point2D,
          Segment2D,
          Point3D,
          Vector3D,
          Geometry,
-         CuboidGeometry } from "./geometry.js"
-import { GraphicComponent } from "./graphics.js"
-import { ContextImpl } from "./context.js"
-import { Action } from "./action.js"
+         CuboidGeometry } from "./geometry.ts"
+import { GraphicComponent } from "./graphics.ts"
+import { ContextImpl } from "./context.ts"
+import { Action } from "./action.ts"
 import { EntityEvent,
-         EventHandler } from "./events.js"
+         EventHandler } from "./events.ts"
 
 export class PhysicalEntity {
   private static _ids: number = 0;

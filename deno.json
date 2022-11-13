@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"],
+    "strict": true,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "strictPropertyInitialization": false,
+  }
+}

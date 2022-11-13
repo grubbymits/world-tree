@@ -1,21 +1,21 @@
 import { PhysicalEntity,
-         MovableEntity } from "./entity.js"
-import { Terrain } from "./terrain.js"
-import { EntityEvent } from "./events.js"
+         MovableEntity } from "./entity.ts"
+import { Terrain } from "./terrain.ts"
+import { EntityEvent } from "./events.ts"
 import { SceneGraph,
          SceneRenderer,
          OnscreenSceneRenderer,
          OffscreenSceneRenderer,
          Perspective,
          TrueIsometric,
-         TwoByOneIsometric } from "./scene.js"
-import { SpriteSheet } from "./graphics.js"
-import { Camera } from "./camera.js"
-import { Octree } from "./tree.js"
+         TwoByOneIsometric } from "./scene.ts"
+import { SpriteSheet } from "./graphics.ts"
+import { Camera } from "./camera.ts"
+import { Octree } from "./tree.ts"
 import { Dimensions,
          BoundingCuboid,
          CollisionDetector,
-         Gravity } from "./physics.js"
+         Gravity } from "./physics.ts"
 
 export interface Context {
   update(camera: Camera): void;

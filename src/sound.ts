@@ -1,8 +1,8 @@
-import { BoundingCuboid } from "./physics.js"
-import { Point3D } from "./geometry.js"
-import { Camera } from "./camera.js"
-import { SceneGraph } from "./scene.js"
-import { InputEvent } from "./events.js"
+import { BoundingCuboid } from "./physics.ts"
+import { Point3D } from "./geometry.ts"
+import { Camera } from "./camera.ts"
+import { SceneGraph } from "./scene.ts"
+import { InputEvent } from "./events.ts"
 
 export class Sound {
   private static _tracks = new Array<Sound>();

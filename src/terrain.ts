@@ -1,11 +1,11 @@
-import { Direction } from "./navigation.js"
-import { Dimensions } from "./physics.js"
-import { PhysicalEntity } from "./entity.js"
+import { Direction } from "./navigation.ts"
+import { Dimensions } from "./physics.ts"
+import { PhysicalEntity } from "./entity.ts"
 import { SpriteSheet,
          Sprite,
          GraphicComponent,
-         StaticGraphicComponent } from "./graphics.js"
-import { ContextImpl } from "./context.js"
+         StaticGraphicComponent } from "./graphics.ts"
+import { ContextImpl } from "./context.ts"
 import { Point2D,
          Point3D,
          Geometry,
@@ -13,7 +13,7 @@ import { Point2D,
          RampUpWestGeometry,
          RampUpEastGeometry,
          RampUpSouthGeometry,
-         RampUpNorthGeometry } from "./geometry.js"
+         RampUpNorthGeometry } from "./geometry.ts"
 
 export enum TerrainShape {
   Flat,             // 0

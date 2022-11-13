@@ -1,7 +1,7 @@
 import { Dimensions,
-         BoundingCuboid } from "./physics.js"
-import { PhysicalEntity } from "./entity.js"
-import { Point3D } from "./geometry.js"
+         BoundingCuboid } from "./physics.ts"
+import { PhysicalEntity } from "./entity.ts"
+import { Point3D } from "./geometry.ts"
 
 // TODO Templates/Generics..?
 

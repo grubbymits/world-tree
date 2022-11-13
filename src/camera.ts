@@ -1,9 +1,9 @@
 import { EventHandler,
          EntityEvent,
-         InputEvent } from "./events.js"
-import { MovableEntity } from "./entity.js"
-import { Point2D, Point3D } from "./geometry.js"
-import { SceneRenderer } from "./scene.js"
+         InputEvent } from "./events.ts"
+import { MovableEntity } from "./entity.ts"
+import { Point2D, Point3D } from "./geometry.ts"
+import { SceneRenderer } from "./scene.ts"
 
 export class Camera {
   protected _lowerX : number = 0;
