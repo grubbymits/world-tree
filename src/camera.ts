@@ -1,3 +1,5 @@
+//deno-lint-ignore-file no-explicit-any
+
 import { EventHandler,
          EntityEvent,
          InputEvent } from "./events.ts"
@@ -6,10 +8,10 @@ import { Point2D, Point3D } from "./geometry.ts"
 import { SceneRenderer } from "./scene.ts"
 
 export class Camera {
-  protected _lowerX : number = 0;
-  protected _lowerY : number = 0;
-  protected _upperX : number;
-  protected _upperY : number;
+  protected _lowerX = 0;
+  protected _lowerY = 0;
+  protected _upperX: number;
+  protected _upperY: number;
   protected readonly _width: number;
   protected readonly _height: number;
   protected _handler = new EventHandler<InputEvent>();
@@ -38,6 +40,17 @@ export class Camera {
   get width(): number { return this._width; }
   get height(): number { return this._height; }
   get location(): Point3D|null { return this._surfaceLocation; }
+  set location(newLocation: Point3D|null) {
+    if (newLocation == undefined) {
+      console.log("undefined camera surface location");
+      return;
+    }
+    const newPoint: Point2D = this._scene.graph.getDrawCoord(newLocation);
+    this.x = newPoint.x;
+    this.y = newPoint.y;
+    this._handler.post(InputEvent.CameraMove);
+    this._surfaceLocation = newLocation;
+  }
   set x(x: number)  {
     this._lowerX = x - Math.floor(this.width / 2);
     this._upperX = x + Math.floor(this.width / 2);
@@ -55,25 +68,14 @@ export class Camera {
     this._handler.service();
   }
 
-  addEventListener(event: InputEvent, callback: Function): void {
+  addEventListener(event: InputEvent, callback: any): void {
     this._handler.addEventListener(event, callback);
   }
 
-  removeEventListener(event: InputEvent, callback: Function): void {
+  removeEventListener(event: InputEvent, callback: any): void {
     this._handler.removeEventListener(event, callback);
   }
 
-  set location(newLocation: Point3D|null) {
-    if (newLocation == undefined) {
-      console.log("undefined camera surface location");
-      return;
-    }
-    const newPoint: Point2D = this._scene.graph.getDrawCoord(newLocation);
-    this.x = newPoint.x;
-    this.y = newPoint.y;
-    this._handler.post(InputEvent.CameraMove);
-    this._surfaceLocation = newLocation;
-  }
 }
 
 export class MouseCamera extends Camera {
@@ -90,7 +92,7 @@ export class MouseCamera extends Camera {
       }
     });
     canvas.addEventListener('touchstart', e => {
-      let touch = e.touches[0];
+      const touch = e.touches[0];
       this.location = scene.getLocationAt(touch.pageX, touch.pageY, this);
     });
   }
@@ -104,9 +106,8 @@ export class TrackerCamera extends Camera {
     super(scene, width, height);
 
     this.location = movable.centre;
-    var camera = this;
-    movable.addEventListener(EntityEvent.Moving, function() {
-      camera.location = movable.centre;
+    movable.addEventListener(EntityEvent.Moving, () => {
+      this.location = movable.centre;
     });
   }
 }

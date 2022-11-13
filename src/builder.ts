@@ -120,27 +120,27 @@ function gaussianBlur(grid: Array<Float32Array>, width: number,
 
   const result = new Array<Float32Array>();
   // Just copy the two left columns
-  for (const y = 0; y < halfSize; y++) {
+  for (let y = 0; y < halfSize; y++) {
     result[y] = grid[y];
   }
   // Just copy the two right columns.
-  for (const y = depth - halfSize; y < depth; y++) {
+  for (let y = depth - halfSize; y < depth; y++) {
     result[y] = grid[y];
   }
 
   const filter = new Float32Array(filterSize);
-  for (const y = halfSize; y < depth - halfSize; y++) {
+  for (let y = halfSize; y < depth - halfSize; y++) {
     result[y] = new Float32Array(width);
 
     // Just copy the edge values.
-    for (const x = 0; x < halfSize; x++) {
+    for (let x = 0; x < halfSize; x++) {
       result[y][x] = grid[y][x];
     }
-    for (const x = width - halfSize; x < width; x++) {
+    for (let x = width - halfSize; x < width; x++) {
       result[y][x] = grid[y][x];
     }
 
-    for (const x = halfSize; x < width - halfSize; x++) {
+    for (let x = halfSize; x < width - halfSize; x++) {
       const sigma = standardDevWindow(grid, x, y, offsets);
       if (sigma == 0) {
         continue;
@@ -155,7 +155,7 @@ function gaussianBlur(grid: Array<Float32Array>, width: number,
         filter[i] = numerator / denominator;
         sum += filter[i];
       }
-      for (const coeff of filter) {
+      for (let coeff of filter) {
         coeff /= sum;
       }
 
@@ -230,9 +230,9 @@ export class Surface {
   get depth(): number { return this._depth; }
 
   init(heightMap: Array<Array<number>>) {
-    for (const y = 0; y < this._depth; y++) {
+    for (let y = 0; y < this._depth; y++) {
       this._surface.push(new Array<TerrainAttributes>());
-      for (const x = 0; x < this._width; x++) {
+      for (let x = 0; x < this._width; x++) {
         const height = heightMap[y][x];
         this._surface[y].push(new TerrainAttributes(x, y, height));
       }
@@ -253,12 +253,12 @@ export class Surface {
   // Return surface neighbours in a 3x3 radius.
   getNeighbours(centreX: number, centreY: number): Array<TerrainAttributes> {
     const neighbours = new Array<TerrainAttributes>();
-    for (const yDiff = -1; yDiff < 2; yDiff++) {
+    for (let yDiff = -1; yDiff < 2; yDiff++) {
       const y = centreY + yDiff;
       if (y < 0 || y >= this._depth) {
         continue;
       }
-      for (const xDiff = -1; xDiff < 2; xDiff++) {
+      for (let xDiff = -1; xDiff < 2; xDiff++) {
         const x = centreX + xDiff;
         if (x < 0 || x >= this._width) {
           continue;
@@ -328,7 +328,7 @@ export class TerrainBuilder {
     // Normalise heights, minimum = 0;
     let minHeight = 0;
     let maxHeight = 0;
-    for (const y = 0; y < depth; y++) {
+    for (let y = 0; y < depth; y++) {
       const row: Array<number> = heightMap[y];
       const max = row.reduce(function(a, b) {
         return Math.max(a, b);
@@ -353,8 +353,8 @@ export class TerrainBuilder {
     this.surface.init(heightMap);
 
     // Calculate the terraces.
-    for (const y = 0; y < this.surface.depth; y++) {
-      for (const x = 0; x < this.surface.width; x++) {
+    for (let y = 0; y < this.surface.depth; y++) {
+      for (let x = 0; x < this.surface.width; x++) {
         const surface = this.surface.at(x, y);
         surface.terrace = Math.floor(surface.height / this._terraceSpacing);
         surface.shape = TerrainShape.Flat;
@@ -427,8 +427,8 @@ export class TerrainBuilder {
     const grid =
       new TerrainGrid(context, this.surface.width, this.surface.depth);
 
-    for (const y = 0; y < this.surface.depth; y++) {
-      for (const x = 0; x < this.surface.width; x++) {
+    for (let y = 0; y < this.surface.depth; y++) {
+      for (let x = 0; x < this.surface.width; x++) {
         const surface = this.surface.at(x, y);
         // Add terrain objects that will be visible.
         console.assert(surface.terrace <= this.config.numTerraces && surface.terrace >= 0,
@@ -440,8 +440,8 @@ export class TerrainBuilder {
     }
 
     // Create a column of visible terrain below the surface tile.
-    for (const y = 0; y < this.surface.depth; y++) {
-      for (const x = 0; x < this.surface.width; x++) {
+    for (let y = 0; y < this.surface.depth; y++) {
+      for (let x = 0; x < this.surface.width; x++) {
         let z = this.surface.at(x, y).terrace;
         const zStop = z - this.calcRelativeHeight(x, y);
         const terrain = grid.getSurfaceTerrainAt(x, y)!;
@@ -508,8 +508,8 @@ export class TerrainBuilder {
   }
 
   setEdges(): void {
-    for (const y = 0; y < this.surface.depth; y++) {
-      for (const x = 0; x < this.surface.width; x++) {
+    for (let y = 0; y < this.surface.depth; y++) {
+      for (let x = 0; x < this.surface.width; x++) {
         const centre = this.surface.at(x, y);
         if (centre.type == TerrainType.Water) {
           continue;

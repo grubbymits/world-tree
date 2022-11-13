@@ -151,7 +151,7 @@ export class SceneLevel {
 
   update(node: SceneNode, graph: SceneGraph): void {
     node.clear();
-    for (const i = 0; i < this._nodes.length; i++) {
+    for (let i = 0; i < this._nodes.length; i++) {
       const existing = this._nodes[i];
       if (existing.id == node.id) {
         continue;
@@ -358,7 +358,7 @@ export interface SceneRenderer {
   getNode(id: number): SceneNode;
   getLocationAt(x: number, y: number, camera: Camera): Point3D | null;
   getEntityDrawnAt(x: number, y: number, camera: Camera): PhysicalEntity | null;
-  addTimedEvent(callback): void;
+  addTimedEvent(callback: any): void;
   render(camera: Camera, force: boolean): number;
   verifyRenderer(entities: Array<PhysicalEntity>): boolean;
 }
@@ -404,7 +404,7 @@ class BaseSceneRenderer implements SceneRenderer {
     return null;
   }
   render(_camera: Camera, _force: boolean): number { return 0; }
-  addTimedEvent(_callback): void { }
+  addTimedEvent(_callback: any): void { }
 
   verifyRenderer(entities: Array<PhysicalEntity>): boolean {
     if (this.graph.numNodes != entities.length) {
@@ -520,7 +520,7 @@ export class OnscreenSceneRenderer extends BaseSceneRenderer {
   get height(): number { return this._height; }
   get ctx(): CanvasRenderingContext2D|null { return this._ctx; }
 
-  addTimedEvent(callback): void {
+  addTimedEvent(callback: any): void {
     this._handler.add(callback);
   }
 
