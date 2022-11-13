@@ -1510,8 +1510,8 @@ class Terrain extends PhysicalEntity {
         return this._featureGraphics.get(terrainFeature);
     }
     static addGraphic(terrainType, terrainShape, sheet, x, y, width, height) {
-        let sprite = new Sprite(sheet, x, y, width, height);
-        let component = new StaticGraphicComponent(sprite.id);
+        const sprite = new Sprite(sheet, x, y, width, height);
+        const component = new StaticGraphicComponent(sprite.id);
         if (!this._terrainGraphics.has(terrainType)) {
             this._terrainGraphics.set(terrainType, new Map());
         }
@@ -1570,6 +1570,7 @@ class Terrain extends PhysicalEntity {
         switch(terrain){
             default:
                 console.error("unhandled terrain shape:", terrain);
+                return "invalid shape";
             case TerrainShape.Flat:
                 return "flat";
             case TerrainShape.Wall:
@@ -1622,6 +1623,7 @@ class Terrain extends PhysicalEntity {
         switch(terrain){
             default:
                 console.error("unhandled terrain type:", terrain);
+                return "invalid terrain";
             case TerrainType.Water:
                 return "water";
             case TerrainType.Lowland0:
@@ -1725,7 +1727,7 @@ class Terrain extends PhysicalEntity {
         this._shape = _shape;
         this.addGraphic(Terrain.graphics(_type, _shape));
         if (!Terrain.isFlat(_shape)) {
-            let theta = Math.atan(this.height / this.depth) * 180 / Math.PI;
+            const theta = Math.atan(this.height / this.depth) * 180 / Math.PI;
             this._tanTheta = Math.tan(theta);
         } else {
             this._tanTheta = 0;
@@ -1739,19 +1741,17 @@ class Terrain extends PhysicalEntity {
         } else if (this._shape == TerrainShape.RampUpNorth) {
             this._geometry = new RampUpNorthGeometry(this.geometry.bounds);
         }
-        let x = this.bounds.centre.x;
-        let y = this.bounds.centre.y;
-        let z = this.heightAt(this.bounds.centre);
+        const x = this.bounds.centre.x;
+        const y = this.bounds.centre.y;
+        const z = this.heightAt(this.bounds.centre);
         this._surfaceLocation = new Point3D(x, y, z);
         if (features == TerrainFeature.None) {
             return;
         }
-        for(let key in TerrainFeature){
-            if (typeof TerrainFeature[key] === "number") {
-                let feature = TerrainFeature[key];
-                if (Terrain.isSupportedFeature(feature) && hasFeature(features, feature)) {
-                    this.addGraphic(Terrain.featureGraphics(feature));
-                }
+        for (const value of Object.values(TerrainFeature)){
+            const feature = value;
+            if (Terrain.isSupportedFeature(feature) && hasFeature(features, feature)) {
+                this.addGraphic(Terrain.featureGraphics(feature));
             }
         }
     }
@@ -1897,7 +1897,7 @@ class TerrainGrid {
         return this._surfaceTerrain;
     }
     addSurfaceTerrain(x, y, z, ty, shape, feature) {
-        let terrain = Terrain.create(this._context, x, y, z, ty, shape, feature);
+        const terrain = Terrain.create(this._context, x, y, z, ty, shape, feature);
         this.surfaceTerrain[y][x] = terrain;
         this._totalSurface++;
     }
@@ -1913,9 +1913,9 @@ class TerrainGrid {
         return this.surfaceTerrain[y][x];
     }
     getNeighbours(centre) {
-        let neighbours = new Array();
-        for (let offset of TerrainGrid.neighbourOffsets){
-            let neighbour = this.getSurfaceTerrainAt(centre.x + offset.x, centre.y + offset.y);
+        const neighbours = new Array();
+        for (const offset of TerrainGrid.neighbourOffsets){
+            const neighbour = this.getSurfaceTerrainAt(centre.x + offset.x, centre.y + offset.y);
             if (!neighbour) {
                 continue;
             }
@@ -2134,11 +2134,11 @@ class MinPriorityQueue {
         return this.items.length;
     }
     pop() {
-        let minItem = this.items[0];
+        const minItem = this.items[0];
         this.items.splice(0, 1);
         this.indices.delete(minItem.element);
         for(let i = 0; i < this.items.length; ++i){
-            let item = this.items[i];
+            const item = this.items[i];
             this.indices.set(item.element, i);
         }
         this.build();
@@ -2155,7 +2155,7 @@ class MinPriorityQueue {
     }
     keyAt(i) {
         console.assert(i < this.length);
-        let item = this.items[i];
+        const item = this.items[i];
         return item.key;
     }
     insert(x, k) {
@@ -2168,7 +2168,7 @@ class MinPriorityQueue {
         console.assert(this.indices.has(x));
         let i = this.indices.get(x);
         console.assert(i < this.length);
-        let item = this.items[i];
+        const item = this.items[i];
         console.assert(k <= item.key);
         item.key = k;
         while(i > 0 && this.keyAt(this.parentIdx(i)) > this.keyAt(i)){
@@ -2179,8 +2179,8 @@ class MinPriorityQueue {
     exchange(idxA, idxB) {
         console.assert(idxA < this.length);
         console.assert(idxB < this.length);
-        let itemA = this.items[idxA];
-        let itemB = this.items[idxB];
+        const itemA = this.items[idxA];
+        const itemB = this.items[idxB];
         this.items[idxA] = itemB;
         this.items[idxB] = itemA;
         this.indices.set(itemA.element, idxB);
@@ -2192,8 +2192,8 @@ class MinPriorityQueue {
         }
     }
     heapify(i) {
-        let left = this.leftIdx(i);
-        let right = this.rightIdx(i);
+        const left = this.leftIdx(i);
+        const right = this.rightIdx(i);
         let smallest = i;
         if (left < this.length && this.keyAt(left) < this.keyAt(i)) {
             smallest = left;
@@ -2864,8 +2864,14 @@ class Cloud {
     get pos() {
         return this._pos;
     }
+    set pos(p) {
+        this._pos = p;
+    }
     get moisture() {
         return this._moisture;
+    }
+    set moisture(m) {
+        this._moisture = m;
     }
     get rain() {
         return this._rain;
@@ -2879,30 +2885,24 @@ class Cloud {
     get surface() {
         return this.rain.surface;
     }
-    set pos(p) {
-        this._pos = p;
-    }
-    set moisture(m) {
-        this._moisture = m;
-    }
     dropMoisture(multiplier) {
-        let moisture = this.moisture * 0.1 * multiplier;
+        const moisture = this.moisture * 0.1 * multiplier;
         this.moisture -= moisture;
         this.rain.addMoistureAt(this.pos, moisture);
     }
     move() {
         while(this.surface.inbounds(this.pos)){
-            let nextCoord = Navigation.getAdjacentCoord(this.pos, this.direction);
+            const nextCoord = Navigation.getAdjacentCoord(this.pos, this.direction);
             if (!this.surface.inbounds(nextCoord)) {
                 this.dropMoisture(1);
                 return;
             }
-            let current = this.surface.at(this.x, this.y);
+            const current = this.surface.at(this.x, this.y);
             if (current.height <= this.minHeight || current.terrace < 1) {
                 this.pos = nextCoord;
                 continue;
             }
-            let next = this.surface.at(nextCoord.x, nextCoord.y);
+            const next = this.surface.at(nextCoord.x, nextCoord.y);
             const multiplier = next.terrace > current.terrace ? 1.5 : 1;
             this.dropMoisture(multiplier);
             this.pos = nextCoord;
@@ -2989,7 +2989,7 @@ class Rain {
     }
     run() {
         while(this.clouds.length != 0){
-            let cloud = this.clouds[this.clouds.length - 1];
+            const cloud = this.clouds[this.clouds.length - 1];
             this.clouds.pop();
             cloud.move();
         }
@@ -3835,7 +3835,7 @@ class OctNode {
             return this.entities.length;
         }
         let total = 0;
-        for (let child of this.children){
+        for (const child of this.children){
             total += child.recursiveCountNumEntities;
         }
         return total;
@@ -3856,14 +3856,14 @@ class OctNode {
                 inserted = true;
             }
         } else {
-            for (let child of this.children){
+            for (const child of this.children){
                 if (child.bounds.containsBounds(entity.bounds)) {
                     inserted = child.insert(entity);
                     break;
                 }
             }
             if (!inserted) {
-                for (let child1 of this.children){
+                for (const child1 of this.children){
                     if (child1.containsLocation(entity.centre)) {
                         inserted = child1.insert(entity);
                         break;
@@ -3887,11 +3887,11 @@ class OctNode {
         for(let z = 0; z < 2; z++){
             for(let y = 0; y < 2; y++){
                 for(let x = 0; x < 2; x++){
-                    let offsetX = offset[x] * dimensions.width;
-                    let offsetY = offset[y] * dimensions.depth;
-                    let offsetZ = offset[z] * dimensions.height;
-                    let centre = new Point3D(this.centre.x + offsetX, this.centre.y + offsetY, this.centre.z + offsetZ);
-                    let bounds = new BoundingCuboid(centre, dimensions);
+                    const offsetX = offset[x] * dimensions.width;
+                    const offsetY = offset[y] * dimensions.depth;
+                    const offsetZ = offset[z] * dimensions.height;
+                    const centre = new Point3D(this.centre.x + offsetX, this.centre.y + offsetY, this.centre.z + offsetZ);
+                    const bounds = new BoundingCuboid(centre, dimensions);
                     this.children.push(new OctNode(bounds));
                 }
             }
@@ -3902,9 +3902,9 @@ class OctNode {
             }
             return false;
         };
-        for (let entity of this._entities){
+        for (const entity of this._entities){
             let inserted = false;
-            for (let child of this._children){
+            for (const child of this._children){
                 if (insertIntoChild(child, entity)) {
                     inserted = true;
                     break;
@@ -3928,7 +3928,7 @@ class OctNode {
         if (this.containsEntity(entity)) {
             return true;
         }
-        for (let child of this._children){
+        for (const child of this._children){
             if (child.recursivelyContainsEntity(entity)) {
                 return true;
             }
@@ -3941,7 +3941,7 @@ class OctNode {
             this.entities.splice(idx, 1);
             return true;
         }
-        for (let child of this.children){
+        for (const child of this.children){
             if (child.recursiveRemoveEntity(entity)) {
                 return true;
             }
@@ -3955,10 +3955,10 @@ class Octree {
     _numEntities = 0;
     _worldBounds;
     constructor(dimensions){
-        let x = dimensions.width / 2;
-        let y = dimensions.depth / 2;
-        let z = dimensions.height / 2;
-        let centre = new Point3D(x, y, z);
+        const x = dimensions.width / 2;
+        const y = dimensions.depth / 2;
+        const z = dimensions.height / 2;
+        const centre = new Point3D(x, y, z);
         this._worldBounds = new BoundingCuboid(centre, dimensions);
         this._root = new OctNode(this._worldBounds);
     }
@@ -3969,7 +3969,7 @@ class Octree {
         return this.root.bounds;
     }
     insert(entity) {
-        let inserted = this._root.insert(entity);
+        const inserted = this._root.insert(entity);
         console.assert(inserted, "failed to insert");
         this._numEntities++;
     }
@@ -3977,7 +3977,7 @@ class Octree {
         if (root.entities.length != 0) {
             root.entities.forEach((entity)=>entities.push(entity));
         } else {
-            for (let child of root.children){
+            for (const child of root.children){
                 if (!child.bounds.intersects(area)) {
                     continue;
                 }
@@ -3986,7 +3986,7 @@ class Octree {
         }
     }
     getEntities(area) {
-        let entities = new Array();
+        const entities = new Array();
         this.findEntitiesInArea(this.root, area, entities);
         return entities;
     }
@@ -3997,7 +3997,7 @@ class Octree {
         this.insert(entity);
     }
     verify(entities) {
-        for (let entity of entities){
+        for (const entity of entities){
             if (!this._root.recursivelyContainsEntity(entity)) {
                 console.error("tree doesn't contain entity at (x,y,z):", entity.x, entity.y, entity.z);
                 return false;
@@ -4426,7 +4426,7 @@ class Sound {
         if (volume > this._maxVolume) {
             volume = this._maxVolume;
         }
-        let track = this._tracks[id];
+        const track = this._tracks[id];
         console.log("play music at:", volume);
         track.volume = volume;
         if (!track.playing) {
@@ -4454,14 +4454,14 @@ class Sound {
     }
 }
 class ZonalAudioLoop extends Sound {
-    constructor(name, area, scene, camera){
+    constructor(name, area, camera){
         super(name, true);
-        let id = this._id;
-        let maxDistance = Math.sqrt(Math.pow(area.maxX - area.minX, 2) + Math.pow(area.maxY - area.minY, 2) + Math.pow(area.maxZ - area.minZ, 2)) / 2;
+        const id = this._id;
+        const maxDistance = Math.sqrt(Math.pow(area.maxX - area.minX, 2) + Math.pow(area.maxY - area.minY, 2) + Math.pow(area.maxZ - area.minZ, 2)) / 2;
         console.log("centre of audio zone (x,y):", area.centre.x, area.centre.y);
         console.log("max distance from centre:", maxDistance);
-        let maybePlay = function() {
-            let location = camera.location;
+        const maybePlay = function() {
+            const location = camera.location;
             if (location == undefined) {
                 console.log("couldn't get camera location");
                 return;
@@ -4475,12 +4475,12 @@ class ZonalAudioLoop extends Sound {
             let dy = location.y - area.centre.y;
             dx = Math.abs(dx / maxDistance);
             dy = Math.abs(dy / maxDistance);
-            let volume = Sound._maxVolume * Math.exp(-8 * (dx + dy));
+            const volume = Sound._maxVolume * Math.exp(-8 * (dx + dy));
             Sound.play(id, volume);
         };
         camera.addEventListener(InputEvent.CameraMove, maybePlay);
         window.addEventListener("focus", maybePlay);
-        window.addEventListener("blur", (event)=>{
+        window.addEventListener("blur", ()=>{
             Sound.pause(id);
         });
     }
@@ -4488,7 +4488,7 @@ class ZonalAudioLoop extends Sound {
 export { Sound as Sound };
 export { ZonalAudioLoop as ZonalAudioLoop };
 function getAllSegments(node) {
-    let allSegments = new Array();
+    const allSegments = new Array();
     node.topSegments.forEach((segment)=>allSegments.push(segment));
     node.baseSegments.forEach((segment)=>allSegments.push(segment));
     node.sideSegments.forEach((segment)=>allSegments.push(segment));
@@ -4506,18 +4506,18 @@ class MovableEntityDebug {
             if (!CollisionDetector.hasMissInfo(movable)) {
                 return;
             }
-            let missedEntities = CollisionDetector.getMissInfo(movable);
-            let scene = context.scene;
+            const missedEntities = CollisionDetector.getMissInfo(movable);
+            const scene = context.scene;
             const start = Date.now();
             scene.addTimedEvent(function() {
                 if (scene.ctx != null) {
                     scene.ctx.strokeStyle = "Green";
-                    for (let entity of missedEntities){
-                        let sceneNode = scene.getNode(entity.id);
+                    for (const entity of missedEntities){
+                        const sceneNode = scene.getNode(entity.id);
                         for (const segment of getAllSegments(sceneNode)){
                             scene.ctx.beginPath();
-                            let drawP0 = camera.getDrawCoord(segment.p0);
-                            let drawP1 = camera.getDrawCoord(segment.p1);
+                            const drawP0 = camera.getDrawCoord(segment.p0);
+                            const drawP1 = camera.getDrawCoord(segment.p1);
                             scene.ctx.moveTo(drawP0.x, drawP0.y);
                             scene.ctx.lineTo(drawP1.x, drawP1.y);
                             scene.ctx.stroke();
@@ -4537,16 +4537,16 @@ class MovableEntityDebug {
             const intersectInfo = collisionInfo.intersectInfo;
             const collidedEntity = collisionInfo.entity;
             const collidedFace = intersectInfo.face;
-            let scene = context.scene;
+            const scene = context.scene;
             const start = Date.now();
             scene.addTimedEvent(function() {
                 if (scene.ctx != null) {
-                    let ctx = scene.ctx;
+                    const ctx = scene.ctx;
                     ctx.strokeStyle = "Green";
                     for (const segment of getAllSegments(scene.getNode(movable.id))){
                         ctx.beginPath();
-                        let drawP0 = camera.getDrawCoord(segment.p0);
-                        let drawP1 = camera.getDrawCoord(segment.p1);
+                        const drawP0 = camera.getDrawCoord(segment.p0);
+                        const drawP1 = camera.getDrawCoord(segment.p1);
                         ctx.moveTo(drawP0.x, drawP0.y);
                         ctx.lineTo(drawP1.x, drawP1.y);
                         ctx.stroke();
@@ -4554,19 +4554,19 @@ class MovableEntityDebug {
                     ctx.strokeStyle = "Orange";
                     for (const segment1 of getAllSegments(scene.getNode(collidedEntity.id))){
                         ctx.beginPath();
-                        let drawP01 = camera.getDrawCoord(segment1.p0);
-                        let drawP11 = camera.getDrawCoord(segment1.p1);
+                        const drawP01 = camera.getDrawCoord(segment1.p0);
+                        const drawP11 = camera.getDrawCoord(segment1.p1);
                         ctx.moveTo(drawP01.x, drawP01.y);
                         ctx.lineTo(drawP11.x, drawP11.y);
                         ctx.stroke();
                     }
                     ctx.strokeStyle = "Red";
                     ctx.fillStyle = "Red";
-                    for (let vertex of collidedFace.vertices()){
+                    for (const vertex of collidedFace.vertices()){
                         ctx.beginPath();
-                        let p0 = camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point));
-                        let p1 = camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point.add(vertex.u)));
-                        let p2 = camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point.add(vertex.v)));
+                        const p0 = camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point));
+                        const p1 = camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point.add(vertex.u)));
+                        const p2 = camera.getDrawCoord(scene.graph.getDrawCoord(vertex.point.add(vertex.v)));
                         ctx.beginPath();
                         ctx.moveTo(p0.x, p0.y);
                         ctx.lineTo(p1.x, p1.y);

@@ -1,3 +1,5 @@
+//deno-lint-ignore-file no-explicit-any
+
 import { PhysicalEntity } from "./entity.ts"
 import { Camera } from "./camera.ts"
 import { Point2D,

@@ -8,8 +8,6 @@ import { SpriteSheet,
 import { ContextImpl } from "./context.ts"
 import { Point2D,
          Point3D,
-         Geometry,
-         CuboidGeometry,
          RampUpWestGeometry,
          RampUpEastGeometry,
          RampUpSouthGeometry,
@@ -116,8 +114,8 @@ export class Terrain extends PhysicalEntity {
                     sheet: SpriteSheet,
                     x: number, y: number,
                     width: number, height: number) {
-    let sprite = new Sprite(sheet, x, y, width, height);
-    let component = new StaticGraphicComponent(sprite.id); 
+    const sprite = new Sprite(sheet, x, y, width, height);
+    const component = new StaticGraphicComponent(sprite.id); 
     if (!this._terrainGraphics.has(terrainType)) {
       this._terrainGraphics.set(terrainType, new Map<TerrainShape, GraphicComponent>());
     }
@@ -187,6 +185,7 @@ export class Terrain extends PhysicalEntity {
     switch (terrain) {
     default:
       console.error("unhandled terrain shape:", terrain);
+      return "invalid shape";
     case TerrainShape.Flat:
       return "flat";
     case TerrainShape.Wall:
@@ -240,6 +239,7 @@ export class Terrain extends PhysicalEntity {
     switch (terrain) {
     default:
       console.error("unhandled terrain type:", terrain);
+      return "invalid terrain";
     case TerrainType.Water:
       return "water";
     case TerrainType.Lowland0:
@@ -360,7 +360,7 @@ export class Terrain extends PhysicalEntity {
 
     // Pre-calculate the angle of the ramp.
     if (!Terrain.isFlat(_shape)) {
-      let theta = Math.atan(this.height / this.depth) * 180 / Math.PI;
+      const theta = Math.atan(this.height / this.depth) * 180 / Math.PI;
       this._tanTheta = Math.tan(theta);
     } else {
       this._tanTheta = 0;
@@ -376,22 +376,20 @@ export class Terrain extends PhysicalEntity {
       this._geometry = new RampUpNorthGeometry(this.geometry.bounds);
     }
 
-    let x = this.bounds.centre.x;
-    let y = this.bounds.centre.y;
-    let z = this.heightAt(this.bounds.centre)!;
+    const x = this.bounds.centre.x;
+    const y = this.bounds.centre.y;
+    const z = this.heightAt(this.bounds.centre)!;
     this._surfaceLocation = new Point3D(x, y, z);
 
     if (features == TerrainFeature.None) {
       return;
     }
 
-    for (let key in TerrainFeature) {
-      if (typeof TerrainFeature[key] === "number") {
-        let feature = <TerrainFeature><any>TerrainFeature[key];
-        if (Terrain.isSupportedFeature(feature) &&
-            hasFeature(features, feature)) {
-          this.addGraphic(Terrain.featureGraphics(feature));
-        }
+    for (const value of Object.values(TerrainFeature)) {
+      const feature = <TerrainFeature>value;
+      if (Terrain.isSupportedFeature(feature) &&
+          hasFeature(features, feature)) {
+        this.addGraphic(Terrain.featureGraphics(feature));
       }
     }
   }
@@ -423,9 +421,9 @@ export class TerrainGrid {
       new Point2D(-1, 0),                       new Point2D(1, 0),
       new Point2D(-1, 1),  new Point2D(0, 1),   new Point2D(1, 1), ];
 
-  private _surfaceTerrain: Array<Array<Terrain>> = new Array();
-  private _totalSurface: number = 0;
-  private _totalSubSurface: number = 0;
+  private _surfaceTerrain: Array<Array<Terrain>> = new Array<Array<Terrain>>();
+  private _totalSurface = 0;
+  private _totalSubSurface = 0;
 
   constructor(private readonly _context: ContextImpl,
               private readonly _width: number,
@@ -443,7 +441,7 @@ export class TerrainGrid {
 
   addSurfaceTerrain(x: number, y: number, z: number, ty: TerrainType,
                     shape: TerrainShape, feature: TerrainFeature): void {
-    let terrain = Terrain.create(this._context, x, y, z, ty, shape, feature);
+    const terrain = Terrain.create(this._context, x, y, z, ty, shape, feature);
     this.surfaceTerrain[y][x] = terrain;
     this._totalSurface++;
   }
@@ -465,10 +463,10 @@ export class TerrainGrid {
   }
 
   getNeighbours(centre: Terrain): Array<Terrain> {
-    let neighbours = new Array<Terrain>();
+    const neighbours = new Array<Terrain>();
    
-    for (let offset of TerrainGrid.neighbourOffsets) {
-      let neighbour = this.getSurfaceTerrainAt(centre.x + offset.x,
+    for (const offset of TerrainGrid.neighbourOffsets) {
+      const neighbour = this.getSurfaceTerrainAt(centre.x + offset.x,
                                                centre.y + offset.y);
       if (!neighbour) {
         continue;

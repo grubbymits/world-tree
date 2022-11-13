@@ -57,7 +57,7 @@ export class MinPriorityQueue<T> implements PriorityQueue<T> {
   }
   setKey(x: T, k: number): void {
     console.assert(this.indices.has(x));
-    const i: number = this.indices.get(x)!;
+    let i: number = this.indices.get(x)!;
     console.assert(i < this.length);
     const item: QueueItem<T> = this.items[i];
     console.assert(k <= item.key);
