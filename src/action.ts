@@ -1,13 +1,10 @@
 import { Actor } from "./entity.ts"
 import { EntityEvent } from "./events.ts"
-import { Direction } from "./navigation.ts"
 import { BoundingCuboid,
          CollisionDetector,
          CollisionInfo } from "./physics.ts"
 import { Point3D,
-         Vector3D,
-         Geometry } from "./geometry.ts"
-import { Octree } from "./tree.ts"
+         Vector3D } from "./geometry.ts"
 
 export abstract class Action {
   constructor(protected _actor: Actor) { }
@@ -23,10 +20,10 @@ class MoveAction extends Action {
   }
 
   obstructed(from: Point3D, to: Point3D): CollisionInfo|null {
-    let bounds = this._actor.bounds;
+    const bounds = this._actor.bounds;
     // Create a bounds to contain the current location and the destination.
-    let path: Vector3D = to.vec_diff(from);
-    let area = new BoundingCuboid(to, bounds.dimensions);
+    const path: Vector3D = to.vec_diff(from);
+    const area = new BoundingCuboid(to, bounds.dimensions);
     area.insert(bounds);
     return CollisionDetector.detectInArea(this._actor, path, area);
   }
@@ -69,14 +66,13 @@ export class MoveDestination extends MoveAction {
     this.destination = _destination;
   }
 
-  get destination(): Point3D { return this._destination; }
-
   set speed(speed: number) { this._step = speed; }
 
+  get destination(): Point3D { return this._destination; }
   set destination(destination: Point3D) {
     this._destination = destination;
-    let currentPos = this.actor.bounds.minLocation;
-    let maxD = destination.vec_diff(currentPos);
+    const currentPos = this.actor.bounds.minLocation;
+    const maxD = destination.vec_diff(currentPos);
 
     console.assert(maxD.x == 0 || maxD.y == 0 || maxD.z == 0,
                    "can only change distance along two axes simultaneously");
@@ -116,9 +112,9 @@ export class MoveDestination extends MoveAction {
         adjacent = maxD.z > 0 ? maxD.x : maxD.z;
         opposite = maxD.z > 0 ? maxD.z : maxD.x;
       }
-      let theta = Math.atan(opposite / adjacent) * 180 / Math.PI;
-      let oppDiff = Math.sin(theta) * this._step;
-      let adjDiff = Math.cos(theta) * this._step;
+      const theta = Math.atan(opposite / adjacent) * 180 / Math.PI;
+      const oppDiff = Math.sin(theta) * this._step;
+      const adjDiff = Math.cos(theta) * this._step;
 
       if (maxD.z == 0) {
         dx = adjacent == maxD.y ? oppDiff : adjDiff;
@@ -137,10 +133,10 @@ export class MoveDestination extends MoveAction {
   perform(): boolean {
     console.log("perform action");
     // Make sure we don't overshoot the destination.
-    let bounds: BoundingCuboid = this.actor.bounds;
-    let location: Point3D = bounds.minLocation;
-    let maxD: Vector3D = this.destination.vec_diff(location);
-    let minD: Vector3D = maxD.absMin(this._d);
+    const bounds: BoundingCuboid = this.actor.bounds;
+    const location: Point3D = bounds.minLocation;
+    const maxD: Vector3D = this.destination.vec_diff(location);
+    const minD: Vector3D = maxD.absMin(this._d);
     this.actor.updatePosition(minD);
     this.actor.postEvent(EntityEvent.Moving);
     return bounds.minLocation.isSameAsRounded(this.destination);
@@ -159,7 +155,7 @@ class MovementCost {
 export class Navigate extends Action {
   private _currentStep: MoveDestination;
   private _waypoints: Array<Point3D>;
-  private _index: number = 0;
+  private _index = 0;
 
   constructor(actor: Actor,
               private readonly _step: number,
@@ -180,7 +176,7 @@ export class Navigate extends Action {
 
     // Perform the current movement until we reach the waypoint, or fail to get
     // there.
-    let finishedStep: boolean = this._currentStep.perform();
+    const finishedStep: boolean = this._currentStep.perform();
     if (!finishedStep) {
       return false;
     }
@@ -204,14 +200,14 @@ export class Navigate extends Action {
       return true;
     }
 
-    let nextLocation = this._waypoints[this._index];
+    const nextLocation = this._waypoints[this._index];
     this._currentStep =
       new MoveDestination(this._actor, this._step, nextLocation);
     return false;
   }
 
   findPath(): Array<Point3D> {
-    let path = new Array<Point3D>();
+    const path = new Array<Point3D>();
     return path;
     /*
   
