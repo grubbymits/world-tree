@@ -1,7 +1,7 @@
 import { assertEquals,
          assertExists } from "https://deno.land/std@0.160.0/testing/asserts.ts";
 
-import * as WT from '../dist/world-tree.js';
+import * as WT from '../world-tree.js';
 
 Deno.test('2D point addition and subtraction', () => {
   const p0 = new WT.Point2D(6, 7);

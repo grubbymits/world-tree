@@ -1,6 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.160.0/testing/asserts.ts";
 
-import * as WT from '../dist/world-tree.js';
+import * as WT from '../world-tree.js';
 
 function addDummyGraphic(sheet, type, shape) {
   WT.Terrain.addGraphic(/*terrainType*/type,

@@ -1,4 +1,2 @@
-node_modules
-coverage
 *.swp
-dist/*.js
+world-tree.js

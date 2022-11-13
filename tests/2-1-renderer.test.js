@@ -1,6 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.160.0/testing/asserts.ts";
 
-import * as WT from '../dist/world-tree.js';
+import * as WT from '../world-tree.js';
 
 const width = 72;
 const depth = 72;
