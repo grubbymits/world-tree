@@ -1,27 +1,27 @@
-import { Direction,
-         Dimensions,
-         BoundingCuboid } from "./physics.js"
-import { Point2D,
-         Segment2D,
-         Point3D,
+//deno-lint-ignore-file no-explicit-any
+
+import { Direction } from "./navigation.ts"
+import { Dimensions,
+         BoundingCuboid } from "./physics.ts"
+import { Point3D,
          Vector3D,
          Geometry,
-         CuboidGeometry } from "./geometry.js"
-import { GraphicComponent } from "./graphics.js"
-import { ContextImpl } from "./context.js"
-import { Action } from "./action.js"
+         CuboidGeometry } from "./geometry.ts"
+import { GraphicComponent } from "./graphics.ts"
+import { ContextImpl } from "./context.ts"
+import { Action } from "./action.ts"
 import { EntityEvent,
-         EventHandler } from "./events.js"
+         EventHandler } from "./events.ts"
 
 export class PhysicalEntity {
-  private static _ids: number = 0;
+  private static _ids = 0;
 
   protected readonly _id: number;
 
-  protected _visible: boolean = true;
-  protected _drawable: boolean = false;
+  protected _visible = true;
+  protected _drawable = false;
   protected _geometry: Geometry;
-  protected _drawGeometry: boolean = false;
+  protected _drawGeometry = false;
   protected _handler = new EventHandler<EntityEvent>();
   protected _graphicComponents: Array<GraphicComponent> =
     new Array<GraphicComponent>();
@@ -47,7 +47,6 @@ export class PhysicalEntity {
     this._context.addEntity(this);
   }
 
-  set visible(visible: boolean) { this._visible = visible; }
   get context(): ContextImpl { return this._context; }  
   get geometry(): Geometry { return this._geometry; }
   get bounds(): BoundingCuboid { return this._geometry.bounds; }
@@ -61,6 +60,7 @@ export class PhysicalEntity {
   get centre(): Point3D { return this.bounds.centre; }
   get id(): number { return this._id; }
   get visible(): boolean { return this._visible; }
+  set visible(visible: boolean) { this._visible = visible; }
   get drawable(): boolean { return this._drawable; }
   get drawGeometry(): boolean { return this._drawGeometry; }
   get graphics(): Array<GraphicComponent> {
@@ -80,11 +80,11 @@ export class PhysicalEntity {
     this.geometry.transform(d);
   }
 
-  addEventListener(event: EntityEvent, callback: Function): void {
+  addEventListener(event: EntityEvent, callback: any): void {
     this._handler.addEventListener(event, callback);
   }
 
-  removeEventListener(event: EntityEvent, callback: Function): void {
+  removeEventListener(event: EntityEvent, callback: any): void {
     this._handler.removeEventListener(event, callback);
   }
 
@@ -96,8 +96,8 @@ export class PhysicalEntity {
 }
 
 export class MovableEntity extends PhysicalEntity {
-  protected readonly _lift: number = 0;
-  protected readonly _canSwim: boolean = false;
+  protected readonly _lift = 0;
+  protected readonly _canSwim = false;
   protected _direction: Direction;
 
   constructor(context: ContextImpl,
@@ -147,7 +147,7 @@ export function createGraphicalEntity(context: ContextImpl,
                                       location: Point3D,
                                       dimensions: Dimensions,
                                       graphicComponent: GraphicComponent) {
-  let entity = new PhysicalEntity(context, location, dimensions);
+  const entity = new PhysicalEntity(context, location, dimensions);
   entity.addGraphic(graphicComponent);
   return entity;
 }
@@ -156,7 +156,7 @@ export function createGraphicalMovableEntity(context: ContextImpl,
                                              location: Point3D,
                                              dimensions: Dimensions,
                                              graphicComponent: GraphicComponent) {
-  let entity = new MovableEntity(context, location, dimensions);
+  const entity = new MovableEntity(context, location, dimensions);
   entity.addGraphic(graphicComponent);
   return entity;
 }
@@ -165,7 +165,7 @@ export function createGraphicalActor(context: ContextImpl,
                                      location: Point3D,
                                      dimensions: Dimensions,
                                      graphicComponent: GraphicComponent) {
-  let actor = new Actor(context, location, dimensions);
+  const actor = new Actor(context, location, dimensions);
   actor.addGraphic(graphicComponent);
   return actor;
 }

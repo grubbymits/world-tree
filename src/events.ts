@@ -1,3 +1,5 @@
+//deno-lint-ignore-file no-explicit-any
+
 export enum EntityEvent {
   Moving = "moving",
   EndMove = "endMove",
@@ -11,7 +13,7 @@ export enum InputEvent {
 }
 
 export class EventHandler<T> {
-  protected _listeners = new Map<T, Array<Function>>();
+  protected _listeners = new Map<T, Array<any>>();
   protected _events = new Set<T>();
 
   constructor() { }
@@ -21,25 +23,25 @@ export class EventHandler<T> {
   }
 
   service(): void {
-    for (let event of this._events) {
+    for (const event of this._events) {
       if (!this._listeners.has(event)) {
         continue;
       }
-      let callbacks = this._listeners.get(event)!;
-      for (let callback of callbacks) { 
+      const callbacks = this._listeners.get(event)!;
+      for (const callback of callbacks) { 
         callback();
       }
     }
     this._events.clear();
   }
 
-  addEventListener(event: T, callback: Function): void {
+  addEventListener(event: T, callback: any): void {
     if (!this._listeners.has(event)) {
-      this._listeners.set(event, new Array<Function>());
+      this._listeners.set(event, new Array<any>());
     } else {
       // Check that the callback doesn't already exist.
-      let callbacks = this._listeners.get(event)!;
-      for (let i in callbacks) {
+      const callbacks = this._listeners.get(event)!;
+      for (const i in callbacks) {
         if (callbacks[i] === callback) {
           return;
         }
@@ -48,11 +50,11 @@ export class EventHandler<T> {
     this._listeners.get(event)!.push(callback);
   }
 
-  removeEventListener(event: T, callback: Function): void {
+  removeEventListener(event: T, callback: any): void {
     if (!this._listeners.has(event)) {
       return;
     }
-    let callbacks = this._listeners.get(event)!;
+    const callbacks = this._listeners.get(event)!;
     const index = callbacks.indexOf(callback, 0);
     if (index > -1) {
       callbacks.splice(index, 1);
@@ -61,11 +63,11 @@ export class EventHandler<T> {
 }
 
 export class TimedEventHandler {
-  private _callbacks: Array<Function> = new Array<Function>();
+  private _callbacks: Array<any> = new Array<any>();
 
   constructor() { }
 
-  add(callback: Function): void {
+  add(callback: any): void {
     this._callbacks.push(callback);
   }
 

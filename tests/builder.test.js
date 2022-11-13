@@ -1,3 +1,5 @@
+import { assertEquals } from "https://deno.land/std@0.160.0/testing/asserts.ts";
+
 import * as WT from '../dist/world-tree.js';
 
 function addDummyGraphic(sheet, type, shape) {
@@ -25,7 +27,7 @@ const shapes = [
   WT.TerrainShape.RampUpNorth,
 ];
                                            
-test('terrace spacing with non-negative heights', () => {
+Deno.test('terrace spacing with non-negative heights', () => {
   const dims = new WT.Dimensions(5, 5, 5);
   const width = 5;
   const depth = 5;
@@ -43,10 +45,10 @@ test('terrace spacing with non-negative heights', () => {
                                              WT.TerrainType.Lowland0,
                                              WT.TerrainType.Lowland0);
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
-  expect(builder.terraceSpacing).toBe(1);
+  assertEquals(builder.terraceSpacing, 1);
 });
 
-test('terrace spacing with non-positive heights', () => {
+Deno.test('terrace spacing with non-positive heights', () => {
   const dims = new WT.Dimensions(5, 5, 5);
   const width = 5;
   const depth = 6;
@@ -64,10 +66,10 @@ test('terrace spacing with non-positive heights', () => {
                                              WT.TerrainType.Lowland0,
                                              WT.TerrainType.Lowland0);
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
-  expect(builder.terraceSpacing).toBe(1);
+  assertEquals(builder.terraceSpacing, 1);
 });
 
-test('terrace spacing with positive and negative heights', () => {
+Deno.test('terrace spacing with positive and negative heights', () => {
   const dims = new WT.Dimensions(5, 5, 5);
   const width = 5;
   const depth = 6;
@@ -85,10 +87,10 @@ test('terrace spacing with positive and negative heights', () => {
                                              WT.TerrainType.Lowland0,
                                              WT.TerrainType.Lowland0);
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
-  expect(builder.terraceSpacing).toBe(1.5);
+  assertEquals(builder.terraceSpacing, 1.5);
 });
 
-test('ramps', () => {
+Deno.test('ramps', () => {
   const dims = new WT.Dimensions(5, 5, 5);
   const width = 11;
   const depth = 11;
@@ -156,13 +158,13 @@ test('ramps', () => {
         shape = WT.TerrainShape.RampUpSouth;
         geometry = "RampUpSouthGeometry";
       }
-      expect(builder.terrainShapeAt(x, y)).toBe(shape);
-      //expect(builder.terrainGeometryName(x, y)).toBe(geometry);
+      assertEquals(builder.terrainShapeAt(x, y), shape);
+      //assertEquals(builder.terrainGeometryName(x, y), geometry);
     }
   }
 });
 
-test('walls', () => {
+Deno.test('walls', () => {
   const dims = new WT.Dimensions(5, 5, 5);
   const width = 5;
   const depth = 6;
@@ -189,20 +191,20 @@ test('walls', () => {
   for (let y = 0; y < depth; ++y) {
     for (let x = 0; x < width; ++x) {
       if (x == 4) {
-        expect(builder.terrainShapeAt(x, y)).toBe(WT.TerrainShape.Wall);
+        assertEquals(builder.terrainShapeAt(x, y), WT.TerrainShape.Wall);
       } else if ((x == 2 && y == 2) ||
                  (x == 1 && y == 3) ||
                  (x == 3 && y == 3) ||
                  (x == 2 && y == 4)) {
-        expect(builder.terrainShapeAt(x, y)).toBe(WT.TerrainShape.Wall);
+        assertEquals(builder.terrainShapeAt(x, y), WT.TerrainShape.Wall);
       } else {
-        expect(builder.terrainShapeAt(x, y)).toBe(WT.TerrainShape.Flat);
+        assertEquals(builder.terrainShapeAt(x, y), WT.TerrainShape.Flat);
       }
     }
   }
 });
 
-test('shoreline', () => {
+Deno.test('shoreline', () => {
   const dims = new WT.Dimensions(5, 5, 5);
   const width = 5;
   const depth = 5;
@@ -239,24 +241,24 @@ test('shoreline', () => {
   builder.generateMap(context);
 
   for (let x = 0; x < width; ++x) {
-    expect(builder.terrainTypeAt(x, 0)).toBe(WT.TerrainType.Water);
-    expect(builder.terrainTypeAt(x, 4)).toBe(WT.TerrainType.Water);
+    assertEquals(builder.terrainTypeAt(x, 0), WT.TerrainType.Water);
+    assertEquals(builder.terrainTypeAt(x, 4), WT.TerrainType.Water);
   }
   for (let y = 0; y < depth; ++y) {
-    expect(builder.terrainTypeAt(0, y)).toBe(WT.TerrainType.Water);
-    expect(builder.terrainTypeAt(4, y)).toBe(WT.TerrainType.Water);
+    assertEquals(builder.terrainTypeAt(0, y), WT.TerrainType.Water);
+    assertEquals(builder.terrainTypeAt(4, y), WT.TerrainType.Water);
   }
   for (let x = 1; x < width - 1; ++x) {
-    expect(builder.terrainTypeAt(x, 1)).toBe(WT.TerrainType.Lowland0);
-    expect(builder.hasFeature(x, 1, WT.TerrainFeature.ShorelineNorth)).toBe(true);
-    expect(builder.terrainTypeAt(x, 3)).toBe(WT.TerrainType.Lowland0);
-    expect(builder.hasFeature(x, 3, WT.TerrainFeature.ShorelineSouth)).toBe(true);
+    assertEquals(builder.terrainTypeAt(x, 1), WT.TerrainType.Lowland0);
+    assertEquals(builder.hasFeature(x, 1, WT.TerrainFeature.ShorelineNorth), true);
+    assertEquals(builder.terrainTypeAt(x, 3), WT.TerrainType.Lowland0);
+    assertEquals(builder.hasFeature(x, 3, WT.TerrainFeature.ShorelineSouth), true);
   }
   for (let y = 1; y < depth - 1; ++y) {
-    expect(builder.terrainTypeAt(1, y)).toBe(WT.TerrainType.Lowland0);
-    expect(builder.hasFeature(1, y, WT.TerrainFeature.ShorelineWest)).toBe(true);
-    expect(builder.terrainTypeAt(3, y)).toBe(WT.TerrainType.Lowland0);
-    expect(builder.hasFeature(3, y, WT.TerrainFeature.ShorelineEast)).toBe(true);
+    assertEquals(builder.terrainTypeAt(1, y), WT.TerrainType.Lowland0);
+    assertEquals(builder.hasFeature(1, y, WT.TerrainFeature.ShorelineWest), true);
+    assertEquals(builder.terrainTypeAt(3, y), WT.TerrainType.Lowland0);
+    assertEquals(builder.hasFeature(3, y, WT.TerrainFeature.ShorelineEast), true);
   }
 });
 

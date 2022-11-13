@@ -45,7 +45,7 @@ class Droid extends WT.Actor {
         dy = 1;
       }
       let moveVector = new WT.Vector3D(dx, dy, dz);
-      this.direction = WT.getDirectionFromVector(moveVector);
+      this.direction = WT.Navigation.getDirectionFromVector(moveVector);
       this.action = new WT.MoveDirection(this, moveVector, context.bounds);
     };
 

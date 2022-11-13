@@ -1,8 +1,9 @@
-import { BoundingCuboid } from "./physics.js"
-import { Point3D } from "./geometry.js"
-import { Camera } from "./camera.js"
-import { SceneGraph } from "./scene.js"
-import { InputEvent } from "./events.js"
+//deno-lint-ignore-file no-window-prefix
+
+import { BoundingCuboid } from "./physics.ts"
+import { Point3D } from "./geometry.ts"
+import { Camera } from "./camera.ts"
+import { InputEvent } from "./events.ts"
 
 export class Sound {
   private static _tracks = new Array<Sound>();
@@ -16,7 +17,7 @@ export class Sound {
     if (volume > this._maxVolume) {
       volume = this._maxVolume;
     }
-    let track = this._tracks[id];
+    const track = this._tracks[id];
     console.log("play music at:", volume);
     track.volume = volume;
     if (!track.playing) {
@@ -44,18 +45,17 @@ export class Sound {
 export class ZonalAudioLoop extends Sound {
   constructor(name: string,
               area: BoundingCuboid,
-              scene: SceneGraph,
               camera: Camera) {
     super(name, true);
-    let id = this._id;
-    let maxDistance = Math.sqrt(Math.pow(area.maxX - area.minX, 2) +
-                                Math.pow(area.maxY - area.minY, 2) +
-                                Math.pow(area.maxZ - area.minZ, 2)) / 2;
+    const id = this._id;
+    const maxDistance = Math.sqrt(Math.pow(area.maxX - area.minX, 2) +
+                                  Math.pow(area.maxY - area.minY, 2) +
+                                  Math.pow(area.maxZ - area.minZ, 2)) / 2;
     console.log("centre of audio zone (x,y):", area.centre.x, area.centre.y);
     console.log("max distance from centre:", maxDistance);
 
-    let maybePlay = function() {
-      let location: Point3D|null = camera.location;
+    const maybePlay = function() {
+      const location: Point3D|null = camera.location;
       if (location == undefined) {
         console.log("couldn't get camera location");
         return;
@@ -69,7 +69,7 @@ export class ZonalAudioLoop extends Sound {
       let dy = location!.y - area.centre.y;
       dx = Math.abs(dx / maxDistance);
       dy = Math.abs(dy / maxDistance);
-      let volume = Sound._maxVolume * Math.exp(-8 * (dx + dy));
+      const volume = Sound._maxVolume * Math.exp(-8 * (dx + dy));
       Sound.play(id, volume);
     }
 
@@ -77,7 +77,7 @@ export class ZonalAudioLoop extends Sound {
     // cameras centre point - further away is quieter.
     camera.addEventListener(InputEvent.CameraMove, maybePlay);
     window.addEventListener("focus", maybePlay);
-    window.addEventListener("blur", (event) => {
+    window.addEventListener("blur", () => {
       Sound.pause(id);
     });
   }
