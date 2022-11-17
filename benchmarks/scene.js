@@ -1,4 +1,4 @@
-import * as WT from '../dist/world-tree.js';
+import * as WT from '../world-tree.js';
 
 class WorldConfig {
   constructor() {
