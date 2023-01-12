@@ -10,5 +10,8 @@
     "files": {
       "include": ["tests/"]
     }
+  },
+  "tasks": {
+    "build": "deno bundle --config deno.json src/world-tree.ts world-tree.js"
   }
 }
