@@ -462,6 +462,17 @@ export class TerrainGrid {
     return this.surfaceTerrain[y][x];
   }
 
+  getSurfaceTerrainAtPoint(loc: Point3D): Terrain|null {
+    const scaled: Point3D = Terrain.scaleLocation(loc);
+    const terrain = this.getSurfaceTerrainAt(scaled.x, scaled.y);
+    if (terrain != null) {
+      if (terrain.surfaceLocation.z == scaled.z) {
+        return terrain;
+      }
+    }
+    return null;
+  }
+
   getNeighbours(centre: Terrain): Array<Terrain> {
     const neighbours = new Array<Terrain>();
    

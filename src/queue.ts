@@ -4,6 +4,7 @@ export interface PriorityQueue<T> {
   build(): void;
   pop(): T;
   setKey(x: T, k: number): void;
+  empty(): boolean;
 }
 
 class QueueItem <T> {
@@ -24,6 +25,7 @@ export class MinPriorityQueue<T> implements PriorityQueue<T> {
   get items(): Array<QueueItem<T>> { return this._items; }
   get size(): number { return this.items.length - 1; }
   get length(): number { return this.items.length; }
+  empty(): boolean { return this.length == 0; }
   pop(): T {
     const minItem = this.items[0];
     this.items.splice(0, 1);

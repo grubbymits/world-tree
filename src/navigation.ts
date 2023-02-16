@@ -1,7 +1,9 @@
 import { Point2D,
+         Point3D,
          Vector2D } from "./geometry.ts"
 import { Terrain,
          TerrainGrid } from "./terrain.ts"
+import { MinPriorityQueue } from "./queue.ts"
 
 export enum Direction {
   North,
@@ -128,30 +130,32 @@ class PathNode {
 
   get x(): number { return this._x; }
   get y(): number { return this._y; }
+  get neighbours(): Map<PathNode, number> { return this._edgeCosts; }
 }
 
 export class PathFinder {
 
   private _graph: Array<Array<PathNode>> = new Array<Array<PathNode>>();
 
-  constructor(grid: TerrainGrid) {
+  constructor(private readonly _grid: TerrainGrid) {
     // Create path nodes for all surface locations.
-    for (let y = 0; y < grid.depth; y++) {
+    for (let y = 0; y < this.grid.depth; y++) {
       this.graph[y] = new Array<PathNode>();
-      for (let x = 0; x < grid.width; x++) {
-        const centre = grid.getSurfaceTerrainAt(x, y)!;
+      for (let x = 0; x < this.grid.width; x++) {
+        const centre = this.grid.getSurfaceTerrainAt(x, y)!;
         this.addNode(x, y, centre);
       }
     }
 
-    for (let y = 0; y < grid.depth; y++) {
-      for (let x = 0; x < grid.width; x++) {
-        const centre = grid.getSurfaceTerrainAt(x, y)!;
-        this.addNeighbours(centre, grid);
+    for (let y = 0; y < this.grid.depth; y++) {
+      for (let x = 0; x < this.grid.width; x++) {
+        const centre = this.grid.getSurfaceTerrainAt(x, y)!;
+        this.addNeighbours(centre, this.grid);
       }
     }
   }
 
+  get grid(): TerrainGrid { return this._grid; }
   get graph(): Array<Array<PathNode>> { return this._graph; }
 
   addNode(x: number, y: number, terrain: Terrain): void {
@@ -160,6 +164,16 @@ export class PathFinder {
 
   getNode(x: number, y: number): PathNode {
     return this._graph[y][x];
+  }
+
+  getNeighbourCost(centre: Terrain, to: Terrain): number {
+    // If a horizontal, or vertical, move cost 1 then a diagonal move would be
+    // 1.444... So scale by 2 and round. Double the cost of changing height.
+    const cost = centre.x == to.x || centre.y == to.y ? 2 : 3;
+    if (Terrain.isFlat(centre.shape) && Terrain.isFlat(to.shape)) {
+      return cost;
+    }
+    return centre.z == to.z ? cost : cost * 2;
   }
 
   addNeighbours(centre: Terrain, grid: TerrainGrid): void {
@@ -211,43 +225,53 @@ export class PathFinder {
     });
   }
 
-  getNeighbourCost(centre: Terrain, to: Terrain): number {
-    // If a horizontal, or vertical, move cost 1 then a diagonal move would be
-    // 1.444... So scale by 2 and round. Double the cost of changing height.
-    const cost = centre.x == to.x || centre.y == to.y ? 2 : 3;
-    if (Terrain.isFlat(centre.shape) && Terrain.isFlat(to.shape)) {
-      return cost;
+  findPath(startPoint: Point3D, endPoint: Point3D): Array<PathNode> {
+    const startTerrain: Terrain|null =
+      this.grid.getSurfaceTerrainAtPoint(startPoint);
+    const endTerrain: Terrain|null =
+      this.grid.getSurfaceTerrainAtPoint(endPoint);
+    if (startTerrain == null || endTerrain == null) {
+      console.log('either start or end terrain is null');
+      return new Array<PathNode>();
     }
-    return centre.z == to.z ? cost : cost * 2;
-  }
-  
-  isAccessible(centre: PathNode, dx: number, dy: number): boolean {
-    const succ: PathNode = this.getNode(centre.x + dx, centre.y + dy);
-    return centre.hasSuccessor(succ);
-  }
+    // https://www.redblobgames.com/pathfinding/a-star/introduction.html
+    const start = new PathNode(startTerrain!);
+    const end = new PathNode(endTerrain!);
+    const frontier = new MinPriorityQueue<PathNode>();
+    const cameFrom = new Map<PathNode, PathNode|null>();
+    const costs = new Map<PathNode, number>();
 
-  findPath() {
-    //let frontier = new MaxPriorityQueue<PathNode, number>();
-    //frontier.insert(startNode, 0);
-    //came_from = new Map<PathNode, PathNode>();
-    //cost_so_far = new Map<PathNode, number>();
+    frontier.insert(start, 0);
+    cameFrom.set(start, null);
+    costs.set(start, 0);
+    let current: PathNode = start;
+    while (!frontier.empty()) {
+      current = frontier.pop();
+      if (current == end) {
+        break;
+      }
+      current.neighbours.forEach((cost: number, next: PathNode) => {
+        const new_cost = costs.get(current)! + cost;
+        if (!costs.has(next) || new_cost < costs.get(next)!) {
+          costs.set(next, new_cost);
+          const priority = new_cost;// + heuristic(goal, next)
+          frontier.insert(next, priority)
+          cameFrom.set(next, current);
+        }
+      });
+    }
 
-    ////came_from.set(start, null);
-    //cost_so_far.set(start, 0);
-    //
-    //while (!frontier.empty()) {
-    //   let current: PathNode = frontier.pop();
-    //
-    //   if current == goal:
-    //      break
-    //   
-    //   for next in graph.neighbors(current):
-    //      new_cost = cost_so_far[current] + graph.cost(current, next)
-    //      if next not in cost_so_far or new_cost < cost_so_far[next]:
-    //         cost_so_far[next] = new_cost
-    //         priority = new_cost + heuristic(goal, next)
-    //         frontier.put(next, priority)
-    //         came_from[next] = current
-    //}
+    // Failed to find path.
+    if (current != end) {
+      return Array<PathNode>();
+    }
+
+    const path = new Array<PathNode>(current!);
+    while (current != start) {
+      current = cameFrom.get(current!)!;
+      path.push(current!);
+    }
+    path.reverse();
+    return path.splice(1);
   }
 }
