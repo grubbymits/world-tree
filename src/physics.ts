@@ -1,21 +1,25 @@
-import { PhysicalEntity,
-         MovableEntity } from "./entity.ts"
-import { Point3D,
-         Vector3D,
-         Geometry,
-         IntersectInfo } from "./geometry.ts"
-import { Octree } from "./tree.ts"
-import { EntityEvent } from "./events.ts"
-import { ContextImpl } from "./context.ts"
+import { MovableEntity, PhysicalEntity } from "./entity.ts";
+import { Geometry, IntersectInfo, Point3D, Vector3D } from "./geometry.ts";
+import { Octree } from "./tree.ts";
+import { EntityEvent } from "./events.ts";
+import { ContextImpl } from "./context.ts";
 
 export class Dimensions {
-  constructor(protected readonly _width: number,
-              protected readonly _depth: number,
-              protected readonly _height: number) { }
+  constructor(
+    protected readonly _width: number,
+    protected readonly _depth: number,
+    protected readonly _height: number,
+  ) {}
 
-  get width(): number { return this._width; }
-  get depth(): number { return this._depth; }
-  get height(): number { return this._height; }
+  get width(): number {
+    return this._width;
+  }
+  get depth(): number {
+    return this._depth;
+  }
+  get height(): number {
+    return this._height;
+  }
   log(): void {
     console.log(" - (WxDxH):", this.width, this.depth, this.height);
   }
@@ -26,26 +30,53 @@ export class BoundingCuboid {
   private _maxLocation: Point3D;
   private _bottomCentre: Point3D;
 
-  constructor(private _centre: Point3D,
-              private _dimensions: Dimensions) {
+  constructor(private _centre: Point3D, private _dimensions: Dimensions) {
     this.centre = _centre;
   }
 
-  get minLocation(): Point3D { return this._minLocation; }
-  get minX(): number { return this.minLocation.x; }
-  get minY(): number { return this.minLocation.y; }
-  get minZ(): number { return this.minLocation.z; }
-  get maxLocation(): Point3D { return this._maxLocation; }
-  get maxX(): number { return this.maxLocation.x; }
-  get maxY(): number { return this.maxLocation.y; }
-  get maxZ(): number { return this.maxLocation.z; }
-  get bottomCentre(): Point3D { return this._bottomCentre; }
-  get width(): number { return this._dimensions.width; }
-  get depth(): number { return this._dimensions.depth; }
-  get height(): number { return this._dimensions.height; }
-  get dimensions(): Dimensions { return this._dimensions; }
+  get minLocation(): Point3D {
+    return this._minLocation;
+  }
+  get minX(): number {
+    return this.minLocation.x;
+  }
+  get minY(): number {
+    return this.minLocation.y;
+  }
+  get minZ(): number {
+    return this.minLocation.z;
+  }
+  get maxLocation(): Point3D {
+    return this._maxLocation;
+  }
+  get maxX(): number {
+    return this.maxLocation.x;
+  }
+  get maxY(): number {
+    return this.maxLocation.y;
+  }
+  get maxZ(): number {
+    return this.maxLocation.z;
+  }
+  get bottomCentre(): Point3D {
+    return this._bottomCentre;
+  }
+  get width(): number {
+    return this._dimensions.width;
+  }
+  get depth(): number {
+    return this._dimensions.depth;
+  }
+  get height(): number {
+    return this._dimensions.height;
+  }
+  get dimensions(): Dimensions {
+    return this._dimensions;
+  }
 
-  get centre(): Point3D { return this._centre; }
+  get centre(): Point3D {
+    return this._centre;
+  }
   set centre(centre: Point3D) {
     this._centre = centre;
     const width = this.width / 2;
@@ -61,7 +92,7 @@ export class BoundingCuboid {
     x = centre.x + width;
     y = centre.y + depth;
     z = centre.z + height;
-    this._maxLocation  = new Point3D(x, y, z);
+    this._maxLocation = new Point3D(x, y, z);
   }
 
   update(d: Vector3D): void {
@@ -72,36 +103,51 @@ export class BoundingCuboid {
   }
 
   contains(location: Point3D): boolean {
-    if (location.x < this._minLocation.x ||
-        location.y < this._minLocation.y ||
-        location.z < this._minLocation.z)
+    if (
+      location.x < this._minLocation.x ||
+      location.y < this._minLocation.y ||
+      location.z < this._minLocation.z
+    ) {
       return false;
+    }
 
-    if (location.x > this._maxLocation.x ||
-        location.y > this._maxLocation.y ||
-        location.z > this._maxLocation.z)
+    if (
+      location.x > this._maxLocation.x ||
+      location.y > this._maxLocation.y ||
+      location.z > this._maxLocation.z
+    ) {
       return false;
+    }
 
     return true;
   }
 
   containsBounds(other: BoundingCuboid) {
     return this.contains(other.minLocation) &&
-           this.contains(other.maxLocation);
+      this.contains(other.maxLocation);
   }
 
   intersects(other: BoundingCuboid): boolean {
-    if (other.minLocation.x > this.maxLocation.x ||
-        other.maxLocation.x < this.minLocation.x)
+    if (
+      other.minLocation.x > this.maxLocation.x ||
+      other.maxLocation.x < this.minLocation.x
+    ) {
       return false;
+    }
 
-    if (other.minLocation.y > this.maxLocation.y ||
-        other.maxLocation.y < this.minLocation.y)
+    if (
+      other.minLocation.y > this.maxLocation.y ||
+      other.maxLocation.y < this.minLocation.y
+    ) {
       return false;
+    }
 
-    if (other.minLocation.z > this.maxLocation.z ||
-        other.maxLocation.z < this.minLocation.z)
+    if (
+      other.minLocation.z > this.maxLocation.z ||
+      other.maxLocation.z < this.minLocation.z
+    ) {
       return false;
+    }
 
     return true;
   }
@@ -111,60 +157,76 @@ export class BoundingCuboid {
       return; // nothing to do.
     }
 
-    const minX = other.minLocation.x < this.minLocation.x ?
-      other.minLocation.x : this.minLocation.x;
-    const minY = other.minLocation.y < this.minLocation.y ?
-      other.minLocation.y : this.minLocation.y;
-    const minZ = other.minLocation.z < this.minLocation.z ?
-      other.minLocation.z : this.minLocation.z;
-    const maxX = other.maxLocation.x > this.maxLocation.x ?
-      other.maxLocation.x : this.maxLocation.x;
-    const maxY = other.maxLocation.y > this.maxLocation.y ?
-      other.maxLocation.y : this.maxLocation.y;
-    const maxZ = other.maxLocation.z > this.maxLocation.z ?
-      other.maxLocation.z : this.maxLocation.z;
+    const minX = other.minLocation.x < this.minLocation.x
+      ? other.minLocation.x
+      : this.minLocation.x;
+    const minY = other.minLocation.y < this.minLocation.y
+      ? other.minLocation.y
+      : this.minLocation.y;
+    const minZ = other.minLocation.z < this.minLocation.z
+      ? other.minLocation.z
+      : this.minLocation.z;
+    const maxX = other.maxLocation.x > this.maxLocation.x
+      ? other.maxLocation.x
+      : this.maxLocation.x;
+    const maxY = other.maxLocation.y > this.maxLocation.y
+      ? other.maxLocation.y
+      : this.maxLocation.y;
+    const maxZ = other.maxLocation.z > this.maxLocation.z
+      ? other.maxLocation.z
+      : this.maxLocation.z;
 
     //console.assert(minX >= 0 && minY >= 0 && minZ >= 0);
-    this._dimensions =
-      new Dimensions(maxX - minX, maxY - minY, maxZ - minZ);
+    this._dimensions = new Dimensions(maxX - minX, maxY - minY, maxZ - minZ);
     const min = new Point3D(minX, minY, minZ);
     const max = new Point3D(maxX, maxY, maxZ);
     const width = (max.x - min.x) / 2;
     const depth = (max.y - min.y) / 2;
     const height = (max.z - min.z) / 2;
-    this._centre = new Point3D(min.x + width,
-                                min.y + depth,
-                                min.z + height);
+    this._centre = new Point3D(min.x + width, min.y + depth, min.z + height);
     this._minLocation = min;
     this._maxLocation = max;
   }
 
   dump(): void {
     console.log("BoundingCuboid");
-    console.log(" - min (x,y,z):",
-                this.minLocation.x,
-                this.minLocation.y,
-                this.minLocation.z);
-    console.log(" - max (x,y,z):",
-                this.maxLocation.x,
-                this.maxLocation.y,
-                this.maxLocation.z);
-    console.log(" - centre (x,y,z):",
-                this.centre.x,
-                this.centre.y,
-                this.centre.z);
-    console.log(" - dimensions (WxDxH):",
-                this.width, this.depth, this.height);
+    console.log(
+      " - min (x,y,z):",
+      this.minLocation.x,
+      this.minLocation.y,
+      this.minLocation.z,
+    );
+    console.log(
+      " - max (x,y,z):",
+      this.maxLocation.x,
+      this.maxLocation.y,
+      this.maxLocation.z,
+    );
+    console.log(
+      " - centre (x,y,z):",
+      this.centre.x,
+      this.centre.y,
+      this.centre.z,
+    );
+    console.log(" - dimensions (WxDxH):", this.width, this.depth, this.height);
   }
 }
 
 export class CollisionInfo {
-  constructor(private readonly _collidedEntity: PhysicalEntity,
-              private readonly _blocking: boolean,
-              private readonly _intersectInfo: IntersectInfo) { }
-  get entity(): PhysicalEntity { return this._collidedEntity; }
-  get blocking(): boolean { return this._blocking; }
-  get intersectInfo(): IntersectInfo { return this._intersectInfo; }
+  constructor(
+    private readonly _collidedEntity: PhysicalEntity,
+    private readonly _blocking: boolean,
+    private readonly _intersectInfo: IntersectInfo,
+  ) {}
+  get entity(): PhysicalEntity {
+    return this._collidedEntity;
+  }
+  get blocking(): boolean {
+    return this._blocking;
+  }
+  get intersectInfo(): IntersectInfo {
+    return this._intersectInfo;
+  }
 }
 
 export class CollisionDetector {
@@ -190,12 +252,15 @@ export class CollisionDetector {
   static removeInfo(movable: MovableEntity): void {
     this._collisionInfo.delete(movable);
   }
-  
+
   static removeMissInfo(movable: MovableEntity): void {
     this._missInfo.delete(movable);
   }
 
-  static addMissInfo(actor: MovableEntity, entities: Array<PhysicalEntity>): void {
+  static addMissInfo(
+    actor: MovableEntity,
+    entities: Array<PhysicalEntity>,
+  ): void {
     this._missInfo.set(actor, entities);
   }
 
@@ -208,22 +273,25 @@ export class CollisionDetector {
     return this._missInfo.get(movable)!;
   }
 
-  static detectInArea(movable: MovableEntity, path: Vector3D,
-                      area: BoundingCuboid): CollisionInfo|null {
+  static detectInArea(
+    movable: MovableEntity,
+    path: Vector3D,
+    area: BoundingCuboid,
+  ): CollisionInfo | null {
     const bounds = movable.bounds;
     const widthVec3D = new Vector3D(bounds.width, 0, 0);
     const depthVec3D = new Vector3D(0, bounds.depth, 0);
     const heightVec3D = new Vector3D(0, 0, bounds.height);
 
     const beginPoints: Array<Point3D> = [
-      bounds.minLocation, 
+      bounds.minLocation,
       bounds.minLocation.add(heightVec3D),
       bounds.minLocation.add(depthVec3D),
       bounds.minLocation.add(widthVec3D),
       bounds.maxLocation.sub(heightVec3D),
       bounds.maxLocation.sub(depthVec3D),
       bounds.maxLocation.sub(widthVec3D),
-      bounds.maxLocation
+      bounds.maxLocation,
     ];
 
     const misses: Array<PhysicalEntity> = new Array<PhysicalEntity>();
@@ -240,8 +308,7 @@ export class CollisionDetector {
         const intersectInfo = geometry.obstructs(beginPoint, endPoint);
         if (intersectInfo != null) {
           const blocking = true;
-          const collision =
-            new CollisionInfo(entity, blocking, intersectInfo!);
+          const collision = new CollisionInfo(entity, blocking, intersectInfo!);
           this._collisionInfo.set(movable, collision);
           movable.postEvent(EntityEvent.Collision);
           return collision;
@@ -274,13 +341,15 @@ export class Gravity {
 
     if (this._force < 0) {
       const path = new Vector3D(0, 0, this._force);
-      entities.forEach(movable => {
+      entities.forEach((movable) => {
         const bounds = movable.bounds;
         // Create a bounds to contain the current location and the destination.
-        const area = new BoundingCuboid(bounds.centre.add(path), bounds.dimensions);
+        const area = new BoundingCuboid(
+          bounds.centre.add(path),
+          bounds.dimensions,
+        );
         area.insert(bounds);
-        const collision =
-        CollisionDetector.detectInArea(movable, path, area);
+        const collision = CollisionDetector.detectInArea(movable, path, area);
         if (collision == null) {
           movable.updatePosition(path);
         }

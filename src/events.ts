@@ -5,7 +5,7 @@ export enum EntityEvent {
   EndMove = "endMove",
   FaceDirection = "faceDirection",
   Collision = "collision",
-  NoCollision = "noCollision"
+  NoCollision = "noCollision",
 }
 
 export enum InputEvent {
@@ -16,7 +16,7 @@ export class EventHandler<T> {
   protected _listeners = new Map<T, Array<any>>();
   protected _events = new Set<T>();
 
-  constructor() { }
+  constructor() {}
 
   post(event: T): void {
     this._events.add(event);
@@ -28,7 +28,7 @@ export class EventHandler<T> {
         continue;
       }
       const callbacks = this._listeners.get(event)!;
-      for (const callback of callbacks) { 
+      for (const callback of callbacks) {
         callback();
       }
     }
@@ -65,7 +65,7 @@ export class EventHandler<T> {
 export class TimedEventHandler {
   private _callbacks: Array<any> = new Array<any>();
 
-  constructor() { }
+  constructor() {}
 
   add(callback: any): void {
     this._callbacks.push(callback);

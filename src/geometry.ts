@@ -1,4 +1,4 @@
-import { BoundingCuboid } from "./physics.ts"
+import { BoundingCuboid } from "./physics.ts";
 
 export enum Orientation {
   Colinear,
@@ -7,12 +7,15 @@ export enum Orientation {
 }
 
 export class Vector2D {
-  constructor(private readonly _x: number,
-              private readonly _y: number) {
+  constructor(private readonly _x: number, private readonly _y: number) {
     Object.freeze(this);
   }
-  get x() { return this._x; }
-  get y() { return this._y; }
+  get x() {
+    return this._x;
+  }
+  get y() {
+    return this._y;
+  }
 
   dot(other: Vector2D): number {
     const x = this.x * other.x;
@@ -32,12 +35,15 @@ export class Vector2D {
 }
 
 export class Point2D {
-  constructor(private readonly _x: number,
-              private readonly _y: number) {
+  constructor(private readonly _x: number, private readonly _y: number) {
     Object.freeze(this);
   }
-  get x() { return this._x; }
-  get y() { return this._y; }
+  get x() {
+    return this._x;
+  }
+  get y() {
+    return this._y;
+  }
 
   add(vec: Vector2D): Point2D {
     return new Point2D(this.x + vec.x, this.y + vec.y);
@@ -54,7 +60,7 @@ export class Point2D {
   static orientation(p: Point2D, q: Point2D, r: Point2D): Orientation {
     // https://www.geeksforgeeks.org/orientation-3-ordered-points/
     const res: number = (q.y - p.y) * (r.x - q.x) -
-                        (q.x - p.x) * (r.y - q.y);
+      (q.x - p.x) * (r.y - q.y);
     if (res == 0) {
       return Orientation.Colinear;
     }
@@ -63,18 +69,21 @@ export class Point2D {
 }
 
 export class Segment2D {
-  constructor(private readonly _p0: Point2D,
-              private readonly _p1: Point2D) {
+  constructor(private readonly _p0: Point2D, private readonly _p1: Point2D) {
   }
 
-  get p0(): Point2D { return this._p0; }
-  get p1(): Point2D { return this._p1; }
+  get p0(): Point2D {
+    return this._p0;
+  }
+  get p1(): Point2D {
+    return this._p1;
+  }
 
   contains(p: Point2D): boolean {
     return p.x <= Math.max(this.p0.x, this.p1.x) &&
-           p.x >= Math.min(this.p0.x, this.p1.x) &&
-           p.y <= Math.max(this.p0.y, this.p1.y) &&
-           p.y >= Math.min(this.p0.y, this.p1.y);
+      p.x >= Math.min(this.p0.x, this.p1.x) &&
+      p.y <= Math.max(this.p0.y, this.p1.y) &&
+      p.y >= Math.min(this.p0.y, this.p1.y);
   }
 
   add(diff: Vector2D): Segment2D {
@@ -128,33 +137,39 @@ export class Segment2D {
     // https://www.geomalgorithms.com/a02-_lines.html
     const vl: number = this.p0.x * this.p1.y - this.p1.x * this.p0.y;
     const w: number = this.p0.x * p.y - p.x * this.p0.y;
-    const u = 1 / Math.sqrt(Math.pow(this.p1.x - this.p0.x, 2) +
-                            Math.pow(this.p1.y - this.p0.y, 2));
+    const u = 1 / Math.sqrt(
+      Math.pow(this.p1.x - this.p0.x, 2) +
+        Math.pow(this.p1.y - this.p0.y, 2),
+    );
     return vl * w * u;
   }
 }
 
 export class Point3D {
-  constructor(private readonly _x: number,
-              private readonly _y: number,
-              private readonly _z: number) {
+  constructor(
+    private readonly _x: number,
+    private readonly _y: number,
+    private readonly _z: number,
+  ) {
     Object.freeze(this);
   }
 
-  get x(): number { return this._x; }
-  get y(): number { return this._y; }
-  get z(): number { return this._z; }
+  get x(): number {
+    return this._x;
+  }
+  get y(): number {
+    return this._y;
+  }
+  get z(): number {
+    return this._z;
+  }
 
   add(vector: Vector3D): Point3D {
-    return new Point3D(this.x + vector.x,
-                       this.y + vector.y,
-                       this.z + vector.z);
+    return new Point3D(this.x + vector.x, this.y + vector.y, this.z + vector.z);
   }
 
   mul(v: Vector3D): Point3D {
-    return new Point3D(this.x * v.x,
-                       this.y * v.y,
-                       this.z * v.z);
+    return new Point3D(this.x * v.x, this.y * v.y, this.z * v.z);
   }
 
   addScalar(v: number): Point3D {
@@ -162,21 +177,17 @@ export class Point3D {
   }
 
   sub(vector: Vector3D): Point3D {
-    return new Point3D(this.x - vector.x,
-                       this.y - vector.y,
-                       this.z - vector.z);
+    return new Point3D(this.x - vector.x, this.y - vector.y, this.z - vector.z);
   }
 
   vec_diff(other: Point3D): Vector3D {
-    return new Vector3D(this.x - other.x,
-                        this.y - other.y,
-                        this.z - other.z);
+    return new Vector3D(this.x - other.x, this.y - other.y, this.z - other.z);
   }
 
   isSameAsRounded(other: Point3D): boolean {
     return Math.round(this.x) == Math.round(other.x) &&
-           Math.round(this.y) == Math.round(other.y) &&
-           Math.round(this.z) == Math.round(other.z);
+      Math.round(this.y) == Math.round(other.y) &&
+      Math.round(this.z) == Math.round(other.z);
   }
 
   isSameAs(other: Point3D): boolean {
@@ -185,20 +196,28 @@ export class Point3D {
 }
 
 export class Vector3D {
-  constructor(private readonly _x: number,
-              private readonly _y: number,
-              private readonly _z: number) {
+  constructor(
+    private readonly _x: number,
+    private readonly _y: number,
+    private readonly _z: number,
+  ) {
     Object.freeze(this);
   }
 
-  get x(): number { return this._x; }
-  get y(): number { return this._y; }
-  get z(): number { return this._z; }
+  get x(): number {
+    return this._x;
+  }
+  get y(): number {
+    return this._y;
+  }
+  get z(): number {
+    return this._z;
+  }
   get zero(): boolean {
     return this.x === 0 && this.y === 0 && this.z === 0;
   }
   get asString(): string {
-      return "(x, y, z) = (" + this.x + ", " + this.y + ", " + this.z + ")";
+    return "(x, y, z) = (" + this.x + ", " + this.y + ", " + this.z + ")";
   }
 
   add(other: Vector3D): Vector3D {
@@ -252,9 +271,9 @@ export class Vector3D {
   }
 
   equal(other: Vector3D): boolean {
-      return this.x == other.x &&
-             this.y == other.y &&
-             this.z == other.z;
+    return this.x == other.x &&
+      this.y == other.y &&
+      this.z == other.z;
   }
 }
 
@@ -263,17 +282,23 @@ export class Vertex3D {
   private readonly _v: Vector3D;
   private readonly _u: Vector3D;
 
-  constructor(private _point: Point3D,
-              a: Point3D,
-              b: Point3D) {
+  constructor(private _point: Point3D, a: Point3D, b: Point3D) {
     this._u = a.vec_diff(_point);
     this._v = b.vec_diff(_point);
     this._normal = this.u.cross(this.v);
   }
-  get point(): Point3D { return this._point; }
-  get normal(): Vector3D { return this._normal; }
-  get u(): Vector3D { return this._u; }
-  get v(): Vector3D { return this._v; }
+  get point(): Point3D {
+    return this._point;
+  }
+  get normal(): Vector3D {
+    return this._normal;
+  }
+  get u(): Vector3D {
+    return this._u;
+  }
+  get v(): Vector3D {
+    return this._v;
+  }
 
   transform(d: Vector3D): void {
     this._point = this.point.add(d);
@@ -281,8 +306,8 @@ export class Vertex3D {
 
   get asString(): string {
     return "normal = " + this.normal.asString +
-    ", u = " + this.u.asString +
-    ", v = " + this.u.asString;
+      ", u = " + this.u.asString +
+      ", v = " + this.u.asString;
   }
 
   // http://www.geomalgorithms.com/a04-_planes.html#Distance-Point-to-Plane
@@ -295,8 +320,8 @@ export class Vertex3D {
     return d;
   }
 
-  // https://www.geomalgorithms.com/a05-_intersect-1.html 
-  intersects(begin: Point3D, end: Point3D): Point3D|null {
+  // https://www.geomalgorithms.com/a05-_intersect-1.html
+  intersects(begin: Point3D, end: Point3D): Point3D | null {
     // Use the vertex to represent a plane and calculate whether the segment
     // (begin, end) intersects that plane.
     const dir: Vector3D = end.vec_diff(begin);
@@ -308,7 +333,7 @@ export class Vertex3D {
       return null;
     }
     const r = a / b;
-    if (r < 0 || r  > 1) {
+    if (r < 0 || r > 1) {
       return null;
     }
     return begin.add(dir.mulScalar(r));
@@ -316,10 +341,14 @@ export class Vertex3D {
 }
 
 export abstract class Face3D {
-  constructor(protected readonly _vertex: Vertex3D) { }
-  get vertex(): Vertex3D { return this._vertex; }
-  get plane(): Vertex3D { return this._vertex; }
-  intersectsPlane(begin: Point3D, end: Point3D): Point3D|null {
+  constructor(protected readonly _vertex: Vertex3D) {}
+  get vertex(): Vertex3D {
+    return this._vertex;
+  }
+  get plane(): Vertex3D {
+    return this._vertex;
+  }
+  intersectsPlane(begin: Point3D, end: Point3D): Point3D | null {
     return this.plane.intersects(begin, end);
   }
   abstract transform(d: Vector3D): void;
@@ -343,16 +372,19 @@ class TriangleFace3D extends Face3D {
     this._uDotv = u.dot(v);
     this._uDotu = u.dot(u);
     this._vDotv = v.dot(v);
-    this._denominator = 1 / (Math.pow(this._uDotv, 2) - this._uDotu * this._vDotv);
+    this._denominator = 1 /
+      (Math.pow(this._uDotv, 2) - this._uDotu * this._vDotv);
   }
 
-  vertices(): Array<Vertex3D> { return [ this.vertex ]; }
+  vertices(): Array<Vertex3D> {
+    return [this.vertex];
+  }
 
   transform(d: Vector3D): void {
     this.vertex.transform(d);
   }
 
-  // https://www.geomalgorithms.com/a06-_intersect-2.html 
+  // https://www.geomalgorithms.com/a06-_intersect-2.html
   intersects(i: Point3D): boolean {
     // Given that a segment intersects the plane, at i, of this face, calculate
     // whether the intersection point is within the triangle.
@@ -373,18 +405,18 @@ export class QuadFace3D extends Face3D {
   private readonly _triangleA: TriangleFace3D;
   private readonly _triangleB: TriangleFace3D;
 
-  constructor(vertexA: Vertex3D,
-              vertexB: Vertex3D) {
+  constructor(vertexA: Vertex3D, vertexB: Vertex3D) {
     super(vertexA);
     if (!vertexA.normal.equal(vertexB.normal)) {
-      throw("Expected QuadFace3D vertices to have equilavent normals");
+      throw ("Expected QuadFace3D vertices to have equilavent normals");
     }
     this._triangleA = new TriangleFace3D(vertexA);
     this._triangleB = new TriangleFace3D(vertexB);
   }
 
-  vertices(): Array<Vertex3D> { return [ this._triangleA.vertex,
-                                         this._triangleB.vertex ]; }
+  vertices(): Array<Vertex3D> {
+    return [this._triangleA.vertex, this._triangleB.vertex];
+  }
 
   transform(d: Vector3D): void {
     this._triangleA.transform(d);
@@ -397,16 +429,28 @@ export class QuadFace3D extends Face3D {
 }
 
 export class IntersectInfo {
-  constructor(private readonly _face: Face3D,
-              private readonly _begin: Point3D,
-              private readonly _end: Point3D,
-              private readonly _i: Point3D,
-              private readonly _theta: number) { }
-  get face(): Face3D { return this._face; }
-  get begin(): Point3D { return this._begin; }
-  get end(): Point3D { return this._end; }
-  get i(): Point3D { return this._i; }
-  get theta(): number { return this._theta; }
+  constructor(
+    private readonly _face: Face3D,
+    private readonly _begin: Point3D,
+    private readonly _end: Point3D,
+    private readonly _i: Point3D,
+    private readonly _theta: number,
+  ) {}
+  get face(): Face3D {
+    return this._face;
+  }
+  get begin(): Point3D {
+    return this._begin;
+  }
+  get end(): Point3D {
+    return this._end;
+  }
+  get i(): Point3D {
+    return this._i;
+  }
+  get theta(): number {
+    return this._theta;
+  }
 }
 
 export class Geometry {
@@ -423,12 +467,24 @@ export class Geometry {
     this._heightVec3D = new Vector3D(0, 0, _bounds.height);
   }
 
-  get bounds(): BoundingCuboid { return this._bounds; }
-  get widthVec3D(): Vector3D { return this._widthVec3D; }
-  get depthVec3D(): Vector3D { return this._depthVec3D; }
-  get heightVec3D(): Vector3D { return this._heightVec3D; }
-  get intersectInfo(): IntersectInfo | null { return this._intersectInfo; }
-  get name(): string { return this._name; }
+  get bounds(): BoundingCuboid {
+    return this._bounds;
+  }
+  get widthVec3D(): Vector3D {
+    return this._widthVec3D;
+  }
+  get depthVec3D(): Vector3D {
+    return this._depthVec3D;
+  }
+  get heightVec3D(): Vector3D {
+    return this._heightVec3D;
+  }
+  get intersectInfo(): IntersectInfo | null {
+    return this._intersectInfo;
+  }
+  get name(): string {
+    return this._name;
+  }
 
   transform(d: Vector3D): void {
     for (const face of this._faces) {
@@ -436,7 +492,7 @@ export class Geometry {
     }
   }
 
-  obstructs(begin: Point3D, end: Point3D): IntersectInfo|null {
+  obstructs(begin: Point3D, end: Point3D): IntersectInfo | null {
     for (const face of this._faces) {
       const i = face.intersectsPlane(begin, end);
       if (i != null && face.intersects(i)) {
@@ -455,7 +511,9 @@ export class NoGeometry extends Geometry {
     super(bounds);
     this._name = "NoGeometry";
   }
-  obstructs(_begin: Point3D, _end: Point3D): IntersectInfo|null { return null; }
+  obstructs(_begin: Point3D, _end: Point3D): IntersectInfo | null {
+    return null;
+  }
 }
 
 export class CuboidGeometry extends Geometry {
@@ -473,14 +531,14 @@ export class CuboidGeometry extends Geometry {
     //       \|______|
     //       2        4
     const p: Array<Point3D> = [
-      this.bounds.minLocation,                         // 0 
-      this.bounds.minLocation.add(this.heightVec3D),   // 1
-      this.bounds.minLocation.add(this.depthVec3D),    // 2
-      this.bounds.minLocation.add(this.widthVec3D),    // 3
-      this.bounds.maxLocation.sub(this.heightVec3D),   // 4
-      this.bounds.maxLocation.sub(this.depthVec3D),    // 5
-      this.bounds.maxLocation.sub(this.widthVec3D),    // 6
-      this.bounds.maxLocation                          // 7
+      this.bounds.minLocation, // 0
+      this.bounds.minLocation.add(this.heightVec3D), // 1
+      this.bounds.minLocation.add(this.depthVec3D), // 2
+      this.bounds.minLocation.add(this.widthVec3D), // 3
+      this.bounds.maxLocation.sub(this.heightVec3D), // 4
+      this.bounds.maxLocation.sub(this.depthVec3D), // 5
+      this.bounds.maxLocation.sub(this.widthVec3D), // 6
+      this.bounds.maxLocation, // 7
     ];
 
     // left
@@ -530,12 +588,12 @@ export class RampUpWestGeometry extends Geometry {
     //  |____\/
     //  1     3
     const p: Array<Point3D> = [
-      this.bounds.minLocation,                       // 0
-      this.bounds.minLocation.add(this.depthVec3D),  // 1
-      this.bounds.minLocation.add(this.widthVec3D),  // 2
+      this.bounds.minLocation, // 0
+      this.bounds.minLocation.add(this.depthVec3D), // 1
+      this.bounds.minLocation.add(this.widthVec3D), // 2
       this.bounds.maxLocation.sub(this.heightVec3D), // 3
       this.bounds.minLocation.add(this.heightVec3D), // 4
-      this.bounds.maxLocation.sub(this.widthVec3D)   // 5
+      this.bounds.maxLocation.sub(this.widthVec3D), // 5
     ];
 
     // left
@@ -575,12 +633,12 @@ export class RampUpEastGeometry extends Geometry {
     //       \/____|
     //       1      3
     const p: Array<Point3D> = [
-      this.bounds.minLocation,                      // 0 
+      this.bounds.minLocation, // 0
       this.bounds.minLocation.add(this.depthVec3D), // 1
       this.bounds.minLocation.add(this.widthVec3D), // 2
-      this.bounds.maxLocation.sub(this.heightVec3D),// 3
+      this.bounds.maxLocation.sub(this.heightVec3D), // 3
       this.bounds.maxLocation.sub(this.depthVec3D), // 4
-      this.bounds.maxLocation                       // 5
+      this.bounds.maxLocation, // 5
     ];
 
     // left
@@ -623,12 +681,12 @@ export class RampUpNorthGeometry extends Geometry {
     //   0     1     4
 
     const p: Array<Point3D> = [
-      this.bounds.minLocation,                        // 0 
-      this.bounds.minLocation.add(this.depthVec3D),   // 1
-      this.bounds.minLocation.add(this.heightVec3D),  // 2
-      this.bounds.maxLocation.sub(this.depthVec3D),   // 3
-      this.bounds.maxLocation.sub(this.heightVec3D),  // 4
-      this.bounds.minLocation.add(this.widthVec3D),   // 5
+      this.bounds.minLocation, // 0
+      this.bounds.minLocation.add(this.depthVec3D), // 1
+      this.bounds.minLocation.add(this.heightVec3D), // 2
+      this.bounds.maxLocation.sub(this.depthVec3D), // 3
+      this.bounds.maxLocation.sub(this.heightVec3D), // 4
+      this.bounds.minLocation.add(this.widthVec3D), // 5
     ];
 
     // left
@@ -645,7 +703,7 @@ export class RampUpNorthGeometry extends Geometry {
     const right = new TriangleFace3D(new Vertex3D(p[5], p[3], p[4]));
     this._faces.push(right);
 
-    // back 
+    // back
     const v2 = new Vertex3D(p[0], p[2], p[5]);
     const v3 = new Vertex3D(p[3], p[5], p[2]);
     const back = new QuadFace3D(v2, v3);
@@ -671,12 +729,12 @@ export class RampUpSouthGeometry extends Geometry {
     // 0   1     4
 
     const p: Array<Point3D> = [
-      this.bounds.minLocation,                        // 0 
-      this.bounds.minLocation.add(this.depthVec3D),   // 1
-      this.bounds.maxLocation.sub(this.widthVec3D),   // 2
-      this.bounds.maxLocation,                        // 3
-      this.bounds.maxLocation.sub(this.heightVec3D),  // 4
-      this.bounds.minLocation.add(this.widthVec3D),   // 5
+      this.bounds.minLocation, // 0
+      this.bounds.minLocation.add(this.depthVec3D), // 1
+      this.bounds.maxLocation.sub(this.widthVec3D), // 2
+      this.bounds.maxLocation, // 3
+      this.bounds.maxLocation.sub(this.heightVec3D), // 4
+      this.bounds.minLocation.add(this.widthVec3D), // 5
     ];
 
     // left
@@ -693,7 +751,7 @@ export class RampUpSouthGeometry extends Geometry {
     const right = new TriangleFace3D(new Vertex3D(p[5], p[3], p[4]));
     this._faces.push(right);
 
-    // back 
+    // back
     const v2 = new Vertex3D(p[0], p[2], p[5]);
     const v3 = new Vertex3D(p[3], p[5], p[2]);
     const back = new QuadFace3D(v2, v3);

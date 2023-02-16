@@ -1,9 +1,11 @@
-import { assertEquals,
-         assertExists } from "https://deno.land/std@0.160.0/testing/asserts.ts";
+import {
+  assertEquals,
+  assertExists,
+} from "https://deno.land/std@0.160.0/testing/asserts.ts";
 
-import * as WT from '../world-tree.js';
+import * as WT from "../world-tree.js";
 
-Deno.test('2D point addition and subtraction', () => {
+Deno.test("2D point addition and subtraction", () => {
   const p0 = new WT.Point2D(6, 7);
   const p1 = new WT.Point2D(10, 12);
   const add = p1.add(p0);
@@ -14,18 +16,21 @@ Deno.test('2D point addition and subtraction', () => {
   assertEquals(sub.y, 5);
 });
 
-Deno.test('2D point orientation', () => {
+Deno.test("2D point orientation", () => {
   const p0 = new WT.Point2D(1, 1);
   const p1 = new WT.Point2D(2, 2);
   const p2 = new WT.Point2D(1, 3);
   const p3 = new WT.Point2D(3, 3);
 
   assertEquals(WT.Point2D.orientation(p0, p2, p1), WT.Orientation.Clockwise);
-  assertEquals(WT.Point2D.orientation(p0, p1, p2), WT.Orientation.CounterClockwise);
+  assertEquals(
+    WT.Point2D.orientation(p0, p1, p2),
+    WT.Orientation.CounterClockwise,
+  );
   assertEquals(WT.Point2D.orientation(p0, p1, p3), WT.Orientation.Colinear);
 });
 
-Deno.test('2D segment intersection (vertically parallel)', () => {
+Deno.test("2D segment intersection (vertically parallel)", () => {
   const p0 = new WT.Point2D(1, 1);
   const p1 = new WT.Point2D(1, 3);
   const p2 = new WT.Point2D(2, 1);
@@ -41,7 +46,7 @@ Deno.test('2D segment intersection (vertically parallel)', () => {
   assertEquals(s1.intersects(s0), false);
 });
 
-Deno.test('2D segment intersection (horizontally parallel)', () => {
+Deno.test("2D segment intersection (horizontally parallel)", () => {
   const p0 = new WT.Point2D(1, 1);
   const p1 = new WT.Point2D(3, 1);
   const p2 = new WT.Point2D(1, 2);
@@ -57,7 +62,7 @@ Deno.test('2D segment intersection (horizontally parallel)', () => {
   assertEquals(s1.intersects(s0), false);
 });
 
-Deno.test('2D point on 2D segment', () => {
+Deno.test("2D point on 2D segment", () => {
   const p0 = new WT.Point2D(1, 1);
   const p1 = new WT.Point2D(3, 1);
   const p2 = new WT.Point2D(1, 3);
@@ -71,7 +76,7 @@ Deno.test('2D point on 2D segment', () => {
   assertEquals(s0.contains(p4), false);
 });
 
-Deno.test('2D segment intersection with shared point', () => {
+Deno.test("2D segment intersection with shared point", () => {
   const p0 = new WT.Point2D(1, 1);
   const p1 = new WT.Point2D(3, 1);
   const p3 = new WT.Point2D(3, 2);
@@ -82,19 +87,19 @@ Deno.test('2D segment intersection with shared point', () => {
   assertEquals(s1.intersects(s0), false);
 });
 
-Deno.test('2D segments crossing', () => {
+Deno.test("2D segments crossing", () => {
   const p0 = new WT.Point2D(1, 1);
   const p1 = new WT.Point2D(3, 3);
   const p2 = new WT.Point2D(1, 3);
   const p3 = new WT.Point2D(3, 1);
   const s0 = new WT.Segment2D(p0, p1);
   const s1 = new WT.Segment2D(p2, p3);
-  
+
   assertEquals(s0.intersects(s1), true);
   assertEquals(s1.intersects(s0), true);
 });
 
-Deno.test('3D point arithmetic', () => {
+Deno.test("3D point arithmetic", () => {
   const p0 = new WT.Point3D(1, 2, 3);
   const p1 = new WT.Point3D(10, 9, 8);
   const v0 = new WT.Vector3D(2, 3, 4);
@@ -113,7 +118,7 @@ Deno.test('3D point arithmetic', () => {
   assertEquals(sub.z, 4);
 });
 
-Deno.test('compare 3D points', () => {
+Deno.test("compare 3D points", () => {
   const p0 = new WT.Point3D(1.5, 2.5, 3.5);
   const p1 = new WT.Point3D(1.5, 2.5, 3.5);
   const p2 = new WT.Point3D(1.6, 2.2, 3.1);
@@ -124,7 +129,7 @@ Deno.test('compare 3D points', () => {
   assertEquals(p2.isSameAsRounded(p3), true);
 });
 
-Deno.test('vertex plane', () => {
+Deno.test("vertex plane", () => {
   const dims = new WT.Dimensions(2, 2, 2);
   const centre = new WT.Point3D(1, 1, 1);
   const widthVec = new WT.Vector3D(2, 0, 0);
@@ -143,28 +148,28 @@ Deno.test('vertex plane', () => {
   assertEquals(v0.normal.equal(v1.normal), true);
 });
 
-Deno.test('cuboid geometry construction', () => {
+Deno.test("cuboid geometry construction", () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);
   assertExists(new WT.CuboidGeometry(bounds));
 });
 
-Deno.test('ramp up west construction', () => {
+Deno.test("ramp up west construction", () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);
   assertExists(new WT.RampUpWestGeometry(bounds));
 });
 
-Deno.test('ramp up east construction', () => {
+Deno.test("ramp up east construction", () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);
   assertExists(new WT.RampUpEastGeometry(bounds));
 });
 
-Deno.test('cuboid obstruction', () => {
+Deno.test("cuboid obstruction", () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);
@@ -232,7 +237,7 @@ Deno.test('cuboid obstruction', () => {
   assertEquals(cube.obstructs(p29, p28), null);
 });
 
-Deno.test('ramp up west plane intersection', () => {
+Deno.test("ramp up west plane intersection", () => {
   const width = 10;
   const depth = 10;
   const height = 10;
@@ -278,7 +283,7 @@ Deno.test('ramp up west plane intersection', () => {
   assertExists(face.intersects(p8));
 });
 
-Deno.test('ramp up west obstruction', () => {
+Deno.test("ramp up west obstruction", () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);
@@ -309,7 +314,7 @@ Deno.test('ramp up west obstruction', () => {
   assertEquals(ramp.obstructs(p7, p6), null);
 });
 
-Deno.test('ramp up east obstruction', () => {
+Deno.test("ramp up east obstruction", () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);
@@ -349,7 +354,7 @@ Deno.test('ramp up east obstruction', () => {
   assertEquals(ramp.obstructs(p10, p9), null);
 });
 
-Deno.test('ramp up north obstruction', () => {
+Deno.test("ramp up north obstruction", () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);
@@ -388,7 +393,7 @@ Deno.test('ramp up north obstruction', () => {
   assertExists(ramp.obstructs(bottomCorner, bounds.minLocation));
 });
 
-Deno.test('ramp up south obstruction', () => {
+Deno.test("ramp up south obstruction", () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const centre = new WT.Point3D(5, 5, 5);
   const bounds = new WT.BoundingCuboid(centre, dims);

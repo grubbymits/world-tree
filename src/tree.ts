@@ -1,7 +1,6 @@
-import { Dimensions,
-         BoundingCuboid } from "./physics.ts"
-import { PhysicalEntity } from "./entity.ts"
-import { Point3D } from "./geometry.ts"
+import { BoundingCuboid, Dimensions } from "./physics.ts";
+import { PhysicalEntity } from "./entity.ts";
+import { Point3D } from "./geometry.ts";
 
 // TODO Templates/Generics..?
 
@@ -12,13 +11,27 @@ class OctNode {
   private _children: Array<OctNode> = new Array<OctNode>();
   private _entities: Array<PhysicalEntity> = new Array<PhysicalEntity>();
 
-  get children(): Array<OctNode> { return this._children; }
-  get entities(): Array<PhysicalEntity> { return this._entities; }
-  get bounds(): BoundingCuboid { return this._bounds; }
-  get centre(): Point3D { return this._bounds.centre; }
-  get width(): number { return this._bounds.width; }
-  get height(): number { return this._bounds.height; }
-  get depth(): number { return this._bounds.depth; }
+  get children(): Array<OctNode> {
+    return this._children;
+  }
+  get entities(): Array<PhysicalEntity> {
+    return this._entities;
+  }
+  get bounds(): BoundingCuboid {
+    return this._bounds;
+  }
+  get centre(): Point3D {
+    return this._bounds.centre;
+  }
+  get width(): number {
+    return this._bounds.width;
+  }
+  get height(): number {
+    return this._bounds.height;
+  }
+  get depth(): number {
+    return this._bounds.depth;
+  }
   get recursiveCountNumEntities(): number {
     if (this.entities.length != 0) {
       return this.entities.length;
@@ -30,7 +43,7 @@ class OctNode {
     return total;
   }
 
-  constructor(private _bounds: BoundingCuboid) { }
+  constructor(private _bounds: BoundingCuboid) {}
 
   insert(entity: PhysicalEntity): boolean {
     let inserted = false;
@@ -89,9 +102,11 @@ class OctNode {
           const offsetX = (offset[x] * dimensions.width);
           const offsetY = (offset[y] * dimensions.depth);
           const offsetZ = (offset[z] * dimensions.height);
-          const centre = new Point3D(this.centre.x + offsetX,
-                                    this.centre.y + offsetY,
-                                    this.centre.z + offsetZ);
+          const centre = new Point3D(
+            this.centre.x + offsetX,
+            this.centre.y + offsetY,
+            this.centre.z + offsetZ,
+          );
 
           const bounds = new BoundingCuboid(centre, dimensions);
           this.children.push(new OctNode(bounds));
@@ -99,12 +114,12 @@ class OctNode {
       }
     }
 
-    const insertIntoChild = function(child: OctNode, entity: PhysicalEntity) {
+    const insertIntoChild = function (child: OctNode, entity: PhysicalEntity) {
       if (child.containsLocation(entity.bounds.centre)) {
         return child.insert(entity);
       }
       return false;
-    }
+    };
 
     // Insert the entities into the children.
     for (const entity of this._entities) {
@@ -115,9 +130,11 @@ class OctNode {
           break;
         }
       }
-      console.assert(inserted,
-                     "failed to insert into children, entity centred at:",
-                     entity.bounds.centre);
+      console.assert(
+        inserted,
+        "failed to insert into children, entity centred at:",
+        entity.bounds.centre,
+      );
     }
 
     this._entities = [];
@@ -177,8 +194,12 @@ export class Octree {
     this._root = new OctNode(this._worldBounds);
   }
 
-  get root(): OctNode { return this._root; }
-  get bounds(): BoundingCuboid { return this.root.bounds; }
+  get root(): OctNode {
+    return this._root;
+  }
+  get bounds(): BoundingCuboid {
+    return this.root.bounds;
+  }
 
   insert(entity: PhysicalEntity): void {
     const inserted = this._root.insert(entity);
@@ -186,11 +207,13 @@ export class Octree {
     this._numEntities++;
   }
 
-  findEntitiesInArea(root: OctNode,
-                     area: BoundingCuboid,
-                     entities: Array<PhysicalEntity>) {
+  findEntitiesInArea(
+    root: OctNode,
+    area: BoundingCuboid,
+    entities: Array<PhysicalEntity>,
+  ) {
     if (root.entities.length != 0) {
-      root.entities.forEach(entity => entities.push(entity));
+      root.entities.forEach((entity) => entities.push(entity));
     } else {
       for (const child of root.children) {
         if (!child.bounds.intersects(area)) {
@@ -217,12 +240,15 @@ export class Octree {
   verify(entities: Array<PhysicalEntity>): boolean {
     for (const entity of entities) {
       if (!this._root.recursivelyContainsEntity(entity)) {
-        console.error("tree doesn't contain entity at (x,y,z):",
-                      entity.x, entity.y, entity.z);
+        console.error(
+          "tree doesn't contain entity at (x,y,z):",
+          entity.x,
+          entity.y,
+          entity.z,
+        );
         return false;
       }
     }
     return true;
   }
 }
-

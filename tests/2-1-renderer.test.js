@@ -1,6 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.160.0/testing/asserts.ts";
 
-import * as WT from '../world-tree.js';
+import * as WT from "../world-tree.js";
 
 const width = 72;
 const depth = 72;
@@ -20,7 +20,7 @@ function drawCoord(entity) {
   return WT.TwoByOneIsometric.getDrawCoord(entity.bounds.minLocation);
 }
 
-Deno.test('calculate physical dimensions from sprite dimensions', () => {
+Deno.test("calculate physical dimensions from sprite dimensions", () => {
   const spriteWidth = 322;
   const spriteHeight = 270;
   const dims = getDimensions(spriteWidth, spriteHeight);
@@ -29,10 +29,13 @@ Deno.test('calculate physical dimensions from sprite dimensions', () => {
   assertEquals(dims.height, height);
 });
 
-Deno.test('scene nodes row overlapping', () => {
+Deno.test("scene nodes row overlapping", () => {
   const numEntities = 2;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
+  let context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric,
+  );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
@@ -50,10 +53,13 @@ Deno.test('scene nodes row overlapping', () => {
   assertEquals(nodes[1].overlapZ(nodes[0]), true);
 });
 
-Deno.test('scene nodes row intersecting', () => {
+Deno.test("scene nodes row intersecting", () => {
   const numEntities = 2;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
+  let context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric,
+  );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
@@ -67,10 +73,13 @@ Deno.test('scene nodes row intersecting', () => {
   assertEquals(nodes[1].intersectsTop(nodes[0]), false);
 });
 
-Deno.test('scene nodes row intersecting with unaligned y and z-axis', () => {
+Deno.test("scene nodes row intersecting with unaligned y and z-axis", () => {
   const numEntities = 2;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
+  let context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric,
+  );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
@@ -84,10 +93,13 @@ Deno.test('scene nodes row intersecting with unaligned y and z-axis', () => {
   assertEquals(nodes[1].intersectsTop(nodes[0]), true);
 });
 
-Deno.test('scene nodes column overlapping', () => {
+Deno.test("scene nodes column overlapping", () => {
   const numEntities = 2;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
+  let context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric,
+  );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
@@ -105,10 +117,13 @@ Deno.test('scene nodes column overlapping', () => {
   assertEquals(nodes[1].overlapZ(nodes[0]), true);
 });
 
-Deno.test('scene nodes column intersecting with unaligned x and z axis', () => {
+Deno.test("scene nodes column intersecting with unaligned x and z axis", () => {
   const numEntities = 3;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
+  let context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric,
+  );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
@@ -125,10 +140,13 @@ Deno.test('scene nodes column intersecting with unaligned x and z axis', () => {
   assertEquals(nodes[0].intersectsTop(nodes[2]), false);
 });
 
-Deno.test('scene nodes column intersecting', () => {
+Deno.test("scene nodes column intersecting", () => {
   const numEntities = 3;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
+  let context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric,
+  );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
@@ -145,15 +163,21 @@ Deno.test('scene nodes column intersecting', () => {
   assertEquals(nodes[0].intersectsTop(nodes[2]), false);
 });
 
-Deno.test('diagonal scene nodes overlapping', () => {
+Deno.test("diagonal scene nodes overlapping", () => {
   const numEntities = 2;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
+  let context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric,
+  );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
-    let minLocation = new WT.Point3D(i * entityDimensions.width,
-                                     i * entityDimensions.depth, 0);
+    let minLocation = new WT.Point3D(
+      i * entityDimensions.width,
+      i * entityDimensions.depth,
+      0,
+    );
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, drawCoord(entity));
     scene.setDrawOutline(node);
@@ -167,15 +191,21 @@ Deno.test('diagonal scene nodes overlapping', () => {
   assertEquals(nodes[1].overlapZ(nodes[0]), true);
 });
 
-Deno.test('diagonal scene nodes intersecting', () => {
+Deno.test("diagonal scene nodes intersecting", () => {
   const numEntities = 3;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
+  let context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric,
+  );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
-    let minLocation = new WT.Point3D(i * entityDimensions.width,
-                                     i * entityDimensions.depth, 0);
+    let minLocation = new WT.Point3D(
+      i * entityDimensions.width,
+      i * entityDimensions.depth,
+      0,
+    );
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, drawCoord(entity));
     scene.setDrawOutline(node);
@@ -188,10 +218,13 @@ Deno.test('diagonal scene nodes intersecting', () => {
   assertEquals(nodes[2].intersectsTop(nodes[0]), false);
 });
 
-Deno.test('draw order of single row', () => {
+Deno.test("draw order of single row", () => {
   const numEntities = 4;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
+  let context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric,
+  );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
@@ -209,10 +242,13 @@ Deno.test('draw order of single row', () => {
   assertEquals(drawOrder(nodes[1], nodes[0]), WT.RenderOrder.Before);
 });
 
-Deno.test('draw order of single column', () => {
+Deno.test("draw order of single column", () => {
   const numEntities = 4;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
+  let context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric,
+  );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
@@ -230,14 +266,20 @@ Deno.test('draw order of single column', () => {
   assertEquals(drawOrder(nodes[1], nodes[0]), WT.RenderOrder.After);
 });
 
-Deno.test('draw order of (x, y) increasing diagonal', () => {
+Deno.test("draw order of (x, y) increasing diagonal", () => {
   const numEntities = 4;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
+  let context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric,
+  );
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
-    let minLocation = new WT.Point3D(i * entityDimensions.width,
-                                     i * entityDimensions.depth, 0);
+    let minLocation = new WT.Point3D(
+      i * entityDimensions.width,
+      i * entityDimensions.depth,
+      0,
+    );
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     entity.addGraphic(dummyGraphic);
     nodes.push(context.scene.getNode(entity.id));
@@ -267,15 +309,25 @@ Deno.test('draw order of (x, y) increasing diagonal', () => {
   assertEquals(level.order[3].entity.id, 3);
 });
 
-Deno.test('draw order of (x, y) four in a square', () => {
+Deno.test("draw order of (x, y) four in a square", () => {
   const numEntities = 4;
   const worldDims = new WT.Dimensions(width * 2, depth * 2, height);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
+  let context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric,
+  );
   for (let y = 0; y < 2; ++y) {
     for (let x = 0; x < 2; ++x) {
-      let minLocation = new WT.Point3D(x * entityDimensions.width,
-                                       y * entityDimensions.depth, 0);
-      let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
+      let minLocation = new WT.Point3D(
+        x * entityDimensions.width,
+        y * entityDimensions.depth,
+        0,
+      );
+      let entity = new WT.PhysicalEntity(
+        context,
+        minLocation,
+        entityDimensions,
+      );
       entity.addGraphic(dummyGraphic);
     }
   }
@@ -296,16 +348,25 @@ Deno.test('draw order of (x, y) four in a square', () => {
   assertEquals(level.order[3].entity.id, 2);
 });
 
-Deno.test('draw order of (x, y, z) eight in a cube', () => {
+Deno.test("draw order of (x, y, z) eight in a cube", () => {
   const worldDims = new WT.Dimensions(width * 2, depth * 2, height * 2);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
+  let context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric,
+  );
   for (let z = 0; z < 2; ++z) {
     for (let y = 0; y < 2; ++y) {
       for (let x = 0; x < 2; ++x) {
-        let minLocation = new WT.Point3D(x * entityDimensions.width,
-                                        y * entityDimensions.depth,
-                                        z * entityDimensions.height);
-        let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
+        let minLocation = new WT.Point3D(
+          x * entityDimensions.width,
+          y * entityDimensions.depth,
+          z * entityDimensions.height,
+        );
+        let entity = new WT.PhysicalEntity(
+          context,
+          minLocation,
+          entityDimensions,
+        );
         entity.addGraphic(dummyGraphic);
       }
     }
@@ -337,17 +398,26 @@ Deno.test('draw order of (x, y, z) eight in a cube', () => {
   assertEquals(drawOrder[3].entity.id, 6);
 });
 
-Deno.test('draw order of (x, y, z) updating eight in a cube', () => {
+Deno.test("draw order of (x, y, z) updating eight in a cube", () => {
   const worldDims = new WT.Dimensions(width * 2, depth * 2, height * 2);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
+  let context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric,
+  );
   let entities = new Array();
   for (let z = 0; z < 2; ++z) {
     for (let y = 0; y < 2; ++y) {
       for (let x = 0; x < 2; ++x) {
-        let minLocation = new WT.Point3D(x * entityDimensions.width,
-                                        y * entityDimensions.depth,
-                                        z * entityDimensions.height);
-        let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
+        let minLocation = new WT.Point3D(
+          x * entityDimensions.width,
+          y * entityDimensions.depth,
+          z * entityDimensions.height,
+        );
+        let entity = new WT.PhysicalEntity(
+          context,
+          minLocation,
+          entityDimensions,
+        );
         entity.addGraphic(dummyGraphic);
         entities.push(entity);
       }
@@ -390,18 +460,23 @@ Deno.test('draw order of (x, y, z) updating eight in a cube', () => {
   assertEquals(drawOrder[3].entity.id, 6);
 });
 
-Deno.test('draw order of (x, y, z) updating level in a cube', () => {
+Deno.test("draw order of (x, y, z) updating level in a cube", () => {
   const worldDims = new WT.Dimensions(width * 2, depth * 2, height * 3);
-  let context = WT.createTestContext(worldDims, WT.Perspective.TwoByOneIsometric);
+  let context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric,
+  );
 
   let addEntityAt = (x, y, z) => {
-     let minLocation = new WT.Point3D(x * entityDimensions.width,
-                                      y * entityDimensions.depth,
-                                      z * entityDimensions.height);
-     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
-     entity.addGraphic(dummyGraphic);
-     return entity;
-  }
+    let minLocation = new WT.Point3D(
+      x * entityDimensions.width,
+      y * entityDimensions.depth,
+      z * entityDimensions.height,
+    );
+    let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
+    entity.addGraphic(dummyGraphic);
+    return entity;
+  };
 
   for (let z = 0; z < 2; ++z) {
     for (let y = 0; y < 2; ++y) {

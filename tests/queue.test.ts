@@ -1,8 +1,8 @@
 import { assertEquals } from "https://deno.land/std@0.160.0/testing/asserts.ts";
 
-import * as WT from '../world-tree.js';
+import * as WT from "../world-tree.js";
 
-Deno.test('build queue', () => {
+Deno.test("build queue", () => {
   const numItems = 10;
   let queue = new WT.MinPriorityQueue();
   for (let i = 0; i < numItems; ++i) {

@@ -1,15 +1,16 @@
-import { Actor } from "./entity.ts"
-import { EntityEvent } from "./events.ts"
-import { BoundingCuboid,
-         CollisionDetector,
-         CollisionInfo } from "./physics.ts"
-import { Point3D,
-         Vector3D } from "./geometry.ts"
+import { Actor } from "./entity.ts";
+import { EntityEvent } from "./events.ts";
+import { BoundingCuboid, CollisionDetector, CollisionInfo } from "./physics.ts";
+import { Point3D, Vector3D } from "./geometry.ts";
 
 export abstract class Action {
-  constructor(protected _actor: Actor) { }
-  get actor(): Actor { return this._actor; }
-  set actor(actor: Actor) { this._actor = actor; }
+  constructor(protected _actor: Actor) {}
+  get actor(): Actor {
+    return this._actor;
+  }
+  set actor(actor: Actor) {
+    this._actor = actor;
+  }
   // Returns true once the action is complete.
   abstract perform(): boolean;
 }
@@ -19,7 +20,7 @@ class MoveAction extends Action {
     super(actor);
   }
 
-  obstructed(from: Point3D, to: Point3D): CollisionInfo|null {
+  obstructed(from: Point3D, to: Point3D): CollisionInfo | null {
     const bounds = this._actor.bounds;
     // Create a bounds to contain the current location and the destination.
     const path: Vector3D = to.vec_diff(from);
@@ -28,13 +29,17 @@ class MoveAction extends Action {
     return CollisionDetector.detectInArea(this._actor, path, area);
   }
 
-  perform(): boolean { return true; }
+  perform(): boolean {
+    return true;
+  }
 }
 
 export class MoveDirection extends MoveAction {
-  constructor(actor: Actor,
-              private readonly _d: Vector3D,
-              private _bounds: BoundingCuboid) {
+  constructor(
+    actor: Actor,
+    private readonly _d: Vector3D,
+    private _bounds: BoundingCuboid,
+  ) {
     super(actor);
   }
 
@@ -59,23 +64,31 @@ export class MoveDirection extends MoveAction {
 export class MoveDestination extends MoveAction {
   private _d: Vector3D;
 
-  constructor(actor: Actor,
-              private _step: number,
-              private _destination: Point3D) {
+  constructor(
+    actor: Actor,
+    private _step: number,
+    private _destination: Point3D,
+  ) {
     super(actor);
     this.destination = _destination;
   }
 
-  set speed(speed: number) { this._step = speed; }
+  set speed(speed: number) {
+    this._step = speed;
+  }
 
-  get destination(): Point3D { return this._destination; }
+  get destination(): Point3D {
+    return this._destination;
+  }
   set destination(destination: Point3D) {
     this._destination = destination;
     const currentPos = this.actor.bounds.minLocation;
     const maxD = destination.vec_diff(currentPos);
 
-    console.assert(maxD.x == 0 || maxD.y == 0 || maxD.z == 0,
-                   "can only change distance along two axes simultaneously");
+    console.assert(
+      maxD.x == 0 || maxD.y == 0 || maxD.z == 0,
+      "can only change distance along two axes simultaneously",
+    );
 
     let dx = 0;
     let dy = 0;
@@ -157,14 +170,15 @@ export class Navigate extends Action {
   private _waypoints: Array<Point3D>;
   private _index = 0;
 
-  constructor(actor: Actor,
-              private readonly _step: number,
-              private readonly _destination: Point3D) {
+  constructor(
+    actor: Actor,
+    private readonly _step: number,
+    private readonly _destination: Point3D,
+  ) {
     super(actor);
     this._waypoints = this.findPath();
     if (this._waypoints.length != 0) {
-      this._currentStep =
-        new MoveDestination(actor, _step, this._waypoints[0]);
+      this._currentStep = new MoveDestination(actor, _step, this._waypoints[0]);
     }
   }
 
@@ -183,13 +197,19 @@ export class Navigate extends Action {
 
     // If the step is reporting that it's done, check whether it completed or
     // failed. If it failed, try to recompute the path.
-    if (!this._currentStep.destination.isSameAsRounded(
-        this._actor.bounds.minLocation)) {
+    if (
+      !this._currentStep.destination.isSameAsRounded(
+        this._actor.bounds.minLocation,
+      )
+    ) {
       this._waypoints = this.findPath();
       if (this._waypoints.length != 0) {
         this._index = 0;
-        this._currentStep =
-          new MoveDestination(this._actor, this._step, this._waypoints[0]);
+        this._currentStep = new MoveDestination(
+          this._actor,
+          this._step,
+          this._waypoints[0],
+        );
         return false;
       }
       return true; // can no longer reach the destination.
@@ -201,8 +221,11 @@ export class Navigate extends Action {
     }
 
     const nextLocation = this._waypoints[this._index];
-    this._currentStep =
-      new MoveDestination(this._actor, this._step, nextLocation);
+    this._currentStep = new MoveDestination(
+      this._actor,
+      this._step,
+      nextLocation,
+    );
     return false;
   }
 
@@ -210,7 +233,7 @@ export class Navigate extends Action {
     const path = new Array<Point3D>();
     return path;
     /*
-  
+
     // Adapted from:
     // http://www.redblobgames.com/pathfinding/a-star/introduction.html
     let frontier = new Array<MovementCost>();

@@ -1,10 +1,11 @@
-import { Point2D } from "./geometry.ts"
-import { Navigation,
-         Direction } from "./navigation.ts"
+import { Point2D } from "./geometry.ts";
+import { Direction, Navigation } from "./navigation.ts";
 
 export const DummySpriteSheet = {
-  addForValidation: function(_sprite: Sprite): boolean { return true; }
-}
+  addForValidation: function (_sprite: Sprite): boolean {
+    return true;
+  },
+};
 
 export class SpriteSheet {
   private static _sheets = new Array<SpriteSheet>();
@@ -12,7 +13,7 @@ export class SpriteSheet {
   private static add(sheet: SpriteSheet) {
     this._sheets.push(sheet);
   }
-  
+
   static reset(): void {
     this._sheets = new Array<SpriteSheet>();
   }
@@ -33,10 +34,16 @@ export class SpriteSheet {
     SpriteSheet.add(this);
 
     this._image.onload = () => {
-      this.canvas = document.createElement('canvas');
+      this.canvas = document.createElement("canvas");
       this.canvas.width = this.width;
       this.canvas.height = this.height;
-      this.canvas.getContext('2d')!.drawImage(this.image, 0, 0, this.width, this.height);
+      this.canvas.getContext("2d")!.drawImage(
+        this.image,
+        0,
+        0,
+        this.width,
+        this.height,
+      );
       this.loaded = true;
       for (const sprite of this._toValidate) {
         sprite.validate();
@@ -44,17 +51,33 @@ export class SpriteSheet {
     };
   }
 
-  get image(): HTMLImageElement { return this._image;  }
-  get width(): number { return this._image.width; }
-  get height(): number { return this._image.height; }
-  get name(): string { return this._image.src; }
-  get loaded(): boolean { return this._loaded; }
-  set loaded(b: boolean) { this._loaded = b; }
-  get canvas(): HTMLCanvasElement { return this._canvas; }
-  set canvas(c: HTMLCanvasElement) { this._canvas = c; }
+  get image(): HTMLImageElement {
+    return this._image;
+  }
+  get width(): number {
+    return this._image.width;
+  }
+  get height(): number {
+    return this._image.height;
+  }
+  get name(): string {
+    return this._image.src;
+  }
+  get loaded(): boolean {
+    return this._loaded;
+  }
+  set loaded(b: boolean) {
+    this._loaded = b;
+  }
+  get canvas(): HTMLCanvasElement {
+    return this._canvas;
+  }
+  set canvas(c: HTMLCanvasElement) {
+    this._canvas = c;
+  }
 
   isTransparentAt(x: number, y: number): boolean {
-    const data = this.canvas.getContext('2d')!.getImageData(x, y, 1, 1).data;
+    const data = this.canvas.getContext("2d")!.getImageData(x, y, 1, 1).data;
     return data[3] == 0;
   }
 
@@ -82,17 +105,21 @@ export class Sprite {
   private readonly _spriteOffset: Point2D;
   private readonly _maxOffset: Point2D;
 
-  constructor(private readonly _sheet: SpriteSheet,
-              offsetX: number,
-              offsetY: number,
-              private readonly _width: number,
-              private readonly _height: number) {
+  constructor(
+    private readonly _sheet: SpriteSheet,
+    offsetX: number,
+    offsetY: number,
+    private readonly _width: number,
+    private readonly _height: number,
+  ) {
     console.assert(offsetX >= 0, "offsetX < 0");
     console.assert(offsetY >= 0, "offsetY < 0");
     this._id = Sprite.sprites.length;
     this._spriteOffset = new Point2D(offsetX, offsetY);
-    this._maxOffset = new Point2D(this.offset.x + this.width,
-                                  this.offset.y + this.height);
+    this._maxOffset = new Point2D(
+      this.offset.x + this.width,
+      this.offset.y + this.height,
+    );
     Sprite.add(this);
 
     if (this.sheet.loaded) {
@@ -103,20 +130,34 @@ export class Sprite {
   }
 
   draw(coord: Point2D, ctx: CanvasRenderingContext2D): void {
-    ctx.drawImage(this.sheet.image,
-                  this.offset.x, this.offset.y,
-                  this.width, this.height,
-                  coord.x, coord.y,
-                  this.width, this.height);
+    ctx.drawImage(
+      this.sheet.image,
+      this.offset.x,
+      this.offset.y,
+      this.width,
+      this.height,
+      coord.x,
+      coord.y,
+      this.width,
+      this.height,
+    );
   }
 
   validate(): void {
-    console.assert(this.maxOffset.x <= this.sheet.width,
-                   "sprite id:", this.id,
-                   "sprite max X offset too large", this.maxOffset.x);
-    console.assert(this.maxOffset.y <= this.sheet.height,
-                   "sprite id:", this.id,
-                   "sprite max Y offset too large", this.maxOffset.y);
+    console.assert(
+      this.maxOffset.x <= this.sheet.width,
+      "sprite id:",
+      this.id,
+      "sprite max X offset too large",
+      this.maxOffset.x,
+    );
+    console.assert(
+      this.maxOffset.y <= this.sheet.height,
+      "sprite id:",
+      this.id,
+      "sprite max Y offset too large",
+      this.maxOffset.y,
+    );
   }
 
   isTransparentAt(x: number, y: number): boolean {
@@ -125,17 +166,35 @@ export class Sprite {
     return this.sheet.isTransparentAt(x, y);
   }
 
-  get id(): number { return this._id; }
-  get width(): number { return this._width; }
-  get height(): number { return this._height; }
-  get sheet(): SpriteSheet { return this._sheet; }
-  get offset(): Point2D { return this._spriteOffset; }
-  get maxOffset(): Point2D { return this._maxOffset; }
+  get id(): number {
+    return this._id;
+  }
+  get width(): number {
+    return this._width;
+  }
+  get height(): number {
+    return this._height;
+  }
+  get sheet(): SpriteSheet {
+    return this._sheet;
+  }
+  get offset(): Point2D {
+    return this._spriteOffset;
+  }
+  get maxOffset(): Point2D {
+    return this._maxOffset;
+  }
 }
 
-export function generateSprites(sheet: SpriteSheet, width: number, height: number,
-                                xBegin: number, yBegin: number,
-                                columns: number, rows: number): Array<Sprite> {
+export function generateSprites(
+  sheet: SpriteSheet,
+  width: number,
+  height: number,
+  xBegin: number,
+  yBegin: number,
+  columns: number,
+  rows: number,
+): Array<Sprite> {
   const sprites = new Array<Sprite>();
   const xEnd = xBegin + columns;
   const yEnd = yBegin + rows;
@@ -148,28 +207,36 @@ export function generateSprites(sheet: SpriteSheet, width: number, height: numbe
 }
 
 export abstract class GraphicComponent {
-  constructor(protected _currentSpriteId: number) { }
-              
+  constructor(protected _currentSpriteId: number) {}
+
   abstract update(): number;
   isTransparentAt(x: number, y: number): boolean {
     return Sprite.sprites[this._currentSpriteId].isTransparentAt(x, y);
   }
-  get width(): number { 
+  get width(): number {
     return Sprite.sprites[this._currentSpriteId].width;
   }
-  get height(): number { 
+  get height(): number {
     return Sprite.sprites[this._currentSpriteId].height;
   }
 }
 
 export class DummyGraphicComponent extends GraphicComponent {
-  constructor(private readonly _width: number,
-              private readonly _height: number) {
+  constructor(
+    private readonly _width: number,
+    private readonly _height: number,
+  ) {
     super(0);
   }
-  get width(): number { return this._width; }
-  get height(): number { return this._height; }
-  update(): number { return 0; }
+  get width(): number {
+    return this._width;
+  }
+  get height(): number {
+    return this._height;
+  }
+  update(): number {
+    return 0;
+  }
 }
 
 export class StaticGraphicComponent extends GraphicComponent {
@@ -183,10 +250,14 @@ export class StaticGraphicComponent extends GraphicComponent {
 }
 
 export function generateStaticGraphics(
-  sheet: SpriteSheet, width: number, height: number,
-  xBegin: number, yBegin: number,
-  columns: number, rows: number): Array<StaticGraphicComponent> {
-
+  sheet: SpriteSheet,
+  width: number,
+  height: number,
+  xBegin: number,
+  yBegin: number,
+  columns: number,
+  rows: number,
+): Array<StaticGraphicComponent> {
   const graphics = new Array<StaticGraphicComponent>();
   const xEnd = xBegin + columns;
   const yEnd = yBegin + rows;
@@ -204,8 +275,7 @@ export class AnimatedGraphicComponent extends GraphicComponent {
   protected _currentSpriteIdx = 0;
   protected _spriteIds: Array<number> = new Array<number>();
 
-  constructor(sprites: Array<Sprite>,
-              protected readonly _interval: number) {
+  constructor(sprites: Array<Sprite>, protected readonly _interval: number) {
     super(sprites[0].id);
     for (const i in sprites) {
       this._spriteIds.push(sprites[i].id);
@@ -217,7 +287,9 @@ export class AnimatedGraphicComponent extends GraphicComponent {
     return this._spriteIds[this._currentSpriteIdx];
   }
 
-  protected get firstId(): number { return this._spriteIds[0] }
+  protected get firstId(): number {
+    return this._spriteIds[0];
+  }
   protected get lastId(): number {
     return this._spriteIds[this._spriteIds.length - 1];
   }
@@ -229,13 +301,13 @@ export class AnimatedGraphicComponent extends GraphicComponent {
 }
 
 export class OssilateGraphicComponent extends AnimatedGraphicComponent {
-
   private _increase = true;
 
   constructor(sprites: Array<Sprite>, interval: number) {
     super(sprites, interval);
-    this._currentSpriteIdx =
-      Math.floor(Math.random() * (this._spriteIds.length - 1));
+    this._currentSpriteIdx = Math.floor(
+      Math.random() * (this._spriteIds.length - 1),
+    );
   }
 
   update(): number {
@@ -270,7 +342,8 @@ export class LoopGraphicComponent extends AnimatedGraphicComponent {
     if (this._nextUpdate > Date.now()) {
       return this.currentSpriteId;
     }
-    this._currentSpriteIdx = (this._currentSpriteIdx + 1 ) % this._spriteIds.length;
+    this._currentSpriteIdx = (this._currentSpriteIdx + 1) %
+      this._spriteIds.length;
     this._nextUpdate = Date.now() + this._interval;
     return this.currentSpriteId;
   }
@@ -283,23 +356,29 @@ export class DirectionalGraphicComponent extends GraphicComponent {
     super(0);
   }
 
-  get direction(): Direction { return this._direction; }
+  get direction(): Direction {
+    return this._direction;
+  }
   set direction(direction: Direction) {
     if (this._staticGraphics.has(direction)) {
       this._direction = direction;
     } else {
       console.log("graphic direction unsupported");
     }
-  } 
+  }
 
   update(): number {
     if (this._staticGraphics.has(this.direction)) {
-      const component: GraphicComponent = this._staticGraphics.get(this.direction)!;
+      const component: GraphicComponent = this._staticGraphics.get(
+        this.direction,
+      )!;
       const spriteId = component.update();
       return spriteId;
     }
-    console.error("unhandled stationary graphic:", 
-                  Navigation.getDirectionName(this.direction));
+    console.error(
+      "unhandled stationary graphic:",
+      Navigation.getDirectionName(this.direction),
+    );
     return 0;
   }
 }
@@ -308,21 +387,32 @@ export class AnimatedDirectionalGraphicComponent extends GraphicComponent {
   protected _stationary = true;
   protected _direction: Direction = Direction.North;
 
-  constructor(protected _staticGraphics: Map<Direction, GraphicComponent>,
-              protected _movementGraphics: Map<Direction, GraphicComponent>) {
+  constructor(
+    protected _staticGraphics: Map<Direction, GraphicComponent>,
+    protected _movementGraphics: Map<Direction, GraphicComponent>,
+  ) {
     super(0);
   }
 
-  get stationary(): boolean { return this._stationary; }
-  set stationary(stationary: boolean) { this._stationary = stationary; }
-  get direction(): Direction { return this._direction; }
+  get stationary(): boolean {
+    return this._stationary;
+  }
+  set stationary(stationary: boolean) {
+    this._stationary = stationary;
+  }
+  get direction(): Direction {
+    return this._direction;
+  }
   set direction(direction: Direction) {
-    if (this._staticGraphics.has(direction) && this._movementGraphics.has(direction)) {
+    if (
+      this._staticGraphics.has(direction) &&
+      this._movementGraphics.has(direction)
+    ) {
       this._direction = direction;
     } else {
       console.log("graphic direction unsupported");
     }
-  } 
+  }
 
   update(): number {
     if (!this.stationary && this._movementGraphics.has(this.direction)) {
@@ -330,16 +420,22 @@ export class AnimatedDirectionalGraphicComponent extends GraphicComponent {
       return spriteId;
     }
     if (this.stationary && this._staticGraphics.has(this.direction)) {
-      const component: GraphicComponent = this._staticGraphics.get(this.direction)!;
+      const component: GraphicComponent = this._staticGraphics.get(
+        this.direction,
+      )!;
       const spriteId = component.update();
       return spriteId;
     }
     if (this.stationary) {
-      console.error("unhandled stationary graphic:",
-                    Navigation.getDirectionName(this.direction));
+      console.error(
+        "unhandled stationary graphic:",
+        Navigation.getDirectionName(this.direction),
+      );
     } else {
-      console.error("unhandled movement graphic:",
-                    Navigation.getDirectionName(this.direction));
+      console.error(
+        "unhandled movement graphic:",
+        Navigation.getDirectionName(this.direction),
+      );
     }
     return 0;
   }

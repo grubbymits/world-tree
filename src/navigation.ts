@@ -1,9 +1,6 @@
-import { Point2D,
-         Point3D,
-         Vector2D } from "./geometry.ts"
-import { Terrain,
-         TerrainGrid } from "./terrain.ts"
-import { MinPriorityQueue } from "./queue.ts"
+import { Point2D, Point3D, Vector2D } from "./geometry.ts";
+import { Terrain, TerrainGrid } from "./terrain.ts";
+import { MinPriorityQueue } from "./queue.ts";
 
 export enum Direction {
   North,
@@ -18,27 +15,26 @@ export enum Direction {
 }
 
 export class Navigation {
-
   static getDirectionName(direction: Direction): string {
     switch (direction) {
-    default:
-      break;
-    case Direction.North:
-      return "north";
-    case Direction.NorthEast:
-      return "north east";
-    case Direction.East:
-      return "east";
-    case Direction.SouthEast:
-      return "south east";
-    case Direction.South:
-      return "south";
-    case Direction.SouthWest:
-      return "south west";
-    case Direction.West:
-      return "west";
-    case Direction.NorthWest:
-      return "north west";
+      default:
+        break;
+      case Direction.North:
+        return "north";
+      case Direction.NorthEast:
+        return "north east";
+      case Direction.East:
+        return "east";
+      case Direction.SouthEast:
+        return "south east";
+      case Direction.South:
+        return "south";
+      case Direction.SouthWest:
+        return "south west";
+      case Direction.West:
+        return "west";
+      case Direction.NorthWest:
+        return "north west";
     }
     console.error("unhandled direction when getting name:", direction);
     return "error";
@@ -47,44 +43,43 @@ export class Navigation {
   static getVector2D(direction: Direction): Vector2D {
     let xDiff = 0;
     let yDiff = 0;
-    switch(direction) {
-    default:
-      console.error("unhandled direction");
-      break;
-    case Direction.North:
-      yDiff = -1;
-      break;
-    case Direction.NorthEast:
-      xDiff = 1;
-      yDiff = -1;
-      break;
-    case Direction.East:
-      xDiff = 1;
-      break;
-    case Direction.SouthEast:
-      xDiff = 1;
-      yDiff = 1;
-      break;
-    case Direction.South:
-      yDiff = 1;
-      break;
-    case Direction.SouthWest:
-      xDiff = -1;
-      yDiff = 1;
-      break;
-    case Direction.West:
-      xDiff = -1;
-      break;
-    case Direction.NorthWest:
-      xDiff = -1;
-      yDiff = -1;
-      break;
+    switch (direction) {
+      default:
+        console.error("unhandled direction");
+        break;
+      case Direction.North:
+        yDiff = -1;
+        break;
+      case Direction.NorthEast:
+        xDiff = 1;
+        yDiff = -1;
+        break;
+      case Direction.East:
+        xDiff = 1;
+        break;
+      case Direction.SouthEast:
+        xDiff = 1;
+        yDiff = 1;
+        break;
+      case Direction.South:
+        yDiff = 1;
+        break;
+      case Direction.SouthWest:
+        xDiff = -1;
+        yDiff = 1;
+        break;
+      case Direction.West:
+        xDiff = -1;
+        break;
+      case Direction.NorthWest:
+        xDiff = -1;
+        yDiff = -1;
+        break;
     }
     return new Vector2D(xDiff, yDiff);
   }
 
-  static getAdjacentCoord(p: Point2D,
-                          direction: Direction): Point2D {
+  static getAdjacentCoord(p: Point2D, direction: Direction): Point2D {
     const v = this.getVector2D(direction);
     return p.add(v);
   }
@@ -95,16 +90,16 @@ export class Navigation {
 
   static getDirectionFromVector(w: Vector2D): Direction {
     const mag = w.mag();
-    const u = new Vector2D(0, -mag);  // 'north'
+    const u = new Vector2D(0, -mag); // 'north'
     let theta = 180 * u.angle(w) / Math.PI;
     if (theta < 0) {
       const rotate = 180 + theta;
       theta = 180 + rotate;
     }
     const direction = Math.round(theta / 45);
-    return <Direction>direction;
+    return <Direction> direction;
   }
-  
+
   static getOppositeDirection(direction: Direction): Direction {
     return (direction + (Direction.Max / 2)) % Direction.Max;
   }
@@ -128,13 +123,18 @@ class PathNode {
     return this._edgeCosts.has(succ);
   }
 
-  get x(): number { return this._x; }
-  get y(): number { return this._y; }
-  get neighbours(): Map<PathNode, number> { return this._edgeCosts; }
+  get x(): number {
+    return this._x;
+  }
+  get y(): number {
+    return this._y;
+  }
+  get neighbours(): Map<PathNode, number> {
+    return this._edgeCosts;
+  }
 }
 
 export class PathFinder {
-
   private _graph: Array<Array<PathNode>> = new Array<Array<PathNode>>();
 
   constructor(private readonly _grid: TerrainGrid) {
@@ -155,8 +155,12 @@ export class PathFinder {
     }
   }
 
-  get grid(): TerrainGrid { return this._grid; }
-  get graph(): Array<Array<PathNode>> { return this._graph; }
+  get grid(): TerrainGrid {
+    return this._grid;
+  }
+  get graph(): Array<Array<PathNode>> {
+    return this._graph;
+  }
 
   addNode(x: number, y: number, terrain: Terrain): void {
     this._graph[y][x] = new PathNode(terrain);
@@ -203,16 +207,23 @@ export class PathFinder {
 
     const neighbours = grid.getNeighbours(centre);
     const centrePoint: Point2D = new Point2D(centre.x, centre.y);
-    return neighbours.filter(function(to: Terrain) {
-      console.assert(Math.abs(centre.z - to.z) <= 1,
-                     "can only handle neighbours separated by 1 terrace max");
+    return neighbours.filter(function (to: Terrain) {
+      console.assert(
+        Math.abs(centre.z - to.z) <= 1,
+        "can only handle neighbours separated by 1 terrace max",
+      );
 
       const toPoint: Point2D = new Point2D(to.x, to.y);
-      const direction: Direction = Navigation.getDirectionFromPoints(centrePoint, toPoint);
-      console.assert(direction == Direction.North ||
-                     direction == Direction.East ||
-                     direction == Direction.South ||
-                     direction == Direction.West);
+      const direction: Direction = Navigation.getDirectionFromPoints(
+        centrePoint,
+        toPoint,
+      );
+      console.assert(
+        direction == Direction.North ||
+          direction == Direction.East ||
+          direction == Direction.South ||
+          direction == Direction.West,
+      );
       const oppositeDir: Direction = Navigation.getOppositeDirection(direction);
       if (to.z == centre.z) {
         return true;
@@ -226,19 +237,21 @@ export class PathFinder {
   }
 
   findPath(startPoint: Point3D, endPoint: Point3D): Array<PathNode> {
-    const startTerrain: Terrain|null =
-      this.grid.getSurfaceTerrainAtPoint(startPoint);
-    const endTerrain: Terrain|null =
-      this.grid.getSurfaceTerrainAtPoint(endPoint);
+    const startTerrain: Terrain | null = this.grid.getSurfaceTerrainAtPoint(
+      startPoint,
+    );
+    const endTerrain: Terrain | null = this.grid.getSurfaceTerrainAtPoint(
+      endPoint,
+    );
     if (startTerrain == null || endTerrain == null) {
-      console.log('either start or end terrain is null');
+      console.log("either start or end terrain is null");
       return new Array<PathNode>();
     }
     // https://www.redblobgames.com/pathfinding/a-star/introduction.html
     const start = new PathNode(startTerrain!);
     const end = new PathNode(endTerrain!);
     const frontier = new MinPriorityQueue<PathNode>();
-    const cameFrom = new Map<PathNode, PathNode|null>();
+    const cameFrom = new Map<PathNode, PathNode | null>();
     const costs = new Map<PathNode, number>();
 
     frontier.insert(start, 0);
@@ -254,8 +267,8 @@ export class PathFinder {
         const new_cost = costs.get(current)! + cost;
         if (!costs.has(next) || new_cost < costs.get(next)!) {
           costs.set(next, new_cost);
-          const priority = new_cost;// + heuristic(goal, next)
-          frontier.insert(next, priority)
+          const priority = new_cost; // + heuristic(goal, next)
+          frontier.insert(next, priority);
           cameFrom.set(next, current);
         }
       });

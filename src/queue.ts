@@ -1,4 +1,3 @@
-
 export interface PriorityQueue<T> {
   insert(x: T, k: number): void;
   build(): void;
@@ -7,25 +6,40 @@ export interface PriorityQueue<T> {
   empty(): boolean;
 }
 
-class QueueItem <T> {
-  constructor(private readonly _element: T,
-              private _key: number) { }
-  get element(): T { return this._element; }
-  get key(): number { return this._key; }
-  set key(k: number) { this._key = k; }
+class QueueItem<T> {
+  constructor(private readonly _element: T, private _key: number) {}
+  get element(): T {
+    return this._element;
+  }
+  get key(): number {
+    return this._key;
+  }
+  set key(k: number) {
+    this._key = k;
+  }
 }
 
 export class MinPriorityQueue<T> implements PriorityQueue<T> {
-  private _items: Array<QueueItem<T>> = new Array<QueueItem<T>>(); 
+  private _items: Array<QueueItem<T>> = new Array<QueueItem<T>>();
   private _indices: Map<T, number> = new Map<T, number>();
 
-  constructor() { }
+  constructor() {}
 
-  get indices(): Map<T, number> { return this._indices; }
-  get items(): Array<QueueItem<T>> { return this._items; }
-  get size(): number { return this.items.length - 1; }
-  get length(): number { return this.items.length; }
-  empty(): boolean { return this.length == 0; }
+  get indices(): Map<T, number> {
+    return this._indices;
+  }
+  get items(): Array<QueueItem<T>> {
+    return this._items;
+  }
+  get size(): number {
+    return this.items.length - 1;
+  }
+  get length(): number {
+    return this.items.length;
+  }
+  empty(): boolean {
+    return this.length == 0;
+  }
   pop(): T {
     const minItem = this.items[0];
     this.items.splice(0, 1);
