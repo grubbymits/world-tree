@@ -1,3 +1,5 @@
+// deno-fmt-ignore-file
+
 Current difficulties
 
 - Need more variation in ground colour to differentiate between areas.

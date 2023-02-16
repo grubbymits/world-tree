@@ -4,7 +4,7 @@
     "strict": true,
     "noImplicitAny": true,
     "removeComments": true,
-    "strictPropertyInitialization": false,
+    "strictPropertyInitialization": false
   },
   "test": {
     "files": {
