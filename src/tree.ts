@@ -99,9 +99,9 @@ class OctNode {
     for (let z = 0; z < 2; z++) {
       for (let y = 0; y < 2; y++) {
         for (let x = 0; x < 2; x++) {
-          const offsetX = (offset[x] * dimensions.width);
-          const offsetY = (offset[y] * dimensions.depth);
-          const offsetZ = (offset[z] * dimensions.height);
+          const offsetX = offset[x] * dimensions.width;
+          const offsetY = offset[y] * dimensions.depth;
+          const offsetZ = offset[z] * dimensions.height;
           const centre = new Point3D(
             this.centre.x + offsetX,
             this.centre.y + offsetY,

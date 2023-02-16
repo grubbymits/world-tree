@@ -1,4 +1,4 @@
-// deno-fmt-ignore-file
+<!-- deno-fmt-ignore-file -->
 
 Current difficulties
 
