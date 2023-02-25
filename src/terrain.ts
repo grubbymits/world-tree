@@ -180,10 +180,15 @@ export class Terrain extends PhysicalEntity {
   }
 
   static scaleLocation(loc: Point3D): Point3D {
+    // round down
+    const x = loc.x - loc.x % this.width;
+    const y = loc.y - loc.y % this.depth;
+    const z = loc.z - loc.z % this.height;
+    // then scale to grid
     return new Point3D(
-      Math.floor(loc.x / this.width),
-      Math.floor(loc.y / this.depth),
-      Math.floor(loc.z / this.height),
+      Math.floor(x / this.width),
+      Math.floor(y / this.depth),
+      Math.floor(z / this.height),
     );
   }
 
@@ -566,7 +571,7 @@ export class TerrainGrid {
     const scaled: Point3D = Terrain.scaleLocation(loc);
     const terrain = this.getSurfaceTerrainAt(scaled.x, scaled.y);
     if (terrain != null) {
-      if (terrain.surfaceLocation.z == scaled.z) {
+      if (terrain.surfaceLocation.z == loc.z) {
         return terrain;
       }
     }
@@ -577,9 +582,10 @@ export class TerrainGrid {
     const neighbours = new Array<Terrain>();
 
     for (const offset of TerrainGrid.neighbourOffsets) {
+      const scaled: Point3D = Terrain.scaleLocation(centre.surfaceLocation);
       const neighbour = this.getSurfaceTerrainAt(
-        centre.x + offset.x,
-        centre.y + offset.y,
+        scaled.x + offset.x,
+        scaled.y + offset.y,
       );
       if (!neighbour) {
         continue;

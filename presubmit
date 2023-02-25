@@ -1,0 +1,6 @@
+#!/bin/sh
+
+deno lint src/*
+deno fmt --check
+deno task build
+deno test

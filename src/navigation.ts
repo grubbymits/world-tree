@@ -107,50 +107,41 @@ export class Navigation {
 
 class PathNode {
   private _edgeCosts: Map<PathNode, number> = new Map<PathNode, number>();
-  private readonly _x: number;
-  private readonly _y: number;
+  private readonly _location: Point3D;
 
   constructor(terrain: Terrain) {
-    this._x = terrain.x;
-    this._y = terrain.y;
+    this._location = terrain.surfaceLocation;
   }
 
-  addSuccessor(succ: PathNode, cost: number): void {
-    this._edgeCosts.set(succ, cost);
+  addNeighbour(neighbour: PathNode, cost: number): void {
+    this._edgeCosts.set(neighbour, cost);
   }
 
-  hasSuccessor(succ: PathNode): boolean {
-    return this._edgeCosts.has(succ);
+  hasNeighbour(neighbour: PathNode): boolean {
+    return this._edgeCosts.has(neighbour);
   }
 
-  get x(): number {
-    return this._x;
-  }
-  get y(): number {
-    return this._y;
-  }
   get neighbours(): Map<PathNode, number> {
     return this._edgeCosts;
   }
 }
 
 export class PathFinder {
-  private _graph: Array<Array<PathNode>> = new Array<Array<PathNode>>();
+  private _nodes = new Map<Terrain, PathNode>();
 
   constructor(private readonly _grid: TerrainGrid) {
     // Create path nodes for all surface locations.
     for (let y = 0; y < this.grid.depth; y++) {
-      this.graph[y] = new Array<PathNode>();
       for (let x = 0; x < this.grid.width; x++) {
         const centre = this.grid.getSurfaceTerrainAt(x, y)!;
-        this.addNode(x, y, centre);
+        this._nodes.set(centre, new PathNode(centre));
       }
     }
 
     for (let y = 0; y < this.grid.depth; y++) {
       for (let x = 0; x < this.grid.width; x++) {
         const centre = this.grid.getSurfaceTerrainAt(x, y)!;
-        this.addNeighbours(centre, this.grid);
+        this.addNeighbours(centre);
       }
     }
   }
@@ -158,16 +149,8 @@ export class PathFinder {
   get grid(): TerrainGrid {
     return this._grid;
   }
-  get graph(): Array<Array<PathNode>> {
-    return this._graph;
-  }
-
-  addNode(x: number, y: number, terrain: Terrain): void {
-    this._graph[y][x] = new PathNode(terrain);
-  }
-
-  getNode(x: number, y: number): PathNode {
-    return this._graph[y][x];
+  get nodes(): Map<Terrain, PathNode> {
+    return this._nodes;
   }
 
   getNeighbourCost(centre: Terrain, to: Terrain): number {
@@ -180,17 +163,29 @@ export class PathFinder {
     return centre.z == to.z ? cost : cost * 2;
   }
 
-  addNeighbours(centre: Terrain, grid: TerrainGrid): void {
-    const neighbours = this.getAccessibleNeighbours(centre, grid);
-    const centreNode = this.getNode(centre.x, centre.y);
+  addNeighbours(centre: Terrain): void {
+    console.assert(
+      this.nodes.has(centre),
+      "object not in node map: %o",
+      centre,
+    );
+    const neighbours: Array<Terrain> = this.getAccessibleNeighbours(centre);
+    if (neighbours.length == 0) {
+      return;
+    }
+    const centreNode: PathNode = this.nodes.get(centre)!;
     for (const neighbour of neighbours) {
+      console.assert(
+        this.nodes.has(neighbour),
+        "object not in node map: %o",
+        neighbour,
+      );
       const cost = this.getNeighbourCost(centre, neighbour);
-      const succ = this.getNode(neighbour.x, neighbour.y);
-      centreNode.addSuccessor(succ, cost);
+      centreNode.addNeighbour(this.nodes.get(neighbour)!, cost);
     }
   }
 
-  getAccessibleNeighbours(centre: Terrain, grid: TerrainGrid): Array<Terrain> {
+  getAccessibleNeighbours(centre: Terrain): Array<Terrain> {
     // Blocked by different Z values, other than when:
     // direction, entering non-blocking tile
     // north,     RampUpNorth
@@ -205,7 +200,7 @@ export class PathFinder {
     // south,     RampUpNorth
     // west,      RampUpEast
 
-    const neighbours = grid.getNeighbours(centre);
+    const neighbours = this.grid.getNeighbours(centre);
     const centrePoint: Point2D = new Point2D(centre.x, centre.y);
     return neighbours.filter(function (to: Terrain) {
       console.assert(
@@ -218,18 +213,16 @@ export class PathFinder {
         centrePoint,
         toPoint,
       );
-      console.assert(
-        direction == Direction.North ||
-          direction == Direction.East ||
-          direction == Direction.South ||
-          direction == Direction.West,
-      );
+      const diagonal = direction != Direction.North &&
+        direction != Direction.East &&
+        direction != Direction.South &&
+        direction != Direction.West;
       const oppositeDir: Direction = Navigation.getOppositeDirection(direction);
       if (to.z == centre.z) {
         return true;
-      } else if (to.z > centre.z) {
+      } else if (to.z > centre.z && !diagonal) {
         return Terrain.isRampUp(to.shape, direction);
-      } else if (to.z < centre.z) {
+      } else if (to.z < centre.z && !diagonal) {
         return Terrain.isRampUp(to.shape, oppositeDir);
       }
       return false;
@@ -243,17 +236,26 @@ export class PathFinder {
     const endTerrain: Terrain | null = this.grid.getSurfaceTerrainAtPoint(
       endPoint,
     );
-    if (startTerrain == null || endTerrain == null) {
-      console.log("either start or end terrain is null");
+    if (startTerrain == null) {
       return new Array<PathNode>();
     }
+    if (endTerrain == null) {
+      return new Array<PathNode>();
+    }
+
+    const start: PathNode = this.nodes.get(startTerrain)!;
+    if (start.neighbours.size == 0) {
+      return new Array<PathNode>();
+    }
+    const end: PathNode = this.nodes.get(endTerrain)!;
+    if (end.neighbours.size == 0) {
+      return new Array<PathNode>();
+    }
+
     // https://www.redblobgames.com/pathfinding/a-star/introduction.html
-    const start = new PathNode(startTerrain!);
-    const end = new PathNode(endTerrain!);
     const frontier = new MinPriorityQueue<PathNode>();
     const cameFrom = new Map<PathNode, PathNode | null>();
     const costs = new Map<PathNode, number>();
-
     frontier.insert(start, 0);
     cameFrom.set(start, null);
     costs.set(start, 0);
@@ -278,7 +280,6 @@ export class PathFinder {
     if (current != end) {
       return Array<PathNode>();
     }
-
     const path = new Array<PathNode>(current!);
     while (current != start) {
       current = cameFrom.get(current!)!;

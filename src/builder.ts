@@ -536,7 +536,7 @@ export class TerrainBuilder {
     return this.surface.at(x, y).terrace;
   }
 
-  generateMap(context: ContextImpl): void {
+  generateMap(context: ContextImpl): TerrainGrid {
     if (this.config.ramps) {
       this.setShapes();
     }
@@ -552,7 +552,6 @@ export class TerrainBuilder {
     }
     this.setEdges();
     this.setFeatures();
-
     const grid = new TerrainGrid(
       context,
       this.surface.width,
@@ -597,6 +596,7 @@ export class TerrainBuilder {
         }
       }
     }
+    return grid;
   }
 
   setShapes(): void {
