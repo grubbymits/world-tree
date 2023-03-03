@@ -107,10 +107,10 @@ export class Navigation {
 
 class PathNode {
   private _edgeCosts: Map<PathNode, number> = new Map<PathNode, number>();
-  private readonly _location: Point3D;
+  private readonly _waypoint: Point3D;
 
   constructor(terrain: Terrain) {
-    this._location = terrain.surfaceLocation;
+    this._waypoint = terrain.surfaceLocation;
   }
 
   addNeighbour(neighbour: PathNode, cost: number): void {
@@ -123,6 +123,10 @@ class PathNode {
 
   get neighbours(): Map<PathNode, number> {
     return this._edgeCosts;
+  }
+
+  get waypoint(): Point3D {
+    return this._waypoint;
   }
 }
 
@@ -229,27 +233,24 @@ export class PathFinder {
     });
   }
 
-  findPath(startPoint: Point3D, endPoint: Point3D): Array<PathNode> {
+  findPath(startPoint: Point3D, endPoint: Point3D): Array<Point3D> {
     const startTerrain: Terrain | null = this.grid.getSurfaceTerrainAtPoint(
       startPoint,
     );
     const endTerrain: Terrain | null = this.grid.getSurfaceTerrainAtPoint(
       endPoint,
     );
-    if (startTerrain == null) {
-      return new Array<PathNode>();
-    }
-    if (endTerrain == null) {
-      return new Array<PathNode>();
+    if (startTerrain == null || endTerrain == null) {
+      return new Array<Point3D>();
     }
 
     const start: PathNode = this.nodes.get(startTerrain)!;
     if (start.neighbours.size == 0) {
-      return new Array<PathNode>();
+      return new Array<Point3D>();
     }
     const end: PathNode = this.nodes.get(endTerrain)!;
     if (end.neighbours.size == 0) {
-      return new Array<PathNode>();
+      return new Array<Point3D>();
     }
 
     // https://www.redblobgames.com/pathfinding/a-star/introduction.html
@@ -278,12 +279,12 @@ export class PathFinder {
 
     // Failed to find path.
     if (current != end) {
-      return Array<PathNode>();
+      return Array<Point3D>();
     }
-    const path = new Array<PathNode>(current!);
+    const path = new Array<Point3D>(current.waypoint);
     while (current != start) {
       current = cameFrom.get(current!)!;
-      path.push(current!);
+      path.push(current.waypoint);
     }
     path.reverse();
     return path.splice(1);

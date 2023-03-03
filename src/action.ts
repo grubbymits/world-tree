@@ -155,15 +155,6 @@ export class MoveDestination extends MoveAction {
     return bounds.minLocation.isSameAsRounded(this.destination);
   }
 }
-/*
-class MovementCost {
-  constructor(private readonly _terrain: Terrain,
-              private readonly _cost: number) { }
-  get terrain(): Terrain { return this._terrain; }
-  get location(): Point3D { return this._terrain.bounds.minLocation; }
-  get cost(): number { return this._cost; }
-}
-*/
 
 export class Navigate extends Action {
   private _currentStep: MoveDestination;
@@ -176,10 +167,10 @@ export class Navigate extends Action {
     private readonly _destination: Point3D,
   ) {
     super(actor);
-    this._waypoints = this.findPath();
-    if (this._waypoints.length != 0) {
-      this._currentStep = new MoveDestination(actor, _step, this._waypoints[0]);
-    }
+    //this._waypoints = this.findPath();
+    //if (this._waypoints.length != 0) {
+    //  this._currentStep = new MoveDestination(actor, _step, this._waypoints[0]);
+    //}
   }
 
   perform(): boolean {
@@ -202,16 +193,16 @@ export class Navigate extends Action {
         this._actor.bounds.minLocation,
       )
     ) {
-      this._waypoints = this.findPath();
-      if (this._waypoints.length != 0) {
-        this._index = 0;
-        this._currentStep = new MoveDestination(
-          this._actor,
-          this._step,
-          this._waypoints[0],
-        );
-        return false;
-      }
+      //this._waypoints = this.findPath();
+      //if (this._waypoints.length != 0) {
+      //  this._index = 0;
+      //  this._currentStep = new MoveDestination(
+      //    this._actor,
+      //    this._step,
+      //    this._waypoints[0],
+      //  );
+      //  return false;
+      //}
       return true; // can no longer reach the destination.
     }
 
@@ -227,79 +218,5 @@ export class Navigate extends Action {
       nextLocation,
     );
     return false;
-  }
-
-  findPath(): Array<Point3D> {
-    const path = new Array<Point3D>();
-    return path;
-    /*
-
-    // Adapted from:
-    // http://www.redblobgames.com/pathfinding/a-star/introduction.html
-    let frontier = new Array<MovementCost>();
-    let cameFrom = new Map<number, number>();
-    let costSoFar = new Map<number, number>();
-    cameFrom.set(begin.id, 0);
-    costSoFar.set(begin.id, 0);
-
-    // frontier is a sorted list of locations with their lowest cost
-    frontier.push(new MovementCost(begin, 0));
-
-    let current: MovementCost = frontier[0];
-    // breadth-first search
-    while (frontier.length > 0) {
-      current = frontier.shift()!;
-
-      // Found!
-      if (current.terrain.id == end.id) {
-        break;
-      }
-
-      let neighbours: Array<Terrain> =
-        this._map.getAccessibleNeighbours(current.terrain);
-
-      let currentLocation: Point3D = current.terrain.surfaceLocation;
-      let bounds: BoundingCuboid = actor.bounds;
-      for (let next of neighbours) {
-        if (!this.obstructed(currentLocation, next.surfaceLocation)) {
-          continue;
-        }
-        let newCost = costSoFar.get(current.terrain.id)! +
-          this.map.getNeighbourCost(current.terrain, next);
-
-        if (!costSoFar.has(next.id) || newCost < costSoFar.get(next.id)!) {
-          frontier.push(new MovementCost(next, newCost));
-          costSoFar.set(next.id, newCost);
-
-          frontier.sort((a, b) => {
-            if (a.cost > b.cost) {
-              return 1;
-            } else if (a.cost < b.cost) {
-              return -1;
-            } else {
-              return 0;
-            }
-          });
-          cameFrom.set(next.id, current.terrain.id);
-        }
-      }
-    }
-
-    // Search has ended...
-    if (current.terrain.id != end.id) {
-      console.log("Could not find a path...");
-      return path;
-    }
-
-    // finalise the path.
-    let step = end;
-    path.push(step);
-    while (step.id != begin.id) {
-      step = this._map.getTerrainFromId(cameFrom.get(step.id)!);
-      path.push(step);
-    }
-    path.reverse();
-    return path.splice(1);
-    */
   }
 }
