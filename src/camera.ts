@@ -3,7 +3,7 @@
 import { EntityEvent, EventHandler, InputEvent } from "./events.ts";
 import { MovableEntity } from "./entity.ts";
 import { Point2D, Point3D } from "./geometry.ts";
-import { SceneRenderer } from "./scene.ts";
+import { Scene } from "./scene.ts";
 
 export class Camera {
   protected _lowerX = 0;
@@ -15,7 +15,7 @@ export class Camera {
   protected _handler = new EventHandler<InputEvent>();
   protected _surfaceLocation: Point3D | null;
 
-  constructor(protected _scene: SceneRenderer, width: number, height: number) {
+  constructor(protected _scene: Scene, width: number, height: number) {
     this._width = Math.floor(width);
     this._height = Math.floor(height);
     this._upperX = Math.floor(width);
@@ -93,7 +93,7 @@ export class Camera {
 
 export class MouseCamera extends Camera {
   constructor(
-    scene: SceneRenderer,
+    scene: Scene,
     canvas: HTMLCanvasElement,
     width: number,
     height: number
@@ -114,7 +114,7 @@ export class MouseCamera extends Camera {
 
 export class TrackerCamera extends Camera {
   constructor(
-    scene: SceneRenderer,
+    scene: Scene,
     width: number,
     height: number,
     movable: MovableEntity

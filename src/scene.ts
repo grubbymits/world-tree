@@ -1,9 +1,7 @@
-//deno-lint-ignore-file no-explicit-any
-
 import { PhysicalEntity } from "./entity.ts";
 import { Camera } from "./camera.ts";
 import { Point2D, Point3D, Segment2D, Vector2D } from "./geometry.ts";
-import { GraphicComponent, Sprite } from "./graphics.ts";
+import { DrawElement, GraphicComponent, Sprite } from "./graphics.ts";
 import { Dimensions } from "./physics.ts";
 import { TimedEventHandler } from "./events.ts";
 
@@ -413,27 +411,12 @@ export abstract class SceneGraph {
   }
 }
 
-export interface SceneRenderer {
-  readonly graph: SceneGraph;
-  readonly ctx: CanvasRenderingContext2D | null;
-  readonly numEntities: number;
-  readonly nodes: Map<number, SceneNode>;
+export class Scene {
+  private _nodes: Map<number, SceneNode> = new Map<number, SceneNode>();
+  private _numEntities = 0;
+  private _handler = new TimedEventHandler();
 
-  insertEntity(entity: PhysicalEntity): void;
-  updateEntity(entity: PhysicalEntity): void;
-  getNode(id: number): SceneNode;
-  getLocationAt(x: number, y: number, camera: Camera): Point3D | null;
-  getEntityDrawnAt(x: number, y: number, camera: Camera): PhysicalEntity | null;
-  addTimedEvent(callback: any): void;
-  render(camera: Camera, force: boolean): number;
-  verifyRenderer(entities: Array<PhysicalEntity>): boolean;
-}
-
-class BaseSceneRenderer implements SceneRenderer {
-  protected _nodes: Map<number, SceneNode> = new Map<number, SceneNode>();
-  protected _numEntities = 0;
-
-  constructor(protected _graph: SceneGraph) {}
+  constructor(private _graph: SceneGraph) {}
 
   get graph(): SceneGraph {
     return this._graph;
@@ -471,20 +454,76 @@ class BaseSceneRenderer implements SceneRenderer {
     console.assert(this.nodes.has(id));
     return this.nodes.get(id)!;
   }
-  getLocationAt(_x: number, _y: number, _camera: Camera): Point3D | null {
+  getLocationAt(x: number, y: number, camera: Camera): Point3D | null {
+    const entity: PhysicalEntity | null = this.getEntityDrawnAt(x, y, camera);
+    if (entity != null) {
+      return entity.bounds.minLocation;
+    }
     return null;
   }
+
   getEntityDrawnAt(
-    _x: number,
-    _y: number,
-    _camera: Camera
+    x: number,
+    y: number,
+    camera: Camera,
   ): PhysicalEntity | null {
+    for (let i = this.graph.levels.length - 1; i >= 0; i--) {
+      const level: SceneLevel = this.graph.levels[i];
+      for (let j = 0; j < level.nodes.length; j++) {
+        const node: SceneNode = level.nodes[j];
+        const entity: PhysicalEntity = node.entity;
+        if (!entity.visible || !entity.drawable) {
+          continue;
+        }
+        if (!camera.isOnScreen(node.drawCoord, entity.width, entity.depth)) {
+          continue;
+        }
+
+        const onScreenCoord: Point2D = camera.getDrawCoord(node.drawCoord);
+        const graphic: GraphicComponent = entity.graphic;
+        // Check whether inbounds of the sprite.
+        if (
+          x < onScreenCoord.x || y < onScreenCoord.y ||
+          x > onScreenCoord.x + graphic.width ||
+          y > onScreenCoord.y + graphic.height
+        ) {
+          continue;
+        }
+        if (
+          !graphic.isTransparentAt(x - onScreenCoord.x, y - onScreenCoord.y)
+        ) {
+          return entity;
+        }
+      }
+    }
     return null;
   }
-  render(_camera: Camera, _force: boolean): number {
-    return 0;
+
+  addTimedEvent(callback: any): void {
+    this._handler.add(callback);
   }
-  addTimedEvent(_callback: any): void {}
+
+  render(camera: Camera, force: boolean): Array<DrawElement> {
+    if (!this.graph.initialised) {
+      this.graph.initialise(this.nodes);
+    }
+    this.graph.buildLevels(camera, force);
+    const drawElements = new Array<DrawElement>(this.numEntities);
+    this.graph.levels.forEach((level) => {
+      for (let i = level.order.length - 1; i >= 0; i--) {
+        const node: SceneNode = level.order[i];
+        const entity: PhysicalEntity = node.entity;
+        const coord = camera.getDrawCoord(node.drawCoord);
+        entity.graphics.forEach((component) => {
+          const spriteId: number = component.update();
+          drawElements.push(new DrawElement(spriteId, coord));
+        });
+      }
+    });
+
+    this._handler.service();
+    return drawElements;
+  }
 
   verifyRenderer(entities: Array<PhysicalEntity>): boolean {
     if (this.graph.numNodes != entities.length) {
@@ -562,131 +601,6 @@ class BaseSceneRenderer implements SceneRenderer {
     }
 
     return true;
-  }
-}
-
-export class OffscreenSceneRenderer extends BaseSceneRenderer {
-  constructor(graph: SceneGraph) {
-    super(graph);
-  }
-
-  render(camera: Camera, force: boolean): number {
-    let drawn = 0;
-    if (!this.graph.initialised) {
-      this.graph.initialise(this.nodes);
-    }
-    this.graph.buildLevels(camera, force);
-    this.graph.levels.forEach((level) => {
-      for (let i = level.order.length - 1; i >= 0; i--) {
-        const node: SceneNode = level.order[i];
-        const entity: PhysicalEntity = node.entity;
-        if (!entity.visible || !entity.drawable) {
-          continue;
-        }
-        drawn++;
-      }
-    });
-    return drawn;
-  }
-}
-
-export class OnscreenSceneRenderer extends BaseSceneRenderer {
-  private readonly _width: number;
-  private readonly _height: number;
-  private _ctx: CanvasRenderingContext2D;
-  private _handler = new TimedEventHandler();
-
-  constructor(private _canvas: HTMLCanvasElement, graph: SceneGraph) {
-    super(graph);
-    this._width = _canvas.width;
-    this._height = _canvas.height;
-    this._ctx = this._canvas.getContext("2d", { alpha: false })!;
-  }
-
-  get width(): number {
-    return this._width;
-  }
-  get height(): number {
-    return this._height;
-  }
-  get ctx(): CanvasRenderingContext2D | null {
-    return this._ctx;
-  }
-
-  addTimedEvent(callback: any): void {
-    this._handler.add(callback);
-  }
-
-  getLocationAt(x: number, y: number, camera: Camera): Point3D | null {
-    const entity: PhysicalEntity | null = this.getEntityDrawnAt(x, y, camera);
-    if (entity != null) {
-      return entity.bounds.minLocation;
-    }
-    return null;
-  }
-
-  getEntityDrawnAt(
-    x: number,
-    y: number,
-    camera: Camera
-  ): PhysicalEntity | null {
-    for (let i = this.graph.levels.length - 1; i >= 0; i--) {
-      const level: SceneLevel = this.graph.levels[i];
-      for (let j = 0; j < level.nodes.length; j++) {
-        const node: SceneNode = level.nodes[j];
-        const entity: PhysicalEntity = node.entity;
-        if (!entity.visible || !entity.drawable) {
-          continue;
-        }
-        if (!camera.isOnScreen(node.drawCoord, entity.width, entity.depth)) {
-          continue;
-        }
-
-        const onScreenCoord: Point2D = camera.getDrawCoord(node.drawCoord);
-        const graphic: GraphicComponent = entity.graphic;
-        // Check whether inbounds of the sprite.
-        if (
-          x < onScreenCoord.x ||
-          y < onScreenCoord.y ||
-          x > onScreenCoord.x + graphic.width ||
-          y > onScreenCoord.y + graphic.height
-        ) {
-          continue;
-        }
-        if (
-          !graphic.isTransparentAt(x - onScreenCoord.x, y - onScreenCoord.y)
-        ) {
-          return entity;
-        }
-      }
-    }
-    return null;
-  }
-
-  renderNode(node: SceneNode, camera: Camera): void {
-    const entity: PhysicalEntity = node.entity;
-    const coord = camera.getDrawCoord(node.drawCoord);
-    entity.graphics.forEach((component) => {
-      const spriteId: number = component.update();
-      Sprite.sprites[spriteId].draw(coord, this.ctx!);
-    });
-  }
-
-  render(camera: Camera, force: boolean): number {
-    if (!this.graph.initialised) {
-      this.graph.initialise(this.nodes);
-    }
-    this.graph.buildLevels(camera, force);
-    this.ctx!.clearRect(0, 0, this._width, this._height);
-    this.graph.levels.forEach((level) => {
-      for (let i = level.order.length - 1; i >= 0; i--) {
-        const node: SceneNode = level.order[i];
-        this.renderNode(node, camera);
-      }
-    });
-
-    this._handler.service();
-    return 0;
   }
 }
 
