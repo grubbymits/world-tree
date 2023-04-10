@@ -4,7 +4,7 @@ import { EntityEvent } from "./events.ts";
 import { CollisionDetector, CollisionInfo } from "./physics.ts";
 import { Face3D, IntersectInfo, Point2D, Segment2D } from "./geometry.ts";
 import { Camera } from "./camera.ts";
-import { SceneNode, SceneRenderer } from "./scene.ts";
+import { SceneNode, Scene } from "./scene.ts";
 
 function getAllSegments(node: SceneNode): Array<Segment2D> {
   const allSegments = new Array<Segment2D>();
@@ -30,7 +30,7 @@ export class MovableEntityDebug {
       }
       const missedEntities: Array<PhysicalEntity> = CollisionDetector
         .getMissInfo(movable);
-      const scene: SceneRenderer = context.scene;
+      const scene: Scene = context.scene;
       const start = Date.now();
 
       scene.addTimedEvent(function () {

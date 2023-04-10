@@ -1,3 +1,4 @@
+export * from "./render.ts";
 export * from "./navigation.ts";
 export * from "./queue.ts";
 export * from "./graphics.ts";

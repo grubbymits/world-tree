@@ -1,5 +1,7 @@
 import { Point2D } from "./geometry.ts";
 import { Direction, Navigation } from "./navigation.ts";
+import { ContextImpl } from "./context.ts";
+import { Renderer } from "./render.ts";
 
 export const DummySpriteSheet = {
   addForValidation: function (_sprite: Sprite): boolean {
@@ -20,10 +22,13 @@ export class SpriteSheet {
 
   private _image: HTMLImageElement;
   private _canvas: HTMLCanvasElement;
+  private _renderer: Renderer;
   private _loaded = false;
   private _toValidate: Array<Sprite> = new Array<Sprite>();
 
-  constructor(name: string) {
+  constructor(name: string,
+              context: ContextImpl) {
+    this._renderer = context.renderer;
     this._image = new Image();
 
     if (name) {
@@ -33,7 +38,7 @@ export class SpriteSheet {
     }
     SpriteSheet.add(this);
 
-    this._image.onload = () => {
+    this.image.addEventListener('onload', () => {
       this.canvas = document.createElement("canvas");
       this.canvas.width = this.width;
       this.canvas.height = this.height;
@@ -45,10 +50,7 @@ export class SpriteSheet {
         this.height,
       );
       this.loaded = true;
-      for (const sprite of this._toValidate) {
-        sprite.validate();
-      }
-    };
+    });
   }
 
   get image(): HTMLImageElement {
@@ -84,80 +86,55 @@ export class SpriteSheet {
   addForValidation(sprite: Sprite): void {
     this._toValidate.push(sprite);
   }
+
+  async addBitmap(id: number, x: number, y: number, width: number, height: number): Promise<void> {
+    const bitmap = await createImageBitmap(this.image, x, y, width, height);
+    if (this.loaded) {
+      this._renderer.addBitmap(id, bitmap);
+    } else {
+      this.image.addEventListener('onload', () => {
+        this._renderer.addBitmap(id, bitmap);
+      });
+    }
+  }
 }
 
 export class Sprite {
-  private static _sprites = new Array<Sprite>();
-
-  static reset(): void {
-    this._sprites = new Array<Sprite>();
-  }
-
-  private static add(sprite: Sprite) {
-    this._sprites.push(sprite);
-  }
-
-  static get sprites(): Array<Sprite> {
-    return this._sprites;
-  }
-
+  static sprites: Array<Sprite> = new Array<Sprite>();
   private readonly _id: number;
-  private readonly _spriteOffset: Point2D;
-  private readonly _maxOffset: Point2D;
+  private readonly _offset: Point2D;
 
   constructor(
     private readonly _sheet: SpriteSheet,
-    offsetX: number,
-    offsetY: number,
+    x: number,
+    y: number,
     private readonly _width: number,
     private readonly _height: number,
   ) {
-    console.assert(offsetX >= 0, "offsetX < 0");
-    console.assert(offsetY >= 0, "offsetY < 0");
-    this._id = Sprite.sprites.length;
-    this._spriteOffset = new Point2D(offsetX, offsetY);
-    this._maxOffset = new Point2D(
+    this._offset = new Point2D(x, y);
+    console.assert(this.offset.x >= 0, "offset.x < 0");
+    console.assert(this.offset.y >= 0, "offset.y < 0");
+    const maxOffset = new Point2D(
       this.offset.x + this.width,
       this.offset.y + this.height,
     );
-    Sprite.add(this);
-
-    if (this.sheet.loaded) {
-      this.validate();
-    } else {
-      this.sheet.addForValidation(this);
-    }
-  }
-
-  draw(coord: Point2D, ctx: CanvasRenderingContext2D): void {
-    ctx.drawImage(
-      this.sheet.image,
-      this.offset.x,
-      this.offset.y,
-      this.width,
-      this.height,
-      coord.x,
-      coord.y,
-      this.width,
-      this.height,
-    );
-  }
-
-  validate(): void {
     console.assert(
-      this.maxOffset.x <= this.sheet.width,
+      maxOffset.x <= this.sheet.width,
       "sprite id:",
       this.id,
       "sprite max X offset too large",
-      this.maxOffset.x,
+      maxOffset.x,
     );
     console.assert(
-      this.maxOffset.y <= this.sheet.height,
+      maxOffset.y <= this.sheet.height,
       "sprite id:",
       this.id,
       "sprite max Y offset too large",
-      this.maxOffset.y,
+      maxOffset.y,
     );
+    this._id = Sprite.sprites.length;
+    Sprite.sprites.push(this);
+    this.sheet.addBitmap(this.id, this.offset.x, this.offset.y, this.width, this.height);
   }
 
   isTransparentAt(x: number, y: number): boolean {
@@ -166,6 +143,9 @@ export class Sprite {
     return this.sheet.isTransparentAt(x, y);
   }
 
+  get sheet(): SpriteSheet {
+    return this._sheet;
+  }
   get id(): number {
     return this._id;
   }
@@ -175,15 +155,24 @@ export class Sprite {
   get height(): number {
     return this._height;
   }
-  get sheet(): SpriteSheet {
-    return this._sheet;
-  }
   get offset(): Point2D {
-    return this._spriteOffset;
+    return this._offset;
   }
-  get maxOffset(): Point2D {
-    return this._maxOffset;
+}
+
+export enum GraphicEvent {
+  AddCanvas,
+  AddSprite,
+  Draw,
+}
+
+export class DrawElement {
+  constructor(private readonly _spriteId: number,
+              private readonly _coord: Point2D) {
+    Object.freeze(this);
   }
+  get spriteId(): number { return this._spriteId; }
+  get coord(): Point2D { return this._coord; }
 }
 
 export function generateSprites(
