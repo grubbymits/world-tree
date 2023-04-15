@@ -1,7 +1,7 @@
 import { PhysicalEntity } from "./entity.ts";
 import { Camera } from "./camera.ts";
 import { Point2D, Point3D, Segment2D, Vector2D } from "./geometry.ts";
-import { DrawElement, GraphicComponent, Sprite } from "./graphics.ts";
+import { GraphicComponent, Sprite } from "./graphics.ts";
 import { Dimensions } from "./physics.ts";
 import { TimedEventHandler } from "./events.ts";
 
@@ -503,23 +503,49 @@ export class Scene {
     this._handler.add(callback);
   }
 
-  render(camera: Camera, force: boolean): Array<DrawElement> {
+  numToDraw(): number {
+    let num = 0;
+    this.graph.levels.forEach((level) => {
+      num += level.order.length;
+    });
+    return num;
+  }
+
+  render(camera: Camera, force: boolean): Uint16Array {
     if (!this.graph.initialised) {
       this.graph.initialise(this.nodes);
     }
     this.graph.buildLevels(camera, force);
-    const drawElements = new Array<DrawElement>(this.numEntities);
+    const elements: number = this.numToDraw();
+    // - 2 bytes for each uint16
+    // - 3 entries per draw element: sprite id, x, y
+    const initByteLength = elements * 3 * 2;
+    const buffer = new ArrayBuffer(initByteLength, { maxByteLength: initByteLength * 3 } );
+    const drawElements = new Uint16Array(buffer);
+    let idx = 0;
     this.graph.levels.forEach((level) => {
       for (let i = level.order.length - 1; i >= 0; i--) {
         const node: SceneNode = level.order[i];
         const entity: PhysicalEntity = node.entity;
         const coord = camera.getDrawCoord(node.drawCoord);
+        // double the size of the buffer if we're running out of space.
+        if (entity.graphics.length + idx >= drawElements.length) {
+          buffer.resize(buffer.byteLength * 2);
+        }
         entity.graphics.forEach((component) => {
           const spriteId: number = component.update();
-          drawElements.push(new DrawElement(spriteId, coord));
+          drawElements[idx] = spriteId;
+          drawElements[idx + 1] = coord.x;
+          drawElements[idx + 2] = coord.y;
+          idx += 3;
         });
       }
     });
+
+    // Shrink the buffer to the necessary size.
+    if (buffer.byteLength != initByteLength) {
+      buffer.resize(idx * 2);
+    }
 
     this._handler.service();
     return drawElements;
