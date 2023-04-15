@@ -132,8 +132,8 @@ export class ContextImpl implements Context {
 
   update(camera: Camera): void {
     camera.update();
-    const drawElements = this._scene.render(camera, false);
-    this.renderer.draw(drawElements);
+    const elements = this._scene.render(camera, false);
+    this.renderer.draw(elements);
 
     Gravity.update(this._movables);
 
