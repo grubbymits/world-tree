@@ -70,15 +70,17 @@ export class ContextImpl implements Context {
   }
 
   verify(): boolean {
-    return this.entities.length == PhysicalEntity.getNumEntities() &&
+    return (
+      this.entities.length == PhysicalEntity.getNumEntities() &&
       this.entities.length == this._totalEntities &&
       this.spatial.verify(this.entities) &&
-      this.scene.verifyRenderer(this.entities);
+      this.scene.verifyRenderer(this.entities)
+    );
   }
 
   addOnscreenRenderer(
     canvas: HTMLCanvasElement,
-    perspective: Perspective,
+    perspective: Perspective
   ): void {
     switch (perspective) {
       default:
@@ -172,7 +174,7 @@ export class ContextImpl implements Context {
 export function createContext(
   canvas: HTMLCanvasElement,
   worldDims: Dimensions,
-  perspective: Perspective,
+  perspective: Perspective
 ): Context {
   const context = new ContextImpl(worldDims);
   context.addOnscreenRenderer(canvas, perspective);
@@ -181,7 +183,7 @@ export function createContext(
 
 export function createTestContext(
   worldDims: Dimensions,
-  perspective: Perspective,
+  perspective: Perspective
 ): Context {
   ContextImpl.reset();
   const context = new ContextImpl(worldDims);

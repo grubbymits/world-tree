@@ -7,7 +7,7 @@ class Cloud {
     private _pos: Point2D,
     private _moisture: number,
     private readonly _direction: Direction,
-    private _rain: Rain,
+    private _rain: Rain
   ) {}
 
   get x(): number {
@@ -81,7 +81,7 @@ export class Rain {
     private _surface: Surface,
     private readonly _minHeight: number,
     moisture: number,
-    direction: Direction,
+    direction: Direction
   ) {
     this._moistureGrid = new Array<Float32Array>();
     for (let y = 0; y < this.surface.depth; y++) {

@@ -53,11 +53,12 @@ export class ZonalAudioLoop extends Sound {
   constructor(name: string, area: BoundingCuboid, camera: Camera) {
     super(name, true);
     const id = this._id;
-    const maxDistance = Math.sqrt(
-      Math.pow(area.maxX - area.minX, 2) +
-        Math.pow(area.maxY - area.minY, 2) +
-        Math.pow(area.maxZ - area.minZ, 2),
-    ) / 2;
+    const maxDistance =
+      Math.sqrt(
+        Math.pow(area.maxX - area.minX, 2) +
+          Math.pow(area.maxY - area.minY, 2) +
+          Math.pow(area.maxZ - area.minZ, 2)
+      ) / 2;
     console.log("centre of audio zone (x,y):", area.centre.x, area.centre.y);
     console.log("max distance from centre:", maxDistance);
 

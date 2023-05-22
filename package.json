@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "compile": "tsc --noEmit --project .",
+    "build-rel": "esbuild src/world-tree.ts --bundle --format=esm --outfile=dist/world-tree.mjs",
+    "build-dev": "esbuild src/world-tree.ts --bundle --format=esm --source-maps --outfile=dist/world-tree.mjs",
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage",
+    "benchmark": "node --experimental-vm-modules benchmarks/all.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.17.19",
+    "jest": "^29.5.0",
+    "prettier": "^2.8.8",
+    "typescript": "^5.0.4"
+  }
+}

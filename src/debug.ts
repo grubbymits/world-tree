@@ -28,8 +28,8 @@ export class MovableEntityDebug {
       if (!CollisionDetector.hasMissInfo(movable)) {
         return;
       }
-      const missedEntities: Array<PhysicalEntity> = CollisionDetector
-        .getMissInfo(movable);
+      const missedEntities: Array<PhysicalEntity> =
+        CollisionDetector.getMissInfo(movable);
       const scene: SceneRenderer = context.scene;
       const start = Date.now();
 
@@ -63,9 +63,8 @@ export class MovableEntityDebug {
         return;
       }
 
-      const collisionInfo: CollisionInfo = CollisionDetector.getCollideInfo(
-        movable,
-      );
+      const collisionInfo: CollisionInfo =
+        CollisionDetector.getCollideInfo(movable);
       const intersectInfo: IntersectInfo = collisionInfo.intersectInfo;
       const collidedEntity: PhysicalEntity = collisionInfo.entity;
       const collidedFace: Face3D = intersectInfo.face;
@@ -88,9 +87,9 @@ export class MovableEntityDebug {
 
           // outline the entity that it collided with in orange.
           ctx.strokeStyle = "Orange";
-          for (
-            const segment of getAllSegments(scene.getNode(collidedEntity.id))
-          ) {
+          for (const segment of getAllSegments(
+            scene.getNode(collidedEntity.id)
+          )) {
             ctx.beginPath();
             const drawP0 = camera.getDrawCoord(segment.p0);
             const drawP1 = camera.getDrawCoord(segment.p1);
@@ -105,13 +104,13 @@ export class MovableEntityDebug {
           for (const vertex of collidedFace.vertices()) {
             ctx.beginPath();
             const p0: Point2D = camera.getDrawCoord(
-              scene.graph.getDrawCoord(vertex.point),
+              scene.graph.getDrawCoord(vertex.point)
             );
             const p1: Point2D = camera.getDrawCoord(
-              scene.graph.getDrawCoord(vertex.point.add(vertex.u)),
+              scene.graph.getDrawCoord(vertex.point.add(vertex.u))
             );
             const p2: Point2D = camera.getDrawCoord(
-              scene.graph.getDrawCoord(vertex.point.add(vertex.v)),
+              scene.graph.getDrawCoord(vertex.point.add(vertex.v))
             );
             ctx.beginPath();
             ctx.moveTo(p0.x, p0.y);

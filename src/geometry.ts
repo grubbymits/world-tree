@@ -59,8 +59,7 @@ export class Point2D {
 
   static orientation(p: Point2D, q: Point2D, r: Point2D): Orientation {
     // https://www.geeksforgeeks.org/orientation-3-ordered-points/
-    const res: number = (q.y - p.y) * (r.x - q.x) -
-      (q.x - p.x) * (r.y - q.y);
+    const res: number = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
     if (res == 0) {
       return Orientation.Colinear;
     }
@@ -69,8 +68,7 @@ export class Point2D {
 }
 
 export class Segment2D {
-  constructor(private readonly _p0: Point2D, private readonly _p1: Point2D) {
-  }
+  constructor(private readonly _p0: Point2D, private readonly _p1: Point2D) {}
 
   get p0(): Point2D {
     return this._p0;
@@ -80,10 +78,12 @@ export class Segment2D {
   }
 
   contains(p: Point2D): boolean {
-    return p.x <= Math.max(this.p0.x, this.p1.x) &&
+    return (
+      p.x <= Math.max(this.p0.x, this.p1.x) &&
       p.x >= Math.min(this.p0.x, this.p1.x) &&
       p.y <= Math.max(this.p0.y, this.p1.y) &&
-      p.y >= Math.min(this.p0.y, this.p1.y);
+      p.y >= Math.min(this.p0.y, this.p1.y)
+    );
   }
 
   add(diff: Vector2D): Segment2D {
@@ -97,7 +97,7 @@ export class Segment2D {
     const dyc = p.y - this.p0.y;
     const dxl = this.p1.x - this.p0.x;
     const dyl = this.p1.y - this.p0.y;
-    return (dxc * dyl - dyc * dxl) == 0;
+    return dxc * dyl - dyc * dxl == 0;
   }
 
   intersects(other: Segment2D): boolean {
@@ -137,10 +137,11 @@ export class Segment2D {
     // https://www.geomalgorithms.com/a02-_lines.html
     const vl: number = this.p0.x * this.p1.y - this.p1.x * this.p0.y;
     const w: number = this.p0.x * p.y - p.x * this.p0.y;
-    const u = 1 / Math.sqrt(
-      Math.pow(this.p1.x - this.p0.x, 2) +
-        Math.pow(this.p1.y - this.p0.y, 2),
-    );
+    const u =
+      1 /
+      Math.sqrt(
+        Math.pow(this.p1.x - this.p0.x, 2) + Math.pow(this.p1.y - this.p0.y, 2)
+      );
     return vl * w * u;
   }
 }
@@ -149,7 +150,7 @@ export class Point3D {
   constructor(
     private readonly _x: number,
     private readonly _y: number,
-    private readonly _z: number,
+    private readonly _z: number
   ) {
     Object.freeze(this);
   }
@@ -185,9 +186,11 @@ export class Point3D {
   }
 
   isSameAsRounded(other: Point3D): boolean {
-    return Math.round(this.x) == Math.round(other.x) &&
+    return (
+      Math.round(this.x) == Math.round(other.x) &&
       Math.round(this.y) == Math.round(other.y) &&
-      Math.round(this.z) == Math.round(other.z);
+      Math.round(this.z) == Math.round(other.z)
+    );
   }
 
   isSameAs(other: Point3D): boolean {
@@ -199,7 +202,7 @@ export class Vector3D {
   constructor(
     private readonly _x: number,
     private readonly _y: number,
-    private readonly _z: number,
+    private readonly _z: number
   ) {
     Object.freeze(this);
   }
@@ -271,9 +274,7 @@ export class Vector3D {
   }
 
   equal(other: Vector3D): boolean {
-    return this.x == other.x &&
-      this.y == other.y &&
-      this.z == other.z;
+    return this.x == other.x && this.y == other.y && this.z == other.z;
   }
 }
 
@@ -305,9 +306,14 @@ export class Vertex3D {
   }
 
   get asString(): string {
-    return "normal = " + this.normal.asString +
-      ", u = " + this.u.asString +
-      ", v = " + this.u.asString;
+    return (
+      "normal = " +
+      this.normal.asString +
+      ", u = " +
+      this.u.asString +
+      ", v = " +
+      this.u.asString
+    );
   }
 
   // http://www.geomalgorithms.com/a04-_planes.html#Distance-Point-to-Plane
@@ -372,8 +378,8 @@ class TriangleFace3D extends Face3D {
     this._uDotv = u.dot(v);
     this._uDotu = u.dot(u);
     this._vDotv = v.dot(v);
-    this._denominator = 1 /
-      (Math.pow(this._uDotv, 2) - this._uDotu * this._vDotv);
+    this._denominator =
+      1 / (Math.pow(this._uDotv, 2) - this._uDotu * this._vDotv);
   }
 
   vertices(): Array<Vertex3D> {
@@ -408,7 +414,7 @@ export class QuadFace3D extends Face3D {
   constructor(vertexA: Vertex3D, vertexB: Vertex3D) {
     super(vertexA);
     if (!vertexA.normal.equal(vertexB.normal)) {
-      throw ("Expected QuadFace3D vertices to have equilavent normals");
+      throw "Expected QuadFace3D vertices to have equilavent normals";
     }
     this._triangleA = new TriangleFace3D(vertexA);
     this._triangleB = new TriangleFace3D(vertexB);
@@ -434,7 +440,7 @@ export class IntersectInfo {
     private readonly _begin: Point3D,
     private readonly _end: Point3D,
     private readonly _i: Point3D,
-    private readonly _theta: number,
+    private readonly _theta: number
   ) {}
   get face(): Face3D {
     return this._face;

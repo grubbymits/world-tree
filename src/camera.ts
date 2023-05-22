@@ -23,14 +23,16 @@ export class Camera {
     this._surfaceLocation = _scene.getLocationAt(
       this._lowerX,
       this._lowerY,
-      this,
+      this
     );
   }
 
   isOnScreen(coord: Point2D, width: number, depth: number): boolean {
     if (
-      coord.x + width < this._lowerX || coord.y + depth < this._lowerY ||
-      coord.x - width > this._upperX || coord.y - depth > this._upperY
+      coord.x + width < this._lowerX ||
+      coord.y + depth < this._lowerY ||
+      coord.x - width > this._upperX ||
+      coord.y - depth > this._upperY
     ) {
       return false;
     }
@@ -94,7 +96,7 @@ export class MouseCamera extends Camera {
     scene: SceneRenderer,
     canvas: HTMLCanvasElement,
     width: number,
-    height: number,
+    height: number
   ) {
     super(scene, width, height);
 
@@ -115,7 +117,7 @@ export class TrackerCamera extends Camera {
     scene: SceneRenderer,
     width: number,
     height: number,
-    movable: MovableEntity,
+    movable: MovableEntity
   ) {
     super(scene, width, height);
 

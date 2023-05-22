@@ -37,13 +37,9 @@ export class SpriteSheet {
       this.canvas = document.createElement("canvas");
       this.canvas.width = this.width;
       this.canvas.height = this.height;
-      this.canvas.getContext("2d")!.drawImage(
-        this.image,
-        0,
-        0,
-        this.width,
-        this.height,
-      );
+      this.canvas
+        .getContext("2d")!
+        .drawImage(this.image, 0, 0, this.width, this.height);
       this.loaded = true;
       for (const sprite of this._toValidate) {
         sprite.validate();
@@ -110,7 +106,7 @@ export class Sprite {
     offsetX: number,
     offsetY: number,
     private readonly _width: number,
-    private readonly _height: number,
+    private readonly _height: number
   ) {
     console.assert(offsetX >= 0, "offsetX < 0");
     console.assert(offsetY >= 0, "offsetY < 0");
@@ -118,7 +114,7 @@ export class Sprite {
     this._spriteOffset = new Point2D(offsetX, offsetY);
     this._maxOffset = new Point2D(
       this.offset.x + this.width,
-      this.offset.y + this.height,
+      this.offset.y + this.height
     );
     Sprite.add(this);
 
@@ -139,7 +135,7 @@ export class Sprite {
       coord.x,
       coord.y,
       this.width,
-      this.height,
+      this.height
     );
   }
 
@@ -149,14 +145,14 @@ export class Sprite {
       "sprite id:",
       this.id,
       "sprite max X offset too large",
-      this.maxOffset.x,
+      this.maxOffset.x
     );
     console.assert(
       this.maxOffset.y <= this.sheet.height,
       "sprite id:",
       this.id,
       "sprite max Y offset too large",
-      this.maxOffset.y,
+      this.maxOffset.y
     );
   }
 
@@ -193,7 +189,7 @@ export function generateSprites(
   xBegin: number,
   yBegin: number,
   columns: number,
-  rows: number,
+  rows: number
 ): Array<Sprite> {
   const sprites = new Array<Sprite>();
   const xEnd = xBegin + columns;
@@ -224,7 +220,7 @@ export abstract class GraphicComponent {
 export class DummyGraphicComponent extends GraphicComponent {
   constructor(
     private readonly _width: number,
-    private readonly _height: number,
+    private readonly _height: number
   ) {
     super(0);
   }
@@ -256,7 +252,7 @@ export function generateStaticGraphics(
   xBegin: number,
   yBegin: number,
   columns: number,
-  rows: number,
+  rows: number
 ): Array<StaticGraphicComponent> {
   const graphics = new Array<StaticGraphicComponent>();
   const xEnd = xBegin + columns;
@@ -306,7 +302,7 @@ export class OssilateGraphicComponent extends AnimatedGraphicComponent {
   constructor(sprites: Array<Sprite>, interval: number) {
     super(sprites, interval);
     this._currentSpriteIdx = Math.floor(
-      Math.random() * (this._spriteIds.length - 1),
+      Math.random() * (this._spriteIds.length - 1)
     );
   }
 
@@ -342,8 +338,8 @@ export class LoopGraphicComponent extends AnimatedGraphicComponent {
     if (this._nextUpdate > Date.now()) {
       return this.currentSpriteId;
     }
-    this._currentSpriteIdx = (this._currentSpriteIdx + 1) %
-      this._spriteIds.length;
+    this._currentSpriteIdx =
+      (this._currentSpriteIdx + 1) % this._spriteIds.length;
     this._nextUpdate = Date.now() + this._interval;
     return this.currentSpriteId;
   }
@@ -370,14 +366,14 @@ export class DirectionalGraphicComponent extends GraphicComponent {
   update(): number {
     if (this._staticGraphics.has(this.direction)) {
       const component: GraphicComponent = this._staticGraphics.get(
-        this.direction,
+        this.direction
       )!;
       const spriteId = component.update();
       return spriteId;
     }
     console.error(
       "unhandled stationary graphic:",
-      Navigation.getDirectionName(this.direction),
+      Navigation.getDirectionName(this.direction)
     );
     return 0;
   }
@@ -389,7 +385,7 @@ export class AnimatedDirectionalGraphicComponent extends GraphicComponent {
 
   constructor(
     protected _staticGraphics: Map<Direction, GraphicComponent>,
-    protected _movementGraphics: Map<Direction, GraphicComponent>,
+    protected _movementGraphics: Map<Direction, GraphicComponent>
   ) {
     super(0);
   }
@@ -421,7 +417,7 @@ export class AnimatedDirectionalGraphicComponent extends GraphicComponent {
     }
     if (this.stationary && this._staticGraphics.has(this.direction)) {
       const component: GraphicComponent = this._staticGraphics.get(
-        this.direction,
+        this.direction
       )!;
       const spriteId = component.update();
       return spriteId;
@@ -429,12 +425,12 @@ export class AnimatedDirectionalGraphicComponent extends GraphicComponent {
     if (this.stationary) {
       console.error(
         "unhandled stationary graphic:",
-        Navigation.getDirectionName(this.direction),
+        Navigation.getDirectionName(this.direction)
       );
     } else {
       console.error(
         "unhandled movement graphic:",
-        Navigation.getDirectionName(this.direction),
+        Navigation.getDirectionName(this.direction)
       );
     }
     return 0;

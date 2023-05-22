@@ -1,4 +1,4 @@
 #!/bin/sh
 
-deno lint src/*
-deno fmt --check
+npx prettier --check --parser typescript "src/*.ts"
+npx prettier --check "tests/*.mjs"

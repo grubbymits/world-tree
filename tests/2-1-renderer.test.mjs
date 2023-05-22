@@ -1,6 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.160.0/testing/asserts.ts";
-
-import * as WT from "../world-tree.js";
+import * as WT from "../dist/world-tree.mjs";
 
 const width = 72;
 const depth = 72;
@@ -20,21 +18,21 @@ function drawCoord(entity) {
   return WT.TwoByOneIsometric.getDrawCoord(entity.bounds.minLocation);
 }
 
-Deno.test("calculate physical dimensions from sprite dimensions", () => {
+test("calculate physical dimensions from sprite dimensions", () => {
   const spriteWidth = 322;
   const spriteHeight = 270;
   const dims = getDimensions(spriteWidth, spriteHeight);
-  assertEquals(dims.width, width);
-  assertEquals(dims.depth, depth);
-  assertEquals(dims.height, height);
+  expect(dims.width).toBe(width);
+  expect(dims.depth).toBe(depth);
+  expect(dims.height).toBe(height);
 });
 
-Deno.test("scene nodes row overlapping", () => {
+test("scene nodes row overlapping", () => {
   const numEntities = 2;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric,
+    WT.Perspective.TwoByOneIsometric
   );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
@@ -45,20 +43,20 @@ Deno.test("scene nodes row overlapping", () => {
     scene.setDrawOutline(node);
     nodes.push(node);
   }
-  assertEquals(nodes[0].overlapX(nodes[1]), false);
-  assertEquals(nodes[1].overlapX(nodes[0]), false);
-  assertEquals(nodes[0].overlapY(nodes[1]), true);
-  assertEquals(nodes[1].overlapY(nodes[0]), true);
-  assertEquals(nodes[0].overlapZ(nodes[1]), true);
-  assertEquals(nodes[1].overlapZ(nodes[0]), true);
+  expect(nodes[0].overlapX(nodes[1])).toBe(false);
+  expect(nodes[1].overlapX(nodes[0])).toBe(false);
+  expect(nodes[0].overlapY(nodes[1])).toBe(true);
+  expect(nodes[1].overlapY(nodes[0])).toBe(true);
+  expect(nodes[0].overlapZ(nodes[1])).toBe(true);
+  expect(nodes[1].overlapZ(nodes[0])).toBe(true);
 });
 
-Deno.test("scene nodes row intersecting", () => {
+test("scene nodes row intersecting", () => {
   const numEntities = 2;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric,
+    WT.Perspective.TwoByOneIsometric
   );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
@@ -69,16 +67,16 @@ Deno.test("scene nodes row intersecting", () => {
     scene.setDrawOutline(node);
     nodes.push(node);
   }
-  assertEquals(nodes[0].intersectsTop(nodes[1]), false);
-  assertEquals(nodes[1].intersectsTop(nodes[0]), false);
+  expect(nodes[0].intersectsTop(nodes[1])).toBe(false);
+  expect(nodes[1].intersectsTop(nodes[0])).toBe(false);
 });
 
-Deno.test("scene nodes row intersecting with unaligned y and z-axis", () => {
+test("scene nodes row intersecting with unaligned y and z-axis", () => {
   const numEntities = 2;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric,
+    WT.Perspective.TwoByOneIsometric
   );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
@@ -89,16 +87,16 @@ Deno.test("scene nodes row intersecting with unaligned y and z-axis", () => {
     scene.setDrawOutline(node);
     nodes.push(node);
   }
-  assertEquals(nodes[0].intersectsTop(nodes[1]), false);
-  assertEquals(nodes[1].intersectsTop(nodes[0]), true);
+  expect(nodes[0].intersectsTop(nodes[1])).toBe(false);
+  expect(nodes[1].intersectsTop(nodes[0])).toBe(true);
 });
 
-Deno.test("scene nodes column overlapping", () => {
+test("scene nodes column overlapping", () => {
   const numEntities = 2;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric,
+    WT.Perspective.TwoByOneIsometric
   );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
@@ -109,20 +107,20 @@ Deno.test("scene nodes column overlapping", () => {
     scene.setDrawOutline(node);
     nodes.push(node);
   }
-  assertEquals(nodes[0].overlapX(nodes[1]), true);
-  assertEquals(nodes[1].overlapX(nodes[0]), true);
-  assertEquals(nodes[0].overlapY(nodes[1]), false);
-  assertEquals(nodes[1].overlapY(nodes[0]), false);
-  assertEquals(nodes[0].overlapZ(nodes[1]), true);
-  assertEquals(nodes[1].overlapZ(nodes[0]), true);
+  expect(nodes[0].overlapX(nodes[1])).toBe(true);
+  expect(nodes[1].overlapX(nodes[0])).toBe(true);
+  expect(nodes[0].overlapY(nodes[1])).toBe(false);
+  expect(nodes[1].overlapY(nodes[0])).toBe(false);
+  expect(nodes[0].overlapZ(nodes[1])).toBe(true);
+  expect(nodes[1].overlapZ(nodes[0])).toBe(true);
 });
 
-Deno.test("scene nodes column intersecting with unaligned x and z axis", () => {
+test("scene nodes column intersecting with unaligned x and z axis", () => {
   const numEntities = 3;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric,
+    WT.Perspective.TwoByOneIsometric
   );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
@@ -133,19 +131,19 @@ Deno.test("scene nodes column intersecting with unaligned x and z axis", () => {
     scene.setDrawOutline(node);
     nodes.push(node);
   }
-  assertEquals(nodes[0].intersectsTop(nodes[1]), false);
-  assertEquals(nodes[1].intersectsTop(nodes[2]), false);
-  assertEquals(nodes[2].intersectsTop(nodes[1]), false);
-  assertEquals(nodes[1].intersectsTop(nodes[0]), false);
-  assertEquals(nodes[0].intersectsTop(nodes[2]), false);
+  expect(nodes[0].intersectsTop(nodes[1])).toBe(false);
+  expect(nodes[1].intersectsTop(nodes[2])).toBe(false);
+  expect(nodes[2].intersectsTop(nodes[1])).toBe(false);
+  expect(nodes[1].intersectsTop(nodes[0])).toBe(false);
+  expect(nodes[0].intersectsTop(nodes[2])).toBe(false);
 });
 
-Deno.test("scene nodes column intersecting", () => {
+test("scene nodes column intersecting", () => {
   const numEntities = 3;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric,
+    WT.Perspective.TwoByOneIsometric
   );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
@@ -156,19 +154,19 @@ Deno.test("scene nodes column intersecting", () => {
     scene.setDrawOutline(node);
     nodes.push(node);
   }
-  assertEquals(nodes[0].intersectsTop(nodes[1]), false);
-  assertEquals(nodes[1].intersectsTop(nodes[2]), false);
-  assertEquals(nodes[2].intersectsTop(nodes[1]), false);
-  assertEquals(nodes[1].intersectsTop(nodes[0]), false);
-  assertEquals(nodes[0].intersectsTop(nodes[2]), false);
+  expect(nodes[0].intersectsTop(nodes[1])).toBe(false);
+  expect(nodes[1].intersectsTop(nodes[2])).toBe(false);
+  expect(nodes[2].intersectsTop(nodes[1])).toBe(false);
+  expect(nodes[1].intersectsTop(nodes[0])).toBe(false);
+  expect(nodes[0].intersectsTop(nodes[2])).toBe(false);
 });
 
-Deno.test("diagonal scene nodes overlapping", () => {
+test("diagonal scene nodes overlapping", () => {
   const numEntities = 2;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric,
+    WT.Perspective.TwoByOneIsometric
   );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
@@ -176,27 +174,27 @@ Deno.test("diagonal scene nodes overlapping", () => {
     let minLocation = new WT.Point3D(
       i * entityDimensions.width,
       i * entityDimensions.depth,
-      0,
+      0
     );
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, drawCoord(entity));
     scene.setDrawOutline(node);
     nodes.push(node);
   }
-  assertEquals(nodes[0].overlapX(nodes[1]), false);
-  assertEquals(nodes[1].overlapX(nodes[0]), false);
-  assertEquals(nodes[0].overlapY(nodes[1]), false);
-  assertEquals(nodes[1].overlapY(nodes[0]), false);
-  assertEquals(nodes[0].overlapZ(nodes[1]), true);
-  assertEquals(nodes[1].overlapZ(nodes[0]), true);
+  expect(nodes[0].overlapX(nodes[1])).toBe(false);
+  expect(nodes[1].overlapX(nodes[0])).toBe(false);
+  expect(nodes[0].overlapY(nodes[1])).toBe(false);
+  expect(nodes[1].overlapY(nodes[0])).toBe(false);
+  expect(nodes[0].overlapZ(nodes[1])).toBe(true);
+  expect(nodes[1].overlapZ(nodes[0])).toBe(true);
 });
 
-Deno.test("diagonal scene nodes intersecting", () => {
+test("diagonal scene nodes intersecting", () => {
   const numEntities = 3;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric,
+    WT.Perspective.TwoByOneIsometric
   );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
@@ -204,26 +202,26 @@ Deno.test("diagonal scene nodes intersecting", () => {
     let minLocation = new WT.Point3D(
       i * entityDimensions.width,
       i * entityDimensions.depth,
-      0,
+      0
     );
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, drawCoord(entity));
     scene.setDrawOutline(node);
     nodes.push(node);
   }
-  assertEquals(nodes[0].intersectsTop(nodes[1]), false);
-  assertEquals(nodes[1].intersectsTop(nodes[0]), false);
-  assertEquals(nodes[1].intersectsTop(nodes[2]), false);
-  assertEquals(nodes[0].intersectsTop(nodes[2]), false);
-  assertEquals(nodes[2].intersectsTop(nodes[0]), false);
+  expect(nodes[0].intersectsTop(nodes[1])).toBe(false);
+  expect(nodes[1].intersectsTop(nodes[0])).toBe(false);
+  expect(nodes[1].intersectsTop(nodes[2])).toBe(false);
+  expect(nodes[0].intersectsTop(nodes[2])).toBe(false);
+  expect(nodes[2].intersectsTop(nodes[0])).toBe(false);
 });
 
-Deno.test("draw order of single row", () => {
+test("draw order of single row", () => {
   const numEntities = 4;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric,
+    WT.Perspective.TwoByOneIsometric
   );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
@@ -234,20 +232,20 @@ Deno.test("draw order of single row", () => {
     scene.setDrawOutline(node);
     nodes.push(node);
   }
-  assertEquals(drawOrder(nodes[0], nodes[1]), WT.RenderOrder.After);
-  assertEquals(drawOrder(nodes[1], nodes[2]), WT.RenderOrder.After);
-  assertEquals(drawOrder(nodes[2], nodes[3]), WT.RenderOrder.After);
-  assertEquals(drawOrder(nodes[3], nodes[2]), WT.RenderOrder.Before);
-  assertEquals(drawOrder(nodes[2], nodes[1]), WT.RenderOrder.Before);
-  assertEquals(drawOrder(nodes[1], nodes[0]), WT.RenderOrder.Before);
+  expect(drawOrder(nodes[0], nodes[1])).toBe(WT.RenderOrder.After);
+  expect(drawOrder(nodes[1], nodes[2])).toBe(WT.RenderOrder.After);
+  expect(drawOrder(nodes[2], nodes[3])).toBe(WT.RenderOrder.After);
+  expect(drawOrder(nodes[3], nodes[2])).toBe(WT.RenderOrder.Before);
+  expect(drawOrder(nodes[2], nodes[1])).toBe(WT.RenderOrder.Before);
+  expect(drawOrder(nodes[1], nodes[0])).toBe(WT.RenderOrder.Before);
 });
 
-Deno.test("draw order of single column", () => {
+test("draw order of single column", () => {
   const numEntities = 4;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric,
+    WT.Perspective.TwoByOneIsometric
   );
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
@@ -258,75 +256,75 @@ Deno.test("draw order of single column", () => {
     scene.setDrawOutline(node);
     nodes.push(node);
   }
-  assertEquals(drawOrder(nodes[0], nodes[1]), WT.RenderOrder.Before);
-  assertEquals(drawOrder(nodes[1], nodes[2]), WT.RenderOrder.Before);
-  assertEquals(drawOrder(nodes[2], nodes[3]), WT.RenderOrder.Before);
-  assertEquals(drawOrder(nodes[3], nodes[2]), WT.RenderOrder.After);
-  assertEquals(drawOrder(nodes[2], nodes[1]), WT.RenderOrder.After);
-  assertEquals(drawOrder(nodes[1], nodes[0]), WT.RenderOrder.After);
+  expect(drawOrder(nodes[0], nodes[1])).toBe(WT.RenderOrder.Before);
+  expect(drawOrder(nodes[1], nodes[2])).toBe(WT.RenderOrder.Before);
+  expect(drawOrder(nodes[2], nodes[3])).toBe(WT.RenderOrder.Before);
+  expect(drawOrder(nodes[3], nodes[2])).toBe(WT.RenderOrder.After);
+  expect(drawOrder(nodes[2], nodes[1])).toBe(WT.RenderOrder.After);
+  expect(drawOrder(nodes[1], nodes[0])).toBe(WT.RenderOrder.After);
 });
 
-Deno.test("draw order of (x, y) increasing diagonal", () => {
+test("draw order of (x, y) increasing diagonal", () => {
   const numEntities = 4;
   const worldDims = new WT.Dimensions(width * numEntities, depth, height);
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric,
+    WT.Perspective.TwoByOneIsometric
   );
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
     let minLocation = new WT.Point3D(
       i * entityDimensions.width,
       i * entityDimensions.depth,
-      0,
+      0
     );
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     entity.addGraphic(dummyGraphic);
     nodes.push(context.scene.getNode(entity.id));
   }
-  assertEquals(drawOrder(nodes[0], nodes[1]), WT.RenderOrder.Any);
-  assertEquals(drawOrder(nodes[0], nodes[2]), WT.RenderOrder.Any);
-  assertEquals(drawOrder(nodes[0], nodes[3]), WT.RenderOrder.Any);
-  assertEquals(drawOrder(nodes[1], nodes[2]), WT.RenderOrder.Any);
-  assertEquals(drawOrder(nodes[1], nodes[3]), WT.RenderOrder.Any);
-  assertEquals(drawOrder(nodes[2], nodes[3]), WT.RenderOrder.Any);
-  assertEquals(drawOrder(nodes[3], nodes[2]), WT.RenderOrder.Any);
-  assertEquals(drawOrder(nodes[2], nodes[1]), WT.RenderOrder.Any);
-  assertEquals(drawOrder(nodes[1], nodes[0]), WT.RenderOrder.Any);
+  expect(drawOrder(nodes[0], nodes[1])).toBe(WT.RenderOrder.Any);
+  expect(drawOrder(nodes[0], nodes[2])).toBe(WT.RenderOrder.Any);
+  expect(drawOrder(nodes[0], nodes[3])).toBe(WT.RenderOrder.Any);
+  expect(drawOrder(nodes[1], nodes[2])).toBe(WT.RenderOrder.Any);
+  expect(drawOrder(nodes[1], nodes[3])).toBe(WT.RenderOrder.Any);
+  expect(drawOrder(nodes[2], nodes[3])).toBe(WT.RenderOrder.Any);
+  expect(drawOrder(nodes[3], nodes[2])).toBe(WT.RenderOrder.Any);
+  expect(drawOrder(nodes[2], nodes[1])).toBe(WT.RenderOrder.Any);
+  expect(drawOrder(nodes[1], nodes[0])).toBe(WT.RenderOrder.Any);
 
   let camera = new WT.Camera(context.scene, 1920, 1080);
   camera.location = new WT.Point3D(0, 0, 0);
   context.scene.render(camera, false);
 
-  assertEquals(context.scene.graph.initialised, true);
-  assertEquals(context.scene.graph.levels.length, 1);
+  expect(context.scene.graph.initialised).toBe(true);
+  expect(context.scene.graph.levels.length).toBe(1);
 
   let level = context.scene.graph.levels[0];
-  assertEquals(level.order.length, numEntities);
-  assertEquals(level.order[0].entity.id, 0);
-  assertEquals(level.order[1].entity.id, 1);
-  assertEquals(level.order[2].entity.id, 2);
-  assertEquals(level.order[3].entity.id, 3);
+  expect(level.order.length).toBe(numEntities);
+  expect(level.order[0].entity.id).toBe(0);
+  expect(level.order[1].entity.id).toBe(1);
+  expect(level.order[2].entity.id).toBe(2);
+  expect(level.order[3].entity.id).toBe(3);
 });
 
-Deno.test("draw order of (x, y) four in a square", () => {
+test("draw order of (x, y) four in a square", () => {
   const numEntities = 4;
   const worldDims = new WT.Dimensions(width * 2, depth * 2, height);
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric,
+    WT.Perspective.TwoByOneIsometric
   );
   for (let y = 0; y < 2; ++y) {
     for (let x = 0; x < 2; ++x) {
       let minLocation = new WT.Point3D(
         x * entityDimensions.width,
         y * entityDimensions.depth,
-        0,
+        0
       );
       let entity = new WT.PhysicalEntity(
         context,
         minLocation,
-        entityDimensions,
+        entityDimensions
       );
       entity.addGraphic(dummyGraphic);
     }
@@ -336,23 +334,23 @@ Deno.test("draw order of (x, y) four in a square", () => {
   camera.location = new WT.Point3D(0, 0, 0);
   context.scene.render(camera, false);
 
-  assertEquals(context.scene.graph.initialised, true);
-  assertEquals(context.scene.graph.levels.length, 1);
+  expect(context.scene.graph.initialised).toBe(true);
+  expect(context.scene.graph.levels.length).toBe(1);
 
   let level = context.scene.graph.levels[0];
   level.order.reverse();
-  assertEquals(level.order.length, numEntities);
-  assertEquals(level.order[0].entity.id, 1);
-  assertEquals(level.order[1].entity.id, 3);
-  assertEquals(level.order[2].entity.id, 0);
-  assertEquals(level.order[3].entity.id, 2);
+  expect(level.order.length).toBe(numEntities);
+  expect(level.order[0].entity.id).toBe(1);
+  expect(level.order[1].entity.id).toBe(3);
+  expect(level.order[2].entity.id).toBe(0);
+  expect(level.order[3].entity.id).toBe(2);
 });
 
-Deno.test("draw order of (x, y, z) eight in a cube", () => {
+test("draw order of (x, y, z) eight in a cube", () => {
   const worldDims = new WT.Dimensions(width * 2, depth * 2, height * 2);
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric,
+    WT.Perspective.TwoByOneIsometric
   );
   for (let z = 0; z < 2; ++z) {
     for (let y = 0; y < 2; ++y) {
@@ -360,12 +358,12 @@ Deno.test("draw order of (x, y, z) eight in a cube", () => {
         let minLocation = new WT.Point3D(
           x * entityDimensions.width,
           y * entityDimensions.depth,
-          z * entityDimensions.height,
+          z * entityDimensions.height
         );
         let entity = new WT.PhysicalEntity(
           context,
           minLocation,
-          entityDimensions,
+          entityDimensions
         );
         entity.addGraphic(dummyGraphic);
       }
@@ -376,33 +374,33 @@ Deno.test("draw order of (x, y, z) eight in a cube", () => {
   camera.location = new WT.Point3D(0, 0, 0);
   context.scene.render(camera, false);
 
-  assertEquals(context.scene.graph.initialised, true);
-  assertEquals(context.scene.graph.levels.length, 2);
+  expect(context.scene.graph.initialised).toBe(true);
+  expect(context.scene.graph.levels.length).toBe(2);
 
   let level = context.scene.graph.levels[0];
   let drawOrder = level.order.slice();
   drawOrder.reverse();
-  assertEquals(drawOrder.length, 4);
-  assertEquals(drawOrder[0].entity.id, 1);
-  assertEquals(drawOrder[1].entity.id, 3);
-  assertEquals(drawOrder[2].entity.id, 0);
-  assertEquals(drawOrder[3].entity.id, 2);
+  expect(drawOrder.length).toBe(4);
+  expect(drawOrder[0].entity.id).toBe(1);
+  expect(drawOrder[1].entity.id).toBe(3);
+  expect(drawOrder[2].entity.id).toBe(0);
+  expect(drawOrder[3].entity.id).toBe(2);
 
   level = context.scene.graph.levels[1];
   drawOrder = level.order.slice();
   drawOrder.reverse();
-  assertEquals(drawOrder.length, 4);
-  assertEquals(drawOrder[0].entity.id, 5);
-  assertEquals(drawOrder[1].entity.id, 7);
-  assertEquals(drawOrder[2].entity.id, 4);
-  assertEquals(drawOrder[3].entity.id, 6);
+  expect(drawOrder.length).toBe(4);
+  expect(drawOrder[0].entity.id).toBe(5);
+  expect(drawOrder[1].entity.id).toBe(7);
+  expect(drawOrder[2].entity.id).toBe(4);
+  expect(drawOrder[3].entity.id).toBe(6);
 });
 
-Deno.test("draw order of (x, y, z) updating eight in a cube", () => {
+test("draw order of (x, y, z) updating eight in a cube", () => {
   const worldDims = new WT.Dimensions(width * 2, depth * 2, height * 2);
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric,
+    WT.Perspective.TwoByOneIsometric
   );
   let entities = new Array();
   for (let z = 0; z < 2; ++z) {
@@ -411,12 +409,12 @@ Deno.test("draw order of (x, y, z) updating eight in a cube", () => {
         let minLocation = new WT.Point3D(
           x * entityDimensions.width,
           y * entityDimensions.depth,
-          z * entityDimensions.height,
+          z * entityDimensions.height
         );
         let entity = new WT.PhysicalEntity(
           context,
           minLocation,
-          entityDimensions,
+          entityDimensions
         );
         entity.addGraphic(dummyGraphic);
         entities.push(entity);
@@ -427,51 +425,51 @@ Deno.test("draw order of (x, y, z) updating eight in a cube", () => {
   camera.location = new WT.Point3D(0, 0, 0);
   context.scene.render(camera, false);
 
-  assertEquals(context.scene.graph.initialised, true);
-  assertEquals(context.scene.graph.levels.length, 2);
+  expect(context.scene.graph.initialised).toBe(true);
+  expect(context.scene.graph.levels.length).toBe(2);
 
   let drawOrder = context.scene.graph.levels[0].order.slice().reverse();
-  assertEquals(drawOrder.length, 4);
-  assertEquals(drawOrder[0].entity.id, 1);
-  assertEquals(drawOrder[1].entity.id, 3);
-  assertEquals(drawOrder[2].entity.id, 0);
-  assertEquals(drawOrder[3].entity.id, 2);
+  expect(drawOrder.length).toBe(4);
+  expect(drawOrder[0].entity.id).toBe(1);
+  expect(drawOrder[1].entity.id).toBe(3);
+  expect(drawOrder[2].entity.id).toBe(0);
+  expect(drawOrder[3].entity.id).toBe(2);
 
   drawOrder = context.scene.graph.levels[1].order.slice().reverse();
-  assertEquals(drawOrder.length, 4);
-  assertEquals(drawOrder[0].entity.id, 5);
-  assertEquals(drawOrder[1].entity.id, 7);
-  assertEquals(drawOrder[2].entity.id, 4);
-  assertEquals(drawOrder[3].entity.id, 6);
+  expect(drawOrder.length).toBe(4);
+  expect(drawOrder[0].entity.id).toBe(5);
+  expect(drawOrder[1].entity.id).toBe(7);
+  expect(drawOrder[2].entity.id).toBe(4);
+  expect(drawOrder[3].entity.id).toBe(6);
 
   entities.forEach((entity) => context.scene.updateEntity(entity));
   drawOrder = context.scene.graph.levels[0].order.slice().reverse();
-  assertEquals(drawOrder.length, 4);
-  assertEquals(drawOrder[0].entity.id, 1);
-  assertEquals(drawOrder[1].entity.id, 3);
-  assertEquals(drawOrder[2].entity.id, 0);
-  assertEquals(drawOrder[3].entity.id, 2);
+  expect(drawOrder.length).toBe(4);
+  expect(drawOrder[0].entity.id).toBe(1);
+  expect(drawOrder[1].entity.id).toBe(3);
+  expect(drawOrder[2].entity.id).toBe(0);
+  expect(drawOrder[3].entity.id).toBe(2);
 
   drawOrder = context.scene.graph.levels[1].order.slice().reverse();
-  assertEquals(drawOrder.length, 4);
-  assertEquals(drawOrder[0].entity.id, 5);
-  assertEquals(drawOrder[1].entity.id, 7);
-  assertEquals(drawOrder[2].entity.id, 4);
-  assertEquals(drawOrder[3].entity.id, 6);
+  expect(drawOrder.length).toBe(4);
+  expect(drawOrder[0].entity.id).toBe(5);
+  expect(drawOrder[1].entity.id).toBe(7);
+  expect(drawOrder[2].entity.id).toBe(4);
+  expect(drawOrder[3].entity.id).toBe(6);
 });
 
-Deno.test("draw order of (x, y, z) updating level in a cube", () => {
+test("draw order of (x, y, z) updating level in a cube", () => {
   const worldDims = new WT.Dimensions(width * 2, depth * 2, height * 3);
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric,
+    WT.Perspective.TwoByOneIsometric
   );
 
   let addEntityAt = (x, y, z) => {
     let minLocation = new WT.Point3D(
       x * entityDimensions.width,
       y * entityDimensions.depth,
-      z * entityDimensions.height,
+      z * entityDimensions.height
     );
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     entity.addGraphic(dummyGraphic);
@@ -493,20 +491,20 @@ Deno.test("draw order of (x, y, z) updating level in a cube", () => {
   camera.location = new WT.Point3D(0, 0, 0);
   context.scene.render(camera, false);
 
-  assertEquals(context.scene.graph.initialised, true);
-  assertEquals(context.scene.graph.levels.length, 3);
+  expect(context.scene.graph.initialised).toBe(true);
+  expect(context.scene.graph.levels.length).toBe(3);
 
   movable.updatePosition(new WT.Vector3D(0, 0, -95));
   context.scene.updateEntity(movable);
   context.scene.render(camera, false);
 
   // Movable shouldn't still be in it's own level.
-  assertEquals(context.scene.graph.levels[2].order.length, 0);
+  expect(context.scene.graph.levels[2].order.length).toBe(0);
 
   let drawOrder = context.scene.graph.levels[1].order.slice().reverse();
-  assertEquals(drawOrder.length, 4);
-  assertEquals(drawOrder[0].entity.id, 4);
-  assertEquals(drawOrder[1].entity.id, 3);
-  assertEquals(drawOrder[2].entity.id, movable.id);
-  assertEquals(drawOrder[3].entity.id, 5);
+  expect(drawOrder.length).toBe(4);
+  expect(drawOrder[0].entity.id).toBe(4);
+  expect(drawOrder[1].entity.id).toBe(3);
+  expect(drawOrder[2].entity.id).toBe(movable.id);
+  expect(drawOrder[3].entity.id).toBe(5);
 });
