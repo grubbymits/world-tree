@@ -520,8 +520,8 @@ export class Scene {
     // - 2 bytes for each uint16
     // - 3 entries per draw element: sprite id, x, y
     const initByteLength = elements * 3 * 2;
-    const buffer = new ArrayBuffer(initByteLength, { maxByteLength: initByteLength * 3 } );
-    const drawElements = new Uint16Array(buffer);
+    let buffer = new ArrayBuffer(initByteLength);
+    let drawElements = new Uint16Array(buffer);
     let idx = 0;
     this.graph.levels.forEach((level) => {
       for (let i = level.order.length - 1; i >= 0; i--) {
@@ -529,8 +529,12 @@ export class Scene {
         const entity: PhysicalEntity = node.entity;
         const coord = camera.getDrawCoord(node.drawCoord);
         // double the size of the buffer if we're running out of space.
-        if (entity.graphics.length + idx >= drawElements.length) {
-          buffer.resize(buffer.byteLength * 2);
+        if ((entity.graphics.length * 3) + idx >= drawElements.length) {
+          //buffer.resize(buffer.byteLength * 2);
+          let new_buffer = new ArrayBuffer(buffer.byteLength * 2);
+          new Uint8Array(new_buffer).set(new Uint8Array(buffer));
+          buffer = new_buffer;
+          drawElements = new Uint16Array(buffer);
         }
         entity.graphics.forEach((component) => {
           const spriteId: number = component.update();
@@ -542,10 +546,10 @@ export class Scene {
       }
     });
 
-    // Shrink the buffer to the necessary size.
-    if (buffer.byteLength != initByteLength) {
-      buffer.resize(idx * 2);
-    }
+    // TODO: Shrink the buffer to the necessary size.
+    //if (buffer.byteLength != initByteLength) {
+      //buffer.resize(idx * 2);
+    //}
 
     this._handler.service();
     return drawElements;

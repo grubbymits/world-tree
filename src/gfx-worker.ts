@@ -40,6 +40,6 @@ ctx.addEventListener("message", (event) => {
       break;
     }
   }
-}
+});
 
 export {};

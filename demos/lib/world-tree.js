@@ -9,6 +9,8 @@ var Orientation;
     Orientation[Orientation["CounterClockwise"] = 2] = "CounterClockwise";
 })(Orientation || (Orientation = {}));
 class Vector2D {
+    _x;
+    _y;
     constructor(_x, _y){
         this._x = _x;
         this._y = _y;
@@ -33,10 +35,10 @@ class Vector2D {
         const y = this.dot(other);
         return Math.atan2(x, y);
     }
-    _x;
-    _y;
 }
 class Point2D {
+    _x;
+    _y;
     constructor(_x, _y){
         this._x = _x;
         this._y = _y;
@@ -64,10 +66,10 @@ class Point2D {
         }
         return res > 0 ? Orientation.Clockwise : Orientation.CounterClockwise;
     }
-    _x;
-    _y;
 }
 class Segment2D {
+    _p0;
+    _p1;
     constructor(_p0, _p1){
         this._p0 = _p0;
         this._p1 = _p1;
@@ -127,10 +129,11 @@ class Segment2D {
         const u = 1 / Math.sqrt(Math.pow(this.p1.x - this.p0.x, 2) + Math.pow(this.p1.y - this.p0.y, 2));
         return vl * w * u;
     }
-    _p0;
-    _p1;
 }
 class Point3D {
+    _x;
+    _y;
+    _z;
     constructor(_x, _y, _z){
         this._x = _x;
         this._y = _y;
@@ -167,11 +170,11 @@ class Point3D {
     isSameAs(other) {
         return this.x === other.x && this.y === other.y && this.z === other.z;
     }
+}
+class Vector3D {
     _x;
     _y;
     _z;
-}
-class Vector3D {
     constructor(_x, _y, _z){
         this._x = _x;
         this._y = _y;
@@ -237,11 +240,9 @@ class Vector3D {
     equal(other) {
         return this.x == other.x && this.y == other.y && this.z == other.z;
     }
-    _x;
-    _y;
-    _z;
 }
 class Vertex3D {
+    _point;
     _normal;
     _v;
     _u;
@@ -291,9 +292,9 @@ class Vertex3D {
         }
         return begin.add(dir.mulScalar(r));
     }
-    _point;
 }
 class Face3D {
+    _vertex;
     constructor(_vertex){
         this._vertex = _vertex;
     }
@@ -306,7 +307,6 @@ class Face3D {
     intersectsPlane(begin, end) {
         return this.plane.intersects(begin, end);
     }
-    _vertex;
 }
 class TriangleFace3D extends Face3D {
     _uDotv;
@@ -367,6 +367,11 @@ class QuadFace3D extends Face3D {
     }
 }
 class IntersectInfo {
+    _face;
+    _begin;
+    _end;
+    _i;
+    _theta;
     constructor(_face, _begin, _end, _i, _theta){
         this._face = _face;
         this._begin = _begin;
@@ -389,13 +394,9 @@ class IntersectInfo {
     get theta() {
         return this._theta;
     }
-    _face;
-    _begin;
-    _end;
-    _i;
-    _theta;
 }
 class Geometry {
+    _bounds;
     _faces;
     _intersectInfo;
     _widthVec3D;
@@ -444,7 +445,6 @@ class Geometry {
         }
         return null;
     }
-    _bounds;
 }
 class NoGeometry extends Geometry {
     constructor(bounds){
@@ -696,6 +696,9 @@ export { InputEvent as InputEvent };
 export { EventHandler as EventHandler };
 export { TimedEventHandler as TimedEventHandler };
 class Dimensions {
+    _width;
+    _depth;
+    _height;
     constructor(_width, _depth, _height){
         this._width = _width;
         this._depth = _depth;
@@ -713,11 +716,10 @@ class Dimensions {
     log() {
         console.log(" - (WxDxH):", this.width, this.depth, this.height);
     }
-    _width;
-    _depth;
-    _height;
 }
 class BoundingCuboid {
+    _centre;
+    _dimensions;
     _minLocation;
     _maxLocation;
     _bottomCentre;
@@ -790,17 +792,27 @@ class BoundingCuboid {
         this._maxLocation = this._maxLocation.add(d);
     }
     contains(location) {
-        if (location.x < this._minLocation.x || location.y < this._minLocation.y || location.z < this._minLocation.z) return false;
-        if (location.x > this._maxLocation.x || location.y > this._maxLocation.y || location.z > this._maxLocation.z) return false;
+        if (location.x < this._minLocation.x || location.y < this._minLocation.y || location.z < this._minLocation.z) {
+            return false;
+        }
+        if (location.x > this._maxLocation.x || location.y > this._maxLocation.y || location.z > this._maxLocation.z) {
+            return false;
+        }
         return true;
     }
     containsBounds(other) {
         return this.contains(other.minLocation) && this.contains(other.maxLocation);
     }
     intersects(other) {
-        if (other.minLocation.x > this.maxLocation.x || other.maxLocation.x < this.minLocation.x) return false;
-        if (other.minLocation.y > this.maxLocation.y || other.maxLocation.y < this.minLocation.y) return false;
-        if (other.minLocation.z > this.maxLocation.z || other.maxLocation.z < this.minLocation.z) return false;
+        if (other.minLocation.x > this.maxLocation.x || other.maxLocation.x < this.minLocation.x) {
+            return false;
+        }
+        if (other.minLocation.y > this.maxLocation.y || other.maxLocation.y < this.minLocation.y) {
+            return false;
+        }
+        if (other.minLocation.z > this.maxLocation.z || other.maxLocation.z < this.minLocation.z) {
+            return false;
+        }
         return true;
     }
     insert(other) {
@@ -830,10 +842,11 @@ class BoundingCuboid {
         console.log(" - centre (x,y,z):", this.centre.x, this.centre.y, this.centre.z);
         console.log(" - dimensions (WxDxH):", this.width, this.depth, this.height);
     }
-    _centre;
-    _dimensions;
 }
 class CollisionInfo {
+    _collidedEntity;
+    _blocking;
+    _intersectInfo;
     constructor(_collidedEntity, _blocking, _intersectInfo){
         this._collidedEntity = _collidedEntity;
         this._blocking = _blocking;
@@ -848,9 +861,6 @@ class CollisionInfo {
     get intersectInfo() {
         return this._intersectInfo;
     }
-    _collidedEntity;
-    _blocking;
-    _intersectInfo;
 }
 class CollisionDetector {
     static _collisionInfo;
@@ -957,6 +967,7 @@ export { CollisionInfo as CollisionInfo };
 export { CollisionDetector as CollisionDetector };
 export { Gravity as Gravity };
 class PhysicalEntity {
+    _context;
     static _ids = 0;
     _id;
     _visible;
@@ -1059,7 +1070,6 @@ class PhysicalEntity {
     update() {
         this._handler.service();
     }
-    _context;
 }
 class MovableEntity extends PhysicalEntity {
     _lift = 0;
@@ -1122,13 +1132,390 @@ export { Actor as Actor };
 export { createGraphicalEntity as createGraphicalEntity };
 export { createGraphicalMovableEntity as createGraphicalMovableEntity };
 export { createGraphicalActor as createGraphicalActor };
-var Direction;
-var TerrainShape;
+class QueueItem {
+    _element;
+    _key;
+    constructor(_element, _key){
+        this._element = _element;
+        this._key = _key;
+    }
+    get element() {
+        return this._element;
+    }
+    get key() {
+        return this._key;
+    }
+    set key(k) {
+        this._key = k;
+    }
+}
+class MinPriorityQueue {
+    _items = new Array();
+    _indices = new Map();
+    constructor(){}
+    get indices() {
+        return this._indices;
+    }
+    get items() {
+        return this._items;
+    }
+    get size() {
+        return this.items.length - 1;
+    }
+    get length() {
+        return this.items.length;
+    }
+    empty() {
+        return this.length == 0;
+    }
+    pop() {
+        const minItem = this.items[0];
+        this.items.splice(0, 1);
+        this.indices.delete(minItem.element);
+        for(let i = 0; i < this.items.length; ++i){
+            const item = this.items[i];
+            this.indices.set(item.element, i);
+        }
+        this.build();
+        return minItem.element;
+    }
+    parentIdx(i) {
+        return i - 1 >> 1;
+    }
+    leftIdx(i) {
+        return 2 * i + 1;
+    }
+    rightIdx(i) {
+        return 2 * i + 2;
+    }
+    keyAt(i) {
+        console.assert(i < this.length);
+        const item = this.items[i];
+        return item.key;
+    }
+    insert(x, k) {
+        console.assert(!this.indices.has(x));
+        this.items.push(new QueueItem(x, Number.MAX_VALUE));
+        this.indices.set(x, this.size);
+        this.setKey(x, k);
+    }
+    setKey(x, k) {
+        console.assert(this.indices.has(x));
+        let i = this.indices.get(x);
+        console.assert(i < this.length);
+        const item = this.items[i];
+        console.assert(k <= item.key);
+        item.key = k;
+        while(i > 0 && this.keyAt(this.parentIdx(i)) > this.keyAt(i)){
+            this.exchange(i, this.parentIdx(i));
+            i = this.parentIdx(i);
+        }
+    }
+    exchange(idxA, idxB) {
+        console.assert(idxA < this.length);
+        console.assert(idxB < this.length);
+        const itemA = this.items[idxA];
+        const itemB = this.items[idxB];
+        this.items[idxA] = itemB;
+        this.items[idxB] = itemA;
+        this.indices.set(itemA.element, idxB);
+        this.indices.set(itemB.element, idxA);
+    }
+    build() {
+        for(let i = this.size >> 1; i >= 0; i--){
+            this.heapify(i);
+        }
+    }
+    heapify(i) {
+        const left = this.leftIdx(i);
+        const right = this.rightIdx(i);
+        let smallest = i;
+        if (left < this.length && this.keyAt(left) < this.keyAt(i)) {
+            smallest = left;
+        }
+        if (right < this.length && this.keyAt(right) < this.keyAt(i)) {
+            smallest = right;
+        }
+        if (smallest != i) {
+            this.exchange(i, smallest);
+            this.heapify(smallest);
+        }
+    }
+}
+export { MinPriorityQueue as MinPriorityQueue };
 const DummySpriteSheet = {
     addForValidation: function(_sprite) {
         return true;
     }
 };
+var Direction;
+var TerrainShape;
+class SpriteSheet {
+    static _sheets = new Array();
+    static add(sheet) {
+        this._sheets.push(sheet);
+    }
+    static reset() {
+        this._sheets = new Array();
+    }
+    _image;
+    _canvas;
+    _renderer;
+    _loaded = false;
+    _toValidate = new Array();
+    constructor(name, context){
+        this._renderer = context.renderer;
+        this._image = new Image();
+        if (name) {
+            this._image.src = name + ".png";
+        } else {
+            throw new Error("No filename passed");
+        }
+        SpriteSheet.add(this);
+        this.image.addEventListener('onload', ()=>{
+            this.canvas = document.createElement("canvas");
+            this.canvas.width = this.width;
+            this.canvas.height = this.height;
+            this.canvas.getContext("2d").drawImage(this.image, 0, 0, this.width, this.height);
+            this.loaded = true;
+        });
+    }
+    get image() {
+        return this._image;
+    }
+    get width() {
+        return this._image.width;
+    }
+    get height() {
+        return this._image.height;
+    }
+    get name() {
+        return this._image.src;
+    }
+    get loaded() {
+        return this._loaded;
+    }
+    set loaded(b) {
+        this._loaded = b;
+    }
+    get canvas() {
+        return this._canvas;
+    }
+    set canvas(c) {
+        this._canvas = c;
+    }
+    isTransparentAt(x, y) {
+        const data = this.canvas.getContext("2d").getImageData(x, y, 1, 1).data;
+        return data[3] == 0;
+    }
+    addForValidation(sprite) {
+        this._toValidate.push(sprite);
+    }
+    async addBitmap(id, x, y, width, height) {
+        if (this.loaded) {
+            const bitmap = await createImageBitmap(this.image, x, y, width, height);
+            this._renderer.addBitmap(id, bitmap);
+        } else {
+            this.image.addEventListener('onload', ()=>{
+                this.addBitmap(id, x, y, width, height);
+            });
+        }
+    }
+}
+class Sprite {
+    _sheet;
+    _width;
+    _height;
+    static sprites = new Array();
+    _id;
+    _offset;
+    constructor(_sheet, x, y, _width, _height){
+        this._sheet = _sheet;
+        this._width = _width;
+        this._height = _height;
+        this._offset = new Point2D(x, y);
+        console.assert(this.offset.x >= 0, "offset.x < 0");
+        console.assert(this.offset.y >= 0, "offset.y < 0");
+        new Point2D(this.offset.x + this.width, this.offset.y + this.height);
+        this._id = Sprite.sprites.length;
+        Sprite.sprites.push(this);
+        this.sheet.addBitmap(this.id, this.offset.x, this.offset.y, this.width, this.height);
+    }
+    isTransparentAt(x, y) {
+        x += this.offset.x;
+        y += this.offset.y;
+        return this.sheet.isTransparentAt(x, y);
+    }
+    get sheet() {
+        return this._sheet;
+    }
+    get id() {
+        return this._id;
+    }
+    get width() {
+        return this._width;
+    }
+    get height() {
+        return this._height;
+    }
+    get offset() {
+        return this._offset;
+    }
+}
+var GraphicEvent;
+(function(GraphicEvent) {
+    GraphicEvent[GraphicEvent["AddCanvas"] = 0] = "AddCanvas";
+    GraphicEvent[GraphicEvent["AddSprite"] = 1] = "AddSprite";
+    GraphicEvent[GraphicEvent["Draw"] = 2] = "Draw";
+})(GraphicEvent || (GraphicEvent = {}));
+class DrawElement {
+    _spriteId;
+    _coord;
+    constructor(_spriteId, _coord){
+        this._spriteId = _spriteId;
+        this._coord = _coord;
+        Object.freeze(this);
+    }
+    get spriteId() {
+        return this._spriteId;
+    }
+    get coord() {
+        return this._coord;
+    }
+}
+function generateSprites(sheet, width, height, xBegin, yBegin, columns, rows) {
+    const sprites = new Array();
+    const xEnd = xBegin + columns;
+    const yEnd = yBegin + rows;
+    for(let y = yBegin; y < yEnd; y++){
+        for(let x = xBegin; x < xEnd; x++){
+            sprites.push(new Sprite(sheet, x * width, y * height, width, height));
+        }
+    }
+    return sprites;
+}
+class GraphicComponent {
+    _currentSpriteId;
+    constructor(_currentSpriteId){
+        this._currentSpriteId = _currentSpriteId;
+    }
+    isTransparentAt(x, y) {
+        return Sprite.sprites[this._currentSpriteId].isTransparentAt(x, y);
+    }
+    get width() {
+        return Sprite.sprites[this._currentSpriteId].width;
+    }
+    get height() {
+        return Sprite.sprites[this._currentSpriteId].height;
+    }
+}
+class DummyGraphicComponent extends GraphicComponent {
+    _width;
+    _height;
+    constructor(_width, _height){
+        super(0);
+        this._width = _width;
+        this._height = _height;
+    }
+    get width() {
+        return this._width;
+    }
+    get height() {
+        return this._height;
+    }
+    update() {
+        return 0;
+    }
+}
+class StaticGraphicComponent extends GraphicComponent {
+    constructor(id){
+        super(id);
+    }
+    update() {
+        return this._currentSpriteId;
+    }
+}
+function generateStaticGraphics(sheet, width, height, xBegin, yBegin, columns, rows) {
+    const graphics = new Array();
+    const xEnd = xBegin + columns;
+    const yEnd = yBegin + rows;
+    for(let y = yBegin; y < yEnd; y++){
+        for(let x = xBegin; x < xEnd; x++){
+            const sprite = new Sprite(sheet, x * width, y * height, width, height);
+            graphics.push(new StaticGraphicComponent(sprite.id));
+        }
+    }
+    return graphics;
+}
+class AnimatedGraphicComponent extends GraphicComponent {
+    _interval;
+    _nextUpdate;
+    _currentSpriteIdx;
+    _spriteIds;
+    constructor(sprites, _interval){
+        super(sprites[0].id);
+        this._interval = _interval;
+        this._nextUpdate = 0;
+        this._currentSpriteIdx = 0;
+        this._spriteIds = new Array();
+        for(const i in sprites){
+            this._spriteIds.push(sprites[i].id);
+        }
+        this._nextUpdate = Date.now() + _interval;
+    }
+    update() {
+        return this._spriteIds[this._currentSpriteIdx];
+    }
+    get firstId() {
+        return this._spriteIds[0];
+    }
+    get lastId() {
+        return this._spriteIds[this._spriteIds.length - 1];
+    }
+    get currentSpriteId() {
+        console.assert(this._currentSpriteIdx >= 0);
+        console.assert(this._currentSpriteIdx < this._spriteIds.length);
+        return this._spriteIds[this._currentSpriteIdx];
+    }
+}
+class OssilateGraphicComponent extends AnimatedGraphicComponent {
+    _increase = true;
+    constructor(sprites, interval){
+        super(sprites, interval);
+        this._currentSpriteIdx = Math.floor(Math.random() * (this._spriteIds.length - 1));
+    }
+    update() {
+        if (this._nextUpdate > Date.now()) {
+            return this.currentSpriteId;
+        }
+        if (this._currentSpriteIdx == this._spriteIds.length - 1) {
+            this._increase = false;
+        } else if (this._currentSpriteIdx == 0) {
+            this._increase = true;
+        }
+        if (this._increase) {
+            this._currentSpriteIdx++;
+        } else {
+            this._currentSpriteIdx--;
+        }
+        this._nextUpdate = Date.now() + this._interval;
+        return this.currentSpriteId;
+    }
+}
+class LoopGraphicComponent extends AnimatedGraphicComponent {
+    constructor(sprites, interval){
+        super(sprites, interval);
+        this._currentSpriteIdx = 0;
+    }
+    update() {
+        if (this._nextUpdate > Date.now()) {
+            return this.currentSpriteId;
+        }
+        this._currentSpriteIdx = (this._currentSpriteIdx + 1) % this._spriteIds.length;
+        this._nextUpdate = Date.now() + this._interval;
+        return this.currentSpriteId;
+    }
+}
 (function(Direction) {
     Direction[Direction["North"] = 0] = "North";
     Direction[Direction["NorthEast"] = 1] = "NorthEast";
@@ -1225,208 +1612,99 @@ class Navigation {
         return (direction + Direction.Max / 2) % Direction.Max;
     }
 }
-class PathNode {
-    _edgeCosts = new Map();
-    _x;
-    _y;
-    constructor(terrain){
-        this._x = terrain.x;
-        this._y = terrain.y;
-    }
-    addSuccessor(succ, cost) {
-        this._edgeCosts.set(succ, cost);
-    }
-    hasSuccessor(succ) {
-        return this._edgeCosts.has(succ);
-    }
-    get x() {
-        return this._x;
-    }
-    get y() {
-        return this._y;
-    }
-}
-class SpriteSheet {
-    static _sheets = new Array();
-    static add(sheet) {
-        this._sheets.push(sheet);
-    }
-    static reset() {
-        this._sheets = new Array();
-    }
-    _image;
-    _canvas;
-    _loaded = false;
-    _toValidate = new Array();
-    constructor(name){
-        this._image = new Image();
-        if (name) {
-            this._image.src = name + ".png";
-        } else {
-            throw new Error("No filename passed");
-        }
-        SpriteSheet.add(this);
-        this._image.onload = ()=>{
-            this.canvas = document.createElement('canvas');
-            this.canvas.width = this.width;
-            this.canvas.height = this.height;
-            this.canvas.getContext('2d').drawImage(this.image, 0, 0, this.width, this.height);
-            this.loaded = true;
-            for (const sprite of this._toValidate){
-                sprite.validate();
-            }
-        };
-    }
-    get image() {
-        return this._image;
-    }
-    get width() {
-        return this._image.width;
-    }
-    get height() {
-        return this._image.height;
-    }
-    get name() {
-        return this._image.src;
-    }
-    get loaded() {
-        return this._loaded;
-    }
-    set loaded(b) {
-        this._loaded = b;
-    }
-    get canvas() {
-        return this._canvas;
-    }
-    set canvas(c) {
-        this._canvas = c;
-    }
-    isTransparentAt(x, y) {
-        const data = this.canvas.getContext('2d').getImageData(x, y, 1, 1).data;
-        return data[3] == 0;
-    }
-    addForValidation(sprite) {
-        this._toValidate.push(sprite);
-    }
-}
-class Sprite {
-    static _sprites = new Array();
-    static reset() {
-        this._sprites = new Array();
-    }
-    static add(sprite) {
-        this._sprites.push(sprite);
-    }
-    static get sprites() {
-        return this._sprites;
-    }
-    _id;
-    _spriteOffset;
-    _maxOffset;
-    constructor(_sheet, offsetX, offsetY, _width, _height){
-        this._sheet = _sheet;
-        this._width = _width;
-        this._height = _height;
-        console.assert(offsetX >= 0, "offsetX < 0");
-        console.assert(offsetY >= 0, "offsetY < 0");
-        this._id = Sprite.sprites.length;
-        this._spriteOffset = new Point2D(offsetX, offsetY);
-        this._maxOffset = new Point2D(this.offset.x + this.width, this.offset.y + this.height);
-        Sprite.add(this);
-        if (this.sheet.loaded) {
-            this.validate();
-        } else {
-            this.sheet.addForValidation(this);
-        }
-    }
-    draw(coord, ctx) {
-        ctx.drawImage(this.sheet.image, this.offset.x, this.offset.y, this.width, this.height, coord.x, coord.y, this.width, this.height);
-    }
-    validate() {
-        console.assert(this.maxOffset.x <= this.sheet.width, "sprite id:", this.id, "sprite max X offset too large", this.maxOffset.x);
-        console.assert(this.maxOffset.y <= this.sheet.height, "sprite id:", this.id, "sprite max Y offset too large", this.maxOffset.y);
-    }
-    isTransparentAt(x, y) {
-        x += this.offset.x;
-        y += this.offset.y;
-        return this.sheet.isTransparentAt(x, y);
-    }
-    get id() {
-        return this._id;
-    }
-    get width() {
-        return this._width;
-    }
-    get height() {
-        return this._height;
-    }
-    get sheet() {
-        return this._sheet;
-    }
-    get offset() {
-        return this._spriteOffset;
-    }
-    get maxOffset() {
-        return this._maxOffset;
-    }
-    _sheet;
-    _width;
-    _height;
-}
-export { Sprite as Sprite };
-function generateSprites(sheet, width, height, xBegin, yBegin, columns, rows) {
-    const sprites = new Array();
-    const xEnd = xBegin + columns;
-    const yEnd = yBegin + rows;
-    for(let y = yBegin; y < yEnd; y++){
-        for(let x = xBegin; x < xEnd; x++){
-            sprites.push(new Sprite(sheet, x * width, y * height, width, height));
-        }
-    }
-    return sprites;
-}
-class GraphicComponent {
-    constructor(_currentSpriteId){
-        this._currentSpriteId = _currentSpriteId;
-    }
-    isTransparentAt(x, y) {
-        return Sprite.sprites[this._currentSpriteId].isTransparentAt(x, y);
-    }
-    get width() {
-        return Sprite.sprites[this._currentSpriteId].width;
-    }
-    get height() {
-        return Sprite.sprites[this._currentSpriteId].height;
-    }
-    _currentSpriteId;
-}
-class DummyGraphicComponent extends GraphicComponent {
-    constructor(_width, _height){
+class DirectionalGraphicComponent extends GraphicComponent {
+    _staticGraphics;
+    _direction;
+    constructor(_staticGraphics){
         super(0);
-        this._width = _width;
-        this._height = _height;
+        this._staticGraphics = _staticGraphics;
+        this._direction = Direction.North;
     }
-    get width() {
-        return this._width;
+    get direction() {
+        return this._direction;
     }
-    get height() {
-        return this._height;
+    set direction(direction) {
+        if (this._staticGraphics.has(direction)) {
+            this._direction = direction;
+        } else {
+            console.log("graphic direction unsupported");
+        }
     }
     update() {
+        if (this._staticGraphics.has(this.direction)) {
+            const component = this._staticGraphics.get(this.direction);
+            const spriteId = component.update();
+            return spriteId;
+        }
+        console.error("unhandled stationary graphic:", Navigation.getDirectionName(this.direction));
         return 0;
     }
-    _width;
-    _height;
 }
-class StaticGraphicComponent extends GraphicComponent {
-    constructor(id){
-        super(id);
+class AnimatedDirectionalGraphicComponent extends GraphicComponent {
+    _staticGraphics;
+    _movementGraphics;
+    _stationary;
+    _direction;
+    constructor(_staticGraphics, _movementGraphics){
+        super(0);
+        this._staticGraphics = _staticGraphics;
+        this._movementGraphics = _movementGraphics;
+        this._stationary = true;
+        this._direction = Direction.North;
+    }
+    get stationary() {
+        return this._stationary;
+    }
+    set stationary(stationary) {
+        this._stationary = stationary;
+    }
+    get direction() {
+        return this._direction;
+    }
+    set direction(direction) {
+        if (this._staticGraphics.has(direction) && this._movementGraphics.has(direction)) {
+            this._direction = direction;
+        } else {
+            console.log("graphic direction unsupported");
+        }
     }
     update() {
-        return this._currentSpriteId;
+        if (!this.stationary && this._movementGraphics.has(this.direction)) {
+            const spriteId = this._movementGraphics.get(this.direction).update();
+            return spriteId;
+        }
+        if (this.stationary && this._staticGraphics.has(this.direction)) {
+            const component = this._staticGraphics.get(this.direction);
+            const spriteId = component.update();
+            return spriteId;
+        }
+        if (this.stationary) {
+            console.error("unhandled stationary graphic:", Navigation.getDirectionName(this.direction));
+        } else {
+            console.error("unhandled movement graphic:", Navigation.getDirectionName(this.direction));
+        }
+        return 0;
     }
 }
-export { StaticGraphicComponent as StaticGraphicComponent };
+class PathNode {
+    _edgeCosts = new Map();
+    _waypoint;
+    constructor(terrain){
+        this._waypoint = terrain.surfaceLocation;
+    }
+    addNeighbour(neighbour, cost) {
+        this._edgeCosts.set(neighbour, cost);
+    }
+    hasNeighbour(neighbour) {
+        return this._edgeCosts.has(neighbour);
+    }
+    get neighbours() {
+        return this._edgeCosts;
+    }
+    get waypoint() {
+        return this._waypoint;
+    }
+}
 (function(TerrainShape) {
     TerrainShape[TerrainShape["Flat"] = 0] = "Flat";
     TerrainShape[TerrainShape["Wall"] = 1] = "Wall";
@@ -1485,6 +1763,11 @@ function hasFeature(features, mask) {
     return (features & mask) == mask;
 }
 class Terrain extends PhysicalEntity {
+    _gridX;
+    _gridY;
+    _gridZ;
+    _type;
+    _shape;
     static _dimensions;
     static _featureGraphics = new Map();
     static _terrainGraphics = new Map();
@@ -1542,7 +1825,10 @@ class Terrain extends PhysicalEntity {
         return this._dimensions.height;
     }
     static scaleLocation(loc) {
-        return new Point3D(Math.floor(loc.x / this.width), Math.floor(loc.y / this.depth), Math.floor(loc.z / this.height));
+        const x = loc.x - loc.x % this.width;
+        const y = loc.y - loc.y % this.depth;
+        const z = loc.z - loc.z % this.height;
+        return new Point3D(Math.floor(x / this.width), Math.floor(y / this.depth), Math.floor(z / this.height));
     }
     static create(context, x, y, z, type, shape, feature) {
         return new Terrain(context, x, y, z, this._dimensions, type, shape, feature);
@@ -1782,66 +2068,32 @@ class Terrain extends PhysicalEntity {
         }
         return this.z + location.y * this._tanTheta;
     }
-    _gridX;
-    _gridY;
-    _gridZ;
-    _type;
-    _shape;
 }
 export { Terrain as Terrain };
 class PathFinder {
-    _graph = new Array();
-    constructor(grid){
-        for(let y = 0; y < grid.depth; y++){
-            this.graph[y] = new Array();
-            for(let x = 0; x < grid.width; x++){
-                const centre = grid.getSurfaceTerrainAt(x, y);
-                this.addNode(x, y, centre);
+    _grid;
+    _nodes;
+    constructor(_grid){
+        this._grid = _grid;
+        this._nodes = new Map();
+        for(let y = 0; y < this.grid.depth; y++){
+            for(let x = 0; x < this.grid.width; x++){
+                const centre = this.grid.getSurfaceTerrainAt(x, y);
+                this._nodes.set(centre, new PathNode(centre));
             }
         }
-        for(let y1 = 0; y1 < grid.depth; y1++){
-            for(let x1 = 0; x1 < grid.width; x1++){
-                const centre1 = grid.getSurfaceTerrainAt(x1, y1);
-                this.addNeighbours(centre1, grid);
+        for(let y = 0; y < this.grid.depth; y++){
+            for(let x = 0; x < this.grid.width; x++){
+                const centre = this.grid.getSurfaceTerrainAt(x, y);
+                this.addNeighbours(centre);
             }
         }
     }
-    get graph() {
-        return this._graph;
+    get grid() {
+        return this._grid;
     }
-    addNode(x, y, terrain) {
-        this._graph[y][x] = new PathNode(terrain);
-    }
-    getNode(x, y) {
-        return this._graph[y][x];
-    }
-    addNeighbours(centre, grid) {
-        const neighbours = this.getAccessibleNeighbours(centre, grid);
-        const centreNode = this.getNode(centre.x, centre.y);
-        for (const neighbour of neighbours){
-            const cost = this.getNeighbourCost(centre, neighbour);
-            const succ = this.getNode(neighbour.x, neighbour.y);
-            centreNode.addSuccessor(succ, cost);
-        }
-    }
-    getAccessibleNeighbours(centre, grid) {
-        const neighbours = grid.getNeighbours(centre);
-        const centrePoint = new Point2D(centre.x, centre.y);
-        return neighbours.filter(function(to) {
-            console.assert(Math.abs(centre.z - to.z) <= 1, "can only handle neighbours separated by 1 terrace max");
-            const toPoint = new Point2D(to.x, to.y);
-            const direction = Navigation.getDirectionFromPoints(centrePoint, toPoint);
-            console.assert(direction == Direction.North || direction == Direction.East || direction == Direction.South || direction == Direction.West);
-            const oppositeDir = Navigation.getOppositeDirection(direction);
-            if (to.z == centre.z) {
-                return true;
-            } else if (to.z > centre.z) {
-                return Terrain.isRampUp(to.shape, direction);
-            } else if (to.z < centre.z) {
-                return Terrain.isRampUp(to.shape, oppositeDir);
-            }
-            return false;
-        });
+    get nodes() {
+        return this._nodes;
     }
     getNeighbourCost(centre, to) {
         const cost = centre.x == to.x || centre.y == to.y ? 2 : 3;
@@ -1850,13 +2102,90 @@ class PathFinder {
         }
         return centre.z == to.z ? cost : cost * 2;
     }
-    isAccessible(centre, dx, dy) {
-        const succ = this.getNode(centre.x + dx, centre.y + dy);
-        return centre.hasSuccessor(succ);
+    addNeighbours(centre) {
+        console.assert(this.nodes.has(centre), "object not in node map: %o", centre);
+        const neighbours = this.getAccessibleNeighbours(centre);
+        if (neighbours.length == 0) {
+            return;
+        }
+        const centreNode = this.nodes.get(centre);
+        for (const neighbour of neighbours){
+            console.assert(this.nodes.has(neighbour), "object not in node map: %o", neighbour);
+            const cost = this.getNeighbourCost(centre, neighbour);
+            centreNode.addNeighbour(this.nodes.get(neighbour), cost);
+        }
     }
-    findPath() {}
+    getAccessibleNeighbours(centre) {
+        const neighbours = this.grid.getNeighbours(centre);
+        const centrePoint = new Point2D(centre.x, centre.y);
+        return neighbours.filter(function(to) {
+            console.assert(Math.abs(centre.z - to.z) <= 1, "can only handle neighbours separated by 1 terrace max");
+            const toPoint = new Point2D(to.x, to.y);
+            const direction = Navigation.getDirectionFromPoints(centrePoint, toPoint);
+            const diagonal = direction != Direction.North && direction != Direction.East && direction != Direction.South && direction != Direction.West;
+            const oppositeDir = Navigation.getOppositeDirection(direction);
+            if (to.z == centre.z) {
+                return true;
+            } else if (to.z > centre.z && !diagonal) {
+                return Terrain.isRampUp(to.shape, direction);
+            } else if (to.z < centre.z && !diagonal) {
+                return Terrain.isRampUp(to.shape, oppositeDir);
+            }
+            return false;
+        });
+    }
+    findPath(startPoint, endPoint) {
+        const startTerrain = this.grid.getSurfaceTerrainAtPoint(startPoint);
+        const endTerrain = this.grid.getSurfaceTerrainAtPoint(endPoint);
+        if (startTerrain == null || endTerrain == null) {
+            return new Array();
+        }
+        const start = this.nodes.get(startTerrain);
+        if (start.neighbours.size == 0) {
+            return new Array();
+        }
+        const end = this.nodes.get(endTerrain);
+        if (end.neighbours.size == 0) {
+            return new Array();
+        }
+        const frontier = new MinPriorityQueue();
+        const cameFrom = new Map();
+        const costs = new Map();
+        frontier.insert(start, 0);
+        cameFrom.set(start, null);
+        costs.set(start, 0);
+        let current = start;
+        while(!frontier.empty()){
+            current = frontier.pop();
+            if (current == end) {
+                break;
+            }
+            current.neighbours.forEach((cost, next)=>{
+                const new_cost = costs.get(current) + cost;
+                if (!costs.has(next) || new_cost < costs.get(next)) {
+                    costs.set(next, new_cost);
+                    const priority = new_cost;
+                    frontier.insert(next, priority);
+                    cameFrom.set(next, current);
+                }
+            });
+        }
+        if (current != end) {
+            return Array();
+        }
+        const path = new Array(current.waypoint);
+        while(current != start){
+            current = cameFrom.get(current);
+            path.push(current.waypoint);
+        }
+        path.reverse();
+        return path.splice(1);
+    }
 }
 class TerrainGrid {
+    _context;
+    _width;
+    _depth;
     static neighbourOffsets = [
         new Point2D(-1, -1),
         new Point2D(0, -1),
@@ -1865,7 +2194,7 @@ class TerrainGrid {
         new Point2D(1, 0),
         new Point2D(-1, 1),
         new Point2D(0, 1),
-        new Point2D(1, 1), 
+        new Point2D(1, 1)
     ];
     _surfaceTerrain;
     _totalSurface;
@@ -1912,10 +2241,21 @@ class TerrainGrid {
         }
         return this.surfaceTerrain[y][x];
     }
+    getSurfaceTerrainAtPoint(loc) {
+        const scaled = Terrain.scaleLocation(loc);
+        const terrain = this.getSurfaceTerrainAt(scaled.x, scaled.y);
+        if (terrain != null) {
+            if (terrain.surfaceLocation.z == loc.z) {
+                return terrain;
+            }
+        }
+        return null;
+    }
     getNeighbours(centre) {
         const neighbours = new Array();
         for (const offset of TerrainGrid.neighbourOffsets){
-            const neighbour = this.getSurfaceTerrainAt(centre.x + offset.x, centre.y + offset.y);
+            const scaled = Terrain.scaleLocation(centre.surfaceLocation);
+            const neighbour = this.getSurfaceTerrainAt(scaled.x + offset.x, scaled.y + offset.y);
             if (!neighbour) {
                 continue;
             }
@@ -1923,165 +2263,22 @@ class TerrainGrid {
         }
         return neighbours;
     }
-    _context;
-    _width;
-    _depth;
 }
-function generateStaticGraphics(sheet, width, height, xBegin, yBegin, columns, rows) {
-    const graphics = new Array();
-    const xEnd = xBegin + columns;
-    const yEnd = yBegin + rows;
-    for(let y = yBegin; y < yEnd; y++){
-        for(let x = xBegin; x < xEnd; x++){
-            const sprite = new Sprite(sheet, x * width, y * height, width, height);
-            graphics.push(new StaticGraphicComponent(sprite.id));
-        }
-    }
-    return graphics;
-}
-class AnimatedGraphicComponent extends GraphicComponent {
-    _nextUpdate;
-    _currentSpriteIdx;
-    _spriteIds;
-    constructor(sprites, _interval){
-        super(sprites[0].id);
-        this._interval = _interval;
-        this._nextUpdate = 0;
-        this._currentSpriteIdx = 0;
-        this._spriteIds = new Array();
-        for(const i in sprites){
-            this._spriteIds.push(sprites[i].id);
-        }
-        this._nextUpdate = Date.now() + _interval;
-    }
-    update() {
-        return this._spriteIds[this._currentSpriteIdx];
-    }
-    get firstId() {
-        return this._spriteIds[0];
-    }
-    get lastId() {
-        return this._spriteIds[this._spriteIds.length - 1];
-    }
-    get currentSpriteId() {
-        console.assert(this._currentSpriteIdx >= 0);
-        console.assert(this._currentSpriteIdx < this._spriteIds.length);
-        return this._spriteIds[this._currentSpriteIdx];
-    }
-    _interval;
-}
-class OssilateGraphicComponent extends AnimatedGraphicComponent {
-    _increase = true;
-    constructor(sprites, interval){
-        super(sprites, interval);
-        this._currentSpriteIdx = Math.floor(Math.random() * (this._spriteIds.length - 1));
-    }
-    update() {
-        if (this._nextUpdate > Date.now()) {
-            return this.currentSpriteId;
-        }
-        if (this._currentSpriteIdx == this._spriteIds.length - 1) {
-            this._increase = false;
-        } else if (this._currentSpriteIdx == 0) {
-            this._increase = true;
-        }
-        if (this._increase) {
-            this._currentSpriteIdx++;
-        } else {
-            this._currentSpriteIdx--;
-        }
-        this._nextUpdate = Date.now() + this._interval;
-        return this.currentSpriteId;
-    }
-}
-class LoopGraphicComponent extends AnimatedGraphicComponent {
-    constructor(sprites, interval){
-        super(sprites, interval);
-        this._currentSpriteIdx = 0;
-    }
-    update() {
-        if (this._nextUpdate > Date.now()) {
-            return this.currentSpriteId;
-        }
-        this._currentSpriteIdx = (this._currentSpriteIdx + 1) % this._spriteIds.length;
-        this._nextUpdate = Date.now() + this._interval;
-        return this.currentSpriteId;
-    }
-}
-class DirectionalGraphicComponent extends GraphicComponent {
-    _direction;
-    constructor(_staticGraphics){
-        super(0);
-        this._staticGraphics = _staticGraphics;
-        this._direction = Direction.North;
-    }
-    get direction() {
-        return this._direction;
-    }
-    set direction(direction) {
-        if (this._staticGraphics.has(direction)) {
-            this._direction = direction;
-        } else {
-            console.log("graphic direction unsupported");
-        }
-    }
-    update() {
-        if (this._staticGraphics.has(this.direction)) {
-            const component = this._staticGraphics.get(this.direction);
-            const spriteId = component.update();
-            return spriteId;
-        }
-        console.error("unhandled stationary graphic:", Navigation.getDirectionName(this.direction));
-        return 0;
-    }
-    _staticGraphics;
-}
-class AnimatedDirectionalGraphicComponent extends GraphicComponent {
-    _stationary;
-    _direction;
-    constructor(_staticGraphics, _movementGraphics){
-        super(0);
-        this._staticGraphics = _staticGraphics;
-        this._movementGraphics = _movementGraphics;
-        this._stationary = true;
-        this._direction = Direction.North;
-    }
-    get stationary() {
-        return this._stationary;
-    }
-    set stationary(stationary) {
-        this._stationary = stationary;
-    }
-    get direction() {
-        return this._direction;
-    }
-    set direction(direction) {
-        if (this._staticGraphics.has(direction) && this._movementGraphics.has(direction)) {
-            this._direction = direction;
-        } else {
-            console.log("graphic direction unsupported");
-        }
-    }
-    update() {
-        if (!this.stationary && this._movementGraphics.has(this.direction)) {
-            const spriteId = this._movementGraphics.get(this.direction).update();
-            return spriteId;
-        }
-        if (this.stationary && this._staticGraphics.has(this.direction)) {
-            const component = this._staticGraphics.get(this.direction);
-            const spriteId1 = component.update();
-            return spriteId1;
-        }
-        if (this.stationary) {
-            console.error("unhandled stationary graphic:", Navigation.getDirectionName(this.direction));
-        } else {
-            console.error("unhandled movement graphic:", Navigation.getDirectionName(this.direction));
-        }
-        return 0;
-    }
-    _staticGraphics;
-    _movementGraphics;
-}
+export { DummySpriteSheet as DummySpriteSheet };
+export { SpriteSheet as SpriteSheet };
+export { Sprite as Sprite };
+export { GraphicEvent as GraphicEvent };
+export { DrawElement as DrawElement };
+export { generateSprites as generateSprites };
+export { GraphicComponent as GraphicComponent };
+export { DummyGraphicComponent as DummyGraphicComponent };
+export { StaticGraphicComponent as StaticGraphicComponent };
+export { generateStaticGraphics as generateStaticGraphics };
+export { AnimatedGraphicComponent as AnimatedGraphicComponent };
+export { OssilateGraphicComponent as OssilateGraphicComponent };
+export { LoopGraphicComponent as LoopGraphicComponent };
+export { DirectionalGraphicComponent as DirectionalGraphicComponent };
+export { AnimatedDirectionalGraphicComponent as AnimatedDirectionalGraphicComponent };
 export { Direction as Direction };
 export { Navigation as Navigation };
 export { PathFinder as PathFinder };
@@ -2089,125 +2286,122 @@ export { TerrainShape as TerrainShape };
 export { TerrainType as TerrainType };
 export { TerrainFeature as TerrainFeature };
 export { TerrainGrid as TerrainGrid };
-export { DummySpriteSheet as DummySpriteSheet };
-export { SpriteSheet as SpriteSheet };
-export { generateSprites as generateSprites };
-export { GraphicComponent as GraphicComponent };
-export { DummyGraphicComponent as DummyGraphicComponent };
-export { generateStaticGraphics as generateStaticGraphics };
-export { AnimatedGraphicComponent as AnimatedGraphicComponent };
-export { OssilateGraphicComponent as OssilateGraphicComponent };
-export { LoopGraphicComponent as LoopGraphicComponent };
-export { DirectionalGraphicComponent as DirectionalGraphicComponent };
-export { AnimatedDirectionalGraphicComponent as AnimatedDirectionalGraphicComponent };
-class QueueItem {
-    constructor(_element, _key){
-        this._element = _element;
-        this._key = _key;
+class OffscreenRenderer {
+    _width;
+    _height;
+    _ctx;
+    _bitmaps;
+    _canvas;
+    constructor(_width, _height){
+        this._width = _width;
+        this._height = _height;
+        this._bitmaps = new Array();
+        this._canvas = new OffscreenCanvas(_width, _height);
+        this._ctx = this._canvas.getContext('2d');
     }
-    get element() {
-        return this._element;
-    }
-    get key() {
-        return this._key;
-    }
-    set key(k) {
-        this._key = k;
-    }
-    _element;
-    _key;
-}
-class MinPriorityQueue {
-    _items = new Array();
-    _indices = new Map();
-    constructor(){}
-    get indices() {
-        return this._indices;
-    }
-    get items() {
-        return this._items;
-    }
-    get size() {
-        return this.items.length - 1;
-    }
-    get length() {
-        return this.items.length;
-    }
-    pop() {
-        const minItem = this.items[0];
-        this.items.splice(0, 1);
-        this.indices.delete(minItem.element);
-        for(let i = 0; i < this.items.length; ++i){
-            const item = this.items[i];
-            this.indices.set(item.element, i);
+    addBitmap(id, bitmap) {
+        if (id >= this._bitmaps.length) {
+            this._bitmaps.length = id + 1;
         }
-        this.build();
-        return minItem.element;
+        this._bitmaps[id] = bitmap;
     }
-    parentIdx(i) {
-        return i - 1 >> 1;
-    }
-    leftIdx(i) {
-        return 2 * i + 1;
-    }
-    rightIdx(i) {
-        return 2 * i + 2;
-    }
-    keyAt(i) {
-        console.assert(i < this.length);
-        const item = this.items[i];
-        return item.key;
-    }
-    insert(x, k) {
-        console.assert(!this.indices.has(x));
-        this.items.push(new QueueItem(x, Number.MAX_VALUE));
-        this.indices.set(x, this.size);
-        this.setKey(x, k);
-    }
-    setKey(x, k) {
-        console.assert(this.indices.has(x));
-        let i = this.indices.get(x);
-        console.assert(i < this.length);
-        const item = this.items[i];
-        console.assert(k <= item.key);
-        item.key = k;
-        while(i > 0 && this.keyAt(this.parentIdx(i)) > this.keyAt(i)){
-            this.exchange(i, this.parentIdx(i));
-            i = this.parentIdx(i);
-        }
-    }
-    exchange(idxA, idxB) {
-        console.assert(idxA < this.length);
-        console.assert(idxB < this.length);
-        const itemA = this.items[idxA];
-        const itemB = this.items[idxB];
-        this.items[idxA] = itemB;
-        this.items[idxB] = itemA;
-        this.indices.set(itemA.element, idxB);
-        this.indices.set(itemB.element, idxA);
-    }
-    build() {
-        for(let i = this.size >> 1; i >= 0; i--){
-            this.heapify(i);
-        }
-    }
-    heapify(i) {
-        const left = this.leftIdx(i);
-        const right = this.rightIdx(i);
-        let smallest = i;
-        if (left < this.length && this.keyAt(left) < this.keyAt(i)) {
-            smallest = left;
-        }
-        if (right < this.length && this.keyAt(right) < this.keyAt(i)) {
-            smallest = right;
-        }
-        if (smallest != i) {
-            this.exchange(i, smallest);
-            this.heapify(smallest);
+    draw(elements) {
+        this._ctx.clearRect(0, 0, this._width, this._height);
+        for(let i = 0; i < elements.length - 2; ++i){
+            const spriteId = elements[i];
+            const x = elements[i + 1];
+            const y = elements[i + 2];
+            console.assert(spriteId < this._bitmaps.length, "bitmap length mismatch");
+            this._ctx.drawImage(this._bitmaps[spriteId], x, y);
         }
     }
 }
-export { MinPriorityQueue as MinPriorityQueue };
+class OnscreenRenderer {
+    _canvas;
+    _worker;
+    _ctx;
+    _bitmaps;
+    _width;
+    _height;
+    constructor(_canvas){
+        this._canvas = _canvas;
+        this._bitmaps = new Array();
+        this._width = this.canvas.width;
+        this._height = this.canvas.height;
+        if (window.Worker) {
+            console.log("using webworker for OnscreenRenderer");
+            const offscreen = this.canvas.transferControlToOffscreen();
+            this._worker = new Worker("/lib/render-worker.js", {
+                type: "module"
+            });
+            this.worker.postMessage({
+                type: GraphicEvent.AddCanvas,
+                canvas: offscreen,
+                width: this.width,
+                height: this.height
+            }, [
+                offscreen
+            ]);
+        } else {
+            this._ctx = this.canvas.getContext('2d');
+        }
+    }
+    get width() {
+        return this._width;
+    }
+    get height() {
+        return this._height;
+    }
+    get canvas() {
+        return this._canvas;
+    }
+    get ctx() {
+        return this._ctx;
+    }
+    get bitmaps() {
+        return this._bitmaps;
+    }
+    get worker() {
+        return this._worker;
+    }
+    addBitmap(id, bitmap) {
+        if (window.Worker) {
+            this.worker.postMessage({
+                type: GraphicEvent.AddSprite,
+                id: id,
+                sprite: bitmap
+            }, [
+                bitmap
+            ]);
+        } else {
+            if (id >= this.bitmaps.length) {
+                this.bitmaps.length = id + 1;
+            }
+            this.bitmaps[id] = bitmap;
+        }
+    }
+    draw(elements) {
+        if (window.Worker) {
+            this.worker.postMessage({
+                type: GraphicEvent.Draw,
+                drawElements: elements
+            }, [
+                elements.buffer
+            ]);
+        } else {
+            this.ctx.clearRect(0, 0, this.width, this.height);
+            for(let i = 0; i < elements.length - 2; ++i){
+                const spriteId = elements[i];
+                const x = elements[i + 1];
+                const y = elements[i + 2];
+                console.assert(spriteId < this.bitmaps.length, "bitmap length mismatch");
+                this.ctx.drawImage(this._bitmaps[spriteId], x, y);
+            }
+        }
+    }
+}
+export { OffscreenRenderer as OffscreenRenderer };
+export { OnscreenRenderer as OnscreenRenderer };
 var RenderOrder;
 (function(RenderOrder) {
     RenderOrder[RenderOrder["Before"] = -1] = "Before";
@@ -2215,6 +2409,8 @@ var RenderOrder;
     RenderOrder[RenderOrder["After"] = 1] = "After";
 })(RenderOrder || (RenderOrder = {}));
 class SceneNode {
+    _entity;
+    _minDrawCoord;
     _preds;
     _succs;
     _level;
@@ -2320,8 +2516,6 @@ class SceneNode {
     get isRoot() {
         return this._preds.length == 0;
     }
-    _entity;
-    _minDrawCoord;
 }
 class SceneLevel {
     _nodes = new Array();
@@ -2509,8 +2703,12 @@ class SceneGraph {
             this.setDrawOutline(node);
         }
         nodeList.sort((a, b)=>{
-            if (a.minZ < b.minZ) return RenderOrder.Before;
-            if (a.minZ > b.minZ) return RenderOrder.After;
+            if (a.minZ < b.minZ) {
+                return RenderOrder.Before;
+            }
+            if (a.minZ > b.minZ) {
+                return RenderOrder.After;
+            }
             return RenderOrder.Any;
         });
         nodeList.forEach((node)=>this.insertIntoLevel(node));
@@ -2530,13 +2728,16 @@ class SceneGraph {
         this._levels.forEach((level)=>level.buildGraph(this, camera, force));
     }
 }
-class BaseSceneRenderer {
+class Scene {
+    _graph;
     _nodes;
     _numEntities;
+    _handler;
     constructor(_graph){
         this._graph = _graph;
         this._nodes = new Map();
         this._numEntities = 0;
+        this._handler = new TimedEventHandler();
     }
     get graph() {
         return this._graph;
@@ -2566,119 +2767,6 @@ class BaseSceneRenderer {
     getNode(id) {
         console.assert(this.nodes.has(id));
         return this.nodes.get(id);
-    }
-    getLocationAt(_x, _y, _camera) {
-        return null;
-    }
-    getEntityDrawnAt(_x, _y, _camera) {
-        return null;
-    }
-    render(_camera, _force) {
-        return 0;
-    }
-    addTimedEvent(_callback) {}
-    verifyRenderer(entities) {
-        if (this.graph.numNodes != entities.length) {
-            console.error("top-level comparison between scene node and entities failed");
-        }
-        let counted = 0;
-        const levelNodeIds = new Array();
-        const nodeIds = new Array();
-        const entityIds = new Array();
-        for (const level of this.graph.levels){
-            counted += level.nodes.length;
-            level.nodes.forEach((node)=>levelNodeIds.push(node.id));
-        }
-        for (const node of this.nodes.values()){
-            nodeIds.push(node.id);
-        }
-        entities.forEach((entity)=>entityIds.push(entity.id));
-        if (nodeIds.length != entityIds.length || nodeIds.length != levelNodeIds.length) {
-            console.error("number of scene nodes and entities don't match up");
-            return false;
-        }
-        if (this.numEntities != entities.length) {
-            console.error("mismatch in number of entities in context and scene");
-        }
-        nodeIds.sort((a, b)=>{
-            if (a < b) return -1;
-            else return 1;
-        });
-        entityIds.sort((a, b)=>{
-            if (a < b) return -1;
-            else return 1;
-        });
-        levelNodeIds.sort((a, b)=>{
-            if (a < b) return -1;
-            else return 1;
-        });
-        for(let i = 0; i < nodeIds.length; ++i){
-            if (i != nodeIds[i]) {
-                console.error("mismatch in expected ids:", i, nodeIds[i]);
-                return false;
-            }
-            if (nodeIds[i] != entityIds[i]) {
-                console.error("mismatch node vs entity ids:", nodeIds[i], entityIds[i]);
-                return false;
-            }
-            if (nodeIds[i] != levelNodeIds[i]) {
-                console.error("mismatch top level node vs found in level ids:", nodeIds[i], levelNodeIds[i]);
-                return false;
-            }
-        }
-        return true;
-    }
-    _graph;
-}
-class OffscreenSceneRenderer extends BaseSceneRenderer {
-    constructor(graph){
-        super(graph);
-    }
-    render(camera, force) {
-        let drawn = 0;
-        if (!this.graph.initialised) {
-            this.graph.initialise(this.nodes);
-        }
-        this.graph.buildLevels(camera, force);
-        this.graph.levels.forEach((level)=>{
-            for(let i = level.order.length - 1; i >= 0; i--){
-                const node = level.order[i];
-                const entity = node.entity;
-                if (!entity.visible || !entity.drawable) {
-                    continue;
-                }
-                drawn++;
-            }
-        });
-        return drawn;
-    }
-}
-class OnscreenSceneRenderer extends BaseSceneRenderer {
-    _width;
-    _height;
-    _ctx;
-    _handler;
-    constructor(_canvas, graph){
-        super(graph);
-        this._canvas = _canvas;
-        this._handler = new TimedEventHandler();
-        this._width = _canvas.width;
-        this._height = _canvas.height;
-        this._ctx = this._canvas.getContext("2d", {
-            alpha: false
-        });
-    }
-    get width() {
-        return this._width;
-    }
-    get height() {
-        return this._height;
-    }
-    get ctx() {
-        return this._ctx;
-    }
-    addTimedEvent(callback) {
-        this._handler.add(callback);
     }
     getLocationAt(x, y, camera) {
         const entity = this.getEntityDrawnAt(x, y, camera);
@@ -2711,30 +2799,109 @@ class OnscreenSceneRenderer extends BaseSceneRenderer {
         }
         return null;
     }
-    renderNode(node, camera) {
-        const entity = node.entity;
-        const coord = camera.getDrawCoord(node.drawCoord);
-        entity.graphics.forEach((component)=>{
-            const spriteId = component.update();
-            Sprite.sprites[spriteId].draw(coord, this.ctx);
+    addTimedEvent(callback) {
+        this._handler.add(callback);
+    }
+    numToDraw() {
+        let num = 0;
+        this.graph.levels.forEach((level)=>{
+            num += level.order.length;
         });
+        return num;
     }
     render(camera, force) {
         if (!this.graph.initialised) {
             this.graph.initialise(this.nodes);
         }
         this.graph.buildLevels(camera, force);
-        this.ctx.clearRect(0, 0, this._width, this._height);
+        const elements = this.numToDraw();
+        const initByteLength = elements * 3 * 2;
+        let buffer = new ArrayBuffer(initByteLength);
+        let drawElements = new Uint16Array(buffer);
+        let idx = 0;
         this.graph.levels.forEach((level)=>{
             for(let i = level.order.length - 1; i >= 0; i--){
                 const node = level.order[i];
-                this.renderNode(node, camera);
+                const entity = node.entity;
+                const coord = camera.getDrawCoord(node.drawCoord);
+                if (entity.graphics.length * 3 + idx >= drawElements.length) {
+                    let new_buffer = new ArrayBuffer(buffer.byteLength * 2);
+                    new Uint8Array(new_buffer).set(new Uint8Array(buffer));
+                    buffer = new_buffer;
+                    drawElements = new Uint16Array(buffer);
+                }
+                entity.graphics.forEach((component)=>{
+                    const spriteId = component.update();
+                    drawElements[idx] = spriteId;
+                    drawElements[idx + 1] = coord.x;
+                    drawElements[idx + 2] = coord.y;
+                    idx += 3;
+                });
             }
         });
         this._handler.service();
-        return 0;
+        return drawElements;
     }
-    _canvas;
+    verifyRenderer(entities) {
+        if (this.graph.numNodes != entities.length) {
+            console.error("top-level comparison between scene node and entities failed");
+        }
+        let counted = 0;
+        const levelNodeIds = new Array();
+        const nodeIds = new Array();
+        const entityIds = new Array();
+        for (const level of this.graph.levels){
+            counted += level.nodes.length;
+            level.nodes.forEach((node)=>levelNodeIds.push(node.id));
+        }
+        for (const node of this.nodes.values()){
+            nodeIds.push(node.id);
+        }
+        entities.forEach((entity)=>entityIds.push(entity.id));
+        if (nodeIds.length != entityIds.length || nodeIds.length != levelNodeIds.length) {
+            console.error("number of scene nodes and entities don't match up");
+            return false;
+        }
+        if (this.numEntities != entities.length) {
+            console.error("mismatch in number of entities in context and scene");
+        }
+        nodeIds.sort((a, b)=>{
+            if (a < b) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+        entityIds.sort((a, b)=>{
+            if (a < b) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+        levelNodeIds.sort((a, b)=>{
+            if (a < b) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+        for(let i = 0; i < nodeIds.length; ++i){
+            if (i != nodeIds[i]) {
+                console.error("mismatch in expected ids:", i, nodeIds[i]);
+                return false;
+            }
+            if (nodeIds[i] != entityIds[i]) {
+                console.error("mismatch node vs entity ids:", nodeIds[i], entityIds[i]);
+                return false;
+            }
+            if (nodeIds[i] != levelNodeIds[i]) {
+                console.error("mismatch top level node vs found in level ids:", nodeIds[i], levelNodeIds[i]);
+                return false;
+            }
+        }
+        return true;
+    }
 }
 var Perspective;
 (function(Perspective) {
@@ -2842,13 +3009,16 @@ export { RenderOrder as RenderOrder };
 export { SceneNode as SceneNode };
 export { SceneLevel as SceneLevel };
 export { SceneGraph as SceneGraph };
-export { OffscreenSceneRenderer as OffscreenSceneRenderer };
-export { OnscreenSceneRenderer as OnscreenSceneRenderer };
+export { Scene as Scene };
 export { Perspective as Perspective };
 export { IsometricPhysicalDimensions as IsometricPhysicalDimensions };
 export { TrueIsometric as TrueIsometric };
 export { TwoByOneIsometric as TwoByOneIsometric };
 class Cloud {
+    _pos;
+    _moisture;
+    _direction;
+    _rain;
     constructor(_pos, _moisture, _direction, _rain){
         this._pos = _pos;
         this._moisture = _moisture;
@@ -2908,12 +3078,10 @@ class Cloud {
             this.pos = nextCoord;
         }
     }
-    _pos;
-    _moisture;
-    _direction;
-    _rain;
 }
 class Rain {
+    _surface;
+    _minHeight;
     _clouds;
     _totalClouds;
     _moistureGrid;
@@ -2928,35 +3096,35 @@ class Rain {
         }
         switch(direction){
             default:
-                console.error('unhandled direction');
+                console.error("unhandled direction");
                 break;
             case Direction.North:
                 {
-                    const y1 = this.surface.depth - 1;
+                    const y = this.surface.depth - 1;
                     for(let x = 0; x < this.surface.width; x++){
-                        this.addCloud(new Point2D(x, y1), moisture, direction);
+                        this.addCloud(new Point2D(x, y), moisture, direction);
                     }
                     break;
                 }
             case Direction.East:
                 {
-                    for(let y2 = 0; y2 < this.surface.depth; y2++){
-                        this.addCloud(new Point2D(0, y2), moisture, direction);
+                    for(let y = 0; y < this.surface.depth; y++){
+                        this.addCloud(new Point2D(0, y), moisture, direction);
                     }
                     break;
                 }
             case Direction.South:
                 {
-                    for(let x2 = 0; x2 < this.surface.width; x2++){
-                        this.addCloud(new Point2D(x2, 0), moisture, direction);
+                    for(let x = 0; x < this.surface.width; x++){
+                        this.addCloud(new Point2D(x, 0), moisture, direction);
                     }
                     break;
                 }
             case Direction.West:
                 {
-                    const x3 = this.surface.width - 1;
-                    for(let y4 = 0; y4 < this.surface.depth; y4++){
-                        this.addCloud(new Point2D(x3, y4), moisture, direction);
+                    const x = this.surface.width - 1;
+                    for(let y = 0; y < this.surface.depth; y++){
+                        this.addCloud(new Point2D(x, y), moisture, direction);
                     }
                     break;
                 }
@@ -2994,8 +3162,6 @@ class Rain {
             cloud.move();
         }
     }
-    _surface;
-    _minHeight;
 }
 var Biome;
 (function(Biome) {
@@ -3109,20 +3275,20 @@ function gaussianBlur(grid, width, depth) {
     for(let y = 0; y < halfSize; y++){
         result[y] = grid[y];
     }
-    for(let y1 = depth - halfSize; y1 < depth; y1++){
-        result[y1] = grid[y1];
+    for(let y = depth - halfSize; y < depth; y++){
+        result[y] = grid[y];
     }
     const filter = new Float32Array(5);
-    for(let y2 = halfSize; y2 < depth - halfSize; y2++){
-        result[y2] = new Float32Array(width);
+    for(let y = halfSize; y < depth - halfSize; y++){
+        result[y] = new Float32Array(width);
         for(let x = 0; x < halfSize; x++){
-            result[y2][x] = grid[y2][x];
+            result[y][x] = grid[y][x];
         }
-        for(let x1 = width - halfSize; x1 < width; x1++){
-            result[y2][x1] = grid[y2][x1];
+        for(let x = width - halfSize; x < width; x++){
+            result[y][x] = grid[y][x];
         }
-        for(let x2 = halfSize; x2 < width - halfSize; x2++){
-            const sigma = standardDevWindow(grid, x2, y2, offsets);
+        for(let x = halfSize; x < width - halfSize; x++){
+            const sigma = standardDevWindow(grid, x, y, offsets);
             if (sigma == 0) {
                 continue;
             }
@@ -3138,20 +3304,23 @@ function gaussianBlur(grid, width, depth) {
                 coeff /= sum;
             }
             let blurred = 0;
-            for(const i1 in offsets){
-                const dx = offsets[i1];
-                blurred += grid[y2][x2 + dx] * filter[i1];
+            for(const i in offsets){
+                const dx = offsets[i];
+                blurred += grid[y][x + dx] * filter[i];
             }
-            for(const i2 in offsets){
-                const dy = offsets[i2];
-                blurred += grid[y2 + dy][x2] * filter[i2];
+            for(const i in offsets){
+                const dy = offsets[i];
+                blurred += grid[y + dy][x] * filter[i];
             }
-            result[y2][x2] = blurred;
+            result[y][x] = blurred;
         }
     }
     return result;
 }
 class TerrainAttributes {
+    _x;
+    _y;
+    _height;
     _moisture;
     _terrace;
     _biome;
@@ -3225,11 +3394,10 @@ class TerrainAttributes {
     set fixed(f) {
         this._fixed = f;
     }
-    _x;
-    _y;
-    _height;
 }
 class Surface {
+    _width;
+    _depth;
     _surface;
     constructor(_width, _depth){
         this._width = _width;
@@ -3252,7 +3420,9 @@ class Surface {
         }
     }
     inbounds(coord) {
-        if (coord.x < 0 || coord.x >= this._width || coord.y < 0 || coord.y >= this._depth) return false;
+        if (coord.x < 0 || coord.x >= this._width || coord.y < 0 || coord.y >= this._depth) {
+            return false;
+        }
         return true;
     }
     at(x, y) {
@@ -3278,10 +3448,11 @@ class Surface {
         }
         return neighbours;
     }
-    _width;
-    _depth;
 }
 class TerrainBuilderConfig {
+    _numTerraces;
+    _defaultFloor;
+    _defaultWall;
     _waterLine;
     _wetLimit;
     _dryLimit;
@@ -3369,11 +3540,9 @@ class TerrainBuilderConfig {
     get biomes() {
         return this._hasBiomes;
     }
-    _numTerraces;
-    _defaultFloor;
-    _defaultWall;
 }
 class TerrainBuilder {
+    _config;
     _surface;
     _terraceSpacing;
     constructor(width, depth, heightMap, _config, physicalDims){
@@ -3394,9 +3563,9 @@ class TerrainBuilder {
         }
         if (minHeight < 0) {
             minHeight = Math.abs(minHeight);
-            for(let y1 = 0; y1 < depth; y1++){
+            for(let y = 0; y < depth; y++){
                 for(let x = 0; x < width; x++){
-                    heightMap[y1][x] += minHeight;
+                    heightMap[y][x] += minHeight;
                 }
             }
             maxHeight += minHeight;
@@ -3404,9 +3573,9 @@ class TerrainBuilder {
         this._terraceSpacing = maxHeight / this.config.numTerraces;
         this._surface = new Surface(width, depth);
         this.surface.init(heightMap);
-        for(let y2 = 0; y2 < this.surface.depth; y2++){
-            for(let x1 = 0; x1 < this.surface.width; x1++){
-                const surface = this.surface.at(x1, y2);
+        for(let y = 0; y < this.surface.depth; y++){
+            for(let x = 0; x < this.surface.width; x++){
+                const surface = this.surface.at(x, y);
                 surface.terrace = Math.floor(surface.height / this._terraceSpacing);
                 surface.shape = TerrainShape.Flat;
                 surface.type = this.config.floor;
@@ -3471,21 +3640,22 @@ class TerrainBuilder {
                 grid.addSurfaceTerrain(x, y, surface.terrace, surface.type, surface.shape, surface.features);
             }
         }
-        for(let y1 = 0; y1 < this.surface.depth; y1++){
-            for(let x1 = 0; x1 < this.surface.width; x1++){
-                let z = this.surface.at(x1, y1).terrace;
-                const zStop = z - this.calcRelativeHeight(x1, y1);
-                const terrain = grid.getSurfaceTerrainAt(x1, y1);
+        for(let y = 0; y < this.surface.depth; y++){
+            for(let x = 0; x < this.surface.width; x++){
+                let z = this.surface.at(x, y).terrace;
+                const zStop = z - this.calcRelativeHeight(x, y);
+                const terrain = grid.getSurfaceTerrainAt(x, y);
                 if (terrain == null) {
-                    console.error("didn't find terrain in map at", x1, y1, z);
+                    console.error("didn't find terrain in map at", x, y, z);
                 }
                 const shape = Terrain.isFlat(terrain.shape) ? terrain.shape : TerrainShape.Flat;
                 while(z > zStop){
                     z--;
-                    grid.addSubSurfaceTerrain(x1, y1, z, terrain.type, shape);
+                    grid.addSubSurfaceTerrain(x, y, z, terrain.type, shape);
                 }
             }
         }
+        return grid;
     }
     setShapes() {
         const coordOffsets = [
@@ -3552,7 +3722,9 @@ class TerrainBuilder {
                     southEdge = southEdge || neighbour.y > centre.y;
                     eastEdge = eastEdge || neighbour.x > centre.x;
                     westEdge = westEdge || neighbour.x < centre.x;
-                    if (northEdge && eastEdge && southEdge && westEdge) break;
+                    if (northEdge && eastEdge && southEdge && westEdge) {
+                        break;
+                    }
                 }
                 if (shapeType == TerrainShape.Flat) {
                     if (northEdge && eastEdge && southEdge && westEdge) {
@@ -3695,7 +3867,7 @@ class TerrainBuilder {
                     console.log("height, threshold", surface.height, this.config.uplandThreshold);
                     switch(moistureScaled){
                         default:
-                            console.error('unhandled moisture scale');
+                            console.error("unhandled moisture scale");
                             break;
                         case 0:
                             biome = Biome.Rock;
@@ -3725,7 +3897,7 @@ class TerrainBuilder {
                 } else {
                     switch(moistureScaled){
                         default:
-                            console.error('unhandled moisture scale');
+                            console.error("unhandled moisture scale");
                             break;
                         case 0:
                             biome = Biome.Desert;
@@ -3798,7 +3970,6 @@ class TerrainBuilder {
             }
         }
     }
-    _config;
 }
 export { Biome as Biome };
 export { getBiomeName as getBiomeName };
@@ -3806,6 +3977,7 @@ export { Surface as Surface };
 export { TerrainBuilderConfig as TerrainBuilderConfig };
 export { TerrainBuilder as TerrainBuilder };
 class OctNode {
+    _bounds;
     static MaxEntities = 30;
     _children;
     _entities;
@@ -3863,9 +4035,9 @@ class OctNode {
                 }
             }
             if (!inserted) {
-                for (const child1 of this.children){
-                    if (child1.containsLocation(entity.centre)) {
-                        inserted = child1.insert(entity);
+                for (const child of this.children){
+                    if (child.containsLocation(entity.centre)) {
+                        inserted = child.insert(entity);
                         break;
                     }
                 }
@@ -3948,7 +4120,6 @@ class OctNode {
         }
         return false;
     }
-    _bounds;
 }
 class Octree {
     _root;
@@ -4008,6 +4179,7 @@ class Octree {
 }
 class ContextImpl {
     _scene;
+    _renderer;
     _entities = new Array();
     _updateables = new Array();
     _movables = new Array();
@@ -4019,15 +4191,27 @@ class ContextImpl {
         Terrain.reset();
         SpriteSheet.reset();
     }
-    constructor(worldDims){
+    constructor(worldDims, perspective){
         this._spatialGraph = new Octree(worldDims);
         CollisionDetector.init(this._spatialGraph);
+        switch(perspective){
+            default:
+                console.error("unhandled perspective");
+                break;
+            case Perspective.TrueIsometric:
+                this._scene = new Scene(new TrueIsometric());
+                break;
+            case Perspective.TwoByOneIsometric:
+                this._scene = new Scene(new TwoByOneIsometric());
+                break;
+        }
+        this._renderer = new OffscreenRenderer(1, 1);
     }
     get scene() {
         return this._scene;
     }
-    set scene(s) {
-        this._scene = s;
+    get renderer() {
+        return this._renderer;
     }
     get entities() {
         return this._entities;
@@ -4044,41 +4228,8 @@ class ContextImpl {
     verify() {
         return this.entities.length == PhysicalEntity.getNumEntities() && this.entities.length == this._totalEntities && this.spatial.verify(this.entities) && this.scene.verifyRenderer(this.entities);
     }
-    addOnscreenRenderer(canvas, perspective) {
-        switch(perspective){
-            default:
-                console.error("unhandled perspective");
-                break;
-            case Perspective.TrueIsometric:
-                this.scene = new OnscreenSceneRenderer(canvas, new TrueIsometric());
-                break;
-            case Perspective.TwoByOneIsometric:
-                this.scene = new OnscreenSceneRenderer(canvas, new TwoByOneIsometric());
-                break;
-        }
-        this.entities.forEach((entity)=>this.scene.insertEntity(entity));
-        this._movables.forEach((entity)=>entity.addEventListener(EntityEvent.Moving, ()=>{
-                this.spatial.update(entity);
-                this.scene.updateEntity(entity);
-            }));
-    }
-    addOffscreenRenderer(perspective) {
-        switch(perspective){
-            default:
-                console.error("unhandled perspective");
-                break;
-            case Perspective.TrueIsometric:
-                this.scene = new OffscreenSceneRenderer(new TrueIsometric());
-                break;
-            case Perspective.TwoByOneIsometric:
-                this.scene = new OffscreenSceneRenderer(new TwoByOneIsometric());
-                break;
-        }
-        this.entities.forEach((entity)=>this.scene.insertEntity(entity));
-        this._movables.forEach((entity)=>entity.addEventListener(EntityEvent.Moving, ()=>{
-                this.spatial.update(entity);
-                this.scene.updateEntity(entity);
-            }));
+    addOnscreenRenderer(canvas) {
+        this._renderer = new OnscreenRenderer(canvas);
     }
     addController(controller) {
         this._controllers.push(controller);
@@ -4110,7 +4261,8 @@ class ContextImpl {
     }
     update(camera) {
         camera.update();
-        this._scene.render(camera, false);
+        const elements = this._scene.render(camera, false);
+        this.renderer.draw(elements);
         Gravity.update(this._movables);
         this._updateables.forEach((entity)=>{
             entity.update();
@@ -4121,20 +4273,21 @@ class ContextImpl {
     }
 }
 function createContext(canvas, worldDims, perspective) {
-    const context = new ContextImpl(worldDims);
-    context.addOnscreenRenderer(canvas, perspective);
+    ContextImpl.reset();
+    const context = new ContextImpl(worldDims, perspective);
+    context.addOnscreenRenderer(canvas);
     return context;
 }
 function createTestContext(worldDims, perspective) {
     ContextImpl.reset();
-    const context = new ContextImpl(worldDims);
-    context.addOffscreenRenderer(perspective);
+    const context = new ContextImpl(worldDims, perspective);
     return context;
 }
 export { ContextImpl as ContextImpl };
 export { createContext as createContext };
 export { createTestContext as createTestContext };
 class Camera {
+    _scene;
     _lowerX;
     _lowerY;
     _upperX;
@@ -4206,17 +4359,16 @@ class Camera {
     removeEventListener(event, callback) {
         this._handler.removeEventListener(event, callback);
     }
-    _scene;
 }
 class MouseCamera extends Camera {
     constructor(scene, canvas, width, height){
         super(scene, width, height);
-        canvas.addEventListener('mousedown', (e)=>{
+        canvas.addEventListener("mousedown", (e)=>{
             if (e.button == 0) {
                 this.location = scene.getLocationAt(e.offsetX, e.offsetY, this);
             }
         });
-        canvas.addEventListener('touchstart', (e)=>{
+        canvas.addEventListener("touchstart", (e)=>{
             const touch = e.touches[0];
             this.location = scene.getLocationAt(touch.pageX, touch.pageY, this);
         });
@@ -4235,6 +4387,7 @@ export { Camera as Camera };
 export { MouseCamera as MouseCamera };
 export { TrackerCamera as TrackerCamera };
 class Action {
+    _actor;
     constructor(_actor){
         this._actor = _actor;
     }
@@ -4244,7 +4397,6 @@ class Action {
     set actor(actor) {
         this._actor = actor;
     }
-    _actor;
 }
 class MoveAction extends Action {
     constructor(actor){
@@ -4262,6 +4414,8 @@ class MoveAction extends Action {
     }
 }
 class MoveDirection extends MoveAction {
+    _d;
+    _bounds;
     constructor(actor, _d, _bounds){
         super(actor);
         this._d = _d;
@@ -4283,10 +4437,10 @@ class MoveDirection extends MoveAction {
         this.actor.updatePosition(this._d);
         return false;
     }
-    _d;
-    _bounds;
 }
 class MoveDestination extends MoveAction {
+    _step;
+    _destination;
     _d;
     constructor(actor, _step, _destination){
         super(actor);
@@ -4361,10 +4515,10 @@ class MoveDestination extends MoveAction {
         this.actor.postEvent(EntityEvent.Moving);
         return bounds.minLocation.isSameAsRounded(this.destination);
     }
-    _step;
-    _destination;
 }
 class Navigate extends Action {
+    _step;
+    _destination;
     _currentStep;
     _waypoints;
     _index;
@@ -4373,10 +4527,6 @@ class Navigate extends Action {
         this._step = _step;
         this._destination = _destination;
         this._index = 0;
-        this._waypoints = this.findPath();
-        if (this._waypoints.length != 0) {
-            this._currentStep = new MoveDestination(actor, _step, this._waypoints[0]);
-        }
     }
     perform() {
         if (this._waypoints.length == 0) {
@@ -4387,12 +4537,6 @@ class Navigate extends Action {
             return false;
         }
         if (!this._currentStep.destination.isSameAsRounded(this._actor.bounds.minLocation)) {
-            this._waypoints = this.findPath();
-            if (this._waypoints.length != 0) {
-                this._index = 0;
-                this._currentStep = new MoveDestination(this._actor, this._step, this._waypoints[0]);
-                return false;
-            }
             return true;
         }
         this._index++;
@@ -4403,12 +4547,6 @@ class Navigate extends Action {
         this._currentStep = new MoveDestination(this._actor, this._step, nextLocation);
         return false;
     }
-    findPath() {
-        const path = new Array();
-        return path;
-    }
-    _step;
-    _destination;
 }
 export { Action as Action };
 export { MoveDirection as MoveDirection };
@@ -4552,12 +4690,12 @@ class MovableEntityDebug {
                         ctx.stroke();
                     }
                     ctx.strokeStyle = "Orange";
-                    for (const segment1 of getAllSegments(scene.getNode(collidedEntity.id))){
+                    for (const segment of getAllSegments(scene.getNode(collidedEntity.id))){
                         ctx.beginPath();
-                        const drawP01 = camera.getDrawCoord(segment1.p0);
-                        const drawP11 = camera.getDrawCoord(segment1.p1);
-                        ctx.moveTo(drawP01.x, drawP01.y);
-                        ctx.lineTo(drawP11.x, drawP11.y);
+                        const drawP0 = camera.getDrawCoord(segment.p0);
+                        const drawP1 = camera.getDrawCoord(segment.p1);
+                        ctx.moveTo(drawP0.x, drawP0.y);
+                        ctx.lineTo(drawP1.x, drawP1.y);
                         ctx.stroke();
                     }
                     ctx.strokeStyle = "Red";
