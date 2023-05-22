@@ -47,8 +47,9 @@ export class OnscreenRenderer implements Renderer {
     this._width = this.canvas.width;
     this._height = this.canvas.height;
     if (window.Worker) {
+      console.log("using webworker for OnscreenRenderer");
       const offscreen = this.canvas.transferControlToOffscreen();
-      this._worker = new Worker("gfx-worker.ts");
+      this._worker = new Worker("/lib/render-worker.js", { type: "module" });
       this.worker.postMessage({ type: GraphicEvent.AddCanvas, canvas: offscreen,
                                 width: this.width, height: this.height },
                               [offscreen]);
