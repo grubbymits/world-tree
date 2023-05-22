@@ -137,10 +137,9 @@ export class Segment2D {
     // https://www.geomalgorithms.com/a02-_lines.html
     const vl: number = this.p0.x * this.p1.y - this.p1.x * this.p0.y;
     const w: number = this.p0.x * p.y - p.x * this.p0.y;
-    const u =
-      1 /
+    const u = 1 /
       Math.sqrt(
-        Math.pow(this.p1.x - this.p0.x, 2) + Math.pow(this.p1.y - this.p0.y, 2)
+        Math.pow(this.p1.x - this.p0.x, 2) + Math.pow(this.p1.y - this.p0.y, 2),
       );
     return vl * w * u;
   }
@@ -150,7 +149,7 @@ export class Point3D {
   constructor(
     private readonly _x: number,
     private readonly _y: number,
-    private readonly _z: number
+    private readonly _z: number,
   ) {
     Object.freeze(this);
   }
@@ -202,7 +201,7 @@ export class Vector3D {
   constructor(
     private readonly _x: number,
     private readonly _y: number,
-    private readonly _z: number
+    private readonly _z: number,
   ) {
     Object.freeze(this);
   }
@@ -378,8 +377,8 @@ class TriangleFace3D extends Face3D {
     this._uDotv = u.dot(v);
     this._uDotu = u.dot(u);
     this._vDotv = v.dot(v);
-    this._denominator =
-      1 / (Math.pow(this._uDotv, 2) - this._uDotu * this._vDotv);
+    this._denominator = 1 /
+      (Math.pow(this._uDotv, 2) - this._uDotu * this._vDotv);
   }
 
   vertices(): Array<Vertex3D> {
@@ -440,7 +439,7 @@ export class IntersectInfo {
     private readonly _begin: Point3D,
     private readonly _end: Point3D,
     private readonly _i: Point3D,
-    private readonly _theta: number
+    private readonly _theta: number,
   ) {}
   get face(): Face3D {
     return this._face;

@@ -105,7 +105,7 @@ class OctNode {
           const centre = new Point3D(
             this.centre.x + offsetX,
             this.centre.y + offsetY,
-            this.centre.z + offsetZ
+            this.centre.z + offsetZ,
           );
 
           const bounds = new BoundingCuboid(centre, dimensions);
@@ -133,7 +133,7 @@ class OctNode {
       console.assert(
         inserted,
         "failed to insert into children, entity centred at:",
-        entity.bounds.centre
+        entity.bounds.centre,
       );
     }
 
@@ -210,7 +210,7 @@ export class Octree {
   findEntitiesInArea(
     root: OctNode,
     area: BoundingCuboid,
-    entities: Array<PhysicalEntity>
+    entities: Array<PhysicalEntity>,
   ) {
     if (root.entities.length != 0) {
       root.entities.forEach((entity) => entities.push(entity));
@@ -244,7 +244,7 @@ export class Octree {
           "tree doesn't contain entity at (x,y,z):",
           entity.x,
           entity.y,
-          entity.z
+          entity.z,
         );
         return false;
       }

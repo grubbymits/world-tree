@@ -76,7 +76,7 @@ function meanWindow(
   grid: Array<Float32Array>,
   centreX: number,
   centreY: number,
-  offsets: Array<number>
+  offsets: Array<number>,
 ): number {
   let total = 0;
   const numElements = offsets.length * offsets.length;
@@ -94,7 +94,7 @@ function standardDevWindow(
   grid: Array<Float32Array>,
   centreX: number,
   centreY: number,
-  offsets: Array<number>
+  offsets: Array<number>,
 ): number {
   const avg: number = meanWindow(grid, centreX, centreY, offsets);
   if (avg == 0) {
@@ -121,7 +121,7 @@ function standardDevWindow(
 function gaussianBlur(
   grid: Array<Float32Array>,
   width: number,
-  depth: number
+  depth: number,
 ): Array<Float32Array> {
   const filterSize = 5;
   const halfSize = Math.floor(filterSize / 2);
@@ -198,14 +198,14 @@ class TerrainAttributes {
   constructor(
     private readonly _x: number,
     private readonly _y: number,
-    private readonly _height: number
+    private readonly _height: number,
   ) {
     this._moisture = 0.0;
     this._biome = Biome.Water;
     this._terrace = 0;
     this._type = TerrainType.Water;
     this._shape = TerrainShape.Flat;
-    this._features = <number>TerrainFeature.None;
+    this._features = <number> TerrainFeature.None;
   }
 
   get x(): number {
@@ -270,7 +270,7 @@ export class Surface {
 
   constructor(
     private readonly _width: number,
-    private readonly _depth: number
+    private readonly _depth: number,
   ) {
     this._surface = new Array<Array<TerrainAttributes>>();
   }
@@ -345,7 +345,7 @@ export class TerrainBuilderConfig {
   constructor(
     private readonly _numTerraces: number,
     private readonly _defaultFloor: TerrainType,
-    private readonly _defaultWall: TerrainType
+    private readonly _defaultWall: TerrainType,
   ) {
     console.assert(_numTerraces > 0);
   }
@@ -425,7 +425,7 @@ export class TerrainBuilder {
     depth: number,
     heightMap: Array<Array<number>>,
     private readonly _config: TerrainBuilderConfig,
-    physicalDims: Dimensions
+    physicalDims: Dimensions,
   ) {
     Terrain.init(physicalDims);
 
@@ -466,7 +466,7 @@ export class TerrainBuilder {
         console.assert(
           surface.terrace <= this.config.numTerraces && surface.terrace >= 0,
           "terrace out of range:",
-          surface.terrace
+          surface.terrace,
         );
       }
     }
@@ -484,49 +484,49 @@ export class TerrainBuilder {
 
   hasFeature(x: number, y: number, feature: TerrainFeature): boolean {
     console.assert(
-      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth
+      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth,
     );
     return (this.surface.at(x, y).features & feature) != 0;
   }
 
   terrainTypeAt(x: number, y: number): TerrainType {
     console.assert(
-      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth
+      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth,
     );
     return this.surface.at(x, y).type;
   }
 
   terrainShapeAt(x: number, y: number): TerrainShape {
     console.assert(
-      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth
+      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth,
     );
     return this.surface.at(x, y).shape;
   }
 
   moistureAt(x: number, y: number): number {
     console.assert(
-      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth
+      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth,
     );
     return this.surface.at(x, y).moisture;
   }
 
   isFlatAt(x: number, y: number): boolean {
     console.assert(
-      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth
+      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth,
     );
     return Terrain.isFlat(this.surface.at(x, y).shape);
   }
 
   biomeAt(x: number, y: number): Biome {
     console.assert(
-      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth
+      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth,
     );
     return this.surface.at(x, y).biome;
   }
 
   relativeHeightAt(x: number, y: number): number {
     console.assert(
-      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth
+      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth,
     );
     return this.surface.at(x, y).terrace;
   }
@@ -539,7 +539,7 @@ export class TerrainBuilder {
       this.addRain(
         this.config.rainDirection,
         this.config.rainfall,
-        this.config.waterLine
+        this.config.waterLine,
       );
     }
     if (this.config.biomes || this.config.hasWater) {
@@ -550,7 +550,7 @@ export class TerrainBuilder {
     const grid = new TerrainGrid(
       context,
       this.surface.width,
-      this.surface.depth
+      this.surface.depth,
     );
 
     for (let y = 0; y < this.surface.depth; y++) {
@@ -560,7 +560,7 @@ export class TerrainBuilder {
         console.assert(
           surface.terrace <= this.config.numTerraces && surface.terrace >= 0,
           "terrace out-of-range",
-          surface.terrace
+          surface.terrace,
         );
         grid.addSurfaceTerrain(
           x,
@@ -568,7 +568,7 @@ export class TerrainBuilder {
           surface.terrace,
           surface.type,
           surface.shape,
-          surface.features
+          surface.features,
         );
       }
     }
@@ -629,11 +629,11 @@ export class TerrainBuilder {
           const offset: Point2D = coordOffsets[i];
           const neighbour: TerrainAttributes = this.surface.at(
             centre.x + offset.x,
-            centre.y + offset.y
+            centre.y + offset.y,
           );
           const nextNeighbour: TerrainAttributes = this.surface.at(
             neighbour.x + offset.x,
-            neighbour.y + offset.y
+            neighbour.y + offset.y,
           );
           if (
             !neighbour.fixed &&
@@ -790,7 +790,7 @@ export class TerrainBuilder {
                 if (
                   Terrain.isSupportedShape(
                     centre.type,
-                    TerrainShape.FlatWestOut
+                    TerrainShape.FlatWestOut,
                   )
                 ) {
                   shapeType = TerrainShape.FlatWestOut;
@@ -842,7 +842,7 @@ export class TerrainBuilder {
       console.assert(
         neighbour.terrace >= 0,
         "Found neighbour with negative terrace!",
-        neighbour.terrace
+        neighbour.terrace,
       );
       const height = centre.terrace - neighbour.terrace;
       relativeHeight = Math.max(height, relativeHeight);
@@ -852,7 +852,7 @@ export class TerrainBuilder {
       "impossible relative height:",
       relativeHeight,
       "\ncentre:",
-      centre
+      centre,
     );
     return relativeHeight;
   }
@@ -863,7 +863,7 @@ export class TerrainBuilder {
     const blurred = gaussianBlur(
       rain.moistureGrid,
       this.surface.width,
-      this.surface.depth
+      this.surface.depth,
     );
     for (let y = 0; y < this.surface.depth; y++) {
       for (let x = 0; x < this.surface.width; x++) {
@@ -891,7 +891,7 @@ export class TerrainBuilder {
           console.log(
             "height, threshold",
             surface.height,
-            this.config.uplandThreshold
+            this.config.uplandThreshold,
           );
           switch (moistureScaled) {
             default:
@@ -961,7 +961,7 @@ export class TerrainBuilder {
         } else {
           console.log(
             "unsupported biome terrain type:",
-            Terrain.getTypeName(terrain)
+            Terrain.getTypeName(terrain),
           );
         }
         surface.biome = biome;

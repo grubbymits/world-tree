@@ -18,8 +18,9 @@ export class PhysicalEntity {
   protected _geometry: Geometry;
   protected _drawGeometry = false;
   protected _handler = new EventHandler<EntityEvent>();
-  protected _graphicComponents: Array<GraphicComponent> =
-    new Array<GraphicComponent>();
+  protected _graphicComponents: Array<GraphicComponent> = new Array<
+    GraphicComponent
+  >();
 
   static reset(): void {
     this._ids = 0;
@@ -32,14 +33,14 @@ export class PhysicalEntity {
   constructor(
     protected _context: ContextImpl,
     minLocation: Point3D,
-    dimensions: Dimensions
+    dimensions: Dimensions,
   ) {
     this._id = PhysicalEntity._ids;
     PhysicalEntity._ids++;
     const centre = new Point3D(
       minLocation.x + dimensions.width / 2,
       minLocation.y + dimensions.depth / 2,
-      minLocation.z + dimensions.height / 2
+      minLocation.z + dimensions.height / 2,
     );
     const bounds = new BoundingCuboid(centre, dimensions);
     this._geometry = new CuboidGeometry(bounds);
@@ -180,7 +181,7 @@ export function createGraphicalEntity(
   context: ContextImpl,
   location: Point3D,
   dimensions: Dimensions,
-  graphicComponent: GraphicComponent
+  graphicComponent: GraphicComponent,
 ) {
   const entity = new PhysicalEntity(context, location, dimensions);
   entity.addGraphic(graphicComponent);
@@ -191,7 +192,7 @@ export function createGraphicalMovableEntity(
   context: ContextImpl,
   location: Point3D,
   dimensions: Dimensions,
-  graphicComponent: GraphicComponent
+  graphicComponent: GraphicComponent,
 ) {
   const entity = new MovableEntity(context, location, dimensions);
   entity.addGraphic(graphicComponent);
@@ -202,7 +203,7 @@ export function createGraphicalActor(
   context: ContextImpl,
   location: Point3D,
   dimensions: Dimensions,
-  graphicComponent: GraphicComponent
+  graphicComponent: GraphicComponent,
 ) {
   const actor = new Actor(context, location, dimensions);
   actor.addGraphic(graphicComponent);

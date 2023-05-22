@@ -97,7 +97,7 @@ export class Navigation {
       theta = 180 + rotate;
     }
     const direction = Math.round(theta / 45);
-    return <Direction>direction;
+    return <Direction> direction;
   }
 
   static getOppositeDirection(direction: Direction): Direction {
@@ -171,7 +171,7 @@ export class PathFinder {
     console.assert(
       this.nodes.has(centre),
       "object not in node map: %o",
-      centre
+      centre,
     );
     const neighbours: Array<Terrain> = this.getAccessibleNeighbours(centre);
     if (neighbours.length == 0) {
@@ -182,7 +182,7 @@ export class PathFinder {
       console.assert(
         this.nodes.has(neighbour),
         "object not in node map: %o",
-        neighbour
+        neighbour,
       );
       const cost = this.getNeighbourCost(centre, neighbour);
       centreNode.addNeighbour(this.nodes.get(neighbour)!, cost);
@@ -209,16 +209,15 @@ export class PathFinder {
     return neighbours.filter(function (to: Terrain) {
       console.assert(
         Math.abs(centre.z - to.z) <= 1,
-        "can only handle neighbours separated by 1 terrace max"
+        "can only handle neighbours separated by 1 terrace max",
       );
 
       const toPoint: Point2D = new Point2D(to.x, to.y);
       const direction: Direction = Navigation.getDirectionFromPoints(
         centrePoint,
-        toPoint
+        toPoint,
       );
-      const diagonal =
-        direction != Direction.North &&
+      const diagonal = direction != Direction.North &&
         direction != Direction.East &&
         direction != Direction.South &&
         direction != Direction.West;
@@ -235,10 +234,12 @@ export class PathFinder {
   }
 
   findPath(startPoint: Point3D, endPoint: Point3D): Array<Point3D> {
-    const startTerrain: Terrain | null =
-      this.grid.getSurfaceTerrainAtPoint(startPoint);
-    const endTerrain: Terrain | null =
-      this.grid.getSurfaceTerrainAtPoint(endPoint);
+    const startTerrain: Terrain | null = this.grid.getSurfaceTerrainAtPoint(
+      startPoint,
+    );
+    const endTerrain: Terrain | null = this.grid.getSurfaceTerrainAtPoint(
+      endPoint,
+    );
     if (startTerrain == null || endTerrain == null) {
       return new Array<Point3D>();
     }

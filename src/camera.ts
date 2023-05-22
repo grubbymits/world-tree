@@ -23,7 +23,7 @@ export class Camera {
     this._surfaceLocation = _scene.getLocationAt(
       this._lowerX,
       this._lowerY,
-      this
+      this,
     );
   }
 
@@ -96,7 +96,7 @@ export class MouseCamera extends Camera {
     scene: SceneRenderer,
     canvas: HTMLCanvasElement,
     width: number,
-    height: number
+    height: number,
   ) {
     super(scene, width, height);
 
@@ -117,7 +117,7 @@ export class TrackerCamera extends Camera {
     scene: SceneRenderer,
     width: number,
     height: number,
-    movable: MovableEntity
+    movable: MovableEntity,
   ) {
     super(scene, width, height);
 

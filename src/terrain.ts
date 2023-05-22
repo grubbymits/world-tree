@@ -73,7 +73,7 @@ export enum TerrainFeature {
 }
 
 function hasFeature(features: number, mask: TerrainFeature): boolean {
-  return (features & (<number>mask)) == <number>mask;
+  return (features & (<number> mask)) == <number> mask;
 }
 
 export class Terrain extends PhysicalEntity {
@@ -99,18 +99,18 @@ export class Terrain extends PhysicalEntity {
 
   static graphics(
     terrainType: TerrainType,
-    shape: TerrainShape
+    shape: TerrainShape,
   ): GraphicComponent {
     if (!this._terrainGraphics.has(terrainType)) {
       console.error(
         "missing graphics for TerrainType",
-        Terrain.getTypeName(terrainType)
+        Terrain.getTypeName(terrainType),
       );
     }
     if (!this._terrainGraphics.get(terrainType)!.has(shape)) {
       console.error(
         "missing graphics for TerrainShape:",
-        Terrain.getShapeName(shape)
+        Terrain.getShapeName(shape),
       );
     }
     return this._terrainGraphics.get(terrainType)!.get(shape)!;
@@ -120,7 +120,7 @@ export class Terrain extends PhysicalEntity {
     console.assert(
       this._featureGraphics.has(terrainFeature),
       "missing terrain feature",
-      Terrain.getFeatureName(terrainFeature)
+      Terrain.getFeatureName(terrainFeature),
     );
     return this._featureGraphics.get(terrainFeature)!;
   }
@@ -132,14 +132,14 @@ export class Terrain extends PhysicalEntity {
     x: number,
     y: number,
     width: number,
-    height: number
+    height: number,
   ) {
     const sprite = new Sprite(sheet, x, y, width, height);
     const component = new StaticGraphicComponent(sprite.id);
     if (!this._terrainGraphics.has(terrainType)) {
       this._terrainGraphics.set(
         terrainType,
-        new Map<TerrainShape, GraphicComponent>()
+        new Map<TerrainShape, GraphicComponent>(),
       );
     }
     this._terrainGraphics.get(terrainType)!.set(terrainShape, component);
@@ -147,7 +147,7 @@ export class Terrain extends PhysicalEntity {
 
   static addFeatureGraphics(
     feature: TerrainFeature,
-    graphics: GraphicComponent
+    graphics: GraphicComponent,
   ) {
     this._featureGraphics.set(feature, graphics);
   }
@@ -189,7 +189,7 @@ export class Terrain extends PhysicalEntity {
     return new Point3D(
       Math.floor(x / this.width),
       Math.floor(y / this.depth),
-      Math.floor(z / this.height)
+      Math.floor(z / this.height),
     );
   }
 
@@ -200,7 +200,7 @@ export class Terrain extends PhysicalEntity {
     z: number,
     type: TerrainType,
     shape: TerrainShape,
-    feature: TerrainFeature
+    feature: TerrainFeature,
   ): Terrain {
     return new Terrain(
       context,
@@ -210,7 +210,7 @@ export class Terrain extends PhysicalEntity {
       this._dimensions,
       type,
       shape,
-      feature
+      feature,
     );
   }
 
@@ -412,16 +412,16 @@ export class Terrain extends PhysicalEntity {
     dimensions: Dimensions,
     private readonly _type: TerrainType,
     private readonly _shape: TerrainShape,
-    features: number
+    features: number,
   ) {
     super(
       context,
       new Point3D(
         _gridX * dimensions.width,
         _gridY * dimensions.depth,
-        _gridZ * dimensions.height
+        _gridZ * dimensions.height,
       ),
-      dimensions
+      dimensions,
     );
     this.addGraphic(Terrain.graphics(_type, _shape));
 
@@ -453,7 +453,7 @@ export class Terrain extends PhysicalEntity {
     }
 
     for (const value of Object.values(TerrainFeature)) {
-      const feature = <TerrainFeature>value;
+      const feature = <TerrainFeature> value;
       if (
         Terrain.isSupportedFeature(feature) &&
         hasFeature(features, feature)
@@ -515,7 +515,7 @@ export class TerrainGrid {
   constructor(
     private readonly _context: ContextImpl,
     private readonly _width: number,
-    private readonly _depth: number
+    private readonly _depth: number,
   ) {
     for (let y = 0; y < this.depth; ++y) {
       this.surfaceTerrain.push(new Array<Terrain>(this.width));
@@ -544,7 +544,7 @@ export class TerrainGrid {
     z: number,
     ty: TerrainType,
     shape: TerrainShape,
-    feature: TerrainFeature
+    feature: TerrainFeature,
   ): void {
     const terrain = Terrain.create(this._context, x, y, z, ty, shape, feature);
     this.surfaceTerrain[y][x] = terrain;
@@ -556,11 +556,11 @@ export class TerrainGrid {
     y: number,
     z: number,
     ty: TerrainType,
-    shape: TerrainShape
+    shape: TerrainShape,
   ): void {
     console.assert(
       this.getSurfaceTerrainAt(x, y)!.z > z,
-      "adding sub-surface terrain which is above surface!"
+      "adding sub-surface terrain which is above surface!",
     );
     Terrain.create(this._context, x, y, z, ty, shape, TerrainFeature.None);
     this._totalSubSurface++;
@@ -591,7 +591,7 @@ export class TerrainGrid {
       const scaled: Point3D = Terrain.scaleLocation(centre.surfaceLocation);
       const neighbour = this.getSurfaceTerrainAt(
         scaled.x + offset.x,
-        scaled.y + offset.y
+        scaled.y + offset.y,
       );
       if (!neighbour) {
         continue;

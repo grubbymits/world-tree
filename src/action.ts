@@ -38,7 +38,7 @@ export class MoveDirection extends MoveAction {
   constructor(
     actor: Actor,
     private readonly _d: Vector3D,
-    private _bounds: BoundingCuboid
+    private _bounds: BoundingCuboid,
   ) {
     super(actor);
   }
@@ -67,7 +67,7 @@ export class MoveDestination extends MoveAction {
   constructor(
     actor: Actor,
     private _step: number,
-    private _destination: Point3D
+    private _destination: Point3D,
   ) {
     super(actor);
     this.destination = _destination;
@@ -87,7 +87,7 @@ export class MoveDestination extends MoveAction {
 
     console.assert(
       maxD.x == 0 || maxD.y == 0 || maxD.z == 0,
-      "can only change distance along two axes simultaneously"
+      "can only change distance along two axes simultaneously",
     );
 
     let dx = 0;
@@ -164,7 +164,7 @@ export class Navigate extends Action {
   constructor(
     actor: Actor,
     private readonly _step: number,
-    private readonly _destination: Point3D
+    private readonly _destination: Point3D,
   ) {
     super(actor);
     //this._waypoints = this.findPath();
@@ -190,7 +190,7 @@ export class Navigate extends Action {
     // failed. If it failed, try to recompute the path.
     if (
       !this._currentStep.destination.isSameAsRounded(
-        this._actor.bounds.minLocation
+        this._actor.bounds.minLocation,
       )
     ) {
       //this._waypoints = this.findPath();
@@ -215,7 +215,7 @@ export class Navigate extends Action {
     this._currentStep = new MoveDestination(
       this._actor,
       this._step,
-      nextLocation
+      nextLocation,
     );
     return false;
   }

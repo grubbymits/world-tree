@@ -8,7 +8,7 @@ export class Dimensions {
   constructor(
     protected readonly _width: number,
     protected readonly _depth: number,
-    protected readonly _height: number
+    protected readonly _height: number,
   ) {}
 
   get width(): number {
@@ -156,30 +156,24 @@ export class BoundingCuboid {
       return; // nothing to do.
     }
 
-    const minX =
-      other.minLocation.x < this.minLocation.x
-        ? other.minLocation.x
-        : this.minLocation.x;
-    const minY =
-      other.minLocation.y < this.minLocation.y
-        ? other.minLocation.y
-        : this.minLocation.y;
-    const minZ =
-      other.minLocation.z < this.minLocation.z
-        ? other.minLocation.z
-        : this.minLocation.z;
-    const maxX =
-      other.maxLocation.x > this.maxLocation.x
-        ? other.maxLocation.x
-        : this.maxLocation.x;
-    const maxY =
-      other.maxLocation.y > this.maxLocation.y
-        ? other.maxLocation.y
-        : this.maxLocation.y;
-    const maxZ =
-      other.maxLocation.z > this.maxLocation.z
-        ? other.maxLocation.z
-        : this.maxLocation.z;
+    const minX = other.minLocation.x < this.minLocation.x
+      ? other.minLocation.x
+      : this.minLocation.x;
+    const minY = other.minLocation.y < this.minLocation.y
+      ? other.minLocation.y
+      : this.minLocation.y;
+    const minZ = other.minLocation.z < this.minLocation.z
+      ? other.minLocation.z
+      : this.minLocation.z;
+    const maxX = other.maxLocation.x > this.maxLocation.x
+      ? other.maxLocation.x
+      : this.maxLocation.x;
+    const maxY = other.maxLocation.y > this.maxLocation.y
+      ? other.maxLocation.y
+      : this.maxLocation.y;
+    const maxZ = other.maxLocation.z > this.maxLocation.z
+      ? other.maxLocation.z
+      : this.maxLocation.z;
 
     //console.assert(minX >= 0 && minY >= 0 && minZ >= 0);
     this._dimensions = new Dimensions(maxX - minX, maxY - minY, maxZ - minZ);
@@ -199,19 +193,19 @@ export class BoundingCuboid {
       " - min (x,y,z):",
       this.minLocation.x,
       this.minLocation.y,
-      this.minLocation.z
+      this.minLocation.z,
     );
     console.log(
       " - max (x,y,z):",
       this.maxLocation.x,
       this.maxLocation.y,
-      this.maxLocation.z
+      this.maxLocation.z,
     );
     console.log(
       " - centre (x,y,z):",
       this.centre.x,
       this.centre.y,
-      this.centre.z
+      this.centre.z,
     );
     console.log(" - dimensions (WxDxH):", this.width, this.depth, this.height);
   }
@@ -221,7 +215,7 @@ export class CollisionInfo {
   constructor(
     private readonly _collidedEntity: PhysicalEntity,
     private readonly _blocking: boolean,
-    private readonly _intersectInfo: IntersectInfo
+    private readonly _intersectInfo: IntersectInfo,
   ) {}
   get entity(): PhysicalEntity {
     return this._collidedEntity;
@@ -264,7 +258,7 @@ export class CollisionDetector {
 
   static addMissInfo(
     actor: MovableEntity,
-    entities: Array<PhysicalEntity>
+    entities: Array<PhysicalEntity>,
   ): void {
     this._missInfo.set(actor, entities);
   }
@@ -281,7 +275,7 @@ export class CollisionDetector {
   static detectInArea(
     movable: MovableEntity,
     path: Vector3D,
-    area: BoundingCuboid
+    area: BoundingCuboid,
   ): CollisionInfo | null {
     const bounds = movable.bounds;
     const widthVec3D = new Vector3D(bounds.width, 0, 0);
@@ -351,7 +345,7 @@ export class Gravity {
         // Create a bounds to contain the current location and the destination.
         const area = new BoundingCuboid(
           bounds.centre.add(path),
-          bounds.dimensions
+          bounds.dimensions,
         );
         area.insert(bounds);
         const collision = CollisionDetector.detectInArea(movable, path, area);

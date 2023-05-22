@@ -8,7 +8,7 @@ function addDummyGraphic(sheet, type, shape) {
     /*coord.x*/ 1,
     1,
     1,
-    1
+    1,
   );
 }
 const dummySheet = WT.DummySpriteSheet;
@@ -49,7 +49,7 @@ test("terrace spacing with non-negative heights", () => {
   const config = new WT.TerrainBuilderConfig(
     numTerraces,
     WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
+    WT.TerrainType.Lowland0,
   );
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
   expect(builder.terraceSpacing).toBe(1);
@@ -74,7 +74,7 @@ test("terrace spacing with non-positive heights", () => {
   const config = new WT.TerrainBuilderConfig(
     numTerraces,
     WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
+    WT.TerrainType.Lowland0,
   );
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
   expect(builder.terraceSpacing).toBe(1);
@@ -99,7 +99,7 @@ test("terrace spacing with positive and negative heights", () => {
   const config = new WT.TerrainBuilderConfig(
     numTerraces,
     WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
+    WT.TerrainType.Lowland0,
   );
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
   expect(builder.terraceSpacing).toBe(1.5);
@@ -113,11 +113,11 @@ test("ramps", () => {
   const worldDims = new WT.Dimensions(
     dims.width * width,
     dims.depth * depth,
-    dims.height * (numTerraces + 1)
+    dims.height * (numTerraces + 1),
   );
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric
+    WT.Perspective.TwoByOneIsometric,
   );
   const heightMap = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -140,7 +140,7 @@ test("ramps", () => {
   let config = new WT.TerrainBuilderConfig(
     numTerraces,
     WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
+    WT.TerrainType.Lowland0,
   );
   config.hasRamps = true;
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
@@ -196,11 +196,11 @@ test("walls", () => {
   const worldDims = new WT.Dimensions(
     dims.width * width,
     dims.depth * depth,
-    dims.height * (numTerraces + 1)
+    dims.height * (numTerraces + 1),
   );
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric
+    WT.Perspective.TwoByOneIsometric,
   );
   const heightMap = [
     [0, 0, 0, 0, 1],
@@ -217,7 +217,7 @@ test("walls", () => {
   const config = new WT.TerrainBuilderConfig(
     numTerraces,
     WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
+    WT.TerrainType.Lowland0,
   );
   let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
   builder.generateMap(context);
@@ -247,11 +247,11 @@ test("shoreline", () => {
   const worldDims = new WT.Dimensions(
     dims.width * width,
     dims.depth * depth,
-    dims.height * (numTerraces + 1)
+    dims.height * (numTerraces + 1),
   );
   let context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric
+    WT.Perspective.TwoByOneIsometric,
   );
   const heightMap = [
     [0, 0, 0, 0, 0],
@@ -277,7 +277,7 @@ test("shoreline", () => {
   let config = new WT.TerrainBuilderConfig(
     numTerraces,
     WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
+    WT.TerrainType.Lowland0,
   );
   config.hasWater = true;
   config.hasBiomes = true;
@@ -297,21 +297,21 @@ test("shoreline", () => {
   for (let x = 1; x < width - 1; ++x) {
     expect(builder.terrainTypeAt(x, 1)).toBe(WT.TerrainType.Lowland0);
     expect(builder.hasFeature(x, 1, WT.TerrainFeature.ShorelineNorth)).toBe(
-      true
+      true,
     );
     expect(builder.terrainTypeAt(x, 3)).toBe(WT.TerrainType.Lowland0);
     expect(builder.hasFeature(x, 3, WT.TerrainFeature.ShorelineSouth)).toBe(
-      true
+      true,
     );
   }
   for (let y = 1; y < depth - 1; ++y) {
     expect(builder.terrainTypeAt(1, y)).toBe(WT.TerrainType.Lowland0);
     expect(builder.hasFeature(1, y, WT.TerrainFeature.ShorelineWest)).toBe(
-      true
+      true,
     );
     expect(builder.terrainTypeAt(3, y)).toBe(WT.TerrainType.Lowland0);
     expect(builder.hasFeature(3, y, WT.TerrainFeature.ShorelineEast)).toBe(
-      true
+      true,
     );
   }
 });

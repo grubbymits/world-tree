@@ -24,7 +24,7 @@ export class SceneNode {
 
   constructor(
     private readonly _entity: PhysicalEntity,
-    private _minDrawCoord: Point2D
+    private _minDrawCoord: Point2D,
   ) {
     this.drawCoord = _minDrawCoord;
   }
@@ -345,7 +345,7 @@ export abstract class SceneGraph {
       node.level != null,
       "node with id:",
       node.entity.id,
-      "isn't assigned a level!"
+      "isn't assigned a level!",
     );
     const level: SceneLevel = node.level!;
     if (level.inrange(node.entity)) {
@@ -395,8 +395,7 @@ export abstract class SceneGraph {
   cameraHasMoved(camera: Camera): boolean {
     const lower = camera.min;
     const upper = camera.max;
-    const needsRedraw =
-      this._prevCameraLower.x != lower.x ||
+    const needsRedraw = this._prevCameraLower.x != lower.x ||
       this._prevCameraLower.y != lower.y ||
       this._prevCameraUpper.x != upper.x ||
       this._prevCameraUpper.y != upper.y;
@@ -451,7 +450,7 @@ class BaseSceneRenderer implements SceneRenderer {
   insertEntity(entity: PhysicalEntity): void {
     const node = new SceneNode(
       entity,
-      this.graph.getDrawCoord(entity.bounds.minLocation)
+      this.graph.getDrawCoord(entity.bounds.minLocation),
     );
     this.nodes.set(node.id, node);
     // If we haven't initialised levels yet (its done in the first call to
@@ -477,7 +476,7 @@ class BaseSceneRenderer implements SceneRenderer {
   getEntityDrawnAt(
     _x: number,
     _y: number,
-    _camera: Camera
+    _camera: Camera,
   ): PhysicalEntity | null {
     return null;
   }
@@ -489,7 +488,7 @@ class BaseSceneRenderer implements SceneRenderer {
   verifyRenderer(entities: Array<PhysicalEntity>): boolean {
     if (this.graph.numNodes != entities.length) {
       console.error(
-        "top-level comparison between scene node and entities failed"
+        "top-level comparison between scene node and entities failed",
       );
     }
     let counted = 0;
@@ -555,7 +554,7 @@ class BaseSceneRenderer implements SceneRenderer {
         console.error(
           "mismatch top level node vs found in level ids:",
           nodeIds[i],
-          levelNodeIds[i]
+          levelNodeIds[i],
         );
         return false;
       }
@@ -628,7 +627,7 @@ export class OnscreenSceneRenderer extends BaseSceneRenderer {
   getEntityDrawnAt(
     x: number,
     y: number,
-    camera: Camera
+    camera: Camera,
   ): PhysicalEntity | null {
     for (let i = this.graph.levels.length - 1; i >= 0; i--) {
       const level: SceneLevel = this.graph.levels[i];
@@ -713,7 +712,7 @@ export class IsometricPhysicalDimensions extends Dimensions {
 
   static physicalHeight(
     physicalWidth: number,
-    relativeDims: Dimensions
+    relativeDims: Dimensions,
   ): number {
     const heightRatio: number = relativeDims.height / relativeDims.width;
     return Math.round(physicalWidth * heightRatio);
@@ -723,11 +722,11 @@ export class IsometricPhysicalDimensions extends Dimensions {
     const width = IsometricPhysicalDimensions.physicalWidth(spriteWidth);
     const depth = IsometricPhysicalDimensions.physicalDepth(
       width,
-      relativeDims
+      relativeDims,
     );
     const height = IsometricPhysicalDimensions.physicalHeight(
       width,
-      relativeDims
+      relativeDims,
     );
     super(width, depth, height);
   }
@@ -801,8 +800,8 @@ export class TwoByOneIsometric extends SceneGraph {
 
   private static readonly _magicRatio: number = Math.cos(Math.atan(0.5));
 
-  private static readonly _oneOverMagicRatio: number =
-    1 / Math.cos(Math.atan(0.5));
+  private static readonly _oneOverMagicRatio: number = 1 /
+    Math.cos(Math.atan(0.5));
 
   static getDrawCoord(loc: Point3D): Point2D {
     // Tiles are placed overlapping each other by half.
@@ -823,7 +822,7 @@ export class TwoByOneIsometric extends SceneGraph {
     return new Dimensions(
       Math.round(width),
       Math.round(depth),
-      Math.round(height)
+      Math.round(height),
     );
   }
 

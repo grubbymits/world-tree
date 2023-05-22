@@ -12,19 +12,19 @@ test("direction from vector", () => {
 
   expect(WT.Navigation.getDirectionFromVector(north)).toBe(WT.Direction.North);
   expect(WT.Navigation.getDirectionFromVector(northEast)).toBe(
-    WT.Direction.NorthEast
+    WT.Direction.NorthEast,
   );
   expect(WT.Navigation.getDirectionFromVector(east)).toBe(WT.Direction.East);
   expect(WT.Navigation.getDirectionFromVector(southEast)).toBe(
-    WT.Direction.SouthEast
+    WT.Direction.SouthEast,
   );
   expect(WT.Navigation.getDirectionFromVector(south)).toBe(WT.Direction.South);
   expect(WT.Navigation.getDirectionFromVector(southWest)).toBe(
-    WT.Direction.SouthWest
+    WT.Direction.SouthWest,
   );
   expect(WT.Navigation.getDirectionFromVector(west)).toBe(WT.Direction.West);
   expect(WT.Navigation.getDirectionFromVector(northWest)).toBe(
-    WT.Direction.NorthWest
+    WT.Direction.NorthWest,
   );
 });
 
@@ -39,28 +39,28 @@ test("direction from 2D points", () => {
   let northWest = new WT.Point2D(-1, -1);
 
   expect(WT.Navigation.getDirectionFromPoints(south, north)).toBe(
-    WT.Direction.North
+    WT.Direction.North,
   );
   expect(WT.Navigation.getDirectionFromPoints(north, south)).toBe(
-    WT.Direction.South
+    WT.Direction.South,
   );
   expect(WT.Navigation.getDirectionFromPoints(east, west)).toBe(
-    WT.Direction.West
+    WT.Direction.West,
   );
   expect(WT.Navigation.getDirectionFromPoints(west, east)).toBe(
-    WT.Direction.East
+    WT.Direction.East,
   );
   expect(WT.Navigation.getDirectionFromPoints(northEast, southWest)).toBe(
-    WT.Direction.SouthWest
+    WT.Direction.SouthWest,
   );
   expect(WT.Navigation.getDirectionFromPoints(southWest, northEast)).toBe(
-    WT.Direction.NorthEast
+    WT.Direction.NorthEast,
   );
   expect(WT.Navigation.getDirectionFromPoints(northWest, southEast)).toBe(
-    WT.Direction.SouthEast
+    WT.Direction.SouthEast,
   );
   expect(WT.Navigation.getDirectionFromPoints(southEast, northWest)).toBe(
-    WT.Direction.NorthWest
+    WT.Direction.NorthWest,
   );
 });
 
@@ -76,55 +76,55 @@ test("adjacent coord", () => {
   const northWest = new WT.Point2D(-1, -1);
 
   expect(
-    WT.Navigation.getAdjacentCoord(centre, WT.Direction.North)
+    WT.Navigation.getAdjacentCoord(centre, WT.Direction.North),
   ).toStrictEqual(north);
   expect(
-    WT.Navigation.getAdjacentCoord(centre, WT.Direction.NorthEast)
+    WT.Navigation.getAdjacentCoord(centre, WT.Direction.NorthEast),
   ).toStrictEqual(northEast);
   expect(
-    WT.Navigation.getAdjacentCoord(centre, WT.Direction.East)
+    WT.Navigation.getAdjacentCoord(centre, WT.Direction.East),
   ).toStrictEqual(east);
   expect(
-    WT.Navigation.getAdjacentCoord(centre, WT.Direction.SouthEast)
+    WT.Navigation.getAdjacentCoord(centre, WT.Direction.SouthEast),
   ).toStrictEqual(southEast);
   expect(
-    WT.Navigation.getAdjacentCoord(centre, WT.Direction.South)
+    WT.Navigation.getAdjacentCoord(centre, WT.Direction.South),
   ).toStrictEqual(south);
   expect(
-    WT.Navigation.getAdjacentCoord(centre, WT.Direction.SouthWest)
+    WT.Navigation.getAdjacentCoord(centre, WT.Direction.SouthWest),
   ).toStrictEqual(southWest);
   expect(
-    WT.Navigation.getAdjacentCoord(centre, WT.Direction.West)
+    WT.Navigation.getAdjacentCoord(centre, WT.Direction.West),
   ).toStrictEqual(west);
   expect(
-    WT.Navigation.getAdjacentCoord(centre, WT.Direction.NorthWest)
+    WT.Navigation.getAdjacentCoord(centre, WT.Direction.NorthWest),
   ).toStrictEqual(northWest);
 });
 
 test("opposite direction", () => {
   expect(WT.Navigation.getOppositeDirection(WT.Direction.North)).toBe(
-    WT.Direction.South
+    WT.Direction.South,
   );
   expect(WT.Navigation.getOppositeDirection(WT.Direction.NorthEast)).toBe(
-    WT.Direction.SouthWest
+    WT.Direction.SouthWest,
   );
   expect(WT.Navigation.getOppositeDirection(WT.Direction.East)).toBe(
-    WT.Direction.West
+    WT.Direction.West,
   );
   expect(WT.Navigation.getOppositeDirection(WT.Direction.SouthEast)).toBe(
-    WT.Direction.NorthWest
+    WT.Direction.NorthWest,
   );
   expect(WT.Navigation.getOppositeDirection(WT.Direction.South)).toBe(
-    WT.Direction.North
+    WT.Direction.North,
   );
   expect(WT.Navigation.getOppositeDirection(WT.Direction.SouthWest)).toBe(
-    WT.Direction.NorthEast
+    WT.Direction.NorthEast,
   );
   expect(WT.Navigation.getOppositeDirection(WT.Direction.West)).toBe(
-    WT.Direction.East
+    WT.Direction.East,
   );
   expect(WT.Navigation.getOppositeDirection(WT.Direction.NorthWest)).toBe(
-    WT.Direction.SouthEast
+    WT.Direction.SouthEast,
   );
 });
 
@@ -184,15 +184,15 @@ test("contains location", () => {
 test("contains bounds", () => {
   const container = new WT.BoundingCuboid(
     new WT.Point3D(0, 0, 0),
-    new WT.Dimensions(100, 90, 60)
+    new WT.Dimensions(100, 90, 60),
   );
   const containee = new WT.BoundingCuboid(
     new WT.Point3D(20, 30, 1),
-    new WT.Dimensions(30, 30, 50)
+    new WT.Dimensions(30, 30, 50),
   );
   const partial = new WT.BoundingCuboid(
     new WT.Point3D(25, 40, 10),
-    new WT.Dimensions(50, 40, 70)
+    new WT.Dimensions(50, 40, 70),
   );
   expect(container.containsBounds(containee)).toBe(true);
   expect(container.containsBounds(partial)).toBe(false);
@@ -202,11 +202,11 @@ test("contains bounds", () => {
 test("insert bounds", () => {
   const container = new WT.BoundingCuboid(
     new WT.Point3D(0, 0, 0),
-    new WT.Dimensions(100, 90, 60)
+    new WT.Dimensions(100, 90, 60),
   );
   const partial = new WT.BoundingCuboid(
     new WT.Point3D(25, 40, 10),
-    new WT.Dimensions(50, 40, 70)
+    new WT.Dimensions(50, 40, 70),
   );
   container.insert(partial);
   expect(container.width).toBe(100);

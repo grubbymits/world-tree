@@ -80,7 +80,7 @@ export class ContextImpl implements Context {
 
   addOnscreenRenderer(
     canvas: HTMLCanvasElement,
-    perspective: Perspective
+    perspective: Perspective,
   ): void {
     switch (perspective) {
       default:
@@ -174,7 +174,7 @@ export class ContextImpl implements Context {
 export function createContext(
   canvas: HTMLCanvasElement,
   worldDims: Dimensions,
-  perspective: Perspective
+  perspective: Perspective,
 ): Context {
   const context = new ContextImpl(worldDims);
   context.addOnscreenRenderer(canvas, perspective);
@@ -183,7 +183,7 @@ export function createContext(
 
 export function createTestContext(
   worldDims: Dimensions,
-  perspective: Perspective
+  perspective: Perspective,
 ): Context {
   ContextImpl.reset();
   const context = new ContextImpl(worldDims);

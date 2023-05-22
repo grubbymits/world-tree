@@ -8,7 +8,7 @@ function addDummyGraphic(spriteSheet, terrainType, terrainShape) {
     /*coord.x*/ 1,
     1,
     1,
-    1
+    1,
   );
 }
 const dummySheet = WT.DummySpriteSheet;
@@ -27,17 +27,17 @@ test("3x3 neighbours", () => {
   const worldDims = new WT.Dimensions(
     dims.width * width,
     dims.depth * depth,
-    dims.height
+    dims.height,
   );
   const context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric
+    WT.Perspective.TwoByOneIsometric,
   );
   addDummyGraphic(dummySheet, WT.TerrainType.Lowland0, WT.TerrainShape.Flat);
   const config = new WT.TerrainBuilderConfig(
     numTerraces,
     WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
+    WT.TerrainType.Lowland0,
   );
   const builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
   const grid = builder.generateMap(context);
@@ -67,17 +67,17 @@ test("eight neighbours", () => {
   const worldDims = new WT.Dimensions(
     dims.width * width,
     dims.depth * depth,
-    dims.height
+    dims.height,
   );
   const context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric
+    WT.Perspective.TwoByOneIsometric,
   );
   addDummyGraphic(dummySheet, WT.TerrainType.Lowland0, WT.TerrainShape.Flat);
   const config = new WT.TerrainBuilderConfig(
     numTerraces,
     WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
+    WT.TerrainType.Lowland0,
   );
   const builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
   const grid = builder.generateMap(context);
@@ -103,17 +103,17 @@ test("move north from centre", () => {
   const worldDims = new WT.Dimensions(
     dims.width * width,
     dims.depth * depth,
-    dims.height
+    dims.height,
   );
   const context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric
+    WT.Perspective.TwoByOneIsometric,
   );
   addDummyGraphic(dummySheet, WT.TerrainType.Lowland0, WT.TerrainShape.Flat);
   const config = new WT.TerrainBuilderConfig(
     numTerraces,
     WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
+    WT.TerrainType.Lowland0,
   );
   const builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
   const grid = builder.generateMap(context);
@@ -140,17 +140,17 @@ test("path north from points", () => {
   const worldDims = new WT.Dimensions(
     dims.width * width,
     dims.depth * depth,
-    dims.height
+    dims.height,
   );
   const context = WT.createTestContext(
     worldDims,
-    WT.Perspective.TwoByOneIsometric
+    WT.Perspective.TwoByOneIsometric,
   );
   addDummyGraphic(dummySheet, WT.TerrainType.Lowland0, WT.TerrainShape.Flat);
   const config = new WT.TerrainBuilderConfig(
     numTerraces,
     WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
+    WT.TerrainType.Lowland0,
   );
   const builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
   const grid = builder.generateMap(context);
@@ -159,7 +159,7 @@ test("path north from points", () => {
   const start = new WT.Point3D(
     (dims.width * width) / 2,
     (dims.depth * depth) / 2,
-    dims.height * 2
+    dims.height * 2,
   );
   // top middle.
   const end = new WT.Point3D((dims.width * width) / 2, 0, dims.height * 2);

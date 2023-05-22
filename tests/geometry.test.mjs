@@ -19,7 +19,7 @@ test("2D point orientation", () => {
 
   expect(WT.Point2D.orientation(p0, p2, p1)).toBe(WT.Orientation.Clockwise);
   expect(WT.Point2D.orientation(p0, p1, p2)).toBe(
-    WT.Orientation.CounterClockwise
+    WT.Orientation.CounterClockwise,
   );
   expect(WT.Point2D.orientation(p0, p1, p3)).toBe(WT.Orientation.Colinear);
 });
