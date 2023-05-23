@@ -1,3 +1,24 @@
+var __async = (__this, __arguments, generator) => {
+  return new Promise((resolve, reject) => {
+    var fulfilled = (value) => {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var rejected = (value) => {
+      try {
+        step(generator.throw(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    step((generator = generator.apply(__this, __arguments)).next());
+  });
+};
+
 // src/geometry.ts
 var Orientation = /* @__PURE__ */ ((Orientation2) => {
   Orientation2[Orientation2["Colinear"] = 0] = "Colinear";
@@ -1102,374 +1123,6 @@ function createGraphicalActor(context, location, dimensions, graphicComponent) {
   return actor;
 }
 
-// src/graphics.ts
-var DummySpriteSheet = {
-  addForValidation: function(_sprite) {
-    return true;
-  }
-};
-var _SpriteSheet = class {
-  constructor(name) {
-    this._loaded = false;
-    this._toValidate = new Array();
-    this._image = new Image();
-    if (name) {
-      this._image.src = name + ".png";
-    } else {
-      throw new Error("No filename passed");
-    }
-    _SpriteSheet.add(this);
-    this._image.onload = () => {
-      this.canvas = document.createElement("canvas");
-      this.canvas.width = this.width;
-      this.canvas.height = this.height;
-      this.canvas.getContext("2d").drawImage(
-        this.image,
-        0,
-        0,
-        this.width,
-        this.height
-      );
-      this.loaded = true;
-      for (const sprite of this._toValidate) {
-        sprite.validate();
-      }
-    };
-  }
-  static add(sheet) {
-    this._sheets.push(sheet);
-  }
-  static reset() {
-    this._sheets = new Array();
-  }
-  get image() {
-    return this._image;
-  }
-  get width() {
-    return this._image.width;
-  }
-  get height() {
-    return this._image.height;
-  }
-  get name() {
-    return this._image.src;
-  }
-  get loaded() {
-    return this._loaded;
-  }
-  set loaded(b) {
-    this._loaded = b;
-  }
-  get canvas() {
-    return this._canvas;
-  }
-  set canvas(c) {
-    this._canvas = c;
-  }
-  isTransparentAt(x, y) {
-    const data = this.canvas.getContext("2d").getImageData(x, y, 1, 1).data;
-    return data[3] == 0;
-  }
-  addForValidation(sprite) {
-    this._toValidate.push(sprite);
-  }
-};
-var SpriteSheet = _SpriteSheet;
-SpriteSheet._sheets = new Array();
-var _Sprite = class {
-  constructor(_sheet, offsetX, offsetY, _width, _height) {
-    this._sheet = _sheet;
-    this._width = _width;
-    this._height = _height;
-    console.assert(offsetX >= 0, "offsetX < 0");
-    console.assert(offsetY >= 0, "offsetY < 0");
-    this._id = _Sprite.sprites.length;
-    this._spriteOffset = new Point2D(offsetX, offsetY);
-    this._maxOffset = new Point2D(
-      this.offset.x + this.width,
-      this.offset.y + this.height
-    );
-    _Sprite.add(this);
-    if (this.sheet.loaded) {
-      this.validate();
-    } else {
-      this.sheet.addForValidation(this);
-    }
-  }
-  static reset() {
-    this._sprites = new Array();
-  }
-  static add(sprite) {
-    this._sprites.push(sprite);
-  }
-  static get sprites() {
-    return this._sprites;
-  }
-  draw(coord, ctx) {
-    ctx.drawImage(
-      this.sheet.image,
-      this.offset.x,
-      this.offset.y,
-      this.width,
-      this.height,
-      coord.x,
-      coord.y,
-      this.width,
-      this.height
-    );
-  }
-  validate() {
-    console.assert(
-      this.maxOffset.x <= this.sheet.width,
-      "sprite id:",
-      this.id,
-      "sprite max X offset too large",
-      this.maxOffset.x
-    );
-    console.assert(
-      this.maxOffset.y <= this.sheet.height,
-      "sprite id:",
-      this.id,
-      "sprite max Y offset too large",
-      this.maxOffset.y
-    );
-  }
-  isTransparentAt(x, y) {
-    x += this.offset.x;
-    y += this.offset.y;
-    return this.sheet.isTransparentAt(x, y);
-  }
-  get id() {
-    return this._id;
-  }
-  get width() {
-    return this._width;
-  }
-  get height() {
-    return this._height;
-  }
-  get sheet() {
-    return this._sheet;
-  }
-  get offset() {
-    return this._spriteOffset;
-  }
-  get maxOffset() {
-    return this._maxOffset;
-  }
-};
-var Sprite = _Sprite;
-Sprite._sprites = new Array();
-function generateSprites(sheet, width, height, xBegin, yBegin, columns, rows) {
-  const sprites = new Array();
-  const xEnd = xBegin + columns;
-  const yEnd = yBegin + rows;
-  for (let y = yBegin; y < yEnd; y++) {
-    for (let x = xBegin; x < xEnd; x++) {
-      sprites.push(new Sprite(sheet, x * width, y * height, width, height));
-    }
-  }
-  return sprites;
-}
-var GraphicComponent = class {
-  constructor(_currentSpriteId) {
-    this._currentSpriteId = _currentSpriteId;
-  }
-  isTransparentAt(x, y) {
-    return Sprite.sprites[this._currentSpriteId].isTransparentAt(x, y);
-  }
-  get width() {
-    return Sprite.sprites[this._currentSpriteId].width;
-  }
-  get height() {
-    return Sprite.sprites[this._currentSpriteId].height;
-  }
-};
-var DummyGraphicComponent = class extends GraphicComponent {
-  constructor(_width, _height) {
-    super(0);
-    this._width = _width;
-    this._height = _height;
-  }
-  get width() {
-    return this._width;
-  }
-  get height() {
-    return this._height;
-  }
-  update() {
-    return 0;
-  }
-};
-var StaticGraphicComponent = class extends GraphicComponent {
-  constructor(id) {
-    super(id);
-  }
-  update() {
-    return this._currentSpriteId;
-  }
-};
-function generateStaticGraphics(sheet, width, height, xBegin, yBegin, columns, rows) {
-  const graphics = new Array();
-  const xEnd = xBegin + columns;
-  const yEnd = yBegin + rows;
-  for (let y = yBegin; y < yEnd; y++) {
-    for (let x = xBegin; x < xEnd; x++) {
-      const sprite = new Sprite(sheet, x * width, y * height, width, height);
-      graphics.push(new StaticGraphicComponent(sprite.id));
-    }
-  }
-  return graphics;
-}
-var AnimatedGraphicComponent = class extends GraphicComponent {
-  constructor(sprites, _interval) {
-    super(sprites[0].id);
-    this._interval = _interval;
-    this._nextUpdate = 0;
-    this._currentSpriteIdx = 0;
-    this._spriteIds = new Array();
-    for (const i in sprites) {
-      this._spriteIds.push(sprites[i].id);
-    }
-    this._nextUpdate = Date.now() + _interval;
-  }
-  update() {
-    return this._spriteIds[this._currentSpriteIdx];
-  }
-  get firstId() {
-    return this._spriteIds[0];
-  }
-  get lastId() {
-    return this._spriteIds[this._spriteIds.length - 1];
-  }
-  get currentSpriteId() {
-    console.assert(this._currentSpriteIdx >= 0);
-    console.assert(this._currentSpriteIdx < this._spriteIds.length);
-    return this._spriteIds[this._currentSpriteIdx];
-  }
-};
-var OssilateGraphicComponent = class extends AnimatedGraphicComponent {
-  constructor(sprites, interval) {
-    super(sprites, interval);
-    this._increase = true;
-    this._currentSpriteIdx = Math.floor(
-      Math.random() * (this._spriteIds.length - 1)
-    );
-  }
-  update() {
-    if (this._nextUpdate > Date.now()) {
-      return this.currentSpriteId;
-    }
-    if (this._currentSpriteIdx == this._spriteIds.length - 1) {
-      this._increase = false;
-    } else if (this._currentSpriteIdx == 0) {
-      this._increase = true;
-    }
-    if (this._increase) {
-      this._currentSpriteIdx++;
-    } else {
-      this._currentSpriteIdx--;
-    }
-    this._nextUpdate = Date.now() + this._interval;
-    return this.currentSpriteId;
-  }
-};
-var LoopGraphicComponent = class extends AnimatedGraphicComponent {
-  constructor(sprites, interval) {
-    super(sprites, interval);
-    this._currentSpriteIdx = 0;
-  }
-  update() {
-    if (this._nextUpdate > Date.now()) {
-      return this.currentSpriteId;
-    }
-    this._currentSpriteIdx = (this._currentSpriteIdx + 1) % this._spriteIds.length;
-    this._nextUpdate = Date.now() + this._interval;
-    return this.currentSpriteId;
-  }
-};
-var DirectionalGraphicComponent = class extends GraphicComponent {
-  constructor(_staticGraphics) {
-    super(0);
-    this._staticGraphics = _staticGraphics;
-    this._direction = 0 /* North */;
-  }
-  get direction() {
-    return this._direction;
-  }
-  set direction(direction) {
-    if (this._staticGraphics.has(direction)) {
-      this._direction = direction;
-    } else {
-      console.log("graphic direction unsupported");
-    }
-  }
-  update() {
-    if (this._staticGraphics.has(this.direction)) {
-      const component = this._staticGraphics.get(
-        this.direction
-      );
-      const spriteId = component.update();
-      return spriteId;
-    }
-    console.error(
-      "unhandled stationary graphic:",
-      Navigation.getDirectionName(this.direction)
-    );
-    return 0;
-  }
-};
-var AnimatedDirectionalGraphicComponent = class extends GraphicComponent {
-  constructor(_staticGraphics, _movementGraphics) {
-    super(0);
-    this._staticGraphics = _staticGraphics;
-    this._movementGraphics = _movementGraphics;
-    this._stationary = true;
-    this._direction = 0 /* North */;
-  }
-  get stationary() {
-    return this._stationary;
-  }
-  set stationary(stationary) {
-    this._stationary = stationary;
-  }
-  get direction() {
-    return this._direction;
-  }
-  set direction(direction) {
-    if (this._staticGraphics.has(direction) && this._movementGraphics.has(direction)) {
-      this._direction = direction;
-    } else {
-      console.log("graphic direction unsupported");
-    }
-  }
-  update() {
-    if (!this.stationary && this._movementGraphics.has(this.direction)) {
-      const spriteId = this._movementGraphics.get(this.direction).update();
-      return spriteId;
-    }
-    if (this.stationary && this._staticGraphics.has(this.direction)) {
-      const component = this._staticGraphics.get(
-        this.direction
-      );
-      const spriteId = component.update();
-      return spriteId;
-    }
-    if (this.stationary) {
-      console.error(
-        "unhandled stationary graphic:",
-        Navigation.getDirectionName(this.direction)
-      );
-    } else {
-      console.error(
-        "unhandled movement graphic:",
-        Navigation.getDirectionName(this.direction)
-      );
-    }
-    return 0;
-  }
-};
-
 // src/terrain.ts
 var TerrainShape = /* @__PURE__ */ ((TerrainShape2) => {
   TerrainShape2[TerrainShape2["Flat"] = 0] = "Flat";
@@ -1904,7 +1557,7 @@ var _TerrainGrid = class {
     this._totalSubSurface++;
   }
   getSurfaceTerrainAt(x, y) {
-    if (x < 0 || x >= this.width || (y < 0 || y >= this.depth)) {
+    if (x < 0 || x >= this.width || y < 0 || y >= this.depth) {
       return null;
     }
     return this.surfaceTerrain[y][x];
@@ -2251,12 +1904,8 @@ var PathFinder = class {
     });
   }
   findPath(startPoint, endPoint) {
-    const startTerrain = this.grid.getSurfaceTerrainAtPoint(
-      startPoint
-    );
-    const endTerrain = this.grid.getSurfaceTerrainAtPoint(
-      endPoint
-    );
+    const startTerrain = this.grid.getSurfaceTerrainAtPoint(startPoint);
+    const endTerrain = this.grid.getSurfaceTerrainAtPoint(endPoint);
     if (startTerrain == null || endTerrain == null) {
       return new Array();
     }
@@ -2300,6 +1949,460 @@ var PathFinder = class {
     }
     path.reverse();
     return path.splice(1);
+  }
+};
+
+// src/graphics.ts
+var DummySpriteSheet = {
+  addForValidation: function(_sprite) {
+    return true;
+  },
+  addBitmap: function(id, x, y, width, height) {
+  }
+};
+var _SpriteSheet = class {
+  constructor(name, context) {
+    this._loaded = false;
+    this._toValidate = new Array();
+    this._renderer = context.renderer;
+    this._image = new Image();
+    if (name) {
+      this._image.src = name + ".png";
+    } else {
+      throw new Error("No filename passed");
+    }
+    _SpriteSheet.add(this);
+    this.image.addEventListener("onload", () => {
+      this.canvas = document.createElement("canvas");
+      this.canvas.width = this.width;
+      this.canvas.height = this.height;
+      this.canvas.getContext("2d").drawImage(this.image, 0, 0, this.width, this.height);
+      this.loaded = true;
+    });
+  }
+  static add(sheet) {
+    this._sheets.push(sheet);
+  }
+  static reset() {
+    this._sheets = new Array();
+  }
+  get image() {
+    return this._image;
+  }
+  get width() {
+    return this._image.width;
+  }
+  get height() {
+    return this._image.height;
+  }
+  get name() {
+    return this._image.src;
+  }
+  get loaded() {
+    return this._loaded;
+  }
+  set loaded(b) {
+    this._loaded = b;
+  }
+  get canvas() {
+    return this._canvas;
+  }
+  set canvas(c) {
+    this._canvas = c;
+  }
+  isTransparentAt(x, y) {
+    const data = this.canvas.getContext("2d").getImageData(x, y, 1, 1).data;
+    return data[3] == 0;
+  }
+  addForValidation(sprite) {
+    this._toValidate.push(sprite);
+  }
+  addBitmap(id, x, y, width, height) {
+    return __async(this, null, function* () {
+      if (this.loaded) {
+        const bitmap = yield createImageBitmap(this.image, x, y, width, height);
+        this._renderer.addBitmap(id, bitmap);
+      } else {
+        this.image.addEventListener("onload", () => {
+          this.addBitmap(id, x, y, width, height);
+        });
+      }
+    });
+  }
+};
+var SpriteSheet2 = _SpriteSheet;
+SpriteSheet2._sheets = new Array();
+var _Sprite = class {
+  constructor(_sheet, x, y, _width, _height) {
+    this._sheet = _sheet;
+    this._width = _width;
+    this._height = _height;
+    this._offset = new Point2D(x, y);
+    console.assert(this.offset.x >= 0, "offset.x < 0");
+    console.assert(this.offset.y >= 0, "offset.y < 0");
+    const maxOffset = new Point2D(
+      this.offset.x + this.width,
+      this.offset.y + this.height
+    );
+    this._id = _Sprite.sprites.length;
+    _Sprite.sprites.push(this);
+    this.sheet.addBitmap(this.id, this.offset.x, this.offset.y, this.width, this.height);
+  }
+  isTransparentAt(x, y) {
+    x += this.offset.x;
+    y += this.offset.y;
+    return this.sheet.isTransparentAt(x, y);
+  }
+  get sheet() {
+    return this._sheet;
+  }
+  get id() {
+    return this._id;
+  }
+  get width() {
+    return this._width;
+  }
+  get height() {
+    return this._height;
+  }
+  get offset() {
+    return this._offset;
+  }
+};
+var Sprite = _Sprite;
+Sprite.sprites = new Array();
+var GraphicEvent = /* @__PURE__ */ ((GraphicEvent2) => {
+  GraphicEvent2[GraphicEvent2["AddCanvas"] = 0] = "AddCanvas";
+  GraphicEvent2[GraphicEvent2["AddSprite"] = 1] = "AddSprite";
+  GraphicEvent2[GraphicEvent2["Draw"] = 2] = "Draw";
+  return GraphicEvent2;
+})(GraphicEvent || {});
+var DrawElement = class {
+  constructor(_spriteId, _coord) {
+    this._spriteId = _spriteId;
+    this._coord = _coord;
+    Object.freeze(this);
+  }
+  get spriteId() {
+    return this._spriteId;
+  }
+  get coord() {
+    return this._coord;
+  }
+};
+function generateSprites(sheet, width, height, xBegin, yBegin, columns, rows) {
+  const sprites = new Array();
+  const xEnd = xBegin + columns;
+  const yEnd = yBegin + rows;
+  for (let y = yBegin; y < yEnd; y++) {
+    for (let x = xBegin; x < xEnd; x++) {
+      sprites.push(new Sprite(sheet, x * width, y * height, width, height));
+    }
+  }
+  return sprites;
+}
+var GraphicComponent2 = class {
+  constructor(_currentSpriteId) {
+    this._currentSpriteId = _currentSpriteId;
+  }
+  isTransparentAt(x, y) {
+    return Sprite.sprites[this._currentSpriteId].isTransparentAt(x, y);
+  }
+  get width() {
+    return Sprite.sprites[this._currentSpriteId].width;
+  }
+  get height() {
+    return Sprite.sprites[this._currentSpriteId].height;
+  }
+};
+var DummyGraphicComponent = class extends GraphicComponent2 {
+  constructor(_width, _height) {
+    super(0);
+    this._width = _width;
+    this._height = _height;
+  }
+  get width() {
+    return this._width;
+  }
+  get height() {
+    return this._height;
+  }
+  update() {
+    return 0;
+  }
+};
+var StaticGraphicComponent = class extends GraphicComponent2 {
+  constructor(id) {
+    super(id);
+  }
+  update() {
+    return this._currentSpriteId;
+  }
+};
+function generateStaticGraphics(sheet, width, height, xBegin, yBegin, columns, rows) {
+  const graphics = new Array();
+  const xEnd = xBegin + columns;
+  const yEnd = yBegin + rows;
+  for (let y = yBegin; y < yEnd; y++) {
+    for (let x = xBegin; x < xEnd; x++) {
+      const sprite = new Sprite(sheet, x * width, y * height, width, height);
+      graphics.push(new StaticGraphicComponent(sprite.id));
+    }
+  }
+  return graphics;
+}
+var AnimatedGraphicComponent = class extends GraphicComponent2 {
+  constructor(sprites, _interval) {
+    super(sprites[0].id);
+    this._interval = _interval;
+    this._nextUpdate = 0;
+    this._currentSpriteIdx = 0;
+    this._spriteIds = new Array();
+    for (const i in sprites) {
+      this._spriteIds.push(sprites[i].id);
+    }
+    this._nextUpdate = Date.now() + _interval;
+  }
+  update() {
+    return this._spriteIds[this._currentSpriteIdx];
+  }
+  get firstId() {
+    return this._spriteIds[0];
+  }
+  get lastId() {
+    return this._spriteIds[this._spriteIds.length - 1];
+  }
+  get currentSpriteId() {
+    console.assert(this._currentSpriteIdx >= 0);
+    console.assert(this._currentSpriteIdx < this._spriteIds.length);
+    return this._spriteIds[this._currentSpriteIdx];
+  }
+};
+var OssilateGraphicComponent = class extends AnimatedGraphicComponent {
+  constructor(sprites, interval) {
+    super(sprites, interval);
+    this._increase = true;
+    this._currentSpriteIdx = Math.floor(
+      Math.random() * (this._spriteIds.length - 1)
+    );
+  }
+  update() {
+    if (this._nextUpdate > Date.now()) {
+      return this.currentSpriteId;
+    }
+    if (this._currentSpriteIdx == this._spriteIds.length - 1) {
+      this._increase = false;
+    } else if (this._currentSpriteIdx == 0) {
+      this._increase = true;
+    }
+    if (this._increase) {
+      this._currentSpriteIdx++;
+    } else {
+      this._currentSpriteIdx--;
+    }
+    this._nextUpdate = Date.now() + this._interval;
+    return this.currentSpriteId;
+  }
+};
+var LoopGraphicComponent = class extends AnimatedGraphicComponent {
+  constructor(sprites, interval) {
+    super(sprites, interval);
+    this._currentSpriteIdx = 0;
+  }
+  update() {
+    if (this._nextUpdate > Date.now()) {
+      return this.currentSpriteId;
+    }
+    this._currentSpriteIdx = (this._currentSpriteIdx + 1) % this._spriteIds.length;
+    this._nextUpdate = Date.now() + this._interval;
+    return this.currentSpriteId;
+  }
+};
+var DirectionalGraphicComponent = class extends GraphicComponent2 {
+  constructor(_staticGraphics) {
+    super(0);
+    this._staticGraphics = _staticGraphics;
+    this._direction = 0 /* North */;
+  }
+  get direction() {
+    return this._direction;
+  }
+  set direction(direction) {
+    if (this._staticGraphics.has(direction)) {
+      this._direction = direction;
+    } else {
+      console.log("graphic direction unsupported");
+    }
+  }
+  update() {
+    if (this._staticGraphics.has(this.direction)) {
+      const component = this._staticGraphics.get(
+        this.direction
+      );
+      const spriteId = component.update();
+      return spriteId;
+    }
+    console.error(
+      "unhandled stationary graphic:",
+      Navigation.getDirectionName(this.direction)
+    );
+    return 0;
+  }
+};
+var AnimatedDirectionalGraphicComponent = class extends GraphicComponent2 {
+  constructor(_staticGraphics, _movementGraphics) {
+    super(0);
+    this._staticGraphics = _staticGraphics;
+    this._movementGraphics = _movementGraphics;
+    this._stationary = true;
+    this._direction = 0 /* North */;
+  }
+  get stationary() {
+    return this._stationary;
+  }
+  set stationary(stationary) {
+    this._stationary = stationary;
+  }
+  get direction() {
+    return this._direction;
+  }
+  set direction(direction) {
+    if (this._staticGraphics.has(direction) && this._movementGraphics.has(direction)) {
+      this._direction = direction;
+    } else {
+      console.log("graphic direction unsupported");
+    }
+  }
+  update() {
+    if (!this.stationary && this._movementGraphics.has(this.direction)) {
+      const spriteId = this._movementGraphics.get(this.direction).update();
+      return spriteId;
+    }
+    if (this.stationary && this._staticGraphics.has(this.direction)) {
+      const component = this._staticGraphics.get(
+        this.direction
+      );
+      const spriteId = component.update();
+      return spriteId;
+    }
+    if (this.stationary) {
+      console.error(
+        "unhandled stationary graphic:",
+        Navigation.getDirectionName(this.direction)
+      );
+    } else {
+      console.error(
+        "unhandled movement graphic:",
+        Navigation.getDirectionName(this.direction)
+      );
+    }
+    return 0;
+  }
+};
+
+// src/render.ts
+var DummyRenderer = class {
+  addBitmap(id, bitmap) {
+  }
+  draw(elements) {
+  }
+};
+var OffscreenRenderer = class {
+  constructor(_width, _height) {
+    this._width = _width;
+    this._height = _height;
+    this._bitmaps = new Array();
+    this._canvas = new OffscreenCanvas(_width, _height);
+    this._ctx = this._canvas.getContext("2d");
+  }
+  addBitmap(id, bitmap) {
+    if (id >= this._bitmaps.length) {
+      this._bitmaps.length = id + 1;
+    }
+    this._bitmaps[id] = bitmap;
+  }
+  draw(elements) {
+    this._ctx.clearRect(0, 0, this._width, this._height);
+    for (let i = 0; i < elements.length - 2; ++i) {
+      const spriteId = elements[i];
+      const x = elements[i + 1];
+      const y = elements[i + 2];
+      console.assert(spriteId < this._bitmaps.length, "bitmap length mismatch");
+      this._ctx.drawImage(this._bitmaps[spriteId], x, y);
+    }
+  }
+};
+var OnscreenRenderer = class {
+  constructor(_canvas) {
+    this._canvas = _canvas;
+    this._bitmaps = new Array();
+    this._width = this.canvas.width;
+    this._height = this.canvas.height;
+    if (window.Worker) {
+      console.log("using webworker for OnscreenRenderer");
+      const offscreen = this.canvas.transferControlToOffscreen();
+      this._worker = new Worker("/lib/render-worker.js", { type: "module" });
+      this.worker.postMessage(
+        {
+          type: 0 /* AddCanvas */,
+          canvas: offscreen,
+          width: this.width,
+          height: this.height
+        },
+        [offscreen]
+      );
+    } else {
+      this._ctx = this.canvas.getContext("2d");
+    }
+  }
+  get width() {
+    return this._width;
+  }
+  get height() {
+    return this._height;
+  }
+  get canvas() {
+    return this._canvas;
+  }
+  get ctx() {
+    return this._ctx;
+  }
+  get bitmaps() {
+    return this._bitmaps;
+  }
+  get worker() {
+    return this._worker;
+  }
+  addBitmap(id, bitmap) {
+    if (window.Worker) {
+      this.worker.postMessage({
+        type: 1 /* AddSprite */,
+        id,
+        sprite: bitmap
+      }, [bitmap]);
+    } else {
+      if (id >= this.bitmaps.length) {
+        this.bitmaps.length = id + 1;
+      }
+      this.bitmaps[id] = bitmap;
+    }
+  }
+  draw(elements) {
+    if (window.Worker) {
+      this.worker.postMessage(
+        { type: 2 /* Draw */, drawElements: elements },
+        [elements.buffer]
+      );
+    } else {
+      this.ctx.clearRect(0, 0, this.width, this.height);
+      for (let i = 0; i < elements.length - 2; ++i) {
+        const spriteId = elements[i];
+        const x = elements[i + 1];
+        const y = elements[i + 2];
+        console.assert(spriteId < this.bitmaps.length, "bitmap length mismatch");
+        this.ctx.drawImage(this._bitmaps[spriteId], x, y);
+      }
+    }
   }
 };
 
@@ -2629,11 +2732,12 @@ var SceneGraph = class {
     this._levels.forEach((level) => level.buildGraph(this, camera, force));
   }
 };
-var BaseSceneRenderer = class {
+var Scene = class {
   constructor(_graph) {
     this._graph = _graph;
     this._nodes = /* @__PURE__ */ new Map();
     this._numEntities = 0;
+    this._handler = new TimedEventHandler();
   }
   get graph() {
     return this._graph;
@@ -2667,134 +2771,6 @@ var BaseSceneRenderer = class {
     console.assert(this.nodes.has(id));
     return this.nodes.get(id);
   }
-  getLocationAt(_x, _y, _camera) {
-    return null;
-  }
-  getEntityDrawnAt(_x, _y, _camera) {
-    return null;
-  }
-  render(_camera, _force) {
-    return 0;
-  }
-  addTimedEvent(_callback) {
-  }
-  verifyRenderer(entities) {
-    if (this.graph.numNodes != entities.length) {
-      console.error(
-        "top-level comparison between scene node and entities failed"
-      );
-    }
-    let counted = 0;
-    const levelNodeIds = new Array();
-    const nodeIds = new Array();
-    const entityIds = new Array();
-    for (const level of this.graph.levels) {
-      counted += level.nodes.length;
-      level.nodes.forEach((node) => levelNodeIds.push(node.id));
-    }
-    for (const node of this.nodes.values()) {
-      nodeIds.push(node.id);
-    }
-    entities.forEach((entity) => entityIds.push(entity.id));
-    if (nodeIds.length != entityIds.length || nodeIds.length != levelNodeIds.length) {
-      console.error("number of scene nodes and entities don't match up");
-      return false;
-    }
-    if (this.numEntities != entities.length) {
-      console.error("mismatch in number of entities in context and scene");
-    }
-    nodeIds.sort(
-      (a, b) => {
-        if (a < b) {
-          return -1;
-        } else {
-          return 1;
-        }
-      }
-    );
-    entityIds.sort(
-      (a, b) => {
-        if (a < b) {
-          return -1;
-        } else {
-          return 1;
-        }
-      }
-    );
-    levelNodeIds.sort(
-      (a, b) => {
-        if (a < b) {
-          return -1;
-        } else {
-          return 1;
-        }
-      }
-    );
-    for (let i = 0; i < nodeIds.length; ++i) {
-      if (i != nodeIds[i]) {
-        console.error("mismatch in expected ids:", i, nodeIds[i]);
-        return false;
-      }
-      if (nodeIds[i] != entityIds[i]) {
-        console.error("mismatch node vs entity ids:", nodeIds[i], entityIds[i]);
-        return false;
-      }
-      if (nodeIds[i] != levelNodeIds[i]) {
-        console.error(
-          "mismatch top level node vs found in level ids:",
-          nodeIds[i],
-          levelNodeIds[i]
-        );
-        return false;
-      }
-    }
-    return true;
-  }
-};
-var OffscreenSceneRenderer = class extends BaseSceneRenderer {
-  constructor(graph) {
-    super(graph);
-  }
-  render(camera, force) {
-    let drawn = 0;
-    if (!this.graph.initialised) {
-      this.graph.initialise(this.nodes);
-    }
-    this.graph.buildLevels(camera, force);
-    this.graph.levels.forEach((level) => {
-      for (let i = level.order.length - 1; i >= 0; i--) {
-        const node = level.order[i];
-        const entity = node.entity;
-        if (!entity.visible || !entity.drawable) {
-          continue;
-        }
-        drawn++;
-      }
-    });
-    return drawn;
-  }
-};
-var OnscreenSceneRenderer = class extends BaseSceneRenderer {
-  constructor(_canvas, graph) {
-    super(graph);
-    this._canvas = _canvas;
-    this._handler = new TimedEventHandler();
-    this._width = _canvas.width;
-    this._height = _canvas.height;
-    this._ctx = this._canvas.getContext("2d", { alpha: false });
-  }
-  get width() {
-    return this._width;
-  }
-  get height() {
-    return this._height;
-  }
-  get ctx() {
-    return this._ctx;
-  }
-  addTimedEvent(callback) {
-    this._handler.add(callback);
-  }
   getLocationAt(x, y, camera) {
     const entity = this.getEntityDrawnAt(x, y, camera);
     if (entity != null) {
@@ -2826,28 +2802,114 @@ var OnscreenSceneRenderer = class extends BaseSceneRenderer {
     }
     return null;
   }
-  renderNode(node, camera) {
-    const entity = node.entity;
-    const coord = camera.getDrawCoord(node.drawCoord);
-    entity.graphics.forEach((component) => {
-      const spriteId = component.update();
-      Sprite.sprites[spriteId].draw(coord, this.ctx);
+  addTimedEvent(callback) {
+    this._handler.add(callback);
+  }
+  numToDraw() {
+    let num = 0;
+    this.graph.levels.forEach((level) => {
+      num += level.order.length;
     });
+    return num;
   }
   render(camera, force) {
     if (!this.graph.initialised) {
       this.graph.initialise(this.nodes);
     }
     this.graph.buildLevels(camera, force);
-    this.ctx.clearRect(0, 0, this._width, this._height);
+    const elements = this.numToDraw();
+    const initByteLength = elements * 3 * 2;
+    let buffer = new ArrayBuffer(initByteLength);
+    let drawElements = new Uint16Array(buffer);
+    let idx = 0;
     this.graph.levels.forEach((level) => {
       for (let i = level.order.length - 1; i >= 0; i--) {
         const node = level.order[i];
-        this.renderNode(node, camera);
+        const entity = node.entity;
+        const coord = camera.getDrawCoord(node.drawCoord);
+        if (entity.graphics.length * 3 + idx >= drawElements.length) {
+          let new_buffer = new ArrayBuffer(buffer.byteLength * 2);
+          new Uint8Array(new_buffer).set(new Uint8Array(buffer));
+          buffer = new_buffer;
+          drawElements = new Uint16Array(buffer);
+        }
+        entity.graphics.forEach((component) => {
+          const spriteId = component.update();
+          drawElements[idx] = spriteId;
+          drawElements[idx + 1] = coord.x;
+          drawElements[idx + 2] = coord.y;
+          idx += 3;
+        });
       }
     });
     this._handler.service();
-    return 0;
+    return drawElements;
+  }
+  verifyRenderer(entities) {
+    if (this.graph.numNodes != entities.length) {
+      console.error(
+        "top-level comparison between scene node and entities failed"
+      );
+    }
+    let counted = 0;
+    const levelNodeIds = new Array();
+    const nodeIds = new Array();
+    const entityIds = new Array();
+    for (const level of this.graph.levels) {
+      counted += level.nodes.length;
+      level.nodes.forEach((node) => levelNodeIds.push(node.id));
+    }
+    for (const node of this.nodes.values()) {
+      nodeIds.push(node.id);
+    }
+    entities.forEach((entity) => entityIds.push(entity.id));
+    if (nodeIds.length != entityIds.length || nodeIds.length != levelNodeIds.length) {
+      console.error("number of scene nodes and entities don't match up");
+      return false;
+    }
+    if (this.numEntities != entities.length) {
+      console.error("mismatch in number of entities in context and scene");
+    }
+    nodeIds.sort((a, b) => {
+      if (a < b) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+    entityIds.sort((a, b) => {
+      if (a < b) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+    levelNodeIds.sort((a, b) => {
+      if (a < b) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+    for (let i = 0; i < nodeIds.length; ++i) {
+      if (i != nodeIds[i]) {
+        console.error("mismatch in expected ids:", i, nodeIds[i]);
+        return false;
+      }
+      if (nodeIds[i] != entityIds[i]) {
+        console.error("mismatch node vs entity ids:", nodeIds[i], entityIds[i]);
+        return false;
+      }
+      if (nodeIds[i] != levelNodeIds[i]) {
+        console.error(
+          "mismatch top level node vs found in level ids:",
+          nodeIds[i],
+          levelNodeIds[i]
+        );
+        return false;
+      }
+    }
+    return true;
   }
 };
 var Perspective = /* @__PURE__ */ ((Perspective2) => {
@@ -4158,7 +4220,7 @@ var Octree = class {
 
 // src/context.ts
 var ContextImpl = class {
-  constructor(worldDims) {
+  constructor(worldDims, perspective) {
     this._entities = new Array();
     this._updateables = new Array();
     this._movables = new Array();
@@ -4166,17 +4228,29 @@ var ContextImpl = class {
     this._totalEntities = 0;
     this._spatialGraph = new Octree(worldDims);
     CollisionDetector.init(this._spatialGraph);
+    switch (perspective) {
+      default:
+        console.error("unhandled perspective");
+        break;
+      case 0 /* TrueIsometric */:
+        this._scene = new Scene(new TrueIsometric());
+        break;
+      case 1 /* TwoByOneIsometric */:
+        this._scene = new Scene(new TwoByOneIsometric());
+        break;
+    }
+    this._renderer = new DummyRenderer();
   }
   static reset() {
     PhysicalEntity.reset();
     Terrain.reset();
-    SpriteSheet.reset();
+    SpriteSheet2.reset();
   }
   get scene() {
     return this._scene;
   }
-  set scene(s) {
-    this._scene = s;
+  get renderer() {
+    return this._renderer;
   }
   get entities() {
     return this._entities;
@@ -4193,45 +4267,8 @@ var ContextImpl = class {
   verify() {
     return this.entities.length == PhysicalEntity.getNumEntities() && this.entities.length == this._totalEntities && this.spatial.verify(this.entities) && this.scene.verifyRenderer(this.entities);
   }
-  addOnscreenRenderer(canvas, perspective) {
-    switch (perspective) {
-      default:
-        console.error("unhandled perspective");
-        break;
-      case 0 /* TrueIsometric */:
-        this.scene = new OnscreenSceneRenderer(canvas, new TrueIsometric());
-        break;
-      case 1 /* TwoByOneIsometric */:
-        this.scene = new OnscreenSceneRenderer(canvas, new TwoByOneIsometric());
-        break;
-    }
-    this.entities.forEach((entity) => this.scene.insertEntity(entity));
-    this._movables.forEach(
-      (entity) => entity.addEventListener("moving" /* Moving */, () => {
-        this.spatial.update(entity);
-        this.scene.updateEntity(entity);
-      })
-    );
-  }
-  addOffscreenRenderer(perspective) {
-    switch (perspective) {
-      default:
-        console.error("unhandled perspective");
-        break;
-      case 0 /* TrueIsometric */:
-        this.scene = new OffscreenSceneRenderer(new TrueIsometric());
-        break;
-      case 1 /* TwoByOneIsometric */:
-        this.scene = new OffscreenSceneRenderer(new TwoByOneIsometric());
-        break;
-    }
-    this.entities.forEach((entity) => this.scene.insertEntity(entity));
-    this._movables.forEach(
-      (entity) => entity.addEventListener("moving" /* Moving */, () => {
-        this.spatial.update(entity);
-        this.scene.updateEntity(entity);
-      })
-    );
+  addOnscreenRenderer(canvas) {
+    this._renderer = new OnscreenRenderer(canvas);
   }
   addController(controller) {
     this._controllers.push(controller);
@@ -4263,7 +4300,8 @@ var ContextImpl = class {
   }
   update(camera) {
     camera.update();
-    this._scene.render(camera, false);
+    const elements = this._scene.render(camera, false);
+    this.renderer.draw(elements);
     Gravity.update(this._movables);
     this._updateables.forEach((entity) => {
       entity.update();
@@ -4274,14 +4312,14 @@ var ContextImpl = class {
   }
 };
 function createContext(canvas, worldDims, perspective) {
-  const context = new ContextImpl(worldDims);
-  context.addOnscreenRenderer(canvas, perspective);
+  ContextImpl.reset();
+  const context = new ContextImpl(worldDims, perspective);
+  context.addOnscreenRenderer(canvas);
   return context;
 }
 function createTestContext(worldDims, perspective) {
   ContextImpl.reset();
-  const context = new ContextImpl(worldDims);
-  context.addOffscreenRenderer(perspective);
+  const context = new ContextImpl(worldDims, perspective);
   return context;
 }
 
@@ -4662,9 +4700,7 @@ var MovableEntityDebug = class {
         console.log("but no info available");
         return;
       }
-      const collisionInfo = CollisionDetector.getCollideInfo(
-        movable
-      );
+      const collisionInfo = CollisionDetector.getCollideInfo(movable);
       const intersectInfo = collisionInfo.intersectInfo;
       const collidedEntity = collisionInfo.entity;
       const collidedFace = intersectInfo.face;
@@ -4683,7 +4719,9 @@ var MovableEntityDebug = class {
             ctx.stroke();
           }
           ctx.strokeStyle = "Orange";
-          for (const segment of getAllSegments(scene.getNode(collidedEntity.id))) {
+          for (const segment of getAllSegments(
+            scene.getNode(collidedEntity.id)
+          )) {
             ctx.beginPath();
             const drawP0 = camera.getDrawCoord(segment.p0);
             const drawP1 = camera.getDrawCoord(segment.p1);
@@ -4734,13 +4772,16 @@ export {
   Dimensions,
   Direction,
   DirectionalGraphicComponent,
+  DrawElement,
   DummyGraphicComponent,
+  DummyRenderer,
   DummySpriteSheet,
   EntityEvent,
   EventHandler,
   Face3D,
   Geometry,
-  GraphicComponent,
+  GraphicComponent2 as GraphicComponent,
+  GraphicEvent,
   Gravity,
   InputEvent,
   IntersectInfo,
@@ -4755,8 +4796,8 @@ export {
   Navigate,
   Navigation,
   NoGeometry,
-  OffscreenSceneRenderer,
-  OnscreenSceneRenderer,
+  OffscreenRenderer,
+  OnscreenRenderer,
   Orientation,
   OssilateGraphicComponent,
   PathFinder,
@@ -4770,13 +4811,14 @@ export {
   RampUpSouthGeometry,
   RampUpWestGeometry,
   RenderOrder,
+  Scene,
   SceneGraph,
   SceneLevel,
   SceneNode,
   Segment2D,
   Sound,
   Sprite,
-  SpriteSheet,
+  SpriteSheet2 as SpriteSheet,
   StaticGraphicComponent,
   Surface,
   Terrain,

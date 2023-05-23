@@ -7,6 +7,7 @@ export const DummySpriteSheet = {
   addForValidation: function (_sprite: Sprite): boolean {
     return true;
   },
+  addBitmap: function(id: number, x: number, y: number, width: number, height: number): void { },
 };
 
 export class SpriteSheet {

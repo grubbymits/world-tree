@@ -8,6 +8,7 @@ import {
   TwoByOneIsometric,
 } from "./scene.ts";
 import { Renderer,
+         DummyRenderer,
          OffscreenRenderer,
          OnscreenRenderer,
 } from "./render.ts";
@@ -63,7 +64,7 @@ export class ContextImpl implements Context {
         this._scene = new Scene(new TwoByOneIsometric());
         break;
     }
-    this._renderer = new OffscreenRenderer(1, 1);
+    this._renderer = new DummyRenderer();
   }
 
   get scene(): Scene {
