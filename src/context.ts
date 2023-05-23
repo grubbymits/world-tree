@@ -7,10 +7,11 @@ import {
   TrueIsometric,
   TwoByOneIsometric,
 } from "./scene.ts";
-import { Renderer,
-         DummyRenderer,
-         OffscreenRenderer,
-         OnscreenRenderer,
+import {
+  Renderer,
+  DummyRenderer,
+  OffscreenRenderer,
+  OnscreenRenderer,
 } from "./render.ts";
 import { SpriteSheet } from "./graphics.ts";
 import { Camera } from "./camera.ts";
@@ -49,8 +50,7 @@ export class ContextImpl implements Context {
     SpriteSheet.reset();
   }
 
-  constructor(worldDims: Dimensions,
-              perspective: Perspective) {
+  constructor(worldDims: Dimensions, perspective: Perspective) {
     this._spatialGraph = new Octree(worldDims);
     CollisionDetector.init(this._spatialGraph);
     switch (perspective) {
@@ -95,9 +95,7 @@ export class ContextImpl implements Context {
     );
   }
 
-  addOnscreenRenderer(
-    canvas: HTMLCanvasElement,
-  ): void {
+  addOnscreenRenderer(canvas: HTMLCanvasElement): void {
     this._renderer = new OnscreenRenderer(canvas);
   }
 

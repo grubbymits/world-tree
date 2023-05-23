@@ -7,8 +7,8 @@ export interface Renderer {
 }
 
 export class DummyRenderer implements Renderer {
-  addBitmap(id: number, bitmap: ImageBitmap): void { }
-  draw(elements: Uint16Array): void { }
+  addBitmap(id: number, bitmap: ImageBitmap): void {}
+  draw(elements: Uint16Array): void {}
 }
 
 export class OffscreenRenderer implements Renderer {
@@ -16,10 +16,12 @@ export class OffscreenRenderer implements Renderer {
   private _bitmaps: Array<ImageBitmap> = new Array<ImageBitmap>();
   private _canvas: OffscreenCanvas;
 
-  constructor(private readonly _width: number,
-              private readonly _height: number) {
+  constructor(
+    private readonly _width: number,
+    private readonly _height: number
+  ) {
     this._canvas = new OffscreenCanvas(_width, _height);
-    this._ctx = this._canvas.getContext('2d')!;
+    this._ctx = this._canvas.getContext("2d")!;
   }
 
   addBitmap(id: number, bitmap: ImageBitmap): void {
@@ -33,8 +35,8 @@ export class OffscreenRenderer implements Renderer {
     this._ctx.clearRect(0, 0, this._width, this._height);
     for (let i = 0; i < elements.length - 2; ++i) {
       const spriteId = elements[i];
-      const x = elements[i+1];
-      const y = elements[i+2];
+      const x = elements[i + 1];
+      const y = elements[i + 2];
       console.assert(spriteId < this._bitmaps.length, "bitmap length mismatch");
       this._ctx.drawImage(this._bitmaps[spriteId], x, y);
     }
@@ -55,11 +57,17 @@ export class OnscreenRenderer implements Renderer {
       console.log("using webworker for OnscreenRenderer");
       const offscreen = this.canvas.transferControlToOffscreen();
       this._worker = new Worker("/lib/render-worker.js", { type: "module" });
-      this.worker.postMessage({ type: GraphicEvent.AddCanvas, canvas: offscreen,
-                                width: this.width, height: this.height },
-                              [offscreen]);
+      this.worker.postMessage(
+        {
+          type: GraphicEvent.AddCanvas,
+          canvas: offscreen,
+          width: this.width,
+          height: this.height,
+        },
+        [offscreen]
+      );
     } else {
-      this._ctx = this.canvas.getContext('2d');
+      this._ctx = this.canvas.getContext("2d");
     }
   }
 
@@ -84,8 +92,10 @@ export class OnscreenRenderer implements Renderer {
 
   addBitmap(id: number, bitmap: ImageBitmap): void {
     if (window.Worker) {
-      this.worker.postMessage({type: GraphicEvent.AddSprite, id: id,
-                              sprite: bitmap}, [ bitmap ] );
+      this.worker.postMessage(
+        { type: GraphicEvent.AddSprite, id: id, sprite: bitmap },
+        [bitmap]
+      );
     } else {
       if (id >= this.bitmaps.length) {
         this.bitmaps.length = id + 1;
@@ -97,15 +107,20 @@ export class OnscreenRenderer implements Renderer {
   draw(elements: Uint16Array): void {
     if (window.Worker) {
       // Transfer drawElements to worker.
-      this.worker.postMessage({type: GraphicEvent.Draw, drawElements: elements},
-                         [ elements.buffer] );
+      this.worker.postMessage(
+        { type: GraphicEvent.Draw, drawElements: elements },
+        [elements.buffer]
+      );
     } else {
       this.ctx.clearRect(0, 0, this.width, this.height);
       for (let i = 0; i < elements.length - 2; ++i) {
         const spriteId = elements[i];
-        const x = elements[i+1];
-        const y = elements[i+2];
-        console.assert(spriteId < this.bitmaps.length, "bitmap length mismatch");
+        const x = elements[i + 1];
+        const y = elements[i + 2];
+        console.assert(
+          spriteId < this.bitmaps.length,
+          "bitmap length mismatch"
+        );
         this.ctx.drawImage(this._bitmaps[spriteId], x, y);
       }
     }

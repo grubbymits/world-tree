@@ -28,8 +28,8 @@ export class MovableEntityDebug {
       if (!CollisionDetector.hasMissInfo(movable)) {
         return;
       }
-      const missedEntities: Array<PhysicalEntity> = CollisionDetector
-        .getMissInfo(movable);
+      const missedEntities: Array<PhysicalEntity> =
+        CollisionDetector.getMissInfo(movable);
       const scene: Scene = context.scene;
       const start = Date.now();
 

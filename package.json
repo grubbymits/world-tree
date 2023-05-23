@@ -4,7 +4,8 @@
     "build-rel": "esbuild src/world-tree.ts --bundle --format=esm --outfile=dist/world-tree.mjs",
     "build-dev": "esbuild src/world-tree.ts --bundle --format=esm --source-maps --outfile=dist/world-tree.mjs",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage",
-    "benchmark": "node --experimental-vm-modules benchmarks/all.js"
+    "benchmark": "node --experimental-vm-modules benchmarks/all.js",
+    "format": "prettier --write --parser typescript src/*.ts; prettier --write tests/*.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.17.19",

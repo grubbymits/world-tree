@@ -7,7 +7,13 @@ export const DummySpriteSheet = {
   addForValidation: function (_sprite: Sprite): boolean {
     return true;
   },
-  addBitmap: function(id: number, x: number, y: number, width: number, height: number): void { },
+  addBitmap: function (
+    id: number,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void {},
 };
 
 export class SpriteSheet {
@@ -27,8 +33,7 @@ export class SpriteSheet {
   private _loaded = false;
   private _toValidate: Array<Sprite> = new Array<Sprite>();
 
-  constructor(name: string,
-              context: ContextImpl) {
+  constructor(name: string, context: ContextImpl) {
     this._renderer = context.renderer;
     this._image = new Image();
 
@@ -39,7 +44,7 @@ export class SpriteSheet {
     }
     SpriteSheet.add(this);
 
-    this.image.addEventListener('onload', () => {
+    this.image.addEventListener("onload", () => {
       this.canvas = document.createElement("canvas");
       this.canvas.width = this.width;
       this.canvas.height = this.height;
@@ -84,12 +89,18 @@ export class SpriteSheet {
     this._toValidate.push(sprite);
   }
 
-  async addBitmap(id: number, x: number, y: number, width: number, height: number): Promise<void> {
+  async addBitmap(
+    id: number,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): Promise<void> {
     if (this.loaded) {
       const bitmap = await createImageBitmap(this.image, x, y, width, height);
       this._renderer.addBitmap(id, bitmap);
     } else {
-      this.image.addEventListener('onload', () => {
+      this.image.addEventListener("onload", () => {
         this.addBitmap(id, x, y, width, height);
       });
     }
@@ -131,7 +142,13 @@ export class Sprite {
     //);
     this._id = Sprite.sprites.length;
     Sprite.sprites.push(this);
-    this.sheet.addBitmap(this.id, this.offset.x, this.offset.y, this.width, this.height);
+    this.sheet.addBitmap(
+      this.id,
+      this.offset.x,
+      this.offset.y,
+      this.width,
+      this.height
+    );
   }
 
   isTransparentAt(x: number, y: number): boolean {
@@ -164,12 +181,18 @@ export enum GraphicEvent {
 }
 
 export class DrawElement {
-  constructor(private readonly _spriteId: number,
-              private readonly _coord: Point2D) {
+  constructor(
+    private readonly _spriteId: number,
+    private readonly _coord: Point2D
+  ) {
     Object.freeze(this);
   }
-  get spriteId(): number { return this._spriteId; }
-  get coord(): Point2D { return this._coord; }
+  get spriteId(): number {
+    return this._spriteId;
+  }
+  get coord(): Point2D {
+    return this._coord;
+  }
 }
 
 export function generateSprites(

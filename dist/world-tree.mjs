@@ -2046,7 +2046,13 @@ var _Sprite = class {
     );
     this._id = _Sprite.sprites.length;
     _Sprite.sprites.push(this);
-    this.sheet.addBitmap(this.id, this.offset.x, this.offset.y, this.width, this.height);
+    this.sheet.addBitmap(
+      this.id,
+      this.offset.x,
+      this.offset.y,
+      this.width,
+      this.height
+    );
   }
   isTransparentAt(x, y) {
     x += this.offset.x;
@@ -2375,11 +2381,10 @@ var OnscreenRenderer = class {
   }
   addBitmap(id, bitmap) {
     if (window.Worker) {
-      this.worker.postMessage({
-        type: 1 /* AddSprite */,
-        id,
-        sprite: bitmap
-      }, [bitmap]);
+      this.worker.postMessage(
+        { type: 1 /* AddSprite */, id, sprite: bitmap },
+        [bitmap]
+      );
     } else {
       if (id >= this.bitmaps.length) {
         this.bitmaps.length = id + 1;
@@ -2399,7 +2404,10 @@ var OnscreenRenderer = class {
         const spriteId = elements[i];
         const x = elements[i + 1];
         const y = elements[i + 2];
-        console.assert(spriteId < this.bitmaps.length, "bitmap length mismatch");
+        console.assert(
+          spriteId < this.bitmaps.length,
+          "bitmap length mismatch"
+        );
         this.ctx.drawImage(this._bitmaps[spriteId], x, y);
       }
     }

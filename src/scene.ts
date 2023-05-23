@@ -465,7 +465,7 @@ export class Scene {
   getEntityDrawnAt(
     x: number,
     y: number,
-    camera: Camera,
+    camera: Camera
   ): PhysicalEntity | null {
     for (let i = this.graph.levels.length - 1; i >= 0; i--) {
       const level: SceneLevel = this.graph.levels[i];
@@ -483,7 +483,8 @@ export class Scene {
         const graphic: GraphicComponent = entity.graphic;
         // Check whether inbounds of the sprite.
         if (
-          x < onScreenCoord.x || y < onScreenCoord.y ||
+          x < onScreenCoord.x ||
+          y < onScreenCoord.y ||
           x > onScreenCoord.x + graphic.width ||
           y > onScreenCoord.y + graphic.height
         ) {
@@ -529,7 +530,7 @@ export class Scene {
         const entity: PhysicalEntity = node.entity;
         const coord = camera.getDrawCoord(node.drawCoord);
         // double the size of the buffer if we're running out of space.
-        if ((entity.graphics.length * 3) + idx >= drawElements.length) {
+        if (entity.graphics.length * 3 + idx >= drawElements.length) {
           //buffer.resize(buffer.byteLength * 2);
           let new_buffer = new ArrayBuffer(buffer.byteLength * 2);
           new Uint8Array(new_buffer).set(new Uint8Array(buffer));
@@ -548,7 +549,7 @@ export class Scene {
 
     // TODO: Shrink the buffer to the necessary size.
     //if (buffer.byteLength != initByteLength) {
-      //buffer.resize(idx * 2);
+    //buffer.resize(idx * 2);
     //}
 
     this._handler.service();
