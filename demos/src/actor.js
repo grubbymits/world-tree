@@ -1,4 +1,4 @@
-import * as WT from "../lib/world-tree.js";
+import * as WT from "../lib/world-tree.mjs";
 
 class Droid extends WT.Actor {
   static sheet = new WT.SpriteSheet("../graphics/png/levitate-droid");

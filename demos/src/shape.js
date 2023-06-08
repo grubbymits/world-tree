@@ -1,4 +1,4 @@
-import * as WT from "../lib/world-tree.js";
+import * as WT from "../lib/world-tree.mjs";
 const spriteWidth = 322;
 const spriteHeight = 270;
 const tileRows = [

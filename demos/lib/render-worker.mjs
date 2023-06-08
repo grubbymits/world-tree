@@ -4,6 +4,7 @@ const ctx = self;
 const sprites = new Array();
 
 ctx.addEventListener("message", (e) => {
+  console.log("worker msg rx");
   switch (e.data.type) {
     default:
       console.error("unhandled graphic event");

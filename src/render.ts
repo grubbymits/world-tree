@@ -56,7 +56,8 @@ export class OnscreenRenderer implements Renderer {
     if (window.Worker) {
       console.log("using webworker for OnscreenRenderer");
       const offscreen = this.canvas.transferControlToOffscreen();
-      this._worker = new Worker("/lib/render-worker.js", { type: "module" });
+      this._worker = new Worker(new URL( "./render-worker.mjs", import.meta.url ),
+                                { type: "module" });
       this.worker.postMessage(
         {
           type: GraphicEvent.AddCanvas,
