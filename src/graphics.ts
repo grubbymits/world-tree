@@ -16,6 +16,21 @@ export const DummySpriteSheet = {
   ): void {},
 };
 
+class SpriteBitmap {
+  constructor(private readonly _id: number,
+              private readonly _x: number,
+              private readonly _y: number,
+              private readonly _width: number,
+              private readonly _height: number) {
+    Object.freeze(this);
+  }
+  get id(): number { return this._id; }
+  get x(): number { return this._x; }
+  get y(): number { return this._y; }
+  get width(): number { return this._width; }
+  get height(): number { return this._height; }
+}
+
 export class SpriteSheet {
   private static _sheets = new Array<SpriteSheet>();
 
@@ -29,13 +44,26 @@ export class SpriteSheet {
 
   private _image: HTMLImageElement;
   private _canvas: HTMLCanvasElement;
+  private _context2D: CanvasRenderingContext2D | null;
   private _renderer: Renderer;
   private _loaded = false;
-  private _toValidate: Array<Sprite> = new Array<Sprite>();
+  private _bitmapsToLoad: Array<SpriteBitmap> = new Array<SpriteBitmap>();
 
   constructor(name: string, context: ContextImpl) {
     this._renderer = context.renderer;
     this._image = new Image();
+
+    this._image.onload = () => {
+      this.canvas = document.createElement("canvas");
+      this.canvas.width = this.width;
+      this.canvas.height = this.height;
+      this.context2D = this.canvas.getContext("2d", { willReadFrequently: true })!;
+      this.context2D.drawImage(this.image, 0, 0, this.width, this.height);
+      this.loaded = true;
+      for (let bitmap of this.bitmapsToLoad) {
+        this.addBitmap(bitmap.id, bitmap.x, bitmap.y, bitmap.width, bitmap.height);
+      }
+    };
 
     if (name) {
       this._image.src = name + ".png";
@@ -43,16 +71,6 @@ export class SpriteSheet {
       throw new Error("No filename passed");
     }
     SpriteSheet.add(this);
-
-    this.image.addEventListener("onload", () => {
-      this.canvas = document.createElement("canvas");
-      this.canvas.width = this.width;
-      this.canvas.height = this.height;
-      this.canvas
-        .getContext("2d")!
-        .drawImage(this.image, 0, 0, this.width, this.height);
-      this.loaded = true;
-    });
   }
 
   get image(): HTMLImageElement {
@@ -71,6 +89,7 @@ export class SpriteSheet {
     return this._loaded;
   }
   set loaded(b: boolean) {
+    console.log("loaded spritesheet:", this.image.src);
     this._loaded = b;
   }
   get canvas(): HTMLCanvasElement {
@@ -79,14 +98,19 @@ export class SpriteSheet {
   set canvas(c: HTMLCanvasElement) {
     this._canvas = c;
   }
-
-  isTransparentAt(x: number, y: number): boolean {
-    const data = this.canvas.getContext("2d")!.getImageData(x, y, 1, 1).data;
-    return data[3] == 0;
+  get context2D(): CanvasRenderingContext2D {
+    return this._context2D!;
+  }
+  set context2D(c: CanvasRenderingContext2D) {
+    this._context2D = c;
+  }
+  get bitmapsToLoad(): Array<SpriteBitmap> {
+    return this._bitmapsToLoad;
   }
 
-  addForValidation(sprite: Sprite): void {
-    this._toValidate.push(sprite);
+  isTransparentAt(x: number, y: number): boolean {
+    const data = this.context2D.getImageData(x, y, 1, 1).data;
+    return data[3] == 0;
   }
 
   async addBitmap(
@@ -100,9 +124,7 @@ export class SpriteSheet {
       const bitmap = await createImageBitmap(this.image, x, y, width, height);
       this._renderer.addBitmap(id, bitmap);
     } else {
-      this.image.addEventListener("onload", () => {
-        this.addBitmap(id, x, y, width, height);
-      });
+      this.bitmapsToLoad.push(new SpriteBitmap(id, x, y, width, height));
     }
   }
 }

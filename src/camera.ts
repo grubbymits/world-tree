@@ -27,6 +27,17 @@ export class Camera {
     );
   }
 
+  coordOnScreen(coord: Point2D): boolean {
+    if (
+      coord.x < this._lowerX ||
+      coord.y < this._lowerY ||
+      coord.x > this._upperX ||
+      coord.y > this._upperY
+    ) {
+      return false;
+    }
+    return true;
+  }
   isOnScreen(coord: Point2D, width: number, depth: number): boolean {
     if (
       coord.x + width < this._lowerX ||

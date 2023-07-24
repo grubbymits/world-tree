@@ -1,7 +1,6 @@
-import * as WT from "../lib/world-tree.js";
+import * as WT from "../lib/world-tree.mjs";
 const spriteWidth = 322;
 const spriteHeight = 270;
-const sheet = new WT.SpriteSheet("../graphics/png/outside-terrain-tiles-muted");
 const tileRows = [
   WT.TerrainType.Lowland5,
   WT.TerrainType.Lowland4,
@@ -18,7 +17,7 @@ const tileRows = [
   WT.TerrainType.Water,
 ];
 
-function addGraphic(column, row) {
+function addGraphic(sheet, column, row) {
   const shape = WT.TerrainShape.Flat;
   const type = tileRows[row];
   WT.Terrain.addGraphic(
@@ -30,10 +29,6 @@ function addGraphic(column, row) {
     /*width*/ spriteWidth,
     /*height*/ spriteHeight,
   );
-}
-
-for (let row in tileRows) {
-  addGraphic(/*column*/ 0, row);
 }
 
 const cellsX = 11;
@@ -54,6 +49,7 @@ let heightMap = [
 ];
 
 window.onload = (event) => {
+  console.log("biome window loaded");
   const physicalDims = WT.TwoByOneIsometric.getDimensions(
     spriteWidth,
     spriteHeight,
@@ -69,6 +65,13 @@ window.onload = (event) => {
     worldDims,
     WT.Perspective.TwoByOneIsometric,
   );
+  console.log("attempting to construct SpriteSheet");
+  const sheet =
+    new WT.SpriteSheet("../graphics/png/outside-terrain-tiles-muted", context);
+  for (let row in tileRows) {
+    addGraphic(sheet, /*column*/ 0, row);
+  }
+
   const config = new WT.TerrainBuilderConfig(
     numTerraces,
     WT.TerrainType.Lowland3,

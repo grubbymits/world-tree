@@ -53,23 +53,23 @@ export class OnscreenRenderer implements Renderer {
   constructor(private _canvas: HTMLCanvasElement) {
     this._width = this.canvas.width;
     this._height = this.canvas.height;
-    if (window.Worker) {
-      console.log("using webworker for OnscreenRenderer");
-      const offscreen = this.canvas.transferControlToOffscreen();
-      this._worker = new Worker(new URL( "./render-worker.mjs", import.meta.url ),
-                                { type: "module" });
-      this.worker.postMessage(
-        {
-          type: GraphicEvent.AddCanvas,
-          canvas: offscreen,
-          width: this.width,
-          height: this.height,
-        },
-        [offscreen]
-      );
-    } else {
+    //if (window.Worker) {
+    //  console.log("using webworker for OnscreenRenderer");
+    //  const offscreen = this.canvas.transferControlToOffscreen();
+    //  this._worker = new Worker(new URL( "./render-worker.mjs", import.meta.url ),
+    //                            { type: "module" });
+    //  this.worker.postMessage(
+    //    {
+    //      type: GraphicEvent.AddCanvas,
+    //      canvas: offscreen,
+    //      width: this.width,
+    //      height: this.height,
+    //    },
+    //    [offscreen]
+    //  );
+    //} else {
       this._ctx = this.canvas.getContext("2d");
-    }
+    //}
   }
 
   get width(): number {
@@ -92,38 +92,41 @@ export class OnscreenRenderer implements Renderer {
   }
 
   addBitmap(id: number, bitmap: ImageBitmap): void {
-    if (window.Worker) {
-      this.worker.postMessage(
-        { type: GraphicEvent.AddSprite, id: id, sprite: bitmap },
-        [bitmap]
-      );
-    } else {
+    console.log("OnscreenRenderer::addBitmap");
+    //if (window.Worker) {
+    //  this.worker.postMessage(
+    //    { type: GraphicEvent.AddSprite, id: id, sprite: bitmap },
+    //    [bitmap]
+    //  );
+    //} else {
       if (id >= this.bitmaps.length) {
         this.bitmaps.length = id + 1;
       }
       this.bitmaps[id] = bitmap;
-    }
+    //}
   }
 
   draw(elements: Uint16Array): void {
-    if (window.Worker) {
-      // Transfer drawElements to worker.
-      this.worker.postMessage(
-        { type: GraphicEvent.Draw, drawElements: elements },
-        [elements.buffer]
-      );
-    } else {
+    //if (window.Worker) {
+    //  // Transfer drawElements to worker.
+    //  this.worker.postMessage(
+    //    { type: GraphicEvent.Draw, drawElements: elements },
+    //    [elements.buffer]
+    //  );
+    //} else {
       this.ctx.clearRect(0, 0, this.width, this.height);
+      console.assert((elements.length % 3) == 0, "elements not mod 3");
       for (let i = 0; i < elements.length - 2; ++i) {
         const spriteId = elements[i];
         const x = elements[i + 1];
         const y = elements[i + 2];
+        if (spriteId >= this.bitmaps.length) continue;
         console.assert(
           spriteId < this.bitmaps.length,
-          "bitmap length mismatch"
+          "bitmap length mismatch", spriteId
         );
         this.ctx.drawImage(this._bitmaps[spriteId], x, y);
       }
-    }
+    //}
   }
 }
