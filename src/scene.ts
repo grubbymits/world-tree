@@ -20,7 +20,6 @@ export class SceneNode {
   private _topOutlineSegments: Array<Segment2D> = new Array<Segment2D>();
   private _sideOutlineSegments: Array<Segment2D> = new Array<Segment2D>();
   private _baseOutlineSegments: Array<Segment2D> = new Array<Segment2D>();
-  private _drawCoords: Array<Point2D> = new Array<Point2D>();
   private _drawCoord: Point2D;
 
   constructor(
@@ -66,14 +65,6 @@ export class SceneNode {
     this.sideSegments[1] = this.sideSegments[1].add(diff);
     this.drawCoord = this.drawCoord.add(diff);
     this.minDrawCoord = this.minDrawCoord.add(diff);
-    this._drawCoords = [];
-    const segments2d = [ this.topSegments, this.baseSegments, this.sideSegments ];
-    for (let segments of segments2d) {
-      for (let segment of segments) {
-        this.drawCoords.push(segment.p0);
-        this.drawCoords.push(segment.p1);
-      }
-    }
   }
 
   intersectsTop(other: SceneNode): boolean {
@@ -237,11 +228,9 @@ export class SceneLevel {
   shouldDraw(node: SceneNode, camera: Camera): boolean {
     const entity: PhysicalEntity = node.entity;
     if (entity.visible && entity.drawable) {
-      // const width = entity.graphics[0].width;
-      // const height = entity.graphics[0].height;
-      // FIXME: This still doesn't work properly. Suspect it is related to using an
-      // adjusted drawCoord.
-      return node.drawCoords.some((drawCoord: Point2D) => camera.coordOnScreen(drawCoord));
+      const width = entity.graphics[0].width;
+      const height = entity.graphics[0].height;
+      return camera.isOnScreen(node.drawCoord, width, height);
     } else {
       return false;
     }
@@ -322,7 +311,6 @@ export abstract class SceneGraph {
     const min2D = this.getDrawCoord(min);
     const base1 = this.getDrawCoord(new Point3D(min.x, max.y, min.z));
     const base2 = this.getDrawCoord(new Point3D(max.x, max.y, min.z));
-    node.drawCoords.push(min2D, base1, base2);
     node.baseSegments.push(new Segment2D(min2D, base1));
     node.baseSegments.push(new Segment2D(base1, base2));
 
@@ -336,9 +324,17 @@ export abstract class SceneGraph {
     node.sideSegments.push(new Segment2D(min2D, top1));
     node.sideSegments.push(new Segment2D(base2, max2D));
 
-    const drawHeightOffset = min2D.diff(top2);
-    const coord = this.getDrawCoord(entity.bounds.minLocation);
-    const adjustedCoord = new Point2D(coord.x, coord.y - drawHeightOffset.y);
+    //  image root: *  /*\ 'top1'
+    //                /   \
+    //               /     \
+    //              |\     /|
+    //              | \   / |
+    // minDrawCoord *  \ /  |
+    //               \  |  / 
+    //                \ | /  * other limit
+    // 
+    const drawHeightOffset = min2D.diff(top1);
+    const adjustedCoord = new Point2D(min2D.x, min2D.y - drawHeightOffset.y);
     node.drawCoord = adjustedCoord;
   }
 
@@ -475,6 +471,7 @@ export class Scene {
   getLocationAt(x: number, y: number, camera: Camera): Point3D | null {
     const entity: PhysicalEntity | null = this.getEntityDrawnAt(x, y, camera);
     if (entity != null) {
+      // FIXME: This is not a surface location.
       return entity.bounds.minLocation;
     }
     return null;
@@ -538,7 +535,7 @@ export class Scene {
     const elements: number = this.numToDraw();
     // - 2 bytes for each uint16
     // - 3 entries per draw element: sprite id, x, y
-    // - 2 graphics per entry
+    // - 2 graphics per entry to hopefully avoid a resize.
     const initByteLength = elements * 2 * 3 * 2;
     let buffer = new ArrayBuffer(initByteLength);
     let drawElements = new Uint16Array(buffer);

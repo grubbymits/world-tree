@@ -2628,7 +2628,9 @@ var SceneLevel = class {
   shouldDraw(node, camera) {
     const entity = node.entity;
     if (entity.visible && entity.drawable) {
-      return node.drawCoords.some((drawCoord) => camera.coordOnScreen(drawCoord));
+      const width = entity.graphics[0].width;
+      const height = entity.graphics[0].height;
+      return camera.isOnScreen(node.drawCoord, width, height);
     } else {
       return false;
     }
@@ -2686,7 +2688,6 @@ var SceneGraph = class {
     const min2D = this.getDrawCoord(min);
     const base1 = this.getDrawCoord(new Point3D(min.x, max.y, min.z));
     const base2 = this.getDrawCoord(new Point3D(max.x, max.y, min.z));
-    node.drawCoords.push(min2D, base1, base2);
     node.baseSegments.push(new Segment2D(min2D, base1));
     node.baseSegments.push(new Segment2D(base1, base2));
     const max2D = this.getDrawCoord(max);
@@ -2697,7 +2698,7 @@ var SceneGraph = class {
     node.topSegments.push(new Segment2D(top2, max2D));
     node.sideSegments.push(new Segment2D(min2D, top1));
     node.sideSegments.push(new Segment2D(base2, max2D));
-    const drawHeightOffset = min2D.diff(top2);
+    const drawHeightOffset = min2D.diff(top1);
     const coord = this.getDrawCoord(entity.bounds.minLocation);
     const adjustedCoord = new Point2D(coord.x, coord.y - drawHeightOffset.y);
     node.drawCoord = adjustedCoord;
@@ -2873,7 +2874,6 @@ var Scene = class {
         const entity = node.entity;
         const coord = camera.getDrawCoord(node.drawCoord);
         if (entity.graphics.length * 3 + idx >= drawElements.length) {
-          console.log("resized element buffer");
           let new_buffer = new ArrayBuffer(buffer.byteLength * 2);
           new Uint16Array(new_buffer).set(new Uint16Array(buffer));
           buffer = new_buffer;
@@ -4385,12 +4385,6 @@ var Camera = class {
       this._lowerY,
       this
     );
-  }
-  coordOnScreen(coord) {
-    if (coord.x < this._lowerX || coord.y < this._lowerY || coord.x > this._upperX || coord.y > this._upperY) {
-      return false;
-    }
-    return true;
   }
   isOnScreen(coord, width, depth) {
     if (coord.x + width < this._lowerX || coord.y + depth < this._lowerY || coord.x - width > this._upperX || coord.y - depth > this._upperY) {
