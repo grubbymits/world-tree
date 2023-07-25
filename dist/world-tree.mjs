@@ -20,6 +20,18 @@ var __async = (__this, __arguments, generator) => {
 };
 
 // src/render.ts
+var DrawElementList = class {
+  constructor(_buffer, _length) {
+    this._buffer = _buffer;
+    this._length = _length;
+  }
+  get buffer() {
+    return this._buffer;
+  }
+  get length() {
+    return this._length;
+  }
+};
 var DummyRenderer = class {
   addBitmap(id, bitmap) {
   }
@@ -42,10 +54,11 @@ var OffscreenRenderer = class {
   }
   draw(elements) {
     this._ctx.clearRect(0, 0, this._width, this._height);
+    const buffer = elements.buffer;
     for (let i = 0; i < elements.length - 2; ++i) {
-      const spriteId = elements[i];
-      const x = elements[i + 1];
-      const y = elements[i + 2];
+      const spriteId = buffer[i];
+      const x = buffer[i + 1];
+      const y = buffer[i + 2];
       console.assert(spriteId < this._bitmaps.length, "bitmap length mismatch");
       this._ctx.drawImage(this._bitmaps[spriteId], x, y);
     }
@@ -87,10 +100,11 @@ var OnscreenRenderer = class {
   draw(elements) {
     this.ctx.clearRect(0, 0, this.width, this.height);
     console.assert(elements.length % 3 == 0, "elements not mod 3");
+    const buffer = elements.buffer;
     for (let i = 0; i < elements.length - 2; ++i) {
-      const spriteId = elements[i];
-      const x = elements[i + 1];
-      const y = elements[i + 2];
+      const spriteId = buffer[i];
+      const x = buffer[i + 1];
+      const y = buffer[i + 2];
       if (spriteId >= this.bitmaps.length)
         continue;
       console.assert(
@@ -2437,6 +2451,7 @@ var SceneNode = class {
     this._minDrawCoord = _minDrawCoord;
     this._preds = new Array();
     this._succs = new Array();
+    // FIXME: Just store the six points, not six segments.
     this._topOutlineSegments = new Array();
     this._sideOutlineSegments = new Array();
     this._baseOutlineSegments = new Array();
@@ -2613,8 +2628,6 @@ var SceneLevel = class {
   shouldDraw(node, camera) {
     const entity = node.entity;
     if (entity.visible && entity.drawable) {
-      const width = entity.graphics[0].width;
-      const height = entity.graphics[0].height;
       return node.drawCoords.some((drawCoord) => camera.coordOnScreen(drawCoord));
     } else {
       return false;
@@ -2850,7 +2863,7 @@ var Scene = class {
     }
     this.graph.buildLevels(camera, force);
     const elements = this.numToDraw();
-    const initByteLength = elements * 3 * 2;
+    const initByteLength = elements * 2 * 3 * 2;
     let buffer = new ArrayBuffer(initByteLength);
     let drawElements = new Uint16Array(buffer);
     let idx = 0;
@@ -2860,8 +2873,9 @@ var Scene = class {
         const entity = node.entity;
         const coord = camera.getDrawCoord(node.drawCoord);
         if (entity.graphics.length * 3 + idx >= drawElements.length) {
+          console.log("resized element buffer");
           let new_buffer = new ArrayBuffer(buffer.byteLength * 2);
-          new Uint8Array(new_buffer).set(new Uint8Array(buffer));
+          new Uint16Array(new_buffer).set(new Uint16Array(buffer));
           buffer = new_buffer;
           drawElements = new Uint16Array(buffer);
         }
@@ -2875,7 +2889,7 @@ var Scene = class {
       }
     });
     this._handler.service();
-    return drawElements;
+    return new DrawElementList(drawElements, idx);
   }
   verifyRenderer(entities) {
     if (this.graph.numNodes != entities.length) {
@@ -4811,6 +4825,7 @@ export {
   Direction,
   DirectionalGraphicComponent,
   DrawElement,
+  DrawElementList,
   DummyGraphicComponent,
   DummyRenderer,
   DummySpriteSheet,

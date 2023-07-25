@@ -1,14 +1,22 @@
 import { GraphicEvent } from "./graphics.ts";
 import { Point2D } from "./geometry.ts";
 
+export class DrawElementList {
+  constructor(private readonly _buffer: Uint16Array,
+              private readonly _length: number) { }
+
+  get buffer(): Uint16Array { return this._buffer; }
+  get length(): number { return this._length; }
+}
+
 export interface Renderer {
   addBitmap(id: number, bitmap: ImageBitmap): void;
-  draw(elements: Uint16Array): void;
+  draw(elements: DrawElementList): void;
 }
 
 export class DummyRenderer implements Renderer {
   addBitmap(id: number, bitmap: ImageBitmap): void {}
-  draw(elements: Uint16Array): void {}
+  draw(elements: DrawElementList): void {}
 }
 
 export class OffscreenRenderer implements Renderer {
@@ -31,12 +39,13 @@ export class OffscreenRenderer implements Renderer {
     this._bitmaps[id] = bitmap;
   }
 
-  draw(elements: Uint16Array): void {
+  draw(elements: DrawElementList): void {
     this._ctx.clearRect(0, 0, this._width, this._height);
+    const buffer = elements.buffer;
     for (let i = 0; i < elements.length - 2; ++i) {
-      const spriteId = elements[i];
-      const x = elements[i + 1];
-      const y = elements[i + 2];
+      const spriteId = buffer[i];
+      const x = buffer[i + 1];
+      const y = buffer[i + 2];
       console.assert(spriteId < this._bitmaps.length, "bitmap length mismatch");
       this._ctx.drawImage(this._bitmaps[spriteId], x, y);
     }
@@ -106,7 +115,7 @@ export class OnscreenRenderer implements Renderer {
     //}
   }
 
-  draw(elements: Uint16Array): void {
+  draw(elements: DrawElementList): void {
     //if (window.Worker) {
     //  // Transfer drawElements to worker.
     //  this.worker.postMessage(
@@ -116,10 +125,11 @@ export class OnscreenRenderer implements Renderer {
     //} else {
       this.ctx.clearRect(0, 0, this.width, this.height);
       console.assert((elements.length % 3) == 0, "elements not mod 3");
+      const buffer = elements.buffer;
       for (let i = 0; i < elements.length - 2; ++i) {
-        const spriteId = elements[i];
-        const x = elements[i + 1];
-        const y = elements[i + 2];
+        const spriteId = buffer[i];
+        const x = buffer[i + 1];
+        const y = buffer[i + 2];
         if (spriteId >= this.bitmaps.length) continue;
         console.assert(
           spriteId < this.bitmaps.length,

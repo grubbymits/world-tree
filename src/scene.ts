@@ -4,6 +4,7 @@ import { Point2D, Point3D, Segment2D, Vector2D } from "./geometry.ts";
 import { GraphicComponent, Sprite } from "./graphics.ts";
 import { Dimensions } from "./physics.ts";
 import { TimedEventHandler } from "./events.ts";
+import { DrawElementList } from "./render.ts";
 
 export enum RenderOrder {
   Before = -1,
@@ -529,7 +530,7 @@ export class Scene {
     return num;
   }
 
-  render(camera: Camera, force: boolean): Uint16Array {
+  render(camera: Camera, force: boolean): DrawElementList {
     if (!this.graph.initialised) {
       this.graph.initialise(this.nodes);
     }
@@ -537,7 +538,8 @@ export class Scene {
     const elements: number = this.numToDraw();
     // - 2 bytes for each uint16
     // - 3 entries per draw element: sprite id, x, y
-    const initByteLength = elements * 3 * 2;
+    // - 2 graphics per entry
+    const initByteLength = elements * 2 * 3 * 2;
     let buffer = new ArrayBuffer(initByteLength);
     let drawElements = new Uint16Array(buffer);
     let idx = 0;
@@ -550,7 +552,7 @@ export class Scene {
         if (entity.graphics.length * 3 + idx >= drawElements.length) {
           //buffer.resize(buffer.byteLength * 2);
           let new_buffer = new ArrayBuffer(buffer.byteLength * 2);
-          new Uint8Array(new_buffer).set(new Uint8Array(buffer));
+          new Uint16Array(new_buffer).set(new Uint16Array(buffer));
           buffer = new_buffer;
           drawElements = new Uint16Array(buffer);
         }
@@ -570,7 +572,7 @@ export class Scene {
     //}
 
     this._handler.service();
-    return drawElements;
+    return new DrawElementList(drawElements, idx);
   }
 
   verifyRenderer(entities: Array<PhysicalEntity>): boolean {
