@@ -1,9 +1,6 @@
-import * as WT from "../lib/world-tree.js";
+import * as WT from "../lib/world-tree.mjs";
 const spriteWidth = 322;
 const spriteHeight = 270;
-const sheet = new WT.SpriteSheet(
-  "../graphics/png/outside-terrain-tiles-muted-textured",
-);
 const tileRows = [
   WT.TerrainType.Lowland5,
   WT.TerrainType.Lowland4,
@@ -36,7 +33,7 @@ const tileColumns = [
   WT.TerrainShape.FlatEast,
 ];
 
-function addGraphic(column, row) {
+function addGraphic(column, row, sheet) {
   const shape = tileColumns[column];
   const type = tileRows[row];
   WT.Terrain.addGraphic(
@@ -48,17 +45,6 @@ function addGraphic(column, row) {
     /*width*/ spriteWidth,
     /*height*/ spriteHeight,
   );
-}
-
-for (let row in tileRows) {
-  if (tileRows[row] == WT.TerrainType.Water) {
-    // Only supporting flat water and sand tiles.
-    addGraphic(tileColumns[0], row);
-    continue;
-  }
-  for (let column in tileColumns) {
-    addGraphic(column, row);
-  }
 }
 
 const cellsX = 11;
@@ -83,7 +69,7 @@ function random_inrange(min, max) {
 }
 
 function addTrees(totalTrees, terrainDims, context, builder) {
-  const treeSheet = new WT.SpriteSheet("../graphics/png/trees");
+  const treeSheet = new WT.SpriteSheet("../graphics/png/trees", context);
   const treeSpriteWidth = 114;
   const treeSpriteHeight = 171;
 
@@ -175,6 +161,21 @@ window.onload = (event) => {
     worldDims,
     WT.Perspective.TwoByOneIsometric,
   );
+  const sheet = new WT.SpriteSheet(
+    "../graphics/png/outside-terrain-tiles-muted-textured",
+    context
+  );
+  for (let row in tileRows) {
+    if (tileRows[row] == WT.TerrainType.Water) {
+      // Only supporting flat water and sand tiles.
+      addGraphic(tileColumns[0], row, sheet);
+      continue;
+    }
+    for (let column in tileColumns) {
+      addGraphic(column, row, sheet);
+    }
+  }
+
   const defaultFloor = WT.TerrainType.Lowland3;
   const defaultWall = WT.TerrainType.Lowland2;
   // Use the height map to construct a terrain.

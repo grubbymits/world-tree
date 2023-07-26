@@ -1,14 +1,12 @@
 import * as WT from "../lib/world-tree.mjs";
 
 class Droid extends WT.Actor {
-  static sheet = new WT.SpriteSheet("../graphics/png/levitate-droid");
   static directions = [
     WT.Direction.West,
     WT.Direction.South,
     WT.Direction.East,
     WT.Direction.North,
   ];
-  static sprites = new Array();
   static spriteWidth = 58;
   static spriteHeight = 107;
   static dims = WT.TwoByOneIsometric.getDimensions(
@@ -16,8 +14,10 @@ class Droid extends WT.Actor {
     this.spriteHeight,
   );
 
-  static initGraphics() {
-    this.staticGraphics = new Map();
+  constructor(context, position) {
+    super(context, position, Droid.dims);
+    this.sheet_ = new WT.SpriteSheet("../graphics/png/levitate-droid", context);
+    this.staticGraphics_ = new Map();
     for (let x in this.directions) {
       let direction = this.directions[x];
       let sprite = new WT.Sprite(
@@ -28,15 +28,9 @@ class Droid extends WT.Actor {
         this.spriteHeight,
       );
       let graphic = new WT.StaticGraphicComponent(sprite.id);
-      this.staticGraphics.set(direction, graphic);
+      this.staticGraphics_.set(direction, graphic);
     }
-  }
-
-  constructor(context, position) {
-    super(context, position, Droid.dims);
-    let graphics = new WT.DirectionalGraphicComponent(Droid.staticGraphics);
-    this.addGraphic(graphics);
-
+    const graphics = new WT.DirectionalGraphicComponent(this.staticGraphics_);
     this.addEventListener(
       WT.EntityEvent.FaceDirection,
       () => graphics.direction = this.direction,
@@ -68,9 +62,6 @@ class Droid extends WT.Actor {
 
 const spriteWidth = 322;
 const spriteHeight = 270;
-const sheet = new WT.SpriteSheet(
-  "../graphics/png/outside-terrain-tiles-muted-textured",
-);
 const tileRows = [
   WT.TerrainType.Upland5,
   WT.TerrainType.Upland4,
@@ -80,7 +71,7 @@ const tileRows = [
   WT.TerrainType.Upland0,
 ];
 
-function addGraphic(row) {
+function addGraphic(row, sheet) {
   const type = tileRows[row];
   WT.Terrain.addGraphic(
     /*terrainType*/ type,
@@ -100,10 +91,6 @@ function addGraphic(row) {
     /*width*/ spriteWidth,
     /*height*/ spriteHeight,
   );
-}
-
-for (let row in tileRows) {
-  addGraphic(row);
 }
 
 const cellsX = 9;
@@ -151,10 +138,16 @@ window.onload = (event) => {
     worldDims,
     WT.Perspective.TwoByOneIsometric,
   );
+  const sheet = new WT.SpriteSheet(
+    "../graphics/png/outside-terrain-tiles-muted-textured", context
+  );
+  for (let row in tileRows) {
+    addGraphic(row, sheet);
+  }
+
   builder.generateMap(context);
 
   // Place the droid in the middle of the map.
-  Droid.initGraphics();
   let droidPosition = new WT.Point3D(
     Math.floor(worldDims.width / 2),
     Math.floor(worldDims.depth / 2),
