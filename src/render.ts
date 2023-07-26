@@ -2,10 +2,10 @@ import { GraphicEvent } from "./graphics.ts";
 import { Point2D } from "./geometry.ts";
 
 export class DrawElementList {
-  constructor(private readonly _buffer: Uint16Array,
+  constructor(private readonly _buffer: Int16Array,
               private readonly _length: number) { }
 
-  get buffer(): Uint16Array { return this._buffer; }
+  get buffer(): Int16Array { return this._buffer; }
   get length(): number { return this._length; }
 }
 
@@ -32,22 +32,26 @@ export class OffscreenRenderer implements Renderer {
     this._ctx = this._canvas.getContext("2d")!;
   }
 
+  get bitmaps(): Array<ImageBitmap> {
+    return this._bitmaps;
+  }
+
   addBitmap(id: number, bitmap: ImageBitmap): void {
-    if (id >= this._bitmaps.length) {
-      this._bitmaps.length = id + 1;
+    if (id >= this.bitmaps.length) {
+      this.bitmaps.length = id + 1;
     }
-    this._bitmaps[id] = bitmap;
+    this.bitmaps[id] = bitmap;
   }
 
   draw(elements: DrawElementList): void {
     this._ctx.clearRect(0, 0, this._width, this._height);
     const buffer = elements.buffer;
-    for (let i = 0; i < elements.length - 2; ++i) {
+    for (let i = 0; i < elements.length - 2; i+=3) {
       const spriteId = buffer[i];
       const x = buffer[i + 1];
       const y = buffer[i + 2];
-      console.assert(spriteId < this._bitmaps.length, "bitmap length mismatch");
-      this._ctx.drawImage(this._bitmaps[spriteId], x, y);
+      console.assert(spriteId < this.bitmaps.length, "bitmap length mismatch");
+      this._ctx.drawImage(this.bitmaps[spriteId], x, y);
     }
   }
 }
@@ -126,7 +130,7 @@ export class OnscreenRenderer implements Renderer {
       this.ctx.clearRect(0, 0, this.width, this.height);
       console.assert((elements.length % 3) == 0, "elements not mod 3");
       const buffer = elements.buffer;
-      for (let i = 0; i < elements.length - 2; ++i) {
+      for (let i = 0; i < elements.length - 2; i+=3) {
         const spriteId = buffer[i];
         const x = buffer[i + 1];
         const y = buffer[i + 2];
@@ -135,7 +139,7 @@ export class OnscreenRenderer implements Renderer {
           spriteId < this.bitmaps.length,
           "bitmap length mismatch", spriteId
         );
-        this.ctx.drawImage(this._bitmaps[spriteId], x, y);
+        this.ctx.drawImage(this.bitmaps[spriteId], x, y);
       }
     //}
   }

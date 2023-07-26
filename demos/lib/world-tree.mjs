@@ -46,21 +46,24 @@ var OffscreenRenderer = class {
     this._canvas = new OffscreenCanvas(_width, _height);
     this._ctx = this._canvas.getContext("2d");
   }
+  get bitmaps() {
+    return this._bitmaps;
+  }
   addBitmap(id, bitmap) {
-    if (id >= this._bitmaps.length) {
-      this._bitmaps.length = id + 1;
+    if (id >= this.bitmaps.length) {
+      this.bitmaps.length = id + 1;
     }
-    this._bitmaps[id] = bitmap;
+    this.bitmaps[id] = bitmap;
   }
   draw(elements) {
     this._ctx.clearRect(0, 0, this._width, this._height);
     const buffer = elements.buffer;
-    for (let i = 0; i < elements.length - 2; ++i) {
+    for (let i = 0; i < elements.length - 2; i += 3) {
       const spriteId = buffer[i];
       const x = buffer[i + 1];
       const y = buffer[i + 2];
-      console.assert(spriteId < this._bitmaps.length, "bitmap length mismatch");
-      this._ctx.drawImage(this._bitmaps[spriteId], x, y);
+      console.assert(spriteId < this.bitmaps.length, "bitmap length mismatch");
+      this._ctx.drawImage(this.bitmaps[spriteId], x, y);
     }
   }
 };
@@ -101,7 +104,7 @@ var OnscreenRenderer = class {
     this.ctx.clearRect(0, 0, this.width, this.height);
     console.assert(elements.length % 3 == 0, "elements not mod 3");
     const buffer = elements.buffer;
-    for (let i = 0; i < elements.length - 2; ++i) {
+    for (let i = 0; i < elements.length - 2; i += 3) {
       const spriteId = buffer[i];
       const x = buffer[i + 1];
       const y = buffer[i + 2];
@@ -112,7 +115,7 @@ var OnscreenRenderer = class {
         "bitmap length mismatch",
         spriteId
       );
-      this.ctx.drawImage(this._bitmaps[spriteId], x, y);
+      this.ctx.drawImage(this.bitmaps[spriteId], x, y);
     }
   }
 };
@@ -2455,7 +2458,6 @@ var SceneNode = class {
     this._topOutlineSegments = new Array();
     this._sideOutlineSegments = new Array();
     this._baseOutlineSegments = new Array();
-    this._drawCoords = new Array();
     this.drawCoord = _minDrawCoord;
   }
   overlapX(other) {
@@ -2476,14 +2478,6 @@ var SceneNode = class {
     this.sideSegments[1] = this.sideSegments[1].add(diff);
     this.drawCoord = this.drawCoord.add(diff);
     this.minDrawCoord = this.minDrawCoord.add(diff);
-    this._drawCoords = [];
-    const segments2d = [this.topSegments, this.baseSegments, this.sideSegments];
-    for (let segments of segments2d) {
-      for (let segment of segments) {
-        this.drawCoords.push(segment.p0);
-        this.drawCoords.push(segment.p1);
-      }
-    }
   }
   intersectsTop(other) {
     for (const otherTop of other.topSegments) {
@@ -2519,9 +2513,6 @@ var SceneNode = class {
   }
   set drawCoord(coord) {
     this._drawCoord = coord;
-  }
-  get drawCoords() {
-    return this._drawCoords;
   }
   get minDrawCoord() {
     return this._minDrawCoord;
@@ -2693,14 +2684,12 @@ var SceneGraph = class {
     const max2D = this.getDrawCoord(max);
     const top1 = this.getDrawCoord(new Point3D(min.x, min.y, max.z));
     const top2 = this.getDrawCoord(new Point3D(max.x, min.y, max.z));
-    node.drawCoords.push(max2D, top1, top2);
     node.topSegments.push(new Segment2D(top1, top2));
     node.topSegments.push(new Segment2D(top2, max2D));
     node.sideSegments.push(new Segment2D(min2D, top1));
     node.sideSegments.push(new Segment2D(base2, max2D));
     const drawHeightOffset = min2D.diff(top1);
-    const coord = this.getDrawCoord(entity.bounds.minLocation);
-    const adjustedCoord = new Point2D(coord.x, coord.y - drawHeightOffset.y);
+    const adjustedCoord = new Point2D(min2D.x, min2D.y - drawHeightOffset.y);
     node.drawCoord = adjustedCoord;
   }
   get levels() {
@@ -2866,7 +2855,7 @@ var Scene = class {
     const elements = this.numToDraw();
     const initByteLength = elements * 2 * 3 * 2;
     let buffer = new ArrayBuffer(initByteLength);
-    let drawElements = new Uint16Array(buffer);
+    let drawElements = new Int16Array(buffer);
     let idx = 0;
     this.graph.levels.forEach((level) => {
       for (let i = level.order.length - 1; i >= 0; i--) {
@@ -2875,9 +2864,9 @@ var Scene = class {
         const coord = camera.getDrawCoord(node.drawCoord);
         if (entity.graphics.length * 3 + idx >= drawElements.length) {
           let new_buffer = new ArrayBuffer(buffer.byteLength * 2);
-          new Uint16Array(new_buffer).set(new Uint16Array(buffer));
+          new Int16Array(new_buffer).set(new Int16Array(buffer));
           buffer = new_buffer;
-          drawElements = new Uint16Array(buffer);
+          drawElements = new Int16Array(buffer);
         }
         entity.graphics.forEach((component) => {
           const spriteId = component.update();

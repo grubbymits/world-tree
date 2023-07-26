@@ -108,9 +108,6 @@ export class SceneNode {
   set drawCoord(coord: Point2D) {
     this._drawCoord = coord;
   }
-  get drawCoords(): Array<Point2D> {
-    return this._drawCoords;
-  }
   get minDrawCoord(): Point2D {
     return this._minDrawCoord;
   }
@@ -317,7 +314,6 @@ export abstract class SceneGraph {
     const max2D = this.getDrawCoord(max);
     const top1 = this.getDrawCoord(new Point3D(min.x, min.y, max.z));
     const top2 = this.getDrawCoord(new Point3D(max.x, min.y, max.z));
-    node.drawCoords.push(max2D, top1, top2);
     node.topSegments.push(new Segment2D(top1, top2));
     node.topSegments.push(new Segment2D(top2, max2D));
 
@@ -538,7 +534,7 @@ export class Scene {
     // - 2 graphics per entry to hopefully avoid a resize.
     const initByteLength = elements * 2 * 3 * 2;
     let buffer = new ArrayBuffer(initByteLength);
-    let drawElements = new Uint16Array(buffer);
+    let drawElements = new Int16Array(buffer);
     let idx = 0;
     this.graph.levels.forEach((level) => {
       for (let i = level.order.length - 1; i >= 0; i--) {
@@ -549,9 +545,9 @@ export class Scene {
         if (entity.graphics.length * 3 + idx >= drawElements.length) {
           //buffer.resize(buffer.byteLength * 2);
           let new_buffer = new ArrayBuffer(buffer.byteLength * 2);
-          new Uint16Array(new_buffer).set(new Uint16Array(buffer));
+          new Int16Array(new_buffer).set(new Int16Array(buffer));
           buffer = new_buffer;
-          drawElements = new Uint16Array(buffer);
+          drawElements = new Int16Array(buffer);
         }
         entity.graphics.forEach((component) => {
           const spriteId: number = component.update();
