@@ -1,63 +1,63 @@
 import * as WT from "../lib/world-tree.mjs";
 
-class Droid extends WT.Actor {
-  static directions = [
+function createDroid(context, position) {
+  const directions = [
     WT.Direction.West,
     WT.Direction.South,
     WT.Direction.East,
     WT.Direction.North,
   ];
-  static spriteWidth = 58;
-  static spriteHeight = 107;
-  static dims = WT.TwoByOneIsometric.getDimensions(
-    this.spriteWidth,
-    this.spriteHeight,
+  const spriteWidth = 58;
+  const spriteHeight = 107;
+  const dimensions = WT.TwoByOneIsometric.getDimensions(
+    spriteWidth, spriteHeight,
+  );
+  const sheet = new WT.SpriteSheet("../graphics/png/levitate-droid", context);
+  const directionGraphicsMap = new Map();
+  for (let x in directions) {
+    let direction = directions[x];
+    let sprite = new WT.Sprite(
+      sheet,
+      x * spriteWidth,
+      0,
+      spriteWidth,
+      spriteHeight,
+    );
+    let graphic = new WT.StaticGraphicComponent(sprite.id);
+    directionGraphicsMap.set(direction, graphic);
+  }
+  const graphics = new WT.DirectionalGraphicComponent(directionGraphicsMap);
+  const droid = WT.createGraphicalActor(
+    context, position, dimensions, graphics);
+
+  droid.addEventListener(
+    WT.EntityEvent.FaceDirection,
+    () => graphics.direction = droid.direction,
   );
 
-  constructor(context, position) {
-    super(context, position, Droid.dims);
-    this.sheet_ = new WT.SpriteSheet("../graphics/png/levitate-droid", context);
-    this.staticGraphics_ = new Map();
-    for (let x in this.directions) {
-      let direction = this.directions[x];
-      let sprite = new WT.Sprite(
-        this.sheet,
-        x * this.spriteWidth,
-        0,
-        this.spriteWidth,
-        this.spriteHeight,
-      );
-      let graphic = new WT.StaticGraphicComponent(sprite.id);
-      this.staticGraphics_.set(direction, graphic);
+  let moveRandomDirection = () => {
+    let dx = Math.round(Math.random() * 2) - 1;
+    let dy = 0;
+    let dz = 0;
+    // Move along either the x or y axis.
+    // Choose values between: -1, 0, 1
+    if (dx == 0) {
+      dy = Math.round(Math.random() * 2) - 1;
     }
-    const graphics = new WT.DirectionalGraphicComponent(this.staticGraphics_);
-    this.addEventListener(
-      WT.EntityEvent.FaceDirection,
-      () => graphics.direction = this.direction,
-    );
+    if (dx == 0 && dy == 0) {
+      dy = 1;
+    }
+    let moveVector = new WT.Vector3D(dx, dy, dz);
+    droid.direction = WT.Navigation.getDirectionFromVector(moveVector);
+    droid.action = new WT.MoveDirection(droid, moveVector, context.bounds);
+  };
 
-    let moveRandomDirection = () => {
-      let dx = Math.round(Math.random() * 2) - 1;
-      let dy = 0;
-      let dz = 0;
-      // Move along either the x or y axis.
-      // Choose values between: -1, 0, 1
-      if (dx == 0) {
-        dy = Math.round(Math.random() * 2) - 1;
-      }
-      if (dx == 0 && dy == 0) {
-        dy = 1;
-      }
-      let moveVector = new WT.Vector3D(dx, dy, dz);
-      this.direction = WT.Navigation.getDirectionFromVector(moveVector);
-      this.action = new WT.MoveDirection(this, moveVector, context.bounds);
-    };
+  // Choose another direction when it can't move anymore.
+  droid.addEventListener(WT.EntityEvent.EndMove, moveRandomDirection);
+  // Initialise movement.
+  moveRandomDirection();
 
-    // Choose another direction when it can't move anymore.
-    this.addEventListener(WT.EntityEvent.EndMove, moveRandomDirection);
-    // Initialise movement.
-    moveRandomDirection();
-  }
+  return droid;
 }
 
 const spriteWidth = 322;
@@ -123,17 +123,8 @@ window.onload = (event) => {
     WT.TerrainType.Upland0,
     WT.TerrainType.Upland1,
   );
-  // Use the height map to construct a terrain.
-  let builder = new WT.TerrainBuilder(
-    cellsX,
-    cellsY,
-    heightMap,
-    config,
-    physicalDims,
-  );
-
-  let canvas = document.getElementById("demoCanvas");
-  let context = WT.createContext(
+  const canvas = document.getElementById("demoCanvas");
+  const context = WT.createContext(
     canvas,
     worldDims,
     WT.Perspective.TwoByOneIsometric,
@@ -145,16 +136,24 @@ window.onload = (event) => {
     addGraphic(row, sheet);
   }
 
+  // Use the height map to construct a terrain.
+  const builder = new WT.TerrainBuilder(
+    cellsX,
+    cellsY,
+    heightMap,
+    config,
+    physicalDims,
+  );
   builder.generateMap(context);
 
   // Place the droid in the middle of the map.
-  let droidPosition = new WT.Point3D(
+  const droidPosition = new WT.Point3D(
     Math.floor(worldDims.width / 2),
     Math.floor(worldDims.depth / 2),
     Math.floor(physicalDims.height + 1),
   );
-  var droid = new Droid(context, droidPosition);
-  let camera = new WT.TrackerCamera(
+  const droid = createDroid(context, droidPosition);
+  const camera = new WT.TrackerCamera(
     context.scene,
     canvas.width,
     canvas.height,

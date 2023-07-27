@@ -225,6 +225,7 @@ export class SceneLevel {
   shouldDraw(node: SceneNode, camera: Camera): boolean {
     const entity: PhysicalEntity = node.entity;
     if (entity.visible && entity.drawable) {
+      // FIXME: Is using the graphics data the right/best thing to do?
       const width = entity.graphics[0].width;
       const height = entity.graphics[0].height;
       return camera.isOnScreen(node.drawCoord, width, height);
@@ -320,16 +321,17 @@ export abstract class SceneGraph {
     node.sideSegments.push(new Segment2D(min2D, top1));
     node.sideSegments.push(new Segment2D(base2, max2D));
 
+    // FIXME: Still not convinced this is right.
     //  image root: *  /*\ 'top1'
     //                /   \
-    //               /     \
+    //       'top2'* /     \
     //              |\     /|
     //              | \   / |
     // minDrawCoord *  \ /  |
     //               \  |  / 
     //                \ | /  * other limit
     // 
-    const drawHeightOffset = min2D.diff(top1);
+    const drawHeightOffset = min2D.diff(top2);
     const adjustedCoord = new Point2D(min2D.x, min2D.y - drawHeightOffset.y);
     node.drawCoord = adjustedCoord;
   }

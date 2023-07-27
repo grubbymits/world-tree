@@ -2688,7 +2688,7 @@ var SceneGraph = class {
     node.topSegments.push(new Segment2D(top2, max2D));
     node.sideSegments.push(new Segment2D(min2D, top1));
     node.sideSegments.push(new Segment2D(base2, max2D));
-    const drawHeightOffset = min2D.diff(top1);
+    const drawHeightOffset = min2D.diff(top2);
     const adjustedCoord = new Point2D(min2D.x, min2D.y - drawHeightOffset.y);
     node.drawCoord = adjustedCoord;
   }
