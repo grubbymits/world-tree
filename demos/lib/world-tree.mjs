@@ -1995,11 +1995,19 @@ var _SpriteSheet = class {
       this.canvas = document.createElement("canvas");
       this.canvas.width = this.width;
       this.canvas.height = this.height;
-      this.context2D = this.canvas.getContext("2d", { willReadFrequently: true });
+      this.context2D = this.canvas.getContext("2d", {
+        willReadFrequently: true
+      });
       this.context2D.drawImage(this.image, 0, 0, this.width, this.height);
       this.loaded = true;
       for (let bitmap of this.bitmapsToLoad) {
-        this.addBitmap(bitmap.id, bitmap.x, bitmap.y, bitmap.width, bitmap.height);
+        this.addBitmap(
+          bitmap.id,
+          bitmap.x,
+          bitmap.y,
+          bitmap.width,
+          bitmap.height
+        );
       }
     };
     if (name) {
@@ -2396,7 +2404,8 @@ var OnscreenRenderer = class {
   constructor(_canvas) {
     this._canvas = _canvas;
     this._bitmaps = new Array();
-    this.workerBlob_ = new Blob([`
+    this.workerBlob_ = new Blob([
+      `
     const ctx = {};
     ctx.sprites = new Array();
     ctx.valid = false;
@@ -2451,7 +2460,8 @@ var OnscreenRenderer = class {
         break;
       }
     }
-  }`]);
+  }`
+    ]);
     this._width = this.canvas.width;
     this._height = this.canvas.height;
     if (window.Worker) {
@@ -2505,7 +2515,11 @@ var OnscreenRenderer = class {
   draw(elements) {
     if (window.Worker) {
       this.worker.postMessage(
-        { type: 2 /* Draw */, buffer: elements.buffer, length: elements.length },
+        {
+          type: 2 /* Draw */,
+          buffer: elements.buffer,
+          length: elements.length
+        },
         [elements.buffer]
       );
     } else {

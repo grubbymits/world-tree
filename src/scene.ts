@@ -328,9 +328,9 @@ export abstract class SceneGraph {
     //              |\     /|
     //              | \   / |
     // minDrawCoord *  \ /  |
-    //               \  |  / 
+    //               \  |  /
     //                \ | /  * other limit
-    // 
+    //
     const drawHeightOffset = min2D.diff(top2);
     const adjustedCoord = new Point2D(min2D.x, min2D.y - drawHeightOffset.y);
     node.drawCoord = adjustedCoord;

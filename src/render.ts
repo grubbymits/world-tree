@@ -2,12 +2,20 @@ import { GraphicEvent } from "./graphics.ts";
 import { Point2D } from "./geometry.ts";
 
 export class DrawElementList {
-  constructor(private readonly _array: Int16Array,
-              private readonly _length: number) { }
+  constructor(
+    private readonly _array: Int16Array,
+    private readonly _length: number
+  ) {}
 
-  get array(): Int16Array { return this._array; }
-  get buffer(): ArrayBuffer { return this._array.buffer; }
-  get length(): number { return this._length; }
+  get array(): Int16Array {
+    return this._array;
+  }
+  get buffer(): ArrayBuffer {
+    return this._array.buffer;
+  }
+  get length(): number {
+    return this._length;
+  }
 }
 
 export interface Renderer {
@@ -47,7 +55,7 @@ export class OffscreenRenderer implements Renderer {
   draw(elements: DrawElementList): void {
     this._ctx.clearRect(0, 0, this._width, this._height);
     const array: Int16Array = elements.array;
-    for (let i = 0; i < elements.length - 2; i+=3) {
+    for (let i = 0; i < elements.length - 2; i += 3) {
       const spriteId = array[i];
       const x = array[i + 1];
       const y = array[i + 2];
@@ -64,7 +72,8 @@ export class OnscreenRenderer implements Renderer {
   private readonly _width: number;
   private readonly _height: number;
 
-  private readonly workerBlob_ = new Blob([`
+  private readonly workerBlob_ = new Blob([
+    `
     const ctx = {};
     ctx.sprites = new Array();
     ctx.valid = false;
@@ -119,7 +128,8 @@ export class OnscreenRenderer implements Renderer {
         break;
       }
     }
-  }`]);
+  }`,
+  ]);
 
   constructor(private _canvas: HTMLCanvasElement) {
     this._width = this.canvas.width;
@@ -127,7 +137,7 @@ export class OnscreenRenderer implements Renderer {
     if (window.Worker) {
       const offscreen = this.canvas.transferControlToOffscreen();
       const workerBlobURL = window.URL.createObjectURL(this.workerBlob_);
-      this._worker = new Worker(workerBlobURL);//, {type: 'module'});
+      this._worker = new Worker(workerBlobURL); //, {type: 'module'});
       this.worker.postMessage(
         {
           type: GraphicEvent.AddCanvas,
@@ -179,21 +189,26 @@ export class OnscreenRenderer implements Renderer {
     if (window.Worker) {
       // Transfer drawElements to worker.
       this.worker.postMessage(
-        { type: GraphicEvent.Draw, buffer: elements.buffer, length: elements.length  },
+        {
+          type: GraphicEvent.Draw,
+          buffer: elements.buffer,
+          length: elements.length,
+        },
         [elements.buffer]
       );
     } else {
       this.ctx.clearRect(0, 0, this.width, this.height);
-      console.assert((elements.length % 3) == 0, "elements not mod 3");
+      console.assert(elements.length % 3 == 0, "elements not mod 3");
       const array: Int16Array = elements.array;
-      for (let i = 0; i < elements.length - 2; i+=3) {
+      for (let i = 0; i < elements.length - 2; i += 3) {
         const spriteId = array[i];
         const x = array[i + 1];
         const y = array[i + 2];
         if (spriteId >= this.bitmaps.length) continue;
         console.assert(
           spriteId < this.bitmaps.length,
-          "bitmap length mismatch", spriteId
+          "bitmap length mismatch",
+          spriteId
         );
         this.ctx.drawImage(this.bitmaps[spriteId], x, y);
       }

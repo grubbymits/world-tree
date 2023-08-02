@@ -2,3 +2,4 @@
 
 npx prettier --check --parser typescript "src/*.ts"
 npx prettier --check "tests/*.mjs"
+npm run test

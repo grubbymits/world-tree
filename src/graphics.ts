@@ -17,18 +17,30 @@ export const DummySpriteSheet = {
 };
 
 class SpriteBitmap {
-  constructor(private readonly _id: number,
-              private readonly _x: number,
-              private readonly _y: number,
-              private readonly _width: number,
-              private readonly _height: number) {
+  constructor(
+    private readonly _id: number,
+    private readonly _x: number,
+    private readonly _y: number,
+    private readonly _width: number,
+    private readonly _height: number
+  ) {
     Object.freeze(this);
   }
-  get id(): number { return this._id; }
-  get x(): number { return this._x; }
-  get y(): number { return this._y; }
-  get width(): number { return this._width; }
-  get height(): number { return this._height; }
+  get id(): number {
+    return this._id;
+  }
+  get x(): number {
+    return this._x;
+  }
+  get y(): number {
+    return this._y;
+  }
+  get width(): number {
+    return this._width;
+  }
+  get height(): number {
+    return this._height;
+  }
 }
 
 export class SpriteSheet {
@@ -57,11 +69,19 @@ export class SpriteSheet {
       this.canvas = document.createElement("canvas");
       this.canvas.width = this.width;
       this.canvas.height = this.height;
-      this.context2D = this.canvas.getContext("2d", { willReadFrequently: true })!;
+      this.context2D = this.canvas.getContext("2d", {
+        willReadFrequently: true,
+      })!;
       this.context2D.drawImage(this.image, 0, 0, this.width, this.height);
       this.loaded = true;
       for (let bitmap of this.bitmapsToLoad) {
-        this.addBitmap(bitmap.id, bitmap.x, bitmap.y, bitmap.width, bitmap.height);
+        this.addBitmap(
+          bitmap.id,
+          bitmap.x,
+          bitmap.y,
+          bitmap.width,
+          bitmap.height
+        );
       }
     };
 
