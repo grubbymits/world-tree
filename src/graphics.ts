@@ -121,8 +121,9 @@ export class SpriteSheet {
     height: number
   ): Promise<void> {
     if (this.loaded) {
-      const bitmap = await createImageBitmap(this.image, x, y, width, height);
-      this._renderer.addBitmap(id, bitmap);
+      createImageBitmap(this.image, x, y, width, height).then((bitmap) => {
+        this._renderer.addBitmap(id, bitmap);
+      });
     } else {
       this.bitmapsToLoad.push(new SpriteBitmap(id, x, y, width, height));
     }

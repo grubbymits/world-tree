@@ -2056,8 +2056,9 @@ var _SpriteSheet = class {
   addBitmap(id, x, y, width, height) {
     return __async(this, null, function* () {
       if (this.loaded) {
-        const bitmap = yield createImageBitmap(this.image, x, y, width, height);
-        this._renderer.addBitmap(id, bitmap);
+        createImageBitmap(this.image, x, y, width, height).then((bitmap) => {
+          this._renderer.addBitmap(id, bitmap);
+        });
       } else {
         this.bitmapsToLoad.push(new SpriteBitmap(id, x, y, width, height));
       }
@@ -4015,11 +4016,6 @@ var TerrainBuilder = class {
           biome = 0 /* Water */;
           terrain = 0 /* Water */;
         } else if (surface.height >= this.config.uplandThreshold) {
-          console.log(
-            "height, threshold",
-            surface.height,
-            this.config.uplandThreshold
-          );
           switch (moistureScaled) {
             default:
               console.error("unhandled moisture scale");

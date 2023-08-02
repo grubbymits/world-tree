@@ -888,11 +888,6 @@ export class TerrainBuilder {
           biome = Biome.Water;
           terrain = TerrainType.Water;
         } else if (surface.height >= this.config.uplandThreshold) {
-          console.log(
-            "height, threshold",
-            surface.height,
-            this.config.uplandThreshold
-          );
           switch (moistureScaled) {
             default:
               console.error("unhandled moisture scale");
