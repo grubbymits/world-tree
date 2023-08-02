@@ -1,4 +1,4 @@
-![example workflow](https://github.com/grubbymits/world-tree/actions/workflows/node.yml/badge.svg?branch=main)
+![example workflow](https://github.com/grubbymits/world-tree/actions/workflows/node.js.yml/badge.svg?branch=main)
 
 <img src="https://raw.githubusercontent.com/grubbymits/world-tree/main/logo.svg" width=40% align=right>
 
