@@ -1,4 +1,4 @@
-![example workflow](https://github.com/grubbymits/world-tree/actions/workflows/deno.yml/badge.svg?branch=main)
+![example workflow](https://github.com/grubbymits/world-tree/actions/workflows/node.yml/badge.svg?branch=main)
 
 <img src="https://raw.githubusercontent.com/grubbymits/world-tree/main/logo.svg" width=40% align=right>
 
@@ -13,10 +13,8 @@ achieved by providing a low barrier to entry for game development:
 - Other terrains, along with water, can easily be added by simply providing some
   extra sprites.
 - A user of the engine will likely want to add player- and computer-controlled
-  characters into the world. For this, the engine employs Controllers to govern
-  Actors, who perform Actions.
-- Two different classes (mouse and keyboard based) are provided for controlling
-  the camera, and these can simply be extended for individual use cases.
+  characters into the world.
+- Mouse click and character tracking camera. 
 - The engine has been developed using isometric sprites, but has been designed
   for so that other perspectives can easily be plugged in by implementing a
   SceneGraph object. This just needs to provide method implementations to
@@ -26,3 +24,4 @@ achieved by providing a low barrier to entry for game development:
   automatically updated in the tree and can be easily queried.
 - A light-weight event system is employed to keep the engine, characters and
   player informed of the changing environment.
+- WebWorker rendering support.
