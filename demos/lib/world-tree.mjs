@@ -19,107 +19,6 @@ var __async = (__this, __arguments, generator) => {
   });
 };
 
-// src/render.ts
-var DrawElementList = class {
-  constructor(_buffer, _length) {
-    this._buffer = _buffer;
-    this._length = _length;
-  }
-  get buffer() {
-    return this._buffer;
-  }
-  get length() {
-    return this._length;
-  }
-};
-var DummyRenderer = class {
-  addBitmap(id, bitmap) {
-  }
-  draw(elements) {
-  }
-};
-var OffscreenRenderer = class {
-  constructor(_width, _height) {
-    this._width = _width;
-    this._height = _height;
-    this._bitmaps = new Array();
-    this._canvas = new OffscreenCanvas(_width, _height);
-    this._ctx = this._canvas.getContext("2d");
-  }
-  get bitmaps() {
-    return this._bitmaps;
-  }
-  addBitmap(id, bitmap) {
-    if (id >= this.bitmaps.length) {
-      this.bitmaps.length = id + 1;
-    }
-    this.bitmaps[id] = bitmap;
-  }
-  draw(elements) {
-    this._ctx.clearRect(0, 0, this._width, this._height);
-    const buffer = elements.buffer;
-    for (let i = 0; i < elements.length - 2; i += 3) {
-      const spriteId = buffer[i];
-      const x = buffer[i + 1];
-      const y = buffer[i + 2];
-      console.assert(spriteId < this.bitmaps.length, "bitmap length mismatch");
-      this._ctx.drawImage(this.bitmaps[spriteId], x, y);
-    }
-  }
-};
-var OnscreenRenderer = class {
-  constructor(_canvas) {
-    this._canvas = _canvas;
-    this._bitmaps = new Array();
-    this._width = this.canvas.width;
-    this._height = this.canvas.height;
-    this._ctx = this.canvas.getContext("2d");
-  }
-  get width() {
-    return this._width;
-  }
-  get height() {
-    return this._height;
-  }
-  get canvas() {
-    return this._canvas;
-  }
-  get ctx() {
-    return this._ctx;
-  }
-  get bitmaps() {
-    return this._bitmaps;
-  }
-  get worker() {
-    return this._worker;
-  }
-  addBitmap(id, bitmap) {
-    console.log("OnscreenRenderer::addBitmap");
-    if (id >= this.bitmaps.length) {
-      this.bitmaps.length = id + 1;
-    }
-    this.bitmaps[id] = bitmap;
-  }
-  draw(elements) {
-    this.ctx.clearRect(0, 0, this.width, this.height);
-    console.assert(elements.length % 3 == 0, "elements not mod 3");
-    const buffer = elements.buffer;
-    for (let i = 0; i < elements.length - 2; i += 3) {
-      const spriteId = buffer[i];
-      const x = buffer[i + 1];
-      const y = buffer[i + 2];
-      if (spriteId >= this.bitmaps.length)
-        continue;
-      console.assert(
-        spriteId < this.bitmaps.length,
-        "bitmap length mismatch",
-        spriteId
-      );
-      this.ctx.drawImage(this.bitmaps[spriteId], x, y);
-    }
-  }
-};
-
 // src/geometry.ts
 var Orientation = /* @__PURE__ */ ((Orientation2) => {
   Orientation2[Orientation2["Colinear"] = 0] = "Colinear";
@@ -1224,394 +1123,6 @@ function createGraphicalActor(context, location, dimensions, graphicComponent) {
   return actor;
 }
 
-// src/graphics.ts
-var DummySpriteSheet = {
-  addForValidation: function(_sprite) {
-    return true;
-  },
-  addBitmap: function(id, x, y, width, height) {
-  }
-};
-var SpriteBitmap = class {
-  constructor(_id, _x, _y, _width, _height) {
-    this._id = _id;
-    this._x = _x;
-    this._y = _y;
-    this._width = _width;
-    this._height = _height;
-    Object.freeze(this);
-  }
-  get id() {
-    return this._id;
-  }
-  get x() {
-    return this._x;
-  }
-  get y() {
-    return this._y;
-  }
-  get width() {
-    return this._width;
-  }
-  get height() {
-    return this._height;
-  }
-};
-var _SpriteSheet = class {
-  constructor(name, context) {
-    this._loaded = false;
-    this._bitmapsToLoad = new Array();
-    this._renderer = context.renderer;
-    this._image = new Image();
-    this._image.onload = () => {
-      this.canvas = document.createElement("canvas");
-      this.canvas.width = this.width;
-      this.canvas.height = this.height;
-      this.context2D = this.canvas.getContext("2d", { willReadFrequently: true });
-      this.context2D.drawImage(this.image, 0, 0, this.width, this.height);
-      this.loaded = true;
-      for (let bitmap of this.bitmapsToLoad) {
-        this.addBitmap(bitmap.id, bitmap.x, bitmap.y, bitmap.width, bitmap.height);
-      }
-    };
-    if (name) {
-      this._image.src = name + ".png";
-    } else {
-      throw new Error("No filename passed");
-    }
-    _SpriteSheet.add(this);
-  }
-  static add(sheet) {
-    this._sheets.push(sheet);
-  }
-  static reset() {
-    this._sheets = new Array();
-  }
-  get image() {
-    return this._image;
-  }
-  get width() {
-    return this._image.width;
-  }
-  get height() {
-    return this._image.height;
-  }
-  get name() {
-    return this._image.src;
-  }
-  get loaded() {
-    return this._loaded;
-  }
-  set loaded(b) {
-    console.log("loaded spritesheet:", this.image.src);
-    this._loaded = b;
-  }
-  get canvas() {
-    return this._canvas;
-  }
-  set canvas(c) {
-    this._canvas = c;
-  }
-  get context2D() {
-    return this._context2D;
-  }
-  set context2D(c) {
-    this._context2D = c;
-  }
-  get bitmapsToLoad() {
-    return this._bitmapsToLoad;
-  }
-  isTransparentAt(x, y) {
-    const data = this.context2D.getImageData(x, y, 1, 1).data;
-    return data[3] == 0;
-  }
-  addBitmap(id, x, y, width, height) {
-    return __async(this, null, function* () {
-      if (this.loaded) {
-        const bitmap = yield createImageBitmap(this.image, x, y, width, height);
-        this._renderer.addBitmap(id, bitmap);
-      } else {
-        this.bitmapsToLoad.push(new SpriteBitmap(id, x, y, width, height));
-      }
-    });
-  }
-};
-var SpriteSheet = _SpriteSheet;
-SpriteSheet._sheets = new Array();
-var _Sprite = class {
-  constructor(_sheet, x, y, _width, _height) {
-    this._sheet = _sheet;
-    this._width = _width;
-    this._height = _height;
-    this._offset = new Point2D(x, y);
-    console.assert(this.offset.x >= 0, "offset.x < 0");
-    console.assert(this.offset.y >= 0, "offset.y < 0");
-    const maxOffset = new Point2D(
-      this.offset.x + this.width,
-      this.offset.y + this.height
-    );
-    this._id = _Sprite.sprites.length;
-    _Sprite.sprites.push(this);
-    this.sheet.addBitmap(
-      this.id,
-      this.offset.x,
-      this.offset.y,
-      this.width,
-      this.height
-    );
-  }
-  isTransparentAt(x, y) {
-    x += this.offset.x;
-    y += this.offset.y;
-    return this.sheet.isTransparentAt(x, y);
-  }
-  get sheet() {
-    return this._sheet;
-  }
-  get id() {
-    return this._id;
-  }
-  get width() {
-    return this._width;
-  }
-  get height() {
-    return this._height;
-  }
-  get offset() {
-    return this._offset;
-  }
-};
-var Sprite = _Sprite;
-Sprite.sprites = new Array();
-var GraphicEvent = /* @__PURE__ */ ((GraphicEvent2) => {
-  GraphicEvent2[GraphicEvent2["AddCanvas"] = 0] = "AddCanvas";
-  GraphicEvent2[GraphicEvent2["AddSprite"] = 1] = "AddSprite";
-  GraphicEvent2[GraphicEvent2["Draw"] = 2] = "Draw";
-  return GraphicEvent2;
-})(GraphicEvent || {});
-var DrawElement = class {
-  constructor(_spriteId, _coord) {
-    this._spriteId = _spriteId;
-    this._coord = _coord;
-    Object.freeze(this);
-  }
-  get spriteId() {
-    return this._spriteId;
-  }
-  get coord() {
-    return this._coord;
-  }
-};
-function generateSprites(sheet, width, height, xBegin, yBegin, columns, rows) {
-  const sprites = new Array();
-  const xEnd = xBegin + columns;
-  const yEnd = yBegin + rows;
-  for (let y = yBegin; y < yEnd; y++) {
-    for (let x = xBegin; x < xEnd; x++) {
-      sprites.push(new Sprite(sheet, x * width, y * height, width, height));
-    }
-  }
-  return sprites;
-}
-var GraphicComponent = class {
-  constructor(_currentSpriteId) {
-    this._currentSpriteId = _currentSpriteId;
-  }
-  isTransparentAt(x, y) {
-    return Sprite.sprites[this._currentSpriteId].isTransparentAt(x, y);
-  }
-  get width() {
-    return Sprite.sprites[this._currentSpriteId].width;
-  }
-  get height() {
-    return Sprite.sprites[this._currentSpriteId].height;
-  }
-};
-var DummyGraphicComponent = class extends GraphicComponent {
-  constructor(_width, _height) {
-    super(0);
-    this._width = _width;
-    this._height = _height;
-  }
-  get width() {
-    return this._width;
-  }
-  get height() {
-    return this._height;
-  }
-  update() {
-    return 0;
-  }
-};
-var StaticGraphicComponent = class extends GraphicComponent {
-  constructor(id) {
-    super(id);
-  }
-  update() {
-    return this._currentSpriteId;
-  }
-};
-function generateStaticGraphics(sheet, width, height, xBegin, yBegin, columns, rows) {
-  const graphics = new Array();
-  const xEnd = xBegin + columns;
-  const yEnd = yBegin + rows;
-  for (let y = yBegin; y < yEnd; y++) {
-    for (let x = xBegin; x < xEnd; x++) {
-      const sprite = new Sprite(sheet, x * width, y * height, width, height);
-      graphics.push(new StaticGraphicComponent(sprite.id));
-    }
-  }
-  return graphics;
-}
-var AnimatedGraphicComponent = class extends GraphicComponent {
-  constructor(sprites, _interval) {
-    super(sprites[0].id);
-    this._interval = _interval;
-    this._nextUpdate = 0;
-    this._currentSpriteIdx = 0;
-    this._spriteIds = new Array();
-    for (const i in sprites) {
-      this._spriteIds.push(sprites[i].id);
-    }
-    this._nextUpdate = Date.now() + _interval;
-  }
-  update() {
-    return this._spriteIds[this._currentSpriteIdx];
-  }
-  get firstId() {
-    return this._spriteIds[0];
-  }
-  get lastId() {
-    return this._spriteIds[this._spriteIds.length - 1];
-  }
-  get currentSpriteId() {
-    console.assert(this._currentSpriteIdx >= 0);
-    console.assert(this._currentSpriteIdx < this._spriteIds.length);
-    return this._spriteIds[this._currentSpriteIdx];
-  }
-};
-var OssilateGraphicComponent = class extends AnimatedGraphicComponent {
-  constructor(sprites, interval) {
-    super(sprites, interval);
-    this._increase = true;
-    this._currentSpriteIdx = Math.floor(
-      Math.random() * (this._spriteIds.length - 1)
-    );
-  }
-  update() {
-    if (this._nextUpdate > Date.now()) {
-      return this.currentSpriteId;
-    }
-    if (this._currentSpriteIdx == this._spriteIds.length - 1) {
-      this._increase = false;
-    } else if (this._currentSpriteIdx == 0) {
-      this._increase = true;
-    }
-    if (this._increase) {
-      this._currentSpriteIdx++;
-    } else {
-      this._currentSpriteIdx--;
-    }
-    this._nextUpdate = Date.now() + this._interval;
-    return this.currentSpriteId;
-  }
-};
-var LoopGraphicComponent = class extends AnimatedGraphicComponent {
-  constructor(sprites, interval) {
-    super(sprites, interval);
-    this._currentSpriteIdx = 0;
-  }
-  update() {
-    if (this._nextUpdate > Date.now()) {
-      return this.currentSpriteId;
-    }
-    this._currentSpriteIdx = (this._currentSpriteIdx + 1) % this._spriteIds.length;
-    this._nextUpdate = Date.now() + this._interval;
-    return this.currentSpriteId;
-  }
-};
-var DirectionalGraphicComponent = class extends GraphicComponent {
-  constructor(_staticGraphics) {
-    super(0);
-    this._staticGraphics = _staticGraphics;
-    this._direction = 0 /* North */;
-  }
-  get direction() {
-    return this._direction;
-  }
-  set direction(direction) {
-    if (this._staticGraphics.has(direction)) {
-      this._direction = direction;
-    } else {
-      console.log("graphic direction unsupported");
-    }
-  }
-  update() {
-    if (this._staticGraphics.has(this.direction)) {
-      const component = this._staticGraphics.get(
-        this.direction
-      );
-      const spriteId = component.update();
-      return spriteId;
-    }
-    console.error(
-      "unhandled stationary graphic:",
-      Navigation.getDirectionName(this.direction)
-    );
-    return 0;
-  }
-};
-var AnimatedDirectionalGraphicComponent = class extends GraphicComponent {
-  constructor(_staticGraphics, _movementGraphics) {
-    super(0);
-    this._staticGraphics = _staticGraphics;
-    this._movementGraphics = _movementGraphics;
-    this._stationary = true;
-    this._direction = 0 /* North */;
-  }
-  get stationary() {
-    return this._stationary;
-  }
-  set stationary(stationary) {
-    this._stationary = stationary;
-  }
-  get direction() {
-    return this._direction;
-  }
-  set direction(direction) {
-    if (this._staticGraphics.has(direction) && this._movementGraphics.has(direction)) {
-      this._direction = direction;
-    } else {
-      console.log("graphic direction unsupported");
-    }
-  }
-  update() {
-    if (!this.stationary && this._movementGraphics.has(this.direction)) {
-      const spriteId = this._movementGraphics.get(this.direction).update();
-      return spriteId;
-    }
-    if (this.stationary && this._staticGraphics.has(this.direction)) {
-      const component = this._staticGraphics.get(
-        this.direction
-      );
-      const spriteId = component.update();
-      return spriteId;
-    }
-    if (this.stationary) {
-      console.error(
-        "unhandled stationary graphic:",
-        Navigation.getDirectionName(this.direction)
-      );
-    } else {
-      console.error(
-        "unhandled movement graphic:",
-        Navigation.getDirectionName(this.direction)
-      );
-    }
-    return 0;
-  }
-};
-
 // src/terrain.ts
 var TerrainShape = /* @__PURE__ */ ((TerrainShape2) => {
   TerrainShape2[TerrainShape2["Flat"] = 0] = "Flat";
@@ -2438,6 +1949,582 @@ var PathFinder = class {
     }
     path.reverse();
     return path.splice(1);
+  }
+};
+
+// src/graphics.ts
+var DummySpriteSheet = {
+  addForValidation: function(_sprite) {
+    return true;
+  },
+  addBitmap: function(id, x, y, width, height) {
+  }
+};
+var SpriteBitmap = class {
+  constructor(_id, _x, _y, _width, _height) {
+    this._id = _id;
+    this._x = _x;
+    this._y = _y;
+    this._width = _width;
+    this._height = _height;
+    Object.freeze(this);
+  }
+  get id() {
+    return this._id;
+  }
+  get x() {
+    return this._x;
+  }
+  get y() {
+    return this._y;
+  }
+  get width() {
+    return this._width;
+  }
+  get height() {
+    return this._height;
+  }
+};
+var _SpriteSheet = class {
+  constructor(name, context) {
+    this._loaded = false;
+    this._bitmapsToLoad = new Array();
+    this._renderer = context.renderer;
+    this._image = new Image();
+    this._image.onload = () => {
+      this.canvas = document.createElement("canvas");
+      this.canvas.width = this.width;
+      this.canvas.height = this.height;
+      this.context2D = this.canvas.getContext("2d", { willReadFrequently: true });
+      this.context2D.drawImage(this.image, 0, 0, this.width, this.height);
+      this.loaded = true;
+      for (let bitmap of this.bitmapsToLoad) {
+        this.addBitmap(bitmap.id, bitmap.x, bitmap.y, bitmap.width, bitmap.height);
+      }
+    };
+    if (name) {
+      this._image.src = name + ".png";
+    } else {
+      throw new Error("No filename passed");
+    }
+    _SpriteSheet.add(this);
+  }
+  static add(sheet) {
+    this._sheets.push(sheet);
+  }
+  static reset() {
+    this._sheets = new Array();
+  }
+  get image() {
+    return this._image;
+  }
+  get width() {
+    return this._image.width;
+  }
+  get height() {
+    return this._image.height;
+  }
+  get name() {
+    return this._image.src;
+  }
+  get loaded() {
+    return this._loaded;
+  }
+  set loaded(b) {
+    console.log("loaded spritesheet:", this.image.src);
+    this._loaded = b;
+  }
+  get canvas() {
+    return this._canvas;
+  }
+  set canvas(c) {
+    this._canvas = c;
+  }
+  get context2D() {
+    return this._context2D;
+  }
+  set context2D(c) {
+    this._context2D = c;
+  }
+  get bitmapsToLoad() {
+    return this._bitmapsToLoad;
+  }
+  isTransparentAt(x, y) {
+    const data = this.context2D.getImageData(x, y, 1, 1).data;
+    return data[3] == 0;
+  }
+  addBitmap(id, x, y, width, height) {
+    return __async(this, null, function* () {
+      if (this.loaded) {
+        const bitmap = yield createImageBitmap(this.image, x, y, width, height);
+        this._renderer.addBitmap(id, bitmap);
+      } else {
+        this.bitmapsToLoad.push(new SpriteBitmap(id, x, y, width, height));
+      }
+    });
+  }
+};
+var SpriteSheet2 = _SpriteSheet;
+SpriteSheet2._sheets = new Array();
+var _Sprite = class {
+  constructor(_sheet, x, y, _width, _height) {
+    this._sheet = _sheet;
+    this._width = _width;
+    this._height = _height;
+    this._offset = new Point2D(x, y);
+    console.assert(this.offset.x >= 0, "offset.x < 0");
+    console.assert(this.offset.y >= 0, "offset.y < 0");
+    const maxOffset = new Point2D(
+      this.offset.x + this.width,
+      this.offset.y + this.height
+    );
+    this._id = _Sprite.sprites.length;
+    _Sprite.sprites.push(this);
+    this.sheet.addBitmap(
+      this.id,
+      this.offset.x,
+      this.offset.y,
+      this.width,
+      this.height
+    );
+  }
+  isTransparentAt(x, y) {
+    x += this.offset.x;
+    y += this.offset.y;
+    return this.sheet.isTransparentAt(x, y);
+  }
+  get sheet() {
+    return this._sheet;
+  }
+  get id() {
+    return this._id;
+  }
+  get width() {
+    return this._width;
+  }
+  get height() {
+    return this._height;
+  }
+  get offset() {
+    return this._offset;
+  }
+};
+var Sprite = _Sprite;
+Sprite.sprites = new Array();
+var GraphicEvent = /* @__PURE__ */ ((GraphicEvent2) => {
+  GraphicEvent2[GraphicEvent2["AddCanvas"] = 0] = "AddCanvas";
+  GraphicEvent2[GraphicEvent2["AddSprite"] = 1] = "AddSprite";
+  GraphicEvent2[GraphicEvent2["Draw"] = 2] = "Draw";
+  return GraphicEvent2;
+})(GraphicEvent || {});
+var DrawElement = class {
+  constructor(_spriteId, _coord) {
+    this._spriteId = _spriteId;
+    this._coord = _coord;
+    Object.freeze(this);
+  }
+  get spriteId() {
+    return this._spriteId;
+  }
+  get coord() {
+    return this._coord;
+  }
+};
+function generateSprites(sheet, width, height, xBegin, yBegin, columns, rows) {
+  const sprites = new Array();
+  const xEnd = xBegin + columns;
+  const yEnd = yBegin + rows;
+  for (let y = yBegin; y < yEnd; y++) {
+    for (let x = xBegin; x < xEnd; x++) {
+      sprites.push(new Sprite(sheet, x * width, y * height, width, height));
+    }
+  }
+  return sprites;
+}
+var GraphicComponent2 = class {
+  constructor(_currentSpriteId) {
+    this._currentSpriteId = _currentSpriteId;
+  }
+  isTransparentAt(x, y) {
+    return Sprite.sprites[this._currentSpriteId].isTransparentAt(x, y);
+  }
+  get width() {
+    return Sprite.sprites[this._currentSpriteId].width;
+  }
+  get height() {
+    return Sprite.sprites[this._currentSpriteId].height;
+  }
+};
+var DummyGraphicComponent = class extends GraphicComponent2 {
+  constructor(_width, _height) {
+    super(0);
+    this._width = _width;
+    this._height = _height;
+  }
+  get width() {
+    return this._width;
+  }
+  get height() {
+    return this._height;
+  }
+  update() {
+    return 0;
+  }
+};
+var StaticGraphicComponent = class extends GraphicComponent2 {
+  constructor(id) {
+    super(id);
+  }
+  update() {
+    return this._currentSpriteId;
+  }
+};
+function generateStaticGraphics(sheet, width, height, xBegin, yBegin, columns, rows) {
+  const graphics = new Array();
+  const xEnd = xBegin + columns;
+  const yEnd = yBegin + rows;
+  for (let y = yBegin; y < yEnd; y++) {
+    for (let x = xBegin; x < xEnd; x++) {
+      const sprite = new Sprite(sheet, x * width, y * height, width, height);
+      graphics.push(new StaticGraphicComponent(sprite.id));
+    }
+  }
+  return graphics;
+}
+var AnimatedGraphicComponent = class extends GraphicComponent2 {
+  constructor(sprites, _interval) {
+    super(sprites[0].id);
+    this._interval = _interval;
+    this._nextUpdate = 0;
+    this._currentSpriteIdx = 0;
+    this._spriteIds = new Array();
+    for (const i in sprites) {
+      this._spriteIds.push(sprites[i].id);
+    }
+    this._nextUpdate = Date.now() + _interval;
+  }
+  update() {
+    return this._spriteIds[this._currentSpriteIdx];
+  }
+  get firstId() {
+    return this._spriteIds[0];
+  }
+  get lastId() {
+    return this._spriteIds[this._spriteIds.length - 1];
+  }
+  get currentSpriteId() {
+    console.assert(this._currentSpriteIdx >= 0);
+    console.assert(this._currentSpriteIdx < this._spriteIds.length);
+    return this._spriteIds[this._currentSpriteIdx];
+  }
+};
+var OssilateGraphicComponent = class extends AnimatedGraphicComponent {
+  constructor(sprites, interval) {
+    super(sprites, interval);
+    this._increase = true;
+    this._currentSpriteIdx = Math.floor(
+      Math.random() * (this._spriteIds.length - 1)
+    );
+  }
+  update() {
+    if (this._nextUpdate > Date.now()) {
+      return this.currentSpriteId;
+    }
+    if (this._currentSpriteIdx == this._spriteIds.length - 1) {
+      this._increase = false;
+    } else if (this._currentSpriteIdx == 0) {
+      this._increase = true;
+    }
+    if (this._increase) {
+      this._currentSpriteIdx++;
+    } else {
+      this._currentSpriteIdx--;
+    }
+    this._nextUpdate = Date.now() + this._interval;
+    return this.currentSpriteId;
+  }
+};
+var LoopGraphicComponent = class extends AnimatedGraphicComponent {
+  constructor(sprites, interval) {
+    super(sprites, interval);
+    this._currentSpriteIdx = 0;
+  }
+  update() {
+    if (this._nextUpdate > Date.now()) {
+      return this.currentSpriteId;
+    }
+    this._currentSpriteIdx = (this._currentSpriteIdx + 1) % this._spriteIds.length;
+    this._nextUpdate = Date.now() + this._interval;
+    return this.currentSpriteId;
+  }
+};
+var DirectionalGraphicComponent = class extends GraphicComponent2 {
+  constructor(_staticGraphics) {
+    super(0);
+    this._staticGraphics = _staticGraphics;
+    this._direction = 0 /* North */;
+  }
+  get direction() {
+    return this._direction;
+  }
+  set direction(direction) {
+    if (this._staticGraphics.has(direction)) {
+      this._direction = direction;
+    } else {
+      console.log("graphic direction unsupported");
+    }
+  }
+  update() {
+    if (this._staticGraphics.has(this.direction)) {
+      const component = this._staticGraphics.get(
+        this.direction
+      );
+      const spriteId = component.update();
+      return spriteId;
+    }
+    console.error(
+      "unhandled stationary graphic:",
+      Navigation.getDirectionName(this.direction)
+    );
+    return 0;
+  }
+};
+var AnimatedDirectionalGraphicComponent = class extends GraphicComponent2 {
+  constructor(_staticGraphics, _movementGraphics) {
+    super(0);
+    this._staticGraphics = _staticGraphics;
+    this._movementGraphics = _movementGraphics;
+    this._stationary = true;
+    this._direction = 0 /* North */;
+  }
+  get stationary() {
+    return this._stationary;
+  }
+  set stationary(stationary) {
+    this._stationary = stationary;
+  }
+  get direction() {
+    return this._direction;
+  }
+  set direction(direction) {
+    if (this._staticGraphics.has(direction) && this._movementGraphics.has(direction)) {
+      this._direction = direction;
+    } else {
+      console.log("graphic direction unsupported");
+    }
+  }
+  update() {
+    if (!this.stationary && this._movementGraphics.has(this.direction)) {
+      const spriteId = this._movementGraphics.get(this.direction).update();
+      return spriteId;
+    }
+    if (this.stationary && this._staticGraphics.has(this.direction)) {
+      const component = this._staticGraphics.get(
+        this.direction
+      );
+      const spriteId = component.update();
+      return spriteId;
+    }
+    if (this.stationary) {
+      console.error(
+        "unhandled stationary graphic:",
+        Navigation.getDirectionName(this.direction)
+      );
+    } else {
+      console.error(
+        "unhandled movement graphic:",
+        Navigation.getDirectionName(this.direction)
+      );
+    }
+    return 0;
+  }
+};
+
+// src/render.ts
+var DrawElementList = class {
+  constructor(_array, _length) {
+    this._array = _array;
+    this._length = _length;
+  }
+  get array() {
+    return this._array;
+  }
+  get buffer() {
+    return this._array.buffer;
+  }
+  get length() {
+    return this._length;
+  }
+};
+var DummyRenderer = class {
+  addBitmap(id, bitmap) {
+  }
+  draw(elements) {
+  }
+};
+var OffscreenRenderer = class {
+  constructor(_width, _height) {
+    this._width = _width;
+    this._height = _height;
+    this._bitmaps = new Array();
+    this._canvas = new OffscreenCanvas(_width, _height);
+    this._ctx = this._canvas.getContext("2d");
+  }
+  get bitmaps() {
+    return this._bitmaps;
+  }
+  addBitmap(id, bitmap) {
+    if (id >= this.bitmaps.length) {
+      this.bitmaps.length = id + 1;
+    }
+    this.bitmaps[id] = bitmap;
+  }
+  draw(elements) {
+    this._ctx.clearRect(0, 0, this._width, this._height);
+    const array = elements.array;
+    for (let i = 0; i < elements.length - 2; i += 3) {
+      const spriteId = array[i];
+      const x = array[i + 1];
+      const y = array[i + 2];
+      console.assert(spriteId < this.bitmaps.length, "bitmap length mismatch");
+      this._ctx.drawImage(this.bitmaps[spriteId], x, y);
+    }
+  }
+};
+var OnscreenRenderer = class {
+  constructor(_canvas) {
+    this._canvas = _canvas;
+    this._bitmaps = new Array();
+    this.workerBlob_ = new Blob([`
+    const ctx = {};
+    ctx.sprites = new Array();
+    ctx.valid = false;
+
+    onmessage = function(e) {
+    switch (e.data.type) {
+      default:
+        console.error('unhandled graphic event');
+        break;
+      case 0: //GraphicEvent.AddCanvas:
+        ctx.width = e.data.width;
+        ctx.height = e.data.height;
+        ctx.canvas = e.data.canvas;
+        break;
+      case 1: { //GraphicEvent.AddSprite:
+        const id = e.data.id;
+        const sprite = e.data.sprite
+        if (id == ctx.sprites.length) {
+          ctx.sprites.push(sprite);
+        } else if (id < ctx.sprites.length) {
+          ctx.sprites[id] = sprite;
+        } else {
+          for (let i = ctx.sprites.length; i < id; ++i) {
+            ctx.sprites.push(0);
+          }
+          ctx.sprites.push(sprite);
+        }
+        ctx.valid = false;
+        break;
+      }
+      case 2: { //GraphicEvent.Draw:
+        if (ctx.canvas == undefined) break;
+
+        const nodes = new Int16Array(e.data.buffer);
+        if (!ctx.valid) {
+          for (let i = 0; i < e.data.length; i += 3) {
+            const spriteId = nodes[i];
+            if (spriteId >= ctx.sprites.length) return;
+            if (typeof ctx.sprites[spriteId] === "number") return;
+          }
+          ctx.valid = true;
+        }
+
+        const ctx2d = ctx.canvas.getContext("2d");
+        ctx2d.clearRect(0, 0, ctx.width, ctx.height);
+        for (let i = 0; i < e.data.length; i += 3) {
+          const spriteId = nodes[i];
+          const x =  nodes[i+1];
+          const y = nodes[i+2];
+          ctx2d.drawImage(ctx.sprites[spriteId], x, y);
+        }
+        break;
+      }
+    }
+  }`]);
+    this._width = this.canvas.width;
+    this._height = this.canvas.height;
+    if (window.Worker) {
+      const offscreen = this.canvas.transferControlToOffscreen();
+      const workerBlobURL = window.URL.createObjectURL(this.workerBlob_);
+      this._worker = new Worker(workerBlobURL);
+      this.worker.postMessage(
+        {
+          type: 0 /* AddCanvas */,
+          canvas: offscreen,
+          width: this.width,
+          height: this.height
+        },
+        [offscreen]
+      );
+    } else {
+      this._ctx = this.canvas.getContext("2d");
+    }
+  }
+  get width() {
+    return this._width;
+  }
+  get height() {
+    return this._height;
+  }
+  get canvas() {
+    return this._canvas;
+  }
+  get ctx() {
+    return this._ctx;
+  }
+  get bitmaps() {
+    return this._bitmaps;
+  }
+  get worker() {
+    return this._worker;
+  }
+  addBitmap(id, bitmap) {
+    if (window.Worker) {
+      this.worker.postMessage(
+        { type: 1 /* AddSprite */, id, sprite: bitmap },
+        [bitmap]
+      );
+    } else {
+      if (id >= this.bitmaps.length) {
+        this.bitmaps.length = id + 1;
+      }
+      this.bitmaps[id] = bitmap;
+    }
+  }
+  draw(elements) {
+    if (window.Worker) {
+      this.worker.postMessage(
+        { type: 2 /* Draw */, buffer: elements.buffer, length: elements.length },
+        [elements.buffer]
+      );
+    } else {
+      this.ctx.clearRect(0, 0, this.width, this.height);
+      console.assert(elements.length % 3 == 0, "elements not mod 3");
+      const array = elements.array;
+      for (let i = 0; i < elements.length - 2; i += 3) {
+        const spriteId = array[i];
+        const x = array[i + 1];
+        const y = array[i + 2];
+        if (spriteId >= this.bitmaps.length)
+          continue;
+        console.assert(
+          spriteId < this.bitmaps.length,
+          "bitmap length mismatch",
+          spriteId
+        );
+        this.ctx.drawImage(this.bitmaps[spriteId], x, y);
+      }
+    }
   }
 };
 
@@ -4279,7 +4366,7 @@ var ContextImpl = class {
   static reset() {
     PhysicalEntity.reset();
     Terrain.reset();
-    SpriteSheet.reset();
+    SpriteSheet2.reset();
   }
   get scene() {
     return this._scene;
@@ -4816,7 +4903,7 @@ export {
   EventHandler,
   Face3D,
   Geometry,
-  GraphicComponent,
+  GraphicComponent2 as GraphicComponent,
   GraphicEvent,
   Gravity,
   InputEvent,
@@ -4854,7 +4941,7 @@ export {
   Segment2D,
   Sound,
   Sprite,
-  SpriteSheet,
+  SpriteSheet2 as SpriteSheet,
   StaticGraphicComponent,
   Surface,
   Terrain,
