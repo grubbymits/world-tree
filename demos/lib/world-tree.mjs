@@ -2551,7 +2551,6 @@ function inRange(n, lower, upper) {
 var SceneNode = class {
   constructor(_entity, graph) {
     this._entity = _entity;
-    this._preds = new Array();
     this._succs = new Array();
     graph.setDrawOutline(this);
   }
@@ -2633,9 +2632,6 @@ var SceneNode = class {
   }
   get maxZ() {
     return this._entity.bounds.maxZ;
-  }
-  get isRoot() {
-    return this._preds.length == 0;
   }
 };
 var SceneLevel = class {
@@ -2765,7 +2761,10 @@ var SceneGraph = class {
     node.top2D = this.getDrawCoord(new Point3D(max.x, min.y, max.z));
     node.bottom2D = this.getDrawCoord(new Point3D(min.x, max.y, min.z));
     const drawHeightOffset = node.min2D.diff(node.top2D);
-    const adjustedCoord = new Point2D(node.min2D.x, node.min2D.y - drawHeightOffset.y);
+    const adjustedCoord = new Point2D(
+      node.min2D.x,
+      node.min2D.y - drawHeightOffset.y
+    );
     node.drawCoord = adjustedCoord;
   }
   get levels() {

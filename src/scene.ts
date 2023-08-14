@@ -17,7 +17,6 @@ function inRange(n: number, lower: number, upper: number): boolean {
 }
 
 export class SceneNode {
-  private _preds: Array<SceneNode> = new Array<SceneNode>();
   private _succs: Array<SceneNode> = new Array<SceneNode>();
   private _level: SceneLevel | null;
   private _min2D: Point2D;
@@ -117,9 +116,6 @@ export class SceneNode {
   get maxZ(): number {
     return this._entity.bounds.maxZ;
   }
-  get isRoot(): boolean {
-    return this._preds.length == 0;
-  }
 }
 
 type NodeCompare = (firstId: number, secondId: number) => RenderOrder;
@@ -211,14 +207,6 @@ export class SceneLevel {
   }
 
   buildGraph(graph: SceneGraph, camera: Camera, force: boolean): void {
-    // https://en.wikipedia.org/wiki/Transitive_reduction
-    // In the mathematical theory of binary relations, any relation R on a set X may
-    // be thought of as a directed graph that has the set X as its vertex set and
-    // that has an arc xy for every ordered pair of elements that are related in R.
-    // In particular, this method lets partially ordered sets be reinterpreted as
-    // directed acyclic graphs, in which there is an arc xy in the graph whenever
-    // there is an order relation x < y between the given pair of elements of the
-    // partial order.
     if (!force && !this.dirty) {
       //console.assert(this.order.length != 0);
       return;
@@ -228,6 +216,16 @@ export class SceneLevel {
     const toDraw: Array<SceneNode> = this._nodes.filter((node) =>
       this.shouldDraw(node, camera)
     );
+
+    // TODO: Represent the scene as a path matrix and perform reduction.
+    // https://en.wikipedia.org/wiki/Transitive_reduction
+    // In the mathematical theory of binary relations, any relation R on a set X may
+    // be thought of as a directed graph that has the set X as its vertex set and
+    // that has an arc xy for every ordered pair of elements that are related in R.
+    // In particular, this method lets partially ordered sets be reinterpreted as
+    // directed acyclic graphs, in which there is an arc xy in the graph whenever
+    // there is an order relation x < y between the given pair of elements of the
+    // partial order.
     toDraw.sort((a, b) => graph.drawOrder(a, b));
 
     this.order = [];
