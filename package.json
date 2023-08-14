@@ -3,7 +3,7 @@
     "compile": "tsc --noEmit --project .",
     "build": "esbuild src/world-tree.ts --bundle --format=esm --outfile=dist/world-tree.mjs",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage",
-    "benchmark": "node --experimental-vm-modules benchmarks/all.js",
+    "benchmark": "node --experimental-vm-modules benchmarks/all.mjs",
     "lint": "npx prettier --check --parser typescript 'src/*.ts'",
     "format": "prettier --write --parser typescript src/*.ts; prettier --write tests/*.mjs"
   },

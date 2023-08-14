@@ -2,8 +2,8 @@ import {
   benchmark_build_levels,
   benchmark_draw_coords,
   benchmark_update_everything,
-} from "./scene.js";
-import { benchmark_collision } from "./collision.js";
+} from "./scene.mjs";
+import { benchmark_collision } from "./collision.mjs";
 
 function run_benchmark_n_times(benchmark, n) {
   let result_times = new Array();

@@ -1,4 +1,4 @@
-import * as WT from "../world-tree.js";
+import * as WT from "../dist/world-tree.mjs";
 
 export function benchmark_collision() {
   const cellsX = 20;
