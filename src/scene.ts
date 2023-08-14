@@ -1,6 +1,6 @@
 import { PhysicalEntity } from "./entity.ts";
 import { Camera } from "./camera.ts";
-import { Point2D, Point3D, Segment2D, Vector2D } from "./geometry.ts";
+import { Point2D, Point3D, Vector2D } from "./geometry.ts";
 import { GraphicComponent, Sprite } from "./graphics.ts";
 import { Dimensions } from "./physics.ts";
 import { TimedEventHandler } from "./events.ts";
@@ -12,77 +12,44 @@ export enum RenderOrder {
   After = 1,
 }
 
+function inRange(n: number, lower: number, upper: number): boolean {
+  return n >= lower && n <= upper;
+}
+
 export class SceneNode {
   private _preds: Array<SceneNode> = new Array<SceneNode>();
   private _succs: Array<SceneNode> = new Array<SceneNode>();
   private _level: SceneLevel | null;
-  // FIXME: Just store the six points, not six segments.
-  private _topOutlineSegments: Array<Segment2D> = new Array<Segment2D>();
-  private _sideOutlineSegments: Array<Segment2D> = new Array<Segment2D>();
-  private _baseOutlineSegments: Array<Segment2D> = new Array<Segment2D>();
+  private _min2D: Point2D;
+  private _max2D: Point2D;
+  private _top2D: Point2D;
+  private _bottom2D: Point2D;
   private _drawCoord: Point2D;
 
-  constructor(
-    private readonly _entity: PhysicalEntity,
-    private _minDrawCoord: Point2D
-  ) {
-    this.drawCoord = _minDrawCoord;
+  constructor(private readonly _entity: PhysicalEntity, graph: SceneGraph) {
+    graph.setDrawOutline(this);
   }
 
-  overlapX(other: SceneNode): boolean {
-    return (
-      (this.entity.bounds.minX >= other.entity.bounds.minX &&
-        this.entity.bounds.minX < other.entity.bounds.maxX) ||
-      (this.entity.bounds.maxX > other.entity.bounds.minX &&
-        this.entity.bounds.maxX <= other.entity.bounds.maxX)
-    );
-  }
-
-  overlapY(other: SceneNode): boolean {
-    return (
-      (this.entity.bounds.minY >= other.entity.bounds.minY &&
-        this.entity.bounds.minY < other.entity.bounds.maxY) ||
-      (this.entity.bounds.maxY > other.entity.bounds.minY &&
-        this.entity.bounds.maxY <= other.entity.bounds.maxY)
-    );
-  }
-
-  overlapZ(other: SceneNode): boolean {
-    return (
-      (this.entity.bounds.minZ >= other.entity.bounds.minZ &&
-        this.entity.bounds.minZ < other.entity.bounds.maxZ) ||
-      (this.entity.bounds.maxZ > other.entity.bounds.minZ &&
-        this.entity.bounds.maxZ <= other.entity.bounds.maxZ)
-    );
-  }
-
-  updateSegments(diff: Vector2D): void {
-    this.topSegments[0] = this.topSegments[0].add(diff);
-    this.topSegments[1] = this.topSegments[1].add(diff);
-    this.baseSegments[0] = this.baseSegments[0].add(diff);
-    this.baseSegments[1] = this.baseSegments[1].add(diff);
-    this.sideSegments[0] = this.sideSegments[0].add(diff);
-    this.sideSegments[1] = this.sideSegments[1].add(diff);
+  updateOutline(diff: Vector2D): void {
+    this.min2D = this.min2D.add(diff);
+    this.max2D = this.max2D.add(diff);
+    this.top2D = this.top2D.add(diff);
+    this.bottom2D = this.bottom2D.add(diff);
     this.drawCoord = this.drawCoord.add(diff);
-    this.minDrawCoord = this.minDrawCoord.add(diff);
   }
 
-  intersectsTop(other: SceneNode): boolean {
-    for (const otherTop of other.topSegments) {
-      if (
-        this.baseSegments[0].intersects(otherTop) ||
-        this.baseSegments[1].intersects(otherTop)
-      ) {
-        return true;
-      }
-      if (
-        this.sideSegments[0].intersects(otherTop) ||
-        this.sideSegments[1].intersects(otherTop)
-      ) {
-        return true;
-      }
-    }
-    return false;
+  overlapDrawX(other: SceneNode): boolean {
+    return (
+      inRange(this.min2D.x, other.min2D.x, other.max2D.x) ||
+      inRange(this.max2D.x, other.min2D.x, other.max2D.x)
+    );
+  }
+
+  overlapDrawY(other: SceneNode): boolean {
+    return (
+      inRange(this.top2D.y, other.top2D.y, other.bottom2D.y) ||
+      inRange(this.bottom2D.y, other.top2D.y, other.bottom2D.y)
+    );
   }
 
   clear(): void {
@@ -108,20 +75,29 @@ export class SceneNode {
   set drawCoord(coord: Point2D) {
     this._drawCoord = coord;
   }
-  get minDrawCoord(): Point2D {
-    return this._minDrawCoord;
+  get min2D(): Point2D {
+    return this._min2D;
   }
-  set minDrawCoord(coord: Point2D) {
-    this._minDrawCoord = coord;
+  set min2D(coord: Point2D) {
+    this._min2D = coord;
   }
-  get topSegments(): Array<Segment2D> {
-    return this._topOutlineSegments;
+  get max2D(): Point2D {
+    return this._max2D;
   }
-  get baseSegments(): Array<Segment2D> {
-    return this._baseOutlineSegments;
+  set max2D(coord: Point2D) {
+    this._max2D = coord;
   }
-  get sideSegments(): Array<Segment2D> {
-    return this._sideOutlineSegments;
+  get top2D(): Point2D {
+    return this._top2D;
+  }
+  set top2D(coord: Point2D) {
+    this._top2D = coord;
+  }
+  get bottom2D(): Point2D {
+    return this._bottom2D;
+  }
+  set bottom2D(coord: Point2D) {
+    this._bottom2D = coord;
   }
   get entity(): PhysicalEntity {
     return this._entity;
@@ -293,46 +269,36 @@ export abstract class SceneGraph {
     const entity: PhysicalEntity = node.entity;
     const min: Point3D = entity.bounds.minLocation;
     const minDraw: Point2D = this.getDrawCoord(min);
-    const diff: Vector2D = minDraw.diff(node.minDrawCoord);
-    node.updateSegments(diff);
+    const diff: Vector2D = minDraw.diff(node.min2D);
+    node.updateOutline(diff);
   }
 
   setDrawOutline(node: SceneNode): void {
     const entity: PhysicalEntity = node.entity;
     const min: Point3D = entity.bounds.minLocation;
     const max: Point3D = entity.bounds.maxLocation;
+    node.min2D = this.getDrawCoord(min);
+    node.max2D = this.getDrawCoord(max);
+    node.top2D = this.getDrawCoord(new Point3D(max.x, min.y, max.z));
+    node.bottom2D = this.getDrawCoord(new Point3D(min.x, max.y, min.z));
 
-    node.topSegments.length = 0;
-    node.baseSegments.length = 0;
-    node.sideSegments.length = 0;
-
-    const min2D = this.getDrawCoord(min);
-    const base1 = this.getDrawCoord(new Point3D(min.x, max.y, min.z));
-    const base2 = this.getDrawCoord(new Point3D(max.x, max.y, min.z));
-    node.baseSegments.push(new Segment2D(min2D, base1));
-    node.baseSegments.push(new Segment2D(base1, base2));
-
-    const max2D = this.getDrawCoord(max);
-    const top1 = this.getDrawCoord(new Point3D(min.x, min.y, max.z));
-    const top2 = this.getDrawCoord(new Point3D(max.x, min.y, max.z));
-    node.topSegments.push(new Segment2D(top1, top2));
-    node.topSegments.push(new Segment2D(top2, max2D));
-
-    node.sideSegments.push(new Segment2D(min2D, top1));
-    node.sideSegments.push(new Segment2D(base2, max2D));
-
-    // FIXME: Still not convinced this is right.
-    //  image root: *  /*\ 'top1'
-    //                /   \
-    //       'top2'* /     \
-    //              |\     /|
-    //              | \   / |
-    // minDrawCoord *  \ /  |
+    //  'drawCoord' *   * 'top2D'
+    //                / | \
+    //               /  |  \
+    //              *   |   * 'max2D'
+    //              |\  |  /|
+    //              | \ | / |
+    //              |   *   |
+    //      'min2D' *   |   *
     //               \  |  /
-    //                \ | /  * other limit
-    //
-    const drawHeightOffset = min2D.diff(top2);
-    const adjustedCoord = new Point2D(min2D.x, min2D.y - drawHeightOffset.y);
+    //                \ | /
+    //                  *
+    //              'bottom2D'
+    const drawHeightOffset = node.min2D.diff(node.top2D);
+    const adjustedCoord = new Point2D(
+      node.min2D.x,
+      node.min2D.y - drawHeightOffset.y
+    );
     node.drawCoord = adjustedCoord;
   }
 
@@ -444,10 +410,7 @@ export class Scene {
   }
 
   insertEntity(entity: PhysicalEntity): void {
-    const node = new SceneNode(
-      entity,
-      this.graph.getDrawCoord(entity.bounds.minLocation)
-    );
+    const node = new SceneNode(entity, this.graph);
     this.nodes.set(node.id, node);
     // If we haven't initialised levels yet (its done in the first call to
     // render), just store the entity for then.
@@ -723,7 +686,7 @@ export class TrueIsometric extends SceneGraph {
     // priority ordering:
     // - smaller y
     // - greater x
-
+    /*
     if (first.overlapX(second)) {
       return first.entity.bounds.minY <= second.entity.bounds.minY
         ? RenderOrder.Before
@@ -743,6 +706,7 @@ export class TrueIsometric extends SceneGraph {
     if (second.intersectsTop(first)) {
       return RenderOrder.After;
     }
+    */
     return RenderOrder.Any;
   }
 }
@@ -787,25 +751,69 @@ export class TwoByOneIsometric extends SceneGraph {
   }
 
   static drawOrder(first: SceneNode, second: SceneNode): RenderOrder {
-    if (first.overlapX(second)) {
-      return first.entity.bounds.minY < second.entity.bounds.minY
-        ? RenderOrder.Before
-        : RenderOrder.After;
-    }
-    if (first.overlapY(second)) {
-      return first.entity.bounds.minX > second.entity.bounds.minX
-        ? RenderOrder.Before
-        : RenderOrder.After;
-    }
-    if (!first.overlapZ(second)) {
+    if (
+      !first.entity.bounds.axisOverlapX(second.entity.bounds) &&
+      !first.entity.bounds.axisOverlapY(second.entity.bounds) &&
+      !first.entity.bounds.axisOverlapZ(second.entity.bounds) &&
+      !first.overlapDrawX(second) &&
+      !first.overlapDrawY(second)
+    ) {
       return RenderOrder.Any;
     }
-    if (first.intersectsTop(second)) {
+
+    // https://shaunlebron.github.io/IsometricBlocks/
+    // draw coords
+    // (0, 0) ______________ x
+    //      |
+    //      |
+    //      |
+    //      |
+    //      |
+    //      |
+    //      |
+    //      y
+
+    // world coords
+    //    z      x
+    //    |    /
+    //    |   /
+    //    |  /
+    //    | /
+    // (0, 0, 0)
+    //     \
+    //      \
+    //       \
+    //        \
+    //         y
+
+    // Draw nodes further from the camera first:
+    // - smaller world z.
+    // - smaller world y.
+    // - larger world x.
+
+    // Draw smaller Z first.
+    if (first.entity.bounds.maxZ <= second.entity.bounds.minZ) {
       return RenderOrder.Before;
     }
-    if (second.intersectsTop(first)) {
+    if (second.entity.bounds.maxZ <= first.entity.bounds.minZ) {
       return RenderOrder.After;
     }
+
+    // Draw smaller Y first.
+    if (first.entity.bounds.maxY <= second.entity.bounds.minY) {
+      return RenderOrder.Before;
+    }
+    if (second.entity.bounds.maxY <= first.entity.bounds.minY) {
+      return RenderOrder.After;
+    }
+    // Draw larger X first
+    if (first.entity.bounds.minX >= second.entity.bounds.maxX) {
+      return RenderOrder.Before;
+    }
+    if (second.entity.bounds.minX >= first.entity.bounds.maxX) {
+      return RenderOrder.After;
+    }
+
     return RenderOrder.Any;
   }
 

@@ -1,24 +1,3 @@
-var __async = (__this, __arguments, generator) => {
-  return new Promise((resolve, reject) => {
-    var fulfilled = (value) => {
-      try {
-        step(generator.next(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var rejected = (value) => {
-      try {
-        step(generator.throw(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
-    step((generator = generator.apply(__this, __arguments)).next());
-  });
-};
-
 // src/geometry.ts
 var Orientation = /* @__PURE__ */ ((Orientation2) => {
   Orientation2[Orientation2["Colinear"] = 0] = "Colinear";
@@ -806,6 +785,24 @@ var BoundingCuboid = class {
       return false;
     }
     return true;
+  }
+  axisOverlapX(other) {
+    if (other.minLocation.x >= this.minLocation.x && other.minLocation.x <= this.maxLocation.x || other.maxLocation.x >= this.minLocation.x && other.maxLocation.x <= this.maxLocation.x) {
+      return true;
+    }
+    return false;
+  }
+  axisOverlapY(other) {
+    if (other.minLocation.y >= this.minLocation.y && other.minLocation.y <= this.maxLocation.y || other.maxLocation.y >= this.minLocation.y && other.maxLocation.y <= this.maxLocation.y) {
+      return true;
+    }
+    return false;
+  }
+  axisOverlapZ(other) {
+    if (other.minLocation.z >= this.minLocation.z && other.minLocation.z <= this.maxLocation.z || other.maxLocation.z >= this.minLocation.z && other.maxLocation.z <= this.maxLocation.z) {
+      return true;
+    }
+    return false;
   }
   insert(other) {
     if (this.containsBounds(other)) {
@@ -2061,16 +2058,14 @@ var _SpriteSheet = class {
     const data = this.context2D.getImageData(x, y, 1, 1).data;
     return data[3] == 0;
   }
-  addBitmap(id, x, y, width, height) {
-    return __async(this, null, function* () {
-      if (this.loaded) {
-        createImageBitmap(this.image, x, y, width, height).then((bitmap) => {
-          this._renderer.addBitmap(id, bitmap);
-        });
-      } else {
-        this.bitmapsToLoad.push(new SpriteBitmap(id, x, y, width, height));
-      }
-    });
+  async addBitmap(id, x, y, width, height) {
+    if (this.loaded) {
+      createImageBitmap(this.image, x, y, width, height).then((bitmap) => {
+        this._renderer.addBitmap(id, bitmap);
+      });
+    } else {
+      this.bitmapsToLoad.push(new SpriteBitmap(id, x, y, width, height));
+    }
   }
 };
 var SpriteSheet2 = _SpriteSheet;
@@ -2550,47 +2545,28 @@ var RenderOrder = /* @__PURE__ */ ((RenderOrder2) => {
   RenderOrder2[RenderOrder2["After"] = 1] = "After";
   return RenderOrder2;
 })(RenderOrder || {});
+function inRange(n, lower, upper) {
+  return n >= lower && n <= upper;
+}
 var SceneNode = class {
-  constructor(_entity, _minDrawCoord) {
+  constructor(_entity, graph) {
     this._entity = _entity;
-    this._minDrawCoord = _minDrawCoord;
     this._preds = new Array();
     this._succs = new Array();
-    // FIXME: Just store the six points, not six segments.
-    this._topOutlineSegments = new Array();
-    this._sideOutlineSegments = new Array();
-    this._baseOutlineSegments = new Array();
-    this.drawCoord = _minDrawCoord;
+    graph.setDrawOutline(this);
   }
-  overlapX(other) {
-    return this.entity.bounds.minX >= other.entity.bounds.minX && this.entity.bounds.minX < other.entity.bounds.maxX || this.entity.bounds.maxX > other.entity.bounds.minX && this.entity.bounds.maxX <= other.entity.bounds.maxX;
-  }
-  overlapY(other) {
-    return this.entity.bounds.minY >= other.entity.bounds.minY && this.entity.bounds.minY < other.entity.bounds.maxY || this.entity.bounds.maxY > other.entity.bounds.minY && this.entity.bounds.maxY <= other.entity.bounds.maxY;
-  }
-  overlapZ(other) {
-    return this.entity.bounds.minZ >= other.entity.bounds.minZ && this.entity.bounds.minZ < other.entity.bounds.maxZ || this.entity.bounds.maxZ > other.entity.bounds.minZ && this.entity.bounds.maxZ <= other.entity.bounds.maxZ;
-  }
-  updateSegments(diff) {
-    this.topSegments[0] = this.topSegments[0].add(diff);
-    this.topSegments[1] = this.topSegments[1].add(diff);
-    this.baseSegments[0] = this.baseSegments[0].add(diff);
-    this.baseSegments[1] = this.baseSegments[1].add(diff);
-    this.sideSegments[0] = this.sideSegments[0].add(diff);
-    this.sideSegments[1] = this.sideSegments[1].add(diff);
+  updateOutline(diff) {
+    this.min2D = this.min2D.add(diff);
+    this.max2D = this.max2D.add(diff);
+    this.top2D = this.top2D.add(diff);
+    this.bottom2D = this.bottom2D.add(diff);
     this.drawCoord = this.drawCoord.add(diff);
-    this.minDrawCoord = this.minDrawCoord.add(diff);
   }
-  intersectsTop(other) {
-    for (const otherTop of other.topSegments) {
-      if (this.baseSegments[0].intersects(otherTop) || this.baseSegments[1].intersects(otherTop)) {
-        return true;
-      }
-      if (this.sideSegments[0].intersects(otherTop) || this.sideSegments[1].intersects(otherTop)) {
-        return true;
-      }
-    }
-    return false;
+  overlapDrawX(other) {
+    return inRange(this.min2D.x, other.min2D.x, other.max2D.x) || inRange(this.max2D.x, other.min2D.x, other.max2D.x);
+  }
+  overlapDrawY(other) {
+    return inRange(this.top2D.y, other.top2D.y, other.bottom2D.y) || inRange(this.bottom2D.y, other.top2D.y, other.bottom2D.y);
   }
   clear() {
     this._succs = [];
@@ -2616,20 +2592,29 @@ var SceneNode = class {
   set drawCoord(coord) {
     this._drawCoord = coord;
   }
-  get minDrawCoord() {
-    return this._minDrawCoord;
+  get min2D() {
+    return this._min2D;
   }
-  set minDrawCoord(coord) {
-    this._minDrawCoord = coord;
+  set min2D(coord) {
+    this._min2D = coord;
   }
-  get topSegments() {
-    return this._topOutlineSegments;
+  get max2D() {
+    return this._max2D;
   }
-  get baseSegments() {
-    return this._baseOutlineSegments;
+  set max2D(coord) {
+    this._max2D = coord;
   }
-  get sideSegments() {
-    return this._sideOutlineSegments;
+  get top2D() {
+    return this._top2D;
+  }
+  set top2D(coord) {
+    this._top2D = coord;
+  }
+  get bottom2D() {
+    return this._bottom2D;
+  }
+  set bottom2D(coord) {
+    this._bottom2D = coord;
   }
   get entity() {
     return this._entity;
@@ -2768,30 +2753,19 @@ var SceneGraph = class {
     const entity = node.entity;
     const min = entity.bounds.minLocation;
     const minDraw = this.getDrawCoord(min);
-    const diff = minDraw.diff(node.minDrawCoord);
-    node.updateSegments(diff);
+    const diff = minDraw.diff(node.min2D);
+    node.updateOutline(diff);
   }
   setDrawOutline(node) {
     const entity = node.entity;
     const min = entity.bounds.minLocation;
     const max = entity.bounds.maxLocation;
-    node.topSegments.length = 0;
-    node.baseSegments.length = 0;
-    node.sideSegments.length = 0;
-    const min2D = this.getDrawCoord(min);
-    const base1 = this.getDrawCoord(new Point3D(min.x, max.y, min.z));
-    const base2 = this.getDrawCoord(new Point3D(max.x, max.y, min.z));
-    node.baseSegments.push(new Segment2D(min2D, base1));
-    node.baseSegments.push(new Segment2D(base1, base2));
-    const max2D = this.getDrawCoord(max);
-    const top1 = this.getDrawCoord(new Point3D(min.x, min.y, max.z));
-    const top2 = this.getDrawCoord(new Point3D(max.x, min.y, max.z));
-    node.topSegments.push(new Segment2D(top1, top2));
-    node.topSegments.push(new Segment2D(top2, max2D));
-    node.sideSegments.push(new Segment2D(min2D, top1));
-    node.sideSegments.push(new Segment2D(base2, max2D));
-    const drawHeightOffset = min2D.diff(top2);
-    const adjustedCoord = new Point2D(min2D.x, min2D.y - drawHeightOffset.y);
+    node.min2D = this.getDrawCoord(min);
+    node.max2D = this.getDrawCoord(max);
+    node.top2D = this.getDrawCoord(new Point3D(max.x, min.y, max.z));
+    node.bottom2D = this.getDrawCoord(new Point3D(min.x, max.y, min.z));
+    const drawHeightOffset = node.min2D.diff(node.top2D);
+    const adjustedCoord = new Point2D(node.min2D.x, node.min2D.y - drawHeightOffset.y);
     node.drawCoord = adjustedCoord;
   }
   get levels() {
@@ -2889,10 +2863,7 @@ var Scene = class {
     return null;
   }
   insertEntity(entity) {
-    const node = new SceneNode(
-      entity,
-      this.graph.getDrawCoord(entity.bounds.minLocation)
-    );
+    const node = new SceneNode(entity, this.graph);
     this.nodes.set(node.id, node);
     if (this.graph.initialised) {
       this.graph.insertNode(node);
@@ -3094,21 +3065,6 @@ var _TrueIsometric = class extends SceneGraph {
     return _TrueIsometric.getDrawCoord(location);
   }
   drawOrder(first, second) {
-    if (first.overlapX(second)) {
-      return first.entity.bounds.minY <= second.entity.bounds.minY ? -1 /* Before */ : 1 /* After */;
-    }
-    if (first.overlapY(second)) {
-      return first.entity.bounds.minX >= second.entity.bounds.minX ? -1 /* Before */ : 1 /* After */;
-    }
-    if (!first.overlapZ(second)) {
-      return 0 /* Any */;
-    }
-    if (first.intersectsTop(second)) {
-      return -1 /* Before */;
-    }
-    if (second.intersectsTop(first)) {
-      return 1 /* After */;
-    }
     return 0 /* Any */;
   }
 };
@@ -3137,19 +3093,25 @@ var _TwoByOneIsometric = class extends SceneGraph {
     );
   }
   static drawOrder(first, second) {
-    if (first.overlapX(second)) {
-      return first.entity.bounds.minY < second.entity.bounds.minY ? -1 /* Before */ : 1 /* After */;
-    }
-    if (first.overlapY(second)) {
-      return first.entity.bounds.minX > second.entity.bounds.minX ? -1 /* Before */ : 1 /* After */;
-    }
-    if (!first.overlapZ(second)) {
+    if (!first.entity.bounds.axisOverlapX(second.entity.bounds) && !first.entity.bounds.axisOverlapY(second.entity.bounds) && !first.entity.bounds.axisOverlapZ(second.entity.bounds) && !first.overlapDrawX(second) && !first.overlapDrawY(second)) {
       return 0 /* Any */;
     }
-    if (first.intersectsTop(second)) {
+    if (first.entity.bounds.maxZ <= second.entity.bounds.minZ) {
       return -1 /* Before */;
     }
-    if (second.intersectsTop(first)) {
+    if (second.entity.bounds.maxZ <= first.entity.bounds.minZ) {
+      return 1 /* After */;
+    }
+    if (first.entity.bounds.maxY <= second.entity.bounds.minY) {
+      return -1 /* Before */;
+    }
+    if (second.entity.bounds.maxY <= first.entity.bounds.minY) {
+      return 1 /* After */;
+    }
+    if (first.entity.bounds.minX >= second.entity.bounds.maxX) {
+      return -1 /* Before */;
+    }
+    if (second.entity.bounds.minX >= first.entity.bounds.maxX) {
       return 1 /* After */;
     }
     return 0 /* Any */;
@@ -4786,13 +4748,6 @@ var ZonalAudioLoop = class extends Sound {
 };
 
 // src/debug.ts
-function getAllSegments(node) {
-  const allSegments = new Array();
-  node.topSegments.forEach((segment) => allSegments.push(segment));
-  node.baseSegments.forEach((segment) => allSegments.push(segment));
-  node.sideSegments.forEach((segment) => allSegments.push(segment));
-  return allSegments;
-}
 var MovableEntityDebug = class {
   constructor(movable, camera, debugCollision) {
     if (debugCollision) {
@@ -4813,14 +4768,13 @@ var MovableEntityDebug = class {
           scene.ctx.strokeStyle = "Green";
           for (const entity of missedEntities) {
             const sceneNode = scene.getNode(entity.id);
-            for (const segment of getAllSegments(sceneNode)) {
-              scene.ctx.beginPath();
-              const drawP0 = camera.getDrawCoord(segment.p0);
-              const drawP1 = camera.getDrawCoord(segment.p1);
-              scene.ctx.moveTo(drawP0.x, drawP0.y);
-              scene.ctx.lineTo(drawP1.x, drawP1.y);
-              scene.ctx.stroke();
-            }
+            scene.ctx.beginPath();
+            scene.ctx.moveTo(sceneNode.top2D.x, sceneNode.top2D.y);
+            scene.ctx.lineTo(sceneNode.max2D.x, sceneNode.max2D.y);
+            scene.ctx.lineTo(sceneNode.bottom2D.x, sceneNode.bottom2D.y);
+            scene.ctx.lineTo(sceneNode.min2D.x, sceneNode.min2D.y);
+            scene.ctx.lineTo(sceneNode.top2D.x, sceneNode.top2D.y);
+            scene.ctx.stroke();
           }
         }
         return Date.now() > start + 1e3;
@@ -4842,25 +4796,23 @@ var MovableEntityDebug = class {
         if (scene.ctx != null) {
           const ctx = scene.ctx;
           ctx.strokeStyle = "Green";
-          for (const segment of getAllSegments(scene.getNode(movable.id))) {
-            ctx.beginPath();
-            const drawP0 = camera.getDrawCoord(segment.p0);
-            const drawP1 = camera.getDrawCoord(segment.p1);
-            ctx.moveTo(drawP0.x, drawP0.y);
-            ctx.lineTo(drawP1.x, drawP1.y);
-            ctx.stroke();
-          }
+          let sceneNode = scene.getNode(movable.id);
+          ctx.beginPath();
+          ctx.moveTo(sceneNode.top2D.x, sceneNode.top2D.y);
+          ctx.lineTo(sceneNode.max2D.x, sceneNode.max2D.y);
+          ctx.lineTo(sceneNode.bottom2D.x, sceneNode.bottom2D.y);
+          ctx.lineTo(sceneNode.min2D.x, sceneNode.min2D.y);
+          ctx.lineTo(sceneNode.top2D.x, sceneNode.top2D.y);
+          ctx.stroke();
           ctx.strokeStyle = "Orange";
-          for (const segment of getAllSegments(
-            scene.getNode(collidedEntity.id)
-          )) {
-            ctx.beginPath();
-            const drawP0 = camera.getDrawCoord(segment.p0);
-            const drawP1 = camera.getDrawCoord(segment.p1);
-            ctx.moveTo(drawP0.x, drawP0.y);
-            ctx.lineTo(drawP1.x, drawP1.y);
-            ctx.stroke();
-          }
+          sceneNode = scene.getNode(collidedEntity.id);
+          ctx.beginPath();
+          ctx.moveTo(sceneNode.top2D.x, sceneNode.top2D.y);
+          ctx.lineTo(sceneNode.max2D.x, sceneNode.max2D.y);
+          ctx.lineTo(sceneNode.bottom2D.x, sceneNode.bottom2D.y);
+          ctx.lineTo(sceneNode.min2D.x, sceneNode.min2D.y);
+          ctx.lineTo(sceneNode.top2D.x, sceneNode.top2D.y);
+          ctx.stroke();
           ctx.strokeStyle = "Red";
           ctx.fillStyle = "Red";
           for (const vertex of collidedFace.vertices()) {

@@ -2,17 +2,9 @@ import { ContextImpl } from "./context.ts";
 import { MovableEntity, PhysicalEntity } from "./entity.ts";
 import { EntityEvent } from "./events.ts";
 import { CollisionDetector, CollisionInfo } from "./physics.ts";
-import { Face3D, IntersectInfo, Point2D, Segment2D } from "./geometry.ts";
+import { Face3D, IntersectInfo, Point2D } from "./geometry.ts";
 import { Camera } from "./camera.ts";
 import { SceneNode, Scene } from "./scene.ts";
-
-function getAllSegments(node: SceneNode): Array<Segment2D> {
-  const allSegments = new Array<Segment2D>();
-  node.topSegments.forEach((segment) => allSegments.push(segment));
-  node.baseSegments.forEach((segment) => allSegments.push(segment));
-  node.sideSegments.forEach((segment) => allSegments.push(segment));
-  return allSegments;
-}
 
 export class MovableEntityDebug {
   constructor(movable: MovableEntity, camera: Camera, debugCollision: boolean) {
@@ -39,15 +31,13 @@ export class MovableEntityDebug {
           scene.ctx!.strokeStyle = "Green";
           for (const entity of missedEntities) {
             const sceneNode = scene.getNode(entity.id);
-
-            for (const segment of getAllSegments(sceneNode)) {
-              scene.ctx!.beginPath();
-              const drawP0 = camera.getDrawCoord(segment.p0);
-              const drawP1 = camera.getDrawCoord(segment.p1);
-              scene.ctx!.moveTo(drawP0.x, drawP0.y);
-              scene.ctx!.lineTo(drawP1.x, drawP1.y);
-              scene.ctx!.stroke();
-            }
+            scene.ctx!.beginPath();
+            scene.ctx!.moveTo(sceneNode.top2D.x, sceneNode.top2D.y);
+            scene.ctx!.lineTo(sceneNode.max2D.x, sceneNode.max2D.y);
+            scene.ctx!.lineTo(sceneNode.bottom2D.x, sceneNode.bottom2D.y);
+            scene.ctx!.lineTo(sceneNode.min2D.x, sceneNode.min2D.y);
+            scene.ctx!.lineTo(sceneNode.top2D.x, sceneNode.top2D.y);
+            scene.ctx!.stroke();
           }
         }
         // Draw for ~1 second.
@@ -76,27 +66,25 @@ export class MovableEntityDebug {
           // outline the movable in green
           const ctx = scene.ctx!;
           ctx.strokeStyle = "Green";
-          for (const segment of getAllSegments(scene.getNode(movable.id))) {
-            ctx.beginPath();
-            const drawP0 = camera.getDrawCoord(segment.p0);
-            const drawP1 = camera.getDrawCoord(segment.p1);
-            ctx.moveTo(drawP0.x, drawP0.y);
-            ctx.lineTo(drawP1.x, drawP1.y);
-            ctx.stroke();
-          }
+          let sceneNode = scene.getNode(movable.id);
+          ctx.beginPath();
+          ctx.moveTo(sceneNode.top2D.x, sceneNode.top2D.y);
+          ctx.lineTo(sceneNode.max2D.x, sceneNode.max2D.y);
+          ctx.lineTo(sceneNode.bottom2D.x, sceneNode.bottom2D.y);
+          ctx.lineTo(sceneNode.min2D.x, sceneNode.min2D.y);
+          ctx.lineTo(sceneNode.top2D.x, sceneNode.top2D.y);
+          ctx.stroke();
 
           // outline the entity that it collided with in orange.
           ctx.strokeStyle = "Orange";
-          for (const segment of getAllSegments(
-            scene.getNode(collidedEntity.id)
-          )) {
-            ctx.beginPath();
-            const drawP0 = camera.getDrawCoord(segment.p0);
-            const drawP1 = camera.getDrawCoord(segment.p1);
-            ctx.moveTo(drawP0.x, drawP0.y);
-            ctx.lineTo(drawP1.x, drawP1.y);
-            ctx.stroke();
-          }
+          sceneNode = scene.getNode(collidedEntity.id);
+          ctx.beginPath();
+          ctx.moveTo(sceneNode.top2D.x, sceneNode.top2D.y);
+          ctx.lineTo(sceneNode.max2D.x, sceneNode.max2D.y);
+          ctx.lineTo(sceneNode.bottom2D.x, sceneNode.bottom2D.y);
+          ctx.lineTo(sceneNode.min2D.x, sceneNode.min2D.y);
+          ctx.lineTo(sceneNode.top2D.x, sceneNode.top2D.y);
+          ctx.stroke();
 
           // draw the collided face red and the other faces orange.
           ctx.strokeStyle = "Red";

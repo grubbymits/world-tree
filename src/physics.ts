@@ -151,6 +151,42 @@ export class BoundingCuboid {
     return true;
   }
 
+  axisOverlapX(other: BoundingCuboid): boolean {
+    if (
+      (other.minLocation.x >= this.minLocation.x &&
+        other.minLocation.x <= this.maxLocation.x) ||
+      (other.maxLocation.x >= this.minLocation.x &&
+        other.maxLocation.x <= this.maxLocation.x)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  axisOverlapY(other: BoundingCuboid): boolean {
+    if (
+      (other.minLocation.y >= this.minLocation.y &&
+        other.minLocation.y <= this.maxLocation.y) ||
+      (other.maxLocation.y >= this.minLocation.y &&
+        other.maxLocation.y <= this.maxLocation.y)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  axisOverlapZ(other: BoundingCuboid): boolean {
+    if (
+      (other.minLocation.z >= this.minLocation.z &&
+        other.minLocation.z <= this.maxLocation.z) ||
+      (other.maxLocation.z >= this.minLocation.z &&
+        other.maxLocation.z <= this.maxLocation.z)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
   insert(other: BoundingCuboid) {
     if (this.containsBounds(other)) {
       return; // nothing to do.
