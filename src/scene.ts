@@ -18,7 +18,6 @@ function inRange(n: number, lower: number, upper: number): boolean {
 
 export class SceneNode {
   private _succs: Array<SceneNode> = new Array<SceneNode>();
-  private _level: SceneLevel | null;
   private _min2D: Point2D;
   private _max2D: Point2D;
   private _top2D: Point2D;
@@ -104,12 +103,6 @@ export class SceneNode {
   get succs(): Array<SceneNode> {
     return this._succs;
   }
-  get level(): SceneLevel | null {
-    return this._level;
-  }
-  set level(level: SceneLevel | null) {
-    this._level = level;
-  }
   get minZ(): number {
     return this._entity.bounds.minZ;
   }
@@ -120,143 +113,12 @@ export class SceneNode {
 
 type NodeCompare = (firstId: number, secondId: number) => RenderOrder;
 
-export class SceneLevel {
-  private _nodes: Array<SceneNode> = new Array<SceneNode>();
-  private _order: Array<SceneNode> = new Array<SceneNode>();
-  private readonly _minZ: number;
-  private readonly _maxZ: number;
-  private _dirty = true;
-
-  constructor(root: SceneNode) {
-    this._minZ = root.minZ;
-    this._maxZ = root.maxZ;
-    this._nodes.push(root);
-    root.level = this;
-  }
-
-  get nodes(): Array<SceneNode> {
-    return this._nodes;
-  }
-  get order(): Array<SceneNode> {
-    return this._order;
-  }
-  set order(o: Array<SceneNode>) {
-    this._order = o;
-  }
-  get minZ(): number {
-    return this._minZ;
-  }
-  get maxZ(): number {
-    return this._maxZ;
-  }
-  get dirty(): boolean {
-    return this._dirty;
-  }
-  set dirty(d: boolean) {
-    this._dirty = d;
-  }
-
-  inrange(entity: PhysicalEntity): boolean {
-    return entity.bounds.minZ >= this._minZ && entity.bounds.minZ < this._maxZ;
-  }
-
-  add(node: SceneNode, graph: SceneGraph): void {
-    this.dirty = true;
-    node.level = this;
-    this._nodes.push(node);
-    this.update(node, graph);
-  }
-
-  remove(node: SceneNode): void {
-    this.dirty = true;
-    const idx = this._nodes.indexOf(node);
-    console.assert(idx != -1);
-    this._nodes.splice(idx, 1);
-    this._nodes.forEach((pred) => pred.removeSucc(node));
-  }
-
-  update(node: SceneNode, graph: SceneGraph): void {
-    node.clear();
-    for (let i = 0; i < this._nodes.length; i++) {
-      const existing = this._nodes[i];
-      if (existing.id == node.id) {
-        continue;
-      }
-      const order = graph.drawOrder(node, existing);
-      if (RenderOrder.Before == order) {
-        node.addSucc(existing);
-      } else if (RenderOrder.After == order) {
-        existing.addSucc(node);
-      } else {
-        existing.removeSucc(node);
-      }
-    }
-    this.dirty = true;
-  }
-
-  shouldDraw(node: SceneNode, camera: Camera): boolean {
-    const entity: PhysicalEntity = node.entity;
-    if (entity.visible && entity.drawable) {
-      // FIXME: Is using the graphics data the right/best thing to do?
-      const width = entity.graphics[0].width;
-      const height = entity.graphics[0].height;
-      return camera.isOnScreen(node.drawCoord, width, height);
-    } else {
-      return false;
-    }
-  }
-
-  buildGraph(graph: SceneGraph, camera: Camera, force: boolean): void {
-    if (!force && !this.dirty) {
-      //console.assert(this.order.length != 0);
-      return;
-    }
-
-    // Filter out the nodes that don't need drawing.
-    const toDraw: Array<SceneNode> = this._nodes.filter((node) =>
-      this.shouldDraw(node, camera)
-    );
-
-    // TODO: Represent the scene as a path matrix and perform reduction.
-    // https://en.wikipedia.org/wiki/Transitive_reduction
-    // In the mathematical theory of binary relations, any relation R on a set X may
-    // be thought of as a directed graph that has the set X as its vertex set and
-    // that has an arc xy for every ordered pair of elements that are related in R.
-    // In particular, this method lets partially ordered sets be reinterpreted as
-    // directed acyclic graphs, in which there is an arc xy in the graph whenever
-    // there is an order relation x < y between the given pair of elements of the
-    // partial order.
-    toDraw.sort((a, b) => graph.drawOrder(a, b));
-
-    this.order = [];
-    const discovered = new Set<SceneNode>();
-
-    const topoSort = (node: SceneNode): void => {
-      if (discovered.has(node)) {
-        return;
-      }
-      discovered.add(node);
-      for (const succ of node.succs) {
-        topoSort(succ);
-      }
-      this.order.push(node);
-    };
-
-    for (const i in toDraw) {
-      if (discovered.has(toDraw[i])) {
-        continue;
-      }
-      topoSort(toDraw[i]);
-    }
-    this.dirty = false;
-  }
-}
-
 export abstract class SceneGraph {
-  protected _levels: Array<SceneLevel> = new Array<SceneLevel>();
-  protected _numNodes = 0;
+  protected _nodes: Array<SceneNode> = new Array<SceneNode>();
+  protected _order: Array<SceneNode> = new Array<SceneNode>();
   protected _prevCameraLower: Point2D = new Point2D(0, 0);
   protected _prevCameraUpper: Point2D = new Point2D(0, 0);
+  protected _dirty = true;
 
   abstract getDrawCoord(location: Point3D): Point2D;
   abstract drawOrder(first: SceneNode, second: SceneNode): RenderOrder;
@@ -300,70 +162,46 @@ export abstract class SceneGraph {
     node.drawCoord = adjustedCoord;
   }
 
-  get levels(): Array<SceneLevel> {
-    return this._levels;
+  get nodes(): Array<SceneNode> {
+    return this._nodes;
   }
-  get initialised(): boolean {
-    return this.levels.length != 0;
+  get order(): Array<SceneNode> {
+    return this._order;
   }
-  get numNodes(): number {
-    return this._numNodes;
+  set order(o: Array<SceneNode>) {
+    this._order = o;
+  }
+  get dirty(): boolean {
+    return this._dirty;
+  }
+  set dirty(d: boolean) {
+    this._dirty = d;
   }
 
   updateNode(node: SceneNode): void {
-    if (!this.initialised) {
-      return;
-    }
     this.updateDrawOutline(node);
-    console.assert(
-      node.level != null,
-      "node with id:",
-      node.entity.id,
-      "isn't assigned a level!"
-    );
-    const level: SceneLevel = node.level!;
-    if (level.inrange(node.entity)) {
-      level.update(node, this);
-    } else {
-      level.remove(node);
-      this.insertIntoLevel(node);
-    }
-  }
-
-  insertIntoLevel(node: SceneNode): void {
-    for (const level of this.levels) {
-      if (level.inrange(node.entity)) {
-        level.add(node, this);
-        return;
+    node.clear();
+    for (let i = 0; i < this.nodes.length; i++) {
+      const existing = this.nodes[i];
+      if (existing.id == node.id) {
+        continue;
+      }
+      const order = this.drawOrder(node, existing);
+      if (RenderOrder.Before == order) {
+        node.addSucc(existing);
+      } else if (RenderOrder.After == order) {
+        existing.addSucc(node);
+      } else {
+        existing.removeSucc(node);
       }
     }
-    this.levels.push(new SceneLevel(node));
+    this.dirty = true;
   }
 
   insertNode(node: SceneNode): void {
+    this.nodes.push(node);
     this.setDrawOutline(node);
-    //this._numEntities++;
-    if (this.initialised) {
-      this.insertIntoLevel(node);
-    }
-  }
-
-  initialise(nodes: Map<number, SceneNode>): void {
-    const nodeList = new Array<SceneNode>();
-    for (const node of nodes.values()) {
-      nodeList.push(node);
-      this.setDrawOutline(node);
-    }
-    nodeList.sort((a, b) => {
-      if (a.minZ < b.minZ) {
-        return RenderOrder.Before;
-      }
-      if (a.minZ > b.minZ) {
-        return RenderOrder.After;
-      }
-      return RenderOrder.Any;
-    });
-    nodeList.forEach((node) => this.insertIntoLevel(node));
+    this.updateNode(node);
   }
 
   cameraHasMoved(camera: Camera): boolean {
@@ -379,26 +217,83 @@ export abstract class SceneGraph {
     return needsRedraw;
   }
 
-  buildLevels(camera: Camera, force: boolean): void {
-    if (this.cameraHasMoved(camera)) {
-      force = true;
+  shouldDraw(node: SceneNode, camera: Camera): boolean {
+    const entity: PhysicalEntity = node.entity;
+    if (entity.visible && entity.drawable) {
+      // FIXME: Is using the graphics data the right/best thing to do?
+      const width = entity.graphics[0].width;
+      const height = entity.graphics[0].height;
+      return camera.isOnScreen(node.drawCoord, width, height);
+    } else {
+      return false;
     }
-    this._levels.forEach((level) => level.buildGraph(this, camera, force));
+  }
+
+  build(camera: Camera, force: boolean): void {
+    if (!force && !this.dirty) {
+      //console.assert(this.order.length != 0);
+      return;
+    }
+
+    // Filter out the nodes that don't need drawing.
+    const toDraw: Array<SceneNode> = this.nodes.filter((node) =>
+      this.shouldDraw(node, camera)
+    );
+    //console.log('nodes length', this.nodes.length);
+    //console.log('toDraw length', toDraw.length);
+
+    // TODO: Represent the scene as a path matrix and perform reduction.
+    // https://en.wikipedia.org/wiki/Transitive_reduction
+    // In the mathematical theory of binary relations, any relation R on a set X may
+    // be thought of as a directed graph that has the set X as its vertex set and
+    // that has an arc xy for every ordered pair of elements that are related in R.
+    // In particular, this method lets partially ordered sets be reinterpreted as
+    // directed acyclic graphs, in which there is an arc xy in the graph whenever
+    // there is an order relation x < y between the given pair of elements of the
+    // partial order.
+    toDraw.sort((a, b) => this.drawOrder(a, b));
+
+    this.order = [];
+    const discovered = new Set<SceneNode>();
+    let totalSuccs = 0;
+    let iterations = 0;
+
+    const topoSort = (node: SceneNode): void => {
+      if (discovered.has(node)) {
+        return;
+      }
+      iterations++;
+      discovered.add(node);
+      totalSuccs += node.succs.length;
+      for (const succ of node.succs) {
+        topoSort(succ);
+      }
+      this.order.push(node);
+    };
+
+    const start = performance.now();
+    for (const i in toDraw) {
+      if (discovered.has(toDraw[i])) {
+        continue;
+      }
+      topoSort(toDraw[i]);
+    }
+    const end = performance.now();
+    //console.log('sort time:', end - start);
+    //console.log('iterations:', iterations);
+    //console.log('total successors:', totalSuccs);
+    this.dirty = false;
   }
 }
 
 export class Scene {
   private _nodes: Map<number, SceneNode> = new Map<number, SceneNode>();
-  private _numEntities = 0;
   private _handler = new TimedEventHandler();
 
   constructor(private _graph: SceneGraph) {}
 
   get graph(): SceneGraph {
     return this._graph;
-  }
-  get numEntities(): number {
-    return this._numEntities;
   }
   get nodes(): Map<number, SceneNode> {
     return this._nodes;
@@ -410,13 +305,7 @@ export class Scene {
   insertEntity(entity: PhysicalEntity): void {
     const node = new SceneNode(entity, this.graph);
     this.nodes.set(node.id, node);
-    // If we haven't initialised levels yet (its done in the first call to
-    // render), just store the entity for then.
-    // Otherwise, find the level that it belongs in, or create a new level.
-    if (this.graph.initialised) {
-      this.graph.insertNode(node);
-    }
-    this._numEntities++;
+    this.graph.insertNode(node);
   }
   updateEntity(entity: PhysicalEntity): void {
     console.assert(this._nodes.has(entity.id));
@@ -441,10 +330,8 @@ export class Scene {
     y: number,
     camera: Camera
   ): PhysicalEntity | null {
-    for (let i = this.graph.levels.length - 1; i >= 0; i--) {
-      const level: SceneLevel = this.graph.levels[i];
-      for (let j = 0; j < level.nodes.length; j++) {
-        const node: SceneNode = level.nodes[j];
+      for (let i = 0; i < this.graph.order.length; ++i) {
+        const node: SceneNode = this.graph.order[i];
         const entity: PhysicalEntity = node.entity;
         if (!entity.visible || !entity.drawable) {
           continue;
@@ -469,7 +356,6 @@ export class Scene {
         ) {
           return entity;
         }
-      }
     }
     return null;
   }
@@ -478,20 +364,9 @@ export class Scene {
     this._handler.add(callback);
   }
 
-  numToDraw(): number {
-    let num = 0;
-    this.graph.levels.forEach((level) => {
-      num += level.order.length;
-    });
-    return num;
-  }
-
   render(camera: Camera, force: boolean): DrawElementList {
-    if (!this.graph.initialised) {
-      this.graph.initialise(this.nodes);
-    }
-    this.graph.buildLevels(camera, force);
-    const elements: number = this.numToDraw();
+    this.graph.build(camera, force);
+    const elements: number = this.graph.order.length;
     // - 2 bytes for each uint16
     // - 3 entries per draw element: sprite id, x, y
     // - 2 graphics per entry to hopefully avoid a resize.
@@ -499,9 +374,8 @@ export class Scene {
     let buffer = new ArrayBuffer(initByteLength);
     let drawElements = new Int16Array(buffer);
     let idx = 0;
-    this.graph.levels.forEach((level) => {
-      for (let i = level.order.length - 1; i >= 0; i--) {
-        const node: SceneNode = level.order[i];
+      for (let i = this.graph.order.length - 1; i >= 0; i--) {
+        const node: SceneNode = this.graph.order[i];
         const entity: PhysicalEntity = node.entity;
         const coord = camera.getDrawCoord(node.drawCoord);
         // double the size of the buffer if we're running out of space.
@@ -520,7 +394,6 @@ export class Scene {
           idx += 3;
         });
       }
-    });
 
     // TODO: Shrink the buffer to the necessary size.
     //if (buffer.byteLength != initByteLength) {
@@ -532,20 +405,20 @@ export class Scene {
   }
 
   verifyRenderer(entities: Array<PhysicalEntity>): boolean {
-    if (this.graph.numNodes != entities.length) {
+    if (this.nodes.size != entities.length) {
       console.error(
-        "top-level comparison between scene node and entities failed"
+        "scene-level comparison between scene node and entities failed"
+      );
+    }
+    if (this.graph.nodes.length != entities.length) {
+      console.error(
+        "graph-level comparison between scene node and entities failed"
       );
     }
     let counted = 0;
     const levelNodeIds = new Array<number>();
     const nodeIds = new Array<number>();
     const entityIds = new Array<number>();
-
-    for (const level of this.graph.levels) {
-      counted += level.nodes.length;
-      level.nodes.forEach((node) => levelNodeIds.push(node.id));
-    }
 
     for (const node of this.nodes.values()) {
       nodeIds.push(node.id);
@@ -559,10 +432,6 @@ export class Scene {
     ) {
       console.error("number of scene nodes and entities don't match up");
       return false;
-    }
-
-    if (this.numEntities != entities.length) {
-      console.error("mismatch in number of entities in context and scene");
     }
 
     nodeIds.sort((a, b) => {
@@ -681,30 +550,6 @@ export class TrueIsometric extends SceneGraph {
   }
 
   drawOrder(first: SceneNode, second: SceneNode): RenderOrder {
-    // priority ordering:
-    // - smaller y
-    // - greater x
-    /*
-    if (first.overlapX(second)) {
-      return first.entity.bounds.minY <= second.entity.bounds.minY
-        ? RenderOrder.Before
-        : RenderOrder.After;
-    }
-    if (first.overlapY(second)) {
-      return first.entity.bounds.minX >= second.entity.bounds.minX
-        ? RenderOrder.Before
-        : RenderOrder.After;
-    }
-    if (!first.overlapZ(second)) {
-      return RenderOrder.Any;
-    }
-    if (first.intersectsTop(second)) {
-      return RenderOrder.Before;
-    }
-    if (second.intersectsTop(first)) {
-      return RenderOrder.After;
-    }
-    */
     return RenderOrder.Any;
   }
 }
