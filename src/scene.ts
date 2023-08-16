@@ -253,33 +253,23 @@ export abstract class SceneGraph {
 
     this.order = [];
     const discovered = new Set<SceneNode>();
-    let totalSuccs = 0;
-    let iterations = 0;
-
     const topoSort = (node: SceneNode): void => {
       if (discovered.has(node)) {
         return;
       }
-      iterations++;
       discovered.add(node);
-      totalSuccs += node.succs.length;
       for (const succ of node.succs) {
         topoSort(succ);
       }
       this.order.push(node);
     };
 
-    const start = performance.now();
     for (const i in toDraw) {
       if (discovered.has(toDraw[i])) {
         continue;
       }
       topoSort(toDraw[i]);
     }
-    const end = performance.now();
-    //console.log('sort time:', end - start);
-    //console.log('iterations:', iterations);
-    //console.log('total successors:', totalSuccs);
     this.dirty = false;
   }
 }
