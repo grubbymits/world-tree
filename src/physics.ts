@@ -102,6 +102,12 @@ export class BoundingCuboid {
     this._maxLocation = this._maxLocation.add(d);
   }
 
+  futureBounds(d: Vector3D): BoundingCuboid {
+    let bounds = new BoundingCuboid(this.centre, this.dimensions);
+    bounds.update(d);
+    return bounds;
+  }
+
   contains(location: Point3D): boolean {
     if (
       location.x < this._minLocation.x ||
@@ -257,7 +263,7 @@ export class CollisionInfo {
   constructor(
     private readonly _collidedEntity: PhysicalEntity,
     private readonly _blocking: boolean,
-    private readonly _intersectInfo: IntersectInfo
+    private readonly _intersectInfo: IntersectInfo | null
   ) {}
   get entity(): PhysicalEntity {
     return this._collidedEntity;
@@ -265,7 +271,7 @@ export class CollisionInfo {
   get blocking(): boolean {
     return this._blocking;
   }
-  get intersectInfo(): IntersectInfo {
+  get intersectInfo(): IntersectInfo | null {
     return this._intersectInfo;
   }
 }
@@ -324,6 +330,7 @@ export class CollisionDetector {
     const depthVec3D = new Vector3D(0, bounds.depth, 0);
     const heightVec3D = new Vector3D(0, 0, bounds.height);
 
+    const newBounds: BoundingCuboid = movable.bounds.futureBounds(path);
     const beginPoints: Array<Point3D> = [
       bounds.minLocation,
       bounds.minLocation.add(heightVec3D),
@@ -342,14 +349,31 @@ export class CollisionDetector {
       if (entity.id == movable.id) {
         continue;
       }
+
+      // First check bounding box intersection.
+      if (!entity.bounds.intersects(newBounds)) {
+        continue;
+      }
+
+      // If both geometries are cuboids, we don't have to check further.
+      if (entity.geometry.cuboid && movable.geometry.cuboid) {
+        // FIXME: Not all entities should block.
+        const blocking = true;
+        const collision = new CollisionInfo(entity, blocking, null);
+        this._collisionInfo.set(movable, collision);
+        movable.postEvent(EntityEvent.Collision);
+        return collision;
+      }
+
       const geometry: Geometry = entity.geometry;
       for (const beginPoint of beginPoints) {
         const endPoint = beginPoint.add(path);
 
-        const intersectInfo = geometry.obstructs(beginPoint, endPoint);
+        const intersectInfo = geometry.obstructsRay(beginPoint, endPoint);
         if (intersectInfo != null) {
+          // FIXME: Not all entities should block.
           const blocking = true;
-          const collision = new CollisionInfo(entity, blocking, intersectInfo!);
+          const collision = new CollisionInfo(entity, blocking, intersectInfo);
           this._collisionInfo.set(movable, collision);
           movable.postEvent(EntityEvent.Collision);
           return collision;

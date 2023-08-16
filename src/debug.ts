@@ -55,65 +55,67 @@ export class MovableEntityDebug {
 
       const collisionInfo: CollisionInfo =
         CollisionDetector.getCollideInfo(movable);
-      const intersectInfo: IntersectInfo = collisionInfo.intersectInfo;
-      const collidedEntity: PhysicalEntity = collisionInfo.entity;
-      const collidedFace: Face3D = intersectInfo.face;
-      const scene = context.scene;
-      const start = Date.now();
 
-      scene.addTimedEvent(function () {
-        if (scene.ctx != null) {
-          // outline the movable in green
-          const ctx = scene.ctx!;
-          ctx.strokeStyle = "Green";
-          let sceneNode = scene.getNode(movable.id);
-          ctx.beginPath();
-          ctx.moveTo(sceneNode.top2D.x, sceneNode.top2D.y);
-          ctx.lineTo(sceneNode.max2D.x, sceneNode.max2D.y);
-          ctx.lineTo(sceneNode.bottom2D.x, sceneNode.bottom2D.y);
-          ctx.lineTo(sceneNode.min2D.x, sceneNode.min2D.y);
-          ctx.lineTo(sceneNode.top2D.x, sceneNode.top2D.y);
-          ctx.stroke();
+      if (collisionInfo.intersectInfo) {
+        const intersectInfo: IntersectInfo = collisionInfo.intersectInfo!;
+        const collidedEntity: PhysicalEntity = collisionInfo.entity;
+        const collidedFace: Face3D = intersectInfo.face;
+        const scene = context.scene;
+        const start = Date.now();
 
-          // outline the entity that it collided with in orange.
-          ctx.strokeStyle = "Orange";
-          sceneNode = scene.getNode(collidedEntity.id);
-          ctx.beginPath();
-          ctx.moveTo(sceneNode.top2D.x, sceneNode.top2D.y);
-          ctx.lineTo(sceneNode.max2D.x, sceneNode.max2D.y);
-          ctx.lineTo(sceneNode.bottom2D.x, sceneNode.bottom2D.y);
-          ctx.lineTo(sceneNode.min2D.x, sceneNode.min2D.y);
-          ctx.lineTo(sceneNode.top2D.x, sceneNode.top2D.y);
-          ctx.stroke();
-
-          // draw the collided face red and the other faces orange.
-          ctx.strokeStyle = "Red";
-          ctx.fillStyle = "Red";
-          for (const vertex of collidedFace.vertices()) {
+        scene.addTimedEvent(function () {
+          if (scene.ctx != null) {
+            // outline the movable in green
+            const ctx = scene.ctx!;
+            ctx.strokeStyle = "Green";
+            let sceneNode = scene.getNode(movable.id);
             ctx.beginPath();
-            const p0: Point2D = camera.getDrawCoord(
-              scene.graph.getDrawCoord(vertex.point)
-            );
-            const p1: Point2D = camera.getDrawCoord(
-              scene.graph.getDrawCoord(vertex.point.add(vertex.u))
-            );
-            const p2: Point2D = camera.getDrawCoord(
-              scene.graph.getDrawCoord(vertex.point.add(vertex.v))
-            );
-            ctx.beginPath();
-            ctx.moveTo(p0.x, p0.y);
-            ctx.lineTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.closePath();
+            ctx.moveTo(sceneNode.top2D.x, sceneNode.top2D.y);
+            ctx.lineTo(sceneNode.max2D.x, sceneNode.max2D.y);
+            ctx.lineTo(sceneNode.bottom2D.x, sceneNode.bottom2D.y);
+            ctx.lineTo(sceneNode.min2D.x, sceneNode.min2D.y);
+            ctx.lineTo(sceneNode.top2D.x, sceneNode.top2D.y);
             ctx.stroke();
-            ctx.fill();
+
+            // outline the entity that it collided with in orange.
+            ctx.strokeStyle = "Orange";
+            sceneNode = scene.getNode(collidedEntity.id);
+            ctx.beginPath();
+            ctx.moveTo(sceneNode.top2D.x, sceneNode.top2D.y);
+            ctx.lineTo(sceneNode.max2D.x, sceneNode.max2D.y);
+            ctx.lineTo(sceneNode.bottom2D.x, sceneNode.bottom2D.y);
+            ctx.lineTo(sceneNode.min2D.x, sceneNode.min2D.y);
+            ctx.lineTo(sceneNode.top2D.x, sceneNode.top2D.y);
+            ctx.stroke();
+
+            // draw the collided face red and the other faces orange.
+            ctx.strokeStyle = "Red";
+            ctx.fillStyle = "Red";
+            for (const vertex of collidedFace.vertices()) {
+              ctx.beginPath();
+              const p0: Point2D = camera.getDrawCoord(
+                scene.graph.getDrawCoord(vertex.point)
+              );
+              const p1: Point2D = camera.getDrawCoord(
+                scene.graph.getDrawCoord(vertex.point.add(vertex.u))
+              );
+              const p2: Point2D = camera.getDrawCoord(
+                scene.graph.getDrawCoord(vertex.point.add(vertex.v))
+              );
+              ctx.beginPath();
+              ctx.moveTo(p0.x, p0.y);
+              ctx.lineTo(p1.x, p1.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.closePath();
+              ctx.stroke();
+              ctx.fill();
+            }
           }
-        }
 
-        // Draw for ~1 second.
-        return Date.now() > start + 1000;
-      });
-
+          // Draw for ~1 second.
+          return Date.now() > start + 1000;
+        });
+      }
       CollisionDetector.removeInfo(movable);
     });
   }

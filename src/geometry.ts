@@ -466,6 +466,7 @@ export class Geometry {
   protected readonly _depthVec3D: Vector3D;
   protected readonly _heightVec3D: Vector3D;
   protected _name: string;
+  protected _cuboid: boolean = false;
 
   constructor(protected _bounds: BoundingCuboid) {
     this._widthVec3D = new Vector3D(_bounds.width, 0, 0);
@@ -491,6 +492,9 @@ export class Geometry {
   get name(): string {
     return this._name;
   }
+  get cuboid(): boolean {
+    return this._cuboid;
+  }
 
   transform(d: Vector3D): void {
     for (const face of this._faces) {
@@ -498,7 +502,7 @@ export class Geometry {
     }
   }
 
-  obstructs(begin: Point3D, end: Point3D): IntersectInfo | null {
+  obstructsRay(begin: Point3D, end: Point3D): IntersectInfo | null {
     for (const face of this._faces) {
       const i = face.intersectsPlane(begin, end);
       if (i != null && face.intersects(i)) {
@@ -526,6 +530,7 @@ export class CuboidGeometry extends Geometry {
   constructor(bounds: BoundingCuboid) {
     super(bounds);
     this._name = "CuboidGeometry";
+    this._cuboid = true;
 
     //  1  ________ 5
     //    |\       \

@@ -1,4 +1,4 @@
-import * as WT from "../lib/world-tree.mjs";
+import * as WT from "../../dist/world-tree.mjs";
 
 function createDroid(context, position) {
   const directions = [
