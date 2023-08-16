@@ -180,21 +180,6 @@ export abstract class SceneGraph {
 
   updateNode(node: SceneNode): void {
     this.updateDrawOutline(node);
-    node.clear();
-    for (let i = 0; i < this.nodes.length; i++) {
-      const existing = this.nodes[i];
-      if (existing.id == node.id) {
-        continue;
-      }
-      const order = this.drawOrder(node, existing);
-      if (RenderOrder.Before == order) {
-        node.addSucc(existing);
-      } else if (RenderOrder.After == order) {
-        existing.addSucc(node);
-      } else {
-        existing.removeSucc(node);
-      }
-    }
     this.dirty = true;
   }
 
@@ -239,10 +224,8 @@ export abstract class SceneGraph {
     const toDraw: Array<SceneNode> = this.nodes.filter((node) =>
       this.shouldDraw(node, camera)
     );
-    //console.log('nodes length', this.nodes.length);
-    //console.log('toDraw length', toDraw.length);
 
-    // TODO: Represent the scene as a path matrix and perform reduction.
+    // TODO: Perform reduction? Or find an elegant way of partitioning the graph?
     // https://en.wikipedia.org/wiki/Transitive_reduction
     // In the mathematical theory of binary relations, any relation R on a set X may
     // be thought of as a directed graph that has the set X as its vertex set and
@@ -252,6 +235,21 @@ export abstract class SceneGraph {
     // there is an order relation x < y between the given pair of elements of the
     // partial order.
     toDraw.sort((a, b) => this.drawOrder(a, b));
+    toDraw.forEach((node) => node.clear());
+
+    for (let i = 0; i < toDraw.length; i++) {
+      const nodeI = toDraw[i];
+      for (let j = 0; j < toDraw.length; ++j) {
+        if (i == j) continue;
+        const nodeJ = toDraw[j];
+        const order = this.drawOrder(nodeI, nodeJ);
+        if (RenderOrder.Before == order) {
+          nodeI.addSucc(nodeJ);
+        } else if (RenderOrder.After == order) {
+          nodeJ.addSucc(nodeI);
+        }
+      }
+    }
 
     this.order = [];
     const discovered = new Set<SceneNode>();
@@ -330,32 +328,30 @@ export class Scene {
     y: number,
     camera: Camera
   ): PhysicalEntity | null {
-      for (let i = 0; i < this.graph.order.length; ++i) {
-        const node: SceneNode = this.graph.order[i];
-        const entity: PhysicalEntity = node.entity;
-        if (!entity.visible || !entity.drawable) {
-          continue;
-        }
-        if (!camera.isOnScreen(node.drawCoord, entity.width, entity.depth)) {
-          continue;
-        }
+    for (let i = 0; i < this.graph.order.length; ++i) {
+      const node: SceneNode = this.graph.order[i];
+      const entity: PhysicalEntity = node.entity;
+      if (!entity.visible || !entity.drawable) {
+        continue;
+      }
+      if (!camera.isOnScreen(node.drawCoord, entity.width, entity.depth)) {
+        continue;
+      }
 
-        const onScreenCoord: Point2D = camera.getDrawCoord(node.drawCoord);
-        const graphic: GraphicComponent = entity.graphic;
-        // Check whether inbounds of the sprite.
-        if (
-          x < onScreenCoord.x ||
-          y < onScreenCoord.y ||
-          x > onScreenCoord.x + graphic.width ||
-          y > onScreenCoord.y + graphic.height
-        ) {
-          continue;
-        }
-        if (
-          !graphic.isTransparentAt(x - onScreenCoord.x, y - onScreenCoord.y)
-        ) {
-          return entity;
-        }
+      const onScreenCoord: Point2D = camera.getDrawCoord(node.drawCoord);
+      const graphic: GraphicComponent = entity.graphic;
+      // Check whether inbounds of the sprite.
+      if (
+        x < onScreenCoord.x ||
+        y < onScreenCoord.y ||
+        x > onScreenCoord.x + graphic.width ||
+        y > onScreenCoord.y + graphic.height
+      ) {
+        continue;
+      }
+      if (!graphic.isTransparentAt(x - onScreenCoord.x, y - onScreenCoord.y)) {
+        return entity;
+      }
     }
     return null;
   }
@@ -374,26 +370,26 @@ export class Scene {
     let buffer = new ArrayBuffer(initByteLength);
     let drawElements = new Int16Array(buffer);
     let idx = 0;
-      for (let i = this.graph.order.length - 1; i >= 0; i--) {
-        const node: SceneNode = this.graph.order[i];
-        const entity: PhysicalEntity = node.entity;
-        const coord = camera.getDrawCoord(node.drawCoord);
-        // double the size of the buffer if we're running out of space.
-        if (entity.graphics.length * 3 + idx >= drawElements.length) {
-          //buffer.resize(buffer.byteLength * 2);
-          let new_buffer = new ArrayBuffer(buffer.byteLength * 2);
-          new Int16Array(new_buffer).set(new Int16Array(buffer));
-          buffer = new_buffer;
-          drawElements = new Int16Array(buffer);
-        }
-        entity.graphics.forEach((component) => {
-          const spriteId: number = component.update();
-          drawElements[idx] = spriteId;
-          drawElements[idx + 1] = coord.x;
-          drawElements[idx + 2] = coord.y;
-          idx += 3;
-        });
+    for (let i = this.graph.order.length - 1; i >= 0; i--) {
+      const node: SceneNode = this.graph.order[i];
+      const entity: PhysicalEntity = node.entity;
+      const coord = camera.getDrawCoord(node.drawCoord);
+      // double the size of the buffer if we're running out of space.
+      if (entity.graphics.length * 3 + idx >= drawElements.length) {
+        //buffer.resize(buffer.byteLength * 2);
+        let new_buffer = new ArrayBuffer(buffer.byteLength * 2);
+        new Int16Array(new_buffer).set(new Int16Array(buffer));
+        buffer = new_buffer;
+        drawElements = new Int16Array(buffer);
       }
+      entity.graphics.forEach((component) => {
+        const spriteId: number = component.update();
+        drawElements[idx] = spriteId;
+        drawElements[idx + 1] = coord.x;
+        drawElements[idx + 2] = coord.y;
+        idx += 3;
+      });
+    }
 
     // TODO: Shrink the buffer to the necessary size.
     //if (buffer.byteLength != initByteLength) {
