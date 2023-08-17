@@ -223,18 +223,160 @@ test("insert bounds", () => {
   expect(container.maxLocation.z).toBe(7.5 + 37.5);
 });
 
-test("detect collision from north", () => {});
+const numTilesWide = 5;
+const numTilesDeep = 5;
+const numTilesHigh = 1;
+const squareTileSize = 10;
+const tileDims = new WT.Dimensions(squareTileSize, squareTileSize, squareTileSize);
+const worldDims = new WT.Dimensions(numTilesWide * squareTileSize,
+                                    numTilesDeep * squareTileSize,
+                                    numTilesHigh * squareTileSize);
+function createMap() {
+  // *  *  *  *  *
+  // *           *
+  // *     *     *
+  // *           *
+  // *  *  *  *  *
+  const context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric
+  );
+  // top row
+  for (let i = 0; i < numTilesWide; i++) {
+    let minLocation = new WT.Point3D(i * squareTileSize, 0, 0);
+    new WT.PhysicalEntity(context, minLocation, tileDims);
+  }
+  // bottom row
+  for (let i = 0; i < numTilesWide; i++) {
+    let minLocation = new WT.Point3D(i * squareTileSize, squareTileSize * 4, 0);
+    new WT.PhysicalEntity(context, minLocation, tileDims);
+  }
+  // left side
+  for (let i = 0; i < numTilesDeep; i++) {
+    let minLocation = new WT.Point3D(0, i * squareTileSize, 0);
+    new WT.PhysicalEntity(context, minLocation, tileDims);
+  }
+  // right side
+  for (let i = 0; i < numTilesDeep; i++) {
+    let minLocation = new WT.Point3D(4 * squareTileSize, i * squareTileSize, 0);
+    new WT.PhysicalEntity(context, minLocation, tileDims);
+  }
+  // middle
+  let minLocation = new WT.Point3D(2 * squareTileSize, 2 * squareTileSize, 0);
+  new WT.PhysicalEntity(context, minLocation, tileDims);
 
-test("detect collision from north east", () => {});
+  return context;
+}
 
-test("detect collision from east", () => {});
+const entityDims = new WT.Dimensions(5, 5, 5);
+function tryMoveFiveSteps(position, path) {
+  const worldCentre = new WT.Point3D(worldDims.width / 2,
+                                     worldDims.depth / 2,
+                                     worldDims.height / 2);
+  const context = createMap();
+  const movable = new WT.MovableEntity(context, position, entityDims);
+  const area = new WT.BoundingCuboid(worldCentre, worldDims);
+  // step 1
+  let detection = WT.CollisionDetector.detectInArea(movable, path, area);
+  expect(detection).toBeNull();
+  movable.updatePosition(path);
 
-test("detect collision from south east", () => {});
+  // step 2
+  detection = WT.CollisionDetector.detectInArea(movable, path, area);
+  expect(detection).toBeNull();
+  movable.updatePosition(path);
 
-test("detect collision from south", () => {});
+  // step 3
+  detection = WT.CollisionDetector.detectInArea(movable, path, area);
+  expect(detection).toBeNull();
+  movable.updatePosition(path);
 
-test("detect collision from south west", () => {});
+  // step 4
+  detection = WT.CollisionDetector.detectInArea(movable, path, area);
+  expect(detection).toBeNull();
+  movable.updatePosition(path);
 
-test("detect collision from west", () => {});
+  // step 5
+  detection = WT.CollisionDetector.detectInArea(movable, path, area);
+  expect(detection).not.toBeNull();
+}
 
-test("detect collision from north west", () => {});
+test("detect collision from north", () => {
+  const idx = 2;
+  const idy = 1;
+  const posx = squareTileSize * idx;
+  const posy = squareTileSize * idy;
+  const position = new WT.Point3D(posx, posy, 0);
+  const path = new WT.Vector3D(0, 1, 0);
+  tryMoveFiveSteps(position, path);
+});
+
+test("detect collision from north east", () => {
+  const idx = 3;
+  const idy = 1;
+  const posx = squareTileSize * idx;
+  const posy = squareTileSize * idy;
+  const position = new WT.Point3D(posx, posy, 0);
+  const path = new WT.Vector3D(-1, 1, 0);
+  tryMoveFiveSteps(position, path);
+});
+
+test("detect collision from east", () => {
+  const idx = 3;
+  const idy = 2;
+  const posx = squareTileSize * idx + entityDims.width;
+  const posy = squareTileSize * idy;
+  const position = new WT.Point3D(posx, posy, 0);
+  const path = new WT.Vector3D(-1, 0, 0);
+  tryMoveFiveSteps(position, path);
+});
+
+test("detect collision from south east", () => {
+  const idx = 3;
+  const idy = 3;
+  const posx = squareTileSize * idx;
+  const posy = squareTileSize * idy + entityDims.depth;
+  const position = new WT.Point3D(posx, posy, 0);
+  const path = new WT.Vector3D(-1, -1, 0);
+  tryMoveFiveSteps(position, path);
+});
+
+test("detect collision from south", () => {
+  const idx = 2;
+  const idy = 3;
+  const posx = squareTileSize * idx;
+  const posy = squareTileSize * idy + entityDims.depth;
+  const position = new WT.Point3D(posx, posy, 0);
+  const path = new WT.Vector3D(0, -1, 0);
+  tryMoveFiveSteps(position, path);
+});
+
+test("detect collision from south west", () => {
+  const idx = 1;
+  const idy = 3;
+  const posx = squareTileSize * idx;
+  const posy = squareTileSize * idy;
+  const position = new WT.Point3D(posx, posy, 0);
+  const path = new WT.Vector3D(1, -1, 0);
+  tryMoveFiveSteps(position, path);
+});
+
+test("detect collision from west", () => {
+  const idx = 1;
+  const idy = 2;
+  const posx = squareTileSize * idx;
+  const posy = squareTileSize * idy;
+  const position = new WT.Point3D(posx, posy, 0);
+  const path = new WT.Vector3D(1, 0, 0);
+  tryMoveFiveSteps(position, path);
+});
+
+test("detect collision from north west", () => {
+  const idx = 1;
+  const idy = 1;
+  const posx = squareTileSize * idx;
+  const posy = squareTileSize * idy;
+  const position = new WT.Point3D(posx, posy, 0);
+  const path = new WT.Vector3D(1, 1, 0);
+  tryMoveFiveSteps(position, path);
+});
