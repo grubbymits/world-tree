@@ -226,6 +226,7 @@ export abstract class SceneGraph {
     );
 
     // TODO: Perform reduction? Or find an elegant way of partitioning the graph?
+    // On the actor demo where are ~70 nodes versus ~2000 edges!
     // https://en.wikipedia.org/wiki/Transitive_reduction
     // In the mathematical theory of binary relations, any relation R on a set X may
     // be thought of as a directed graph that has the set X as its vertex set and
@@ -239,8 +240,7 @@ export abstract class SceneGraph {
 
     for (let i = 0; i < toDraw.length; i++) {
       const nodeI = toDraw[i];
-      for (let j = 0; j < toDraw.length; ++j) {
-        if (i == j) continue;
+      for (let j = i + 1; j < toDraw.length; ++j) {
         const nodeJ = toDraw[j];
         const order = this.drawOrder(nodeI, nodeJ);
         if (RenderOrder.Before == order) {
@@ -265,9 +265,6 @@ export abstract class SceneGraph {
     };
 
     for (const i in toDraw) {
-      if (discovered.has(toDraw[i])) {
-        continue;
-      }
       topoSort(toDraw[i]);
     }
     this.dirty = false;

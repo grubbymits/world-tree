@@ -81,7 +81,7 @@ window.onload = (event) => {
     WT.Perspective.TwoByOneIsometric,
   );
   const sheet = new WT.SpriteSheet(
-    "../graphics/png/outside-terrain-tiles-muted-textured",
+    "graphics/png/outside-terrain-tiles-muted-textured",
     context
   );
 

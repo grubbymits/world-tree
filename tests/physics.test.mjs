@@ -227,10 +227,16 @@ const numTilesWide = 5;
 const numTilesDeep = 5;
 const numTilesHigh = 1;
 const squareTileSize = 10;
-const tileDims = new WT.Dimensions(squareTileSize, squareTileSize, squareTileSize);
-const worldDims = new WT.Dimensions(numTilesWide * squareTileSize,
-                                    numTilesDeep * squareTileSize,
-                                    numTilesHigh * squareTileSize);
+const tileDims = new WT.Dimensions(
+  squareTileSize,
+  squareTileSize,
+  squareTileSize
+);
+const worldDims = new WT.Dimensions(
+  numTilesWide * squareTileSize,
+  numTilesDeep * squareTileSize,
+  numTilesHigh * squareTileSize
+);
 function createMap() {
   // *  *  *  *  *
   // *           *
@@ -270,9 +276,11 @@ function createMap() {
 
 const entityDims = new WT.Dimensions(5, 5, 5);
 function tryMoveFiveSteps(position, path) {
-  const worldCentre = new WT.Point3D(worldDims.width / 2,
-                                     worldDims.depth / 2,
-                                     worldDims.height / 2);
+  const worldCentre = new WT.Point3D(
+    worldDims.width / 2,
+    worldDims.depth / 2,
+    worldDims.height / 2
+  );
   const context = createMap();
   const movable = new WT.MovableEntity(context, position, entityDims);
   const area = new WT.BoundingCuboid(worldCentre, worldDims);

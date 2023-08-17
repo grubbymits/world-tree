@@ -67,7 +67,7 @@ window.onload = (event) => {
   );
   console.log("attempting to construct SpriteSheet");
   const sheet =
-    new WT.SpriteSheet("../graphics/png/outside-terrain-tiles-muted", context);
+    new WT.SpriteSheet("graphics/png/outside-terrain-tiles-muted", context);
   for (let row in tileRows) {
     addGraphic(sheet, /*column*/ 0, row);
   }

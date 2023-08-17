@@ -12,7 +12,7 @@ function createDroid(context, position) {
   const dimensions = WT.TwoByOneIsometric.getDimensions(
     spriteWidth, spriteHeight,
   );
-  const sheet = new WT.SpriteSheet("../graphics/png/levitate-droid", context);
+  const sheet = new WT.SpriteSheet("graphics/png/levitate-droid", context);
   const directionGraphicsMap = new Map();
   for (let x in directions) {
     let direction = directions[x];
@@ -130,7 +130,7 @@ window.onload = (event) => {
     WT.Perspective.TwoByOneIsometric,
   );
   const sheet = new WT.SpriteSheet(
-    "../graphics/png/outside-terrain-tiles-muted-textured", context
+    "graphics/png/outside-terrain-tiles-muted-textured", context
   );
   for (let row in tileRows) {
     addGraphic(row, sheet);

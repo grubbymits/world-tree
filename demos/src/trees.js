@@ -69,7 +69,7 @@ function random_inrange(min, max) {
 }
 
 function addTrees(totalTrees, terrainDims, context, builder) {
-  const treeSheet = new WT.SpriteSheet("../graphics/png/trees", context);
+  const treeSheet = new WT.SpriteSheet("graphics/png/trees", context);
   const treeSpriteWidth = 114;
   const treeSpriteHeight = 171;
 
@@ -162,7 +162,7 @@ window.onload = (event) => {
     WT.Perspective.TwoByOneIsometric,
   );
   const sheet = new WT.SpriteSheet(
-    "../graphics/png/outside-terrain-tiles-muted-textured",
+    "graphics/png/outside-terrain-tiles-muted-textured",
     context
   );
   for (let row in tileRows) {
