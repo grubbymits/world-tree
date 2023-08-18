@@ -215,8 +215,7 @@ export abstract class SceneGraph {
   }
 
   build(camera: Camera, force: boolean): void {
-    if (!force && !this.dirty) {
-      //console.assert(this.order.length != 0);
+    if (!force && !this.dirty && !camera.hasMoved) {
       return;
     }
 
@@ -268,6 +267,7 @@ export abstract class SceneGraph {
       topoSort(toDraw[i]);
     }
     this.dirty = false;
+    camera.hasMoved = false;
   }
 }
 

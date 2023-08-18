@@ -14,6 +14,7 @@ export class Camera {
   protected readonly _height: number;
   protected _handler = new EventHandler<InputEvent>();
   protected _surfaceLocation: Point3D | null;
+  protected _hasMoved: boolean = true;
 
   constructor(protected _scene: Scene, width: number, height: number) {
     this._width = Math.floor(width);
@@ -39,6 +40,12 @@ export class Camera {
     return true;
   }
 
+  get hasMoved(): boolean {
+    return this._hasMoved;
+  }
+  set hasMoved(moved: boolean) {
+    this._hasMoved = moved;
+  }
   get min(): Point2D {
     return new Point2D(this._lowerX, this._lowerY);
   }
@@ -103,11 +110,13 @@ export class MouseCamera extends Camera {
     canvas.addEventListener("mousedown", (e) => {
       if (e.button == 0) {
         this.location = scene.getLocationAt(e.offsetX, e.offsetY, this);
+        this.hasMoved = true;
       }
     });
     canvas.addEventListener("touchstart", (e) => {
       const touch = e.touches[0];
       this.location = scene.getLocationAt(touch.pageX, touch.pageY, this);
+      this.hasMoved = true;
     });
   }
 }
@@ -124,6 +133,7 @@ export class TrackerCamera extends Camera {
     this.location = movable.centre;
     movable.addEventListener(EntityEvent.Moving, () => {
       this.location = movable.centre;
+      this.hasMoved = true;
     });
   }
 }
