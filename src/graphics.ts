@@ -55,8 +55,9 @@ export class SpriteSheet {
   }
 
   private _image: HTMLImageElement;
-  private _canvas: HTMLCanvasElement;
-  private _context2D: CanvasRenderingContext2D | null;
+  private _canvas: OffscreenCanvas;
+  private _context2D: OffscreenCanvasRenderingContext2D | null;
+  private _canvasBlob: Blob;
   private _renderer: Renderer;
   private _loaded = false;
   private _bitmapsToLoad: Array<SpriteBitmap> = new Array<SpriteBitmap>();
@@ -65,14 +66,15 @@ export class SpriteSheet {
     this._renderer = context.renderer;
     this._image = new Image();
 
-    this._image.onload = () => {
-      this.canvas = document.createElement("canvas");
-      this.canvas.width = this.width;
-      this.canvas.height = this.height;
+    this._image.onload = async () => {
+      this.canvas = new OffscreenCanvas(this.width, this.height);
       this.context2D = this.canvas.getContext("2d", {
         willReadFrequently: true,
       })!;
       this.context2D.drawImage(this.image, 0, 0, this.width, this.height);
+      await this.canvas.convertToBlob().then((blob) => {
+        this.canvasBlob = blob;
+      });
       this.loaded = true;
       for (let bitmap of this.bitmapsToLoad) {
         this.addBitmap(
@@ -112,17 +114,23 @@ export class SpriteSheet {
     console.log("loaded spritesheet:", this.image.src);
     this._loaded = b;
   }
-  get canvas(): HTMLCanvasElement {
+  get canvas(): OffscreenCanvas {
     return this._canvas;
   }
-  set canvas(c: HTMLCanvasElement) {
+  set canvas(c: OffscreenCanvas) {
     this._canvas = c;
   }
-  get context2D(): CanvasRenderingContext2D {
+  get context2D(): OffscreenCanvasRenderingContext2D {
     return this._context2D!;
   }
-  set context2D(c: CanvasRenderingContext2D) {
+  set context2D(c: OffscreenCanvasRenderingContext2D) {
     this._context2D = c;
+  }
+  get canvasBlob(): Blob {
+    return this._canvasBlob!;
+  }
+  set canvasBlob(b: Blob) {
+    this._canvasBlob = b;
   }
   get bitmapsToLoad(): Array<SpriteBitmap> {
     return this._bitmapsToLoad;
@@ -141,7 +149,7 @@ export class SpriteSheet {
     height: number
   ): Promise<void> {
     if (this.loaded) {
-      createImageBitmap(this.image, x, y, width, height).then((bitmap) => {
+      createImageBitmap(this.canvasBlob, x, y, width, height).then((bitmap) => {
         this._renderer.addBitmap(id, bitmap);
       });
     } else {
