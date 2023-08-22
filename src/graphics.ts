@@ -72,9 +72,14 @@ export class SpriteSheet {
         willReadFrequently: true,
       })!;
       this.context2D.drawImage(this.image, 0, 0, this.width, this.height);
-      await this.canvas.convertToBlob().then((blob) => {
-        this.canvasBlob = blob;
-      });
+      await this.canvas.convertToBlob().then(
+        (blob) => {
+          this.canvasBlob = blob;
+        },
+        (error) => {
+          console.log("failed to convert to blob:", error);
+        }
+      );
       this.loaded = true;
       for (let bitmap of this.bitmapsToLoad) {
         this.addBitmap(
@@ -149,9 +154,14 @@ export class SpriteSheet {
     height: number
   ): Promise<void> {
     if (this.loaded) {
-      createImageBitmap(this.canvasBlob, x, y, width, height).then((bitmap) => {
-        this._renderer.addBitmap(id, bitmap);
-      });
+      createImageBitmap(this.canvasBlob, x, y, width, height).then(
+        (bitmap) => {
+          this._renderer.addBitmap(id, bitmap);
+        },
+        (error) => {
+          console.log("failed to createImageBitmap:", error);
+        }
+      );
     } else {
       this.bitmapsToLoad.push(new SpriteBitmap(id, x, y, width, height));
     }
