@@ -556,8 +556,8 @@ export class TwoByOneIsometric extends SceneGraph {
   static getDrawCoord(loc: Point3D): Point2D {
     // Tiles are placed overlapping each other by half.
     // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
-    const dx = Math.round((loc.x + loc.y) * 2 * this._oneOverMagicRatio);
-    const dy = Math.round((loc.y - loc.x - loc.z) * this._oneOverMagicRatio);
+    const dx = Math.floor((loc.x + loc.y) * 2 * this._oneOverMagicRatio);
+    const dy = Math.floor((loc.y - loc.x - loc.z) * this._oneOverMagicRatio);
     return new Point2D(dx, dy);
   }
 
@@ -567,12 +567,12 @@ export class TwoByOneIsometric extends SceneGraph {
     const oneUnit = spriteWidth * 0.25;
     const twoUnits = spriteWidth * 0.5;
     const width = oneUnit * this._magicRatio;
-    const depth = twoUnits * Math.sin(Math.atan(0.5));
+    const depth = width; //twoUnits * Math.sin(Math.atan(0.5));
     const height = (spriteHeight - twoUnits) * this._magicRatio;
     return new Dimensions(
-      Math.round(width),
-      Math.round(depth),
-      Math.round(height)
+      Math.floor(width),
+      Math.floor(depth),
+      Math.floor(height)
     );
   }
 
