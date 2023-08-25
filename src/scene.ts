@@ -548,6 +548,9 @@ export class TwoByOneIsometric extends SceneGraph {
     super();
   }
 
+  // atan(0.5) = 26.565
+  // cos(26.565) = 0.8944
+  // 1 / magicRatio = 1.118
   private static readonly _magicRatio: number = Math.cos(Math.atan(0.5));
 
   private static readonly _oneOverMagicRatio: number =
@@ -564,6 +567,13 @@ export class TwoByOneIsometric extends SceneGraph {
   static getDimensions(spriteWidth: number, spriteHeight: number): Dimensions {
     // We're allowing the height to vary, so its a cuboid, not a cube, but with
     // a square top.
+    // one unit width ratio = 0.25 * magicRatio ~= 0.2236
+    // two unit ratio = 0.5 * magicRatio ~= 0.4472
+    // graphic width  |  physical width   |   graphic height  | physical height
+    //      161       |     36.0007       |       161         |   72.001
+    //      161       |     36.0007       |       123         |   38.013
+    //      322       |     72.001        |       246         |   76.026
+    //      322       |     72.001        |       322         |   144.0028
     const oneUnit = spriteWidth * 0.25;
     const twoUnits = spriteWidth * 0.5;
     const width = oneUnit * this._magicRatio;

@@ -1,6 +1,6 @@
 import * as WT from "../../../dist/world-tree.mjs";
 const spriteWidth = 322;
-const spriteHeight = 270;
+const spriteHeight = 322;
 const tileRows = [
   WT.TerrainType.Lowland5,
   WT.TerrainType.Lowland4,
