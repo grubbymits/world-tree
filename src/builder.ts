@@ -748,11 +748,28 @@ export class TerrainBuilder {
 
         // Fixup the sides of the map.
         if (
-          centre.terrace > 0 &&
           shapeType == TerrainShape.Flat &&
           neighbours.length != 8
         ) {
-          shapeType = TerrainShape.Wall;
+          if (centre.terrace > 0) {
+            shapeType = TerrainShape.Wall;
+          } else if (x == 0 &&  y == 0) {
+            shapeType = TerrainShape.FlatNorthWest;
+          } else if (x == 0 &&  y == this.surface.depth - 1) {
+            shapeType = TerrainShape.FlatSouthWest;
+          } else if (x == this.surface.width - 1 && y == 0) {
+            shapeType = TerrainShape.FlatNorthEast;
+          } else if (x == 0) {
+            shapeType = TerrainShape.FlatWest;
+          } else if (y == 0) {
+            shapeType = TerrainShape.FlatNorth;
+          } else if (x == this.surface.width - 1 && y == this.surface.depth - 1) {
+            shapeType = TerrainShape.FlatSouthEast;
+          } else if (x == this.surface.width - 1) {
+            shapeType = TerrainShape.FlatEast;
+          } else if (y == this.surface.depth - 1) {
+            shapeType = TerrainShape.FlatSouth;
+          }
         }
 
         // If we don't support edge, try the basic wall tile and use the

@@ -1,36 +1,24 @@
 import * as WT from "../../../dist/world-tree.mjs";
-const spriteWidth = 322;
-const spriteHeight = 322;
+const spriteWidth = 161;
+const spriteHeight = 123;
 const tileRows = [
-  WT.TerrainType.Lowland5,
-  WT.TerrainType.Lowland4,
-  WT.TerrainType.Lowland3,
-  WT.TerrainType.Lowland2,
-  WT.TerrainType.Lowland1,
   WT.TerrainType.Lowland0,
-  WT.TerrainType.Upland5,
-  WT.TerrainType.Upland4,
-  WT.TerrainType.Upland3,
-  WT.TerrainType.Upland2,
-  WT.TerrainType.Upland1,
-  WT.TerrainType.Upland0,
-  WT.TerrainType.Water,
 ];
 const tileColumns = [
   WT.TerrainShape.Flat,
-  WT.TerrainShape.RampUpSouth,
-  WT.TerrainShape.RampUpWest,
-  WT.TerrainShape.RampUpEast,
-  WT.TerrainShape.RampUpNorth,
-  WT.TerrainShape.Wall,
-  WT.TerrainShape.FlatAloneOut,
-  WT.TerrainShape.FlatWestOut,
-  WT.TerrainShape.FlatSouthOut,
-  WT.TerrainShape.FlatSouthWest,
-  WT.TerrainShape.FlatNorthEast,
+  WT.TerrainShape.FlatWest,
   WT.TerrainShape.FlatNorth,
-  WT.TerrainShape.FlatEastOut,
   WT.TerrainShape.FlatEast,
+  WT.TerrainShape.FlatSouth,
+  WT.TerrainShape.FlatNorthWest,
+  WT.TerrainShape.FlatNorthEast,
+  WT.TerrainShape.FlatSouthEast,
+  WT.TerrainShape.FlatSouthWest,
+  WT.TerrainShape.FlatWestOut,
+  WT.TerrainShape.FlatNorthOut,
+  WT.TerrainShape.FlatEastOut,
+  WT.TerrainShape.FlatSouthOut,
+  WT.TerrainShape.FlatAloneOut,
 ];
 
 function addGraphic(column, row, sheet) {
@@ -81,7 +69,7 @@ window.onload = (event) => {
     WT.Perspective.TwoByOneIsometric,
   );
   const sheet = new WT.SpriteSheet(
-    "graphics/png/outside-terrain-tiles-muted-textured",
+    "graphics/png/outside-tiles-muted-161x125",
     context
   );
 
@@ -98,16 +86,16 @@ window.onload = (event) => {
 
   const config = new WT.TerrainBuilderConfig(
     numTerraces,
-    WT.TerrainType.DryGrass,
-    WT.TerrainType.DryGrass,
+    WT.TerrainType.Lowland0,
+    WT.TerrainType.Lowland0,
   );
   config.hasWater = true;
   config.waterLine = 0;
-  config.hasBiomes = true;
-  config.hasRamps = true;
-  config.rainfall = 30;
-  config.rainDirection = WT.Direction.North;
-  config.uplandThreshold = 4;
+  //config.hasBiomes = true;
+  //config.hasRamps = true;
+  //config.rainfall = 30;
+  //config.rainDirection = WT.Direction.North;
+  //config.uplandThreshold = 4;
 
   // Use the height map to construct a terrain.
   let builder = new WT.TerrainBuilder(
