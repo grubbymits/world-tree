@@ -751,9 +751,7 @@ export class TerrainBuilder {
           shapeType == TerrainShape.Flat &&
           neighbours.length != 8
         ) {
-          if (centre.terrace > 0) {
-            shapeType = TerrainShape.Wall;
-          } else if (x == 0 &&  y == 0) {
+          if (x == 0 &&  y == 0) {
             shapeType = TerrainShape.FlatNorthWest;
           } else if (x == 0 &&  y == this.surface.depth - 1) {
             shapeType = TerrainShape.FlatSouthWest;
@@ -826,6 +824,12 @@ export class TerrainBuilder {
                 break;
             }
           }
+        }
+
+        // Avoid introducing Wall tiles for the floor around the edge of the
+        // map.
+        if (centre.terrace == 0 && shapeType == TerrainShape.Wall) {
+          shapeType = TerrainShape.Flat;
         }
 
         // If we have a unsupported shape, such as a ramp, check whether we have
