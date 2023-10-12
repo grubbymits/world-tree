@@ -1,6 +1,6 @@
 import * as WT from "../../../dist/world-tree.mjs";
 const spriteWidth = 161;
-const spriteHeight = 123;
+const spriteHeight = 125;
 const tileRows = [
   WT.TerrainType.Lowland0,
 ];
@@ -19,6 +19,10 @@ const tileColumns = [
   WT.TerrainShape.FlatEastOut,
   WT.TerrainShape.FlatSouthOut,
   WT.TerrainShape.FlatAloneOut,
+  WT.TerrainShape.RampUpSouth,
+  WT.TerrainShape.RampUpWest,
+  WT.TerrainShape.RampUpEast,
+  WT.TerrainShape.RampUpNorth,
 ];
 
 function addGraphic(column, row, sheet) {
@@ -92,7 +96,7 @@ window.onload = (event) => {
   config.hasWater = true;
   config.waterLine = 0;
   //config.hasBiomes = true;
-  //config.hasRamps = true;
+  config.hasRamps = true;
   //config.rainfall = 30;
   //config.rainDirection = WT.Direction.North;
   //config.uplandThreshold = 4;

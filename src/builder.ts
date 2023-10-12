@@ -675,12 +675,34 @@ export class TerrainBuilder {
           if (neighbour.x != centre.x && neighbour.y != centre.y) {
             continue;
           }
-          // we may have an edge against a ramp, though it is in the same terrace.
+
           if (
             neighbour.terrace == centre.terrace &&
             Terrain.isFlat(centre.shape) == Terrain.isFlat(neighbour.shape)
           ) {
             continue;
+          }
+
+          // We want to enable edges, just not at the point where the ramp
+          // joins the upper terrace.
+          if (!Terrain.isFlat(neighbour.shape)) {
+            const direction = Navigation.getDirectionFromPoints(neighbour.pos, centre.pos);
+            switch (direction) {
+            default:
+              break;
+            case Direction.North:
+              if (neighbour.shape == TerrainShape.RampUpNorth) continue;
+              break;
+            case Direction.East:
+              if (neighbour.shape == TerrainShape.RampUpEast) continue;
+              break;
+            case Direction.South:
+              if (neighbour.shape == TerrainShape.RampUpSouth) continue;
+              break;
+            case Direction.West:
+              if (neighbour.shape == TerrainShape.RampUpWest) continue;
+              break;
+            }
           }
 
           northEdge = northEdge || neighbour.y < centre.y;
