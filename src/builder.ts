@@ -729,12 +729,16 @@ export class TerrainBuilder {
             shapeType = TerrainShape.FlatNorthEast;
           } else if (northEdge && westEdge) {
             shapeType = TerrainShape.FlatNorthWest;
-          } else if (northEdge) {
-            shapeType = TerrainShape.FlatNorth;
           } else if (southEdge && eastEdge) {
             shapeType = TerrainShape.FlatSouthEast;
           } else if (southEdge && westEdge) {
             shapeType = TerrainShape.FlatSouthWest;
+          } else if (southEdge && northEdge) {
+            shapeType = TerrainShape.FlatNorthSouth;
+          } else if (eastEdge && westEdge) {
+            shapeType = TerrainShape.FlatEastWest;
+          } else if (northEdge) {
+            shapeType = TerrainShape.FlatNorth;
           } else if (southEdge) {
             shapeType = TerrainShape.FlatSouth;
           } else if (eastEdge) {

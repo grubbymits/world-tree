@@ -18,30 +18,32 @@ import {
 } from "./geometry.ts";
 
 export enum TerrainShape {
-  Flat, // 0
-  Wall, // 1
-  FlatWest, // 2
-  FlatEast, // 3
-  FlatNorthWest, // 4
-  FlatNorth, // 5
-  FlatNorthEast, // 6
-  FlatSouthWest, // 7
-  FlatSouth, // 8
-  FlatSouthEast, // 9
-  FlatNorthOut, // 10
-  FlatEastOut, // 11
-  FlatWestOut, // 12
-  FlatSouthOut, // 13
-  FlatAloneOut, // 14
-  RampUpSouthEdge, // 15
-  RampUpWestEdge, // 16
-  RampUpEastEdge, // 17
-  RampUpNorthEdge, // 18
-  RampUpSouth, // 19
-  RampUpWest, // 20
-  RampUpEast, // 21
-  RampUpNorth, // 22
-  Max, // 23
+  Flat,             // 0
+  Wall,             // 1
+  FlatWest,         // 2
+  FlatEast,         // 3
+  FlatNorthWest,    // 4
+  FlatNorth,        // 5
+  FlatNorthEast,    // 6
+  FlatSouthWest,    // 7
+  FlatSouth,        // 8
+  FlatSouthEast,    // 9
+  FlatNorthOut,     // 10
+  FlatEastOut,      // 11
+  FlatWestOut,      // 12
+  FlatSouthOut,     // 13
+  FlatAloneOut,     // 14
+  FlatNorthSouth,   // 15
+  FlatEastWest,     // 16
+  RampUpSouthEdge,  // 17
+  RampUpWestEdge,   // 18
+  RampUpEastEdge,   // 19
+  RampUpNorthEdge,  // 20
+  RampUpSouth,      // 21
+  RampUpWest,       // 22
+  RampUpEast,       // 23
+  RampUpNorth,      // 24
+  Max,              // 25
 }
 
 export enum TerrainType {
@@ -329,10 +331,12 @@ export class Terrain extends PhysicalEntity {
       case TerrainShape.FlatNorthWest:
       case TerrainShape.FlatNorth:
       case TerrainShape.FlatNorthEast:
+      case TerrainShape.FlatNorthSouth:
       case TerrainShape.FlatWest:
       case TerrainShape.Flat:
       case TerrainShape.Wall:
       case TerrainShape.FlatEast:
+      case TerrainShape.FlatEastWest:
       case TerrainShape.FlatSouthWest:
       case TerrainShape.FlatSouth:
       case TerrainShape.FlatSouthEast:

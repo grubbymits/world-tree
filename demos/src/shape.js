@@ -19,6 +19,8 @@ const tileColumns = [
   WT.TerrainShape.FlatEastOut,
   WT.TerrainShape.FlatSouthOut,
   WT.TerrainShape.FlatAloneOut,
+  WT.TerrainShape.FlatNorthSouth,
+  WT.TerrainShape.FlatEastWest,
   WT.TerrainShape.RampUpSouth,
   WT.TerrainShape.RampUpWest,
   WT.TerrainShape.RampUpEast,
