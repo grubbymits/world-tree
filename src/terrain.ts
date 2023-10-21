@@ -242,51 +242,51 @@ export class Terrain extends PhysicalEntity {
         console.error("unhandled terrain shape:", terrain);
         return "invalid shape";
       case TerrainShape.Flat:
-        return "flat";
+        return "TerrainShape.Flat";
       case TerrainShape.Wall:
-        return "wall";
+        return "TerrainShape.Wall";
       case TerrainShape.FlatNorth:
-        return "flat north";
+        return "TerrainShape.FlatNorth";
       case TerrainShape.FlatNorthEast:
-        return "flat north east";
+        return "TerrainShape.FlatNorthRast";
       case TerrainShape.FlatNorthWest:
-        return "flat north west";
+        return "TerrainShape.FlatNorthWest";
       case TerrainShape.FlatEast:
-        return "flat east";
+        return "TerrainShape.FlatEast";
       case TerrainShape.FlatWest:
-        return "flat west";
+        return "TerrainShape.FlatWest";
       case TerrainShape.FlatSouth:
-        return "flat south";
+        return "TerrainShape.FlatSouth";
       case TerrainShape.FlatSouthEast:
-        return "flat south east";
+        return "TerrainShape.FlatSouthEast";
       case TerrainShape.FlatSouthWest:
-        return "flat south west";
+        return "TerrainShape.FlatSouthWest";
       case TerrainShape.RampUpNorth:
-        return "ramp up north";
+        return "TerrainShape.RampUporth";
       case TerrainShape.RampUpNorthEdge:
-        return "ramp up north edge";
+        return "TerrainShape.RampUpNorthEdge";
       case TerrainShape.RampUpEast:
-        return "ramp up east";
+        return "TerrainShape.RampUpEast";
       case TerrainShape.RampUpEastEdge:
-        return "ramp up east edge";
+        return "TerrainShape.RampUpEastEdge";
       case TerrainShape.RampUpSouth:
-        return "ramp up south";
+        return "TerrainShape.RampUpSouth";
       case TerrainShape.RampUpSouthEdge:
-        return "ramp up south edge";
+        return "TerrainShape.RampUpSouthEdge";
       case TerrainShape.RampUpWest:
-        return "ramp up west";
+        return "TerrainShape.RampUpWest";
       case TerrainShape.RampUpWestEdge:
-        return "ramp up west edge";
+        return "TerrainShape.RampUpWestEdge";
       case TerrainShape.FlatNorthOut:
-        return "flat north out";
+        return "TerrainShape.FlatNorthOut";
       case TerrainShape.FlatEastOut:
-        return "flat east out";
+        return "TerrainShape.FlatEastOut";
       case TerrainShape.FlatWestOut:
-        return "flat west out";
+        return "TerrainShape.FlatWestOut";
       case TerrainShape.FlatSouthOut:
-        return "flat south out";
+        return "TerrainShape.FlatSouthOut";
       case TerrainShape.FlatAloneOut:
-        return "flat alone out";
+        return "TerrainShape.FlatAloneOut";
     }
   }
 
@@ -296,31 +296,31 @@ export class Terrain extends PhysicalEntity {
         console.error("unhandled terrain type:", terrain);
         return "invalid terrain";
       case TerrainType.Water:
-        return "water";
+        return "TerrainType.Water";
       case TerrainType.Lowland0:
-        return "lowland 0";
+        return "TerrainType.Lowland0";
       case TerrainType.Lowland1:
-        return "lowland 1";
+        return "TerrainType.Lowland1";
       case TerrainType.Lowland2:
-        return "lowland 2";
+        return "TerrainType.Lowland2";
       case TerrainType.Lowland3:
-        return "lowland 3";
+        return "TerrainType.Lowland3";
       case TerrainType.Lowland4:
-        return "lowland 4";
+        return "TerrainType.Lowland4";
       case TerrainType.Lowland5:
-        return "lowland 5";
+        return "TerrainType.Lowland5";
       case TerrainType.Upland0:
-        return "upland 0";
+        return "TerrainType.Upland0";
       case TerrainType.Upland1:
-        return "upland 1";
+        return "TerrainType.Upland1";
       case TerrainType.Upland2:
-        return "upland 2";
+        return "TerrainType.Upland2";
       case TerrainType.Upland3:
-        return "upland 3";
+        return "TerrainType.Upland3";
       case TerrainType.Upland4:
-        return "upland 4";
+        return "TerrainType.Upland4";
       case TerrainType.Upland5:
-        return "upland 5";
+        return "TerrainType.Upland5";
     }
   }
 
@@ -363,6 +363,8 @@ export class Terrain extends PhysicalEntity {
       case TerrainShape.FlatSouthWest:
       case TerrainShape.FlatSouth:
       case TerrainShape.FlatSouthEast:
+      case TerrainShape.FlatNorthSouth:
+      case TerrainShape.FlatEastWest:
       case TerrainShape.FlatNorthOut:
       case TerrainShape.FlatEastOut:
       case TerrainShape.FlatSouthOut:
@@ -372,6 +374,23 @@ export class Terrain extends PhysicalEntity {
       case TerrainShape.RampUpWestEdge:
       case TerrainShape.RampUpEastEdge:
       case TerrainShape.RampUpNorthEdge:
+        return true;
+    }
+    return false;
+  }
+
+  static isRamp(shape: TerrainShape): boolean {
+    switch (shape) {
+      default:
+        break;
+      case TerrainShape.RampUpSouthEdge:
+      case TerrainShape.RampUpWestEdge:
+      case TerrainShape.RampUpEastEdge:
+      case TerrainShape.RampUpNorthEdge:
+      case TerrainShape.RampUpSouth:
+      case TerrainShape.RampUpWest:
+      case TerrainShape.RampUpEast:
+      case TerrainShape.RampUpNorth:
         return true;
     }
     return false;
