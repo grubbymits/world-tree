@@ -62,25 +62,8 @@ export enum TerrainType {
   Upland5,
 }
 
-export enum TerrainFeature {
-  None,
-  Shoreline = 1,
-  ShorelineNorth = 1 << 1,
-  ShorelineEast = 1 << 2,
-  ShorelineSouth = 1 << 3,
-  ShorelineWest = 1 << 4,
-  DryGrass = 1 << 5,
-  WetGrass = 1 << 6,
-  Mud = 1 << 7,
-}
-
-function hasFeature(features: number, mask: TerrainFeature): boolean {
-  return (features & (<number>mask)) == <number>mask;
-}
-
 export class Terrain extends PhysicalEntity {
   private static _dimensions: Dimensions;
-  private static _featureGraphics = new Map<TerrainFeature, GraphicComponent>();
   private static _terrainGraphics = new Map<
     TerrainType,
     Map<TerrainShape, GraphicComponent>
@@ -88,7 +71,6 @@ export class Terrain extends PhysicalEntity {
 
   static reset(): void {
     this._dimensions = new Dimensions(0, 0, 0);
-    this._featureGraphics = new Map<TerrainFeature, GraphicComponent>();
     this._terrainGraphics = new Map<
       TerrainType,
       Map<TerrainShape, GraphicComponent>
@@ -118,15 +100,6 @@ export class Terrain extends PhysicalEntity {
     return this._terrainGraphics.get(terrainType)!.get(shape)!;
   }
 
-  static featureGraphics(terrainFeature: TerrainFeature): GraphicComponent {
-    console.assert(
-      this._featureGraphics.has(terrainFeature),
-      "missing terrain feature",
-      Terrain.getFeatureName(terrainFeature)
-    );
-    return this._featureGraphics.get(terrainFeature)!;
-  }
-
   static addGraphic(
     terrainType: TerrainType,
     terrainShape: TerrainShape,
@@ -145,17 +118,6 @@ export class Terrain extends PhysicalEntity {
       );
     }
     this._terrainGraphics.get(terrainType)!.set(terrainShape, component);
-  }
-
-  static addFeatureGraphics(
-    feature: TerrainFeature,
-    graphics: GraphicComponent
-  ) {
-    this._featureGraphics.set(feature, graphics);
-  }
-
-  static isSupportedFeature(feature: TerrainFeature): boolean {
-    return this._featureGraphics.has(feature);
   }
 
   static isSupportedType(type: TerrainType): boolean {
@@ -202,7 +164,6 @@ export class Terrain extends PhysicalEntity {
     z: number,
     type: TerrainType,
     shape: TerrainShape,
-    feature: TerrainFeature
   ): Terrain {
     return new Terrain(
       context,
@@ -211,29 +172,8 @@ export class Terrain extends PhysicalEntity {
       z,
       this._dimensions,
       type,
-      shape,
-      feature
+      shape
     );
-  }
-
-  static getFeatureName(feature: TerrainFeature): string {
-    switch (feature) {
-      default:
-        break;
-      case TerrainFeature.Shoreline:
-      case TerrainFeature.ShorelineNorth:
-      case TerrainFeature.ShorelineEast:
-      case TerrainFeature.ShorelineSouth:
-      case TerrainFeature.ShorelineWest:
-        return "Shoreline";
-      case TerrainFeature.DryGrass:
-        return "Dry Grass";
-      case TerrainFeature.WetGrass:
-        return "Wet Grass";
-      case TerrainFeature.Mud:
-        return "Mud";
-    }
-    return "None";
   }
 
   static getShapeName(terrain: TerrainShape): string {
@@ -434,8 +374,7 @@ export class Terrain extends PhysicalEntity {
     private readonly _gridZ: number,
     dimensions: Dimensions,
     private readonly _type: TerrainType,
-    private readonly _shape: TerrainShape,
-    features: number
+    private readonly _shape: TerrainShape
   ) {
     super(
       context,
@@ -470,20 +409,6 @@ export class Terrain extends PhysicalEntity {
     const y = this.bounds.centre.y;
     const z = this.heightAt(this.bounds.centre)!;
     this._surfaceLocation = new Point3D(x, y, z);
-
-    if (features == TerrainFeature.None) {
-      return;
-    }
-
-    for (const value of Object.values(TerrainFeature)) {
-      const feature = <TerrainFeature>value;
-      if (
-        Terrain.isSupportedFeature(feature) &&
-        hasFeature(features, feature)
-      ) {
-        this.addGraphic(Terrain.featureGraphics(feature));
-      }
-    }
   }
 
   get gridX(): number {
@@ -567,9 +492,8 @@ export class TerrainGrid {
     z: number,
     ty: TerrainType,
     shape: TerrainShape,
-    feature: TerrainFeature
   ): void {
-    const terrain = Terrain.create(this._context, x, y, z, ty, shape, feature);
+    const terrain = Terrain.create(this._context, x, y, z, ty, shape);
     this.surfaceTerrain[y][x] = terrain;
     this._totalSurface++;
   }
@@ -585,7 +509,7 @@ export class TerrainGrid {
       this.getSurfaceTerrainAt(x, y)!.z > z,
       "adding sub-surface terrain which is above surface!"
     );
-    Terrain.create(this._context, x, y, z, ty, shape, TerrainFeature.None);
+    Terrain.create(this._context, x, y, z, ty, shape);
     this._totalSubSurface++;
   }
 

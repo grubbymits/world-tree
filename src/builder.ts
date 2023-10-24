@@ -1,6 +1,5 @@
 import {
   Terrain,
-  TerrainFeature,
   TerrainGrid,
   TerrainShape,
   TerrainType,
@@ -192,7 +191,6 @@ class TerrainAttributes {
   private _biome: Biome;
   private _type: TerrainType;
   private _shape: TerrainShape;
-  private _features: number;
   private _fixed = false;
 
   constructor(
@@ -205,7 +203,6 @@ class TerrainAttributes {
     this._terrace = 0;
     this._type = TerrainType.Water;
     this._shape = TerrainShape.Flat;
-    this._features = <number>TerrainFeature.None;
   }
 
   get x(): number {
@@ -237,12 +234,6 @@ class TerrainAttributes {
   }
   set shape(s: TerrainShape) {
     this._shape = s;
-  }
-  get features(): number {
-    return this._features;
-  }
-  set features(f: number) {
-    this._features |= f;
   }
   get moisture(): number {
     return this._moisture;
@@ -482,13 +473,6 @@ export class TerrainBuilder {
     return this._terraceSpacing;
   }
 
-  hasFeature(x: number, y: number, feature: TerrainFeature): boolean {
-    console.assert(
-      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth
-    );
-    return (this.surface.at(x, y).features & feature) != 0;
-  }
-
   terrainTypeAt(x: number, y: number): TerrainType {
     console.assert(
       x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth
@@ -546,7 +530,6 @@ export class TerrainBuilder {
       this.setBiomes();
     }
     this.setEdges();
-    this.setFeatures();
     const grid = new TerrainGrid(
       context,
       this.surface.width,
@@ -567,8 +550,7 @@ export class TerrainBuilder {
           y,
           surface.terrace,
           surface.type,
-          surface.shape,
-          surface.features
+          surface.shape
         );
       }
     }
@@ -1007,46 +989,6 @@ export class TerrainBuilder {
           );
         }
         surface.biome = biome;
-      }
-    }
-  }
-
-  setFeatures(): void {
-    for (let y = 0; y < this.surface.depth; y++) {
-      for (let x = 0; x < this.surface.width; x++) {
-        const surface = this.surface.at(x, y);
-        // Add shoreline features on beach tiles.
-        if (Terrain.isFlat(surface.shape)) {
-          const neighbours = this.surface.getNeighbours(surface.x, surface.y);
-          for (const neighbour of neighbours) {
-            if (neighbour.biome != Biome.Water) {
-              continue;
-            }
-            switch (
-              Navigation.getDirectionFromPoints(surface.pos, neighbour.pos)
-            ) {
-              default:
-                break;
-              case Direction.North:
-                surface.features |= TerrainFeature.ShorelineNorth;
-                break;
-              case Direction.East:
-                surface.features |= TerrainFeature.ShorelineEast;
-                break;
-              case Direction.South:
-                surface.features |= TerrainFeature.ShorelineSouth;
-                break;
-              case Direction.West:
-                surface.features |= TerrainFeature.ShorelineWest;
-                break;
-            }
-          }
-          if (surface.biome == Biome.Grassland) {
-            surface.features |= TerrainFeature.DryGrass;
-          } else if (surface.biome == Biome.Tundra) {
-            surface.features |= TerrainFeature.DryGrass;
-          }
-        }
       }
     }
   }
