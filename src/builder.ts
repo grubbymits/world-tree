@@ -4,7 +4,7 @@ import {
   TerrainShape,
   TerrainType,
 } from "./terrain.ts";
-import { Rain } from "./weather.ts";
+import { Rain, addRain } from "./weather.ts";
 import { Dimensions } from "./physics.ts";
 import { Direction, Navigation } from "./navigation.ts";
 import { Point2D } from "./geometry.ts";
@@ -56,133 +56,6 @@ export function getBiomeName(biome: Biome): string {
     case Biome.Taiga:
       return "taiga";
   }
-}
-
-function mean(grid: Array<Float32Array>): number {
-  let total = 0;
-  let numElements = 0;
-  for (const row of grid) {
-    const acc = row.reduce(function (acc: number, value: number) {
-      return acc + value;
-    }, 0);
-    total += acc;
-    numElements += row.length;
-  }
-  return total / numElements;
-}
-
-function meanWindow(
-  grid: Array<Float32Array>,
-  centreX: number,
-  centreY: number,
-  offsets: Array<number>
-): number {
-  let total = 0;
-  const numElements = offsets.length * offsets.length;
-  for (const dy in offsets) {
-    const y = centreY + offsets[dy];
-    for (const dx in offsets) {
-      const x = centreX + offsets[dx];
-      total += grid[y][x];
-    }
-  }
-  return total / numElements;
-}
-
-function standardDevWindow(
-  grid: Array<Float32Array>,
-  centreX: number,
-  centreY: number,
-  offsets: Array<number>
-): number {
-  const avg: number = meanWindow(grid, centreX, centreY, offsets);
-  if (avg == 0) {
-    return 0;
-  }
-  const diffsSquared = new Array<Float32Array>();
-  const size = offsets.length;
-
-  for (const dy in offsets) {
-    const y = centreY + offsets[dy];
-    const row = new Float32Array(size);
-    let wx = 0;
-    for (const dx in offsets) {
-      const x = centreX + offsets[dx];
-      const diff = grid[y][x] - avg;
-      row[wx] = diff * diff;
-      wx++;
-    }
-    diffsSquared.push(row);
-  }
-  return Math.sqrt(mean(diffsSquared));
-}
-
-function gaussianBlur(
-  grid: Array<Float32Array>,
-  width: number,
-  depth: number
-): Array<Float32Array> {
-  const filterSize = 5;
-  const halfSize = Math.floor(filterSize / 2);
-  const offsets: Array<number> = [-2, -1, 0, 1, 2];
-  const distancesSquared: Array<number> = [4, 1, 0, 1, 4];
-
-  const result = new Array<Float32Array>();
-  // Just copy the two left columns
-  for (let y = 0; y < halfSize; y++) {
-    result[y] = grid[y];
-  }
-  // Just copy the two right columns.
-  for (let y = depth - halfSize; y < depth; y++) {
-    result[y] = grid[y];
-  }
-
-  const filter = new Float32Array(filterSize);
-  for (let y = halfSize; y < depth - halfSize; y++) {
-    result[y] = new Float32Array(width);
-
-    // Just copy the edge values.
-    for (let x = 0; x < halfSize; x++) {
-      result[y][x] = grid[y][x];
-    }
-    for (let x = width - halfSize; x < width; x++) {
-      result[y][x] = grid[y][x];
-    }
-
-    for (let x = halfSize; x < width - halfSize; x++) {
-      const sigma = standardDevWindow(grid, x, y, offsets);
-      if (sigma == 0) {
-        continue;
-      }
-
-      const sigmaSquared = sigma * sigma;
-      const denominator: number = Math.sqrt(2 * Math.PI * sigmaSquared);
-
-      let sum = 0;
-      for (const i in distancesSquared) {
-        const numerator = Math.exp(-(distancesSquared[i] / (2 * sigmaSquared)));
-        filter[i] = numerator / denominator;
-        sum += filter[i];
-      }
-      for (let coeff of filter) {
-        coeff /= sum;
-      }
-
-      let blurred = 0;
-      for (const i in offsets) {
-        const dx = offsets[i];
-        blurred += grid[y][x + dx] * filter[i];
-      }
-
-      for (const i in offsets) {
-        const dy = offsets[i];
-        blurred += grid[y + dy][x] * filter[i];
-      }
-      result[y][x] = blurred; //Math.floor(blurred);
-    }
-  }
-
-  return result;
 }
 
 class TerrainAttributes {
@@ -252,73 +125,6 @@ class TerrainAttributes {
   }
   set fixed(f: boolean) {
     this._fixed = f;
-  }
-}
-
-/** @internal */
-export class Surface {
-  private _surface: Array<Array<TerrainAttributes>>;
-
-  constructor(
-    private readonly _width: number,
-    private readonly _depth: number
-  ) {
-    this._surface = new Array<Array<TerrainAttributes>>();
-  }
-
-  get width(): number {
-    return this._width;
-  }
-  get depth(): number {
-    return this._depth;
-  }
-
-  init(heightMap: Array<Array<number>>) {
-    for (let y = 0; y < this._depth; y++) {
-      this._surface.push(new Array<TerrainAttributes>());
-      for (let x = 0; x < this._width; x++) {
-        const height = heightMap[y][x];
-        this._surface[y].push(new TerrainAttributes(x, y, height));
-      }
-    }
-  }
-
-  inbounds(coord: Point2D): boolean {
-    if (
-      coord.x < 0 ||
-      coord.x >= this._width ||
-      coord.y < 0 ||
-      coord.y >= this._depth
-    ) {
-      return false;
-    }
-    return true;
-  }
-
-  at(x: number, y: number): TerrainAttributes {
-    return this._surface[y][x];
-  }
-
-  // Return surface neighbours in a 3x3 radius.
-  getNeighbours(centreX: number, centreY: number): Array<TerrainAttributes> {
-    const neighbours = new Array<TerrainAttributes>();
-    for (let yDiff = -1; yDiff < 2; yDiff++) {
-      const y = centreY + yDiff;
-      if (y < 0 || y >= this._depth) {
-        continue;
-      }
-      for (let xDiff = -1; xDiff < 2; xDiff++) {
-        const x = centreX + xDiff;
-        if (x < 0 || x >= this._width) {
-          continue;
-        }
-        if (x == centreX && y == centreY) {
-          continue;
-        }
-        neighbours.push(this._surface[y][x]);
-      }
-    }
-    return neighbours;
   }
 }
 
@@ -408,13 +214,22 @@ export class TerrainBuilderConfig {
 }
 
 export class TerrainBuilder {
-  protected _surface: Surface;
   protected readonly _terraceSpacing: number;
 
+  private _terraceGrid: Array<Array<number>> =
+    new Array<Array<number>>();
+  private _moistureGrid: Array<Array<number>> =
+    new Array<Array<number>>();
+  private _biomeGrid: Array<Array<Biome>> = new Array<Array<Biome>>();
+  private _typeGrid: Array<Array<TerrainType>> =
+    new Array<Array<TerrainType>>();
+  private _shapeGrid: Array<Array<TerrainShape>> =
+    new Array<Array<TerrainShape>>();
+
   constructor(
-    width: number,
-    depth: number,
-    heightMap: Array<Array<number>>,
+    private readonly _width: number,
+    private readonly _depth: number,
+    private _heightGrid: Array<Array<number>>,
     private readonly _config: TerrainBuilderConfig,
     physicalDims: Dimensions
   ) {
@@ -423,8 +238,8 @@ export class TerrainBuilder {
     // Normalise heights, minimum = 0;
     let minHeight = 0;
     let maxHeight = 0;
-    for (let y = 0; y < depth; y++) {
-      const row: Array<number> = heightMap[y];
+    for (let y = 0; y < this.depth; y++) {
+      const row: Array<number> = this.heightGrid[y];
       const max = row.reduce(function (a, b) {
         return Math.max(a, b);
       });
@@ -436,29 +251,26 @@ export class TerrainBuilder {
     }
     if (minHeight < 0) {
       minHeight = Math.abs(minHeight);
-      for (let y = 0; y < depth; y++) {
-        for (let x = 0; x < width; x++) {
-          heightMap[y][x] += minHeight;
+      for (let y = 0; y < this.depth; y++) {
+        for (let x = 0; x < this.width; x++) {
+          this.heightGrid[y][x] += minHeight;
         }
       }
       maxHeight += minHeight;
     }
     this._terraceSpacing = maxHeight / this.config.numTerraces;
-    this._surface = new Surface(width, depth);
-    this.surface.init(heightMap);
 
     // Calculate the terraces.
-    for (let y = 0; y < this.surface.depth; y++) {
-      for (let x = 0; x < this.surface.width; x++) {
-        const surface = this.surface.at(x, y);
-        surface.terrace = Math.floor(surface.height / this._terraceSpacing);
-        surface.shape = TerrainShape.Flat;
-        surface.type = this.config.floor;
-        console.assert(
-          surface.terrace <= this.config.numTerraces && surface.terrace >= 0,
-          "terrace out of range:",
-          surface.terrace
-        );
+    for (let y = 0; y < this.depth; y++) {
+      this._terraceGrid[y] = new Array<number>();
+      this._shapeGrid[y] = new Array<TerrainShape>();
+      this._typeGrid[y] = new Array<TerrainType>();
+      for (let x = 0; x < this.width; x++) {
+        const surfaceHeight = this.heightAt(x, y);
+        this.terraceGrid[y][x] =
+          Math.floor(surfaceHeight / this._terraceSpacing);
+        this.shapeGrid[y][x] = TerrainShape.Flat;
+        this.typeGrid[y][x] = this.config.floor;
       }
     }
   }
@@ -466,53 +278,78 @@ export class TerrainBuilder {
   get config(): TerrainBuilderConfig {
     return this._config;
   }
-  get surface(): Surface {
-    return this._surface;
-  }
   get terraceSpacing(): number {
     return this._terraceSpacing;
+  }
+  get width(): number {
+    return this._width;
+  }
+  get depth(): number {
+    return this._depth;
+  }
+  get heightGrid(): Array<Array<number>> {
+    return this._heightGrid;
+  }
+  get terraceGrid(): Array<Array<number>> {
+    return this._terraceGrid;
+  }
+  get shapeGrid(): Array<Array<TerrainShape>> {
+    return this._shapeGrid;
+  }
+  get typeGrid(): Array<Array<TerrainType>> {
+    return this._typeGrid;
+  }
+  get biomeGrid(): Array<Array<Biome>> {
+    return this._biomeGrid;
+  }
+
+  terraceAt(x: number, y: number): number {
+    console.assert(
+      x >= 0 && x < this.width && y >= 0 && y < this.depth
+    );
+    return this._terraceGrid[y][x];
   }
 
   terrainTypeAt(x: number, y: number): TerrainType {
     console.assert(
-      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth
+      x >= 0 && x < this.width && y >= 0 && y < this.depth
     );
-    return this.surface.at(x, y).type;
+    return this._typeGrid[y][x];
   }
 
   terrainShapeAt(x: number, y: number): TerrainShape {
     console.assert(
-      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth
+      x >= 0 && x < this.width && y >= 0 && y < this.depth
     );
-    return this.surface.at(x, y).shape;
+    return this._shapeGrid[y][x];
   }
 
   moistureAt(x: number, y: number): number {
     console.assert(
-      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth
+      x >= 0 && x < this.width && y >= 0 && y < this.depth
     );
-    return this.surface.at(x, y).moisture;
+    return this._moistureGrid[y][x];
   }
 
   isFlatAt(x: number, y: number): boolean {
     console.assert(
-      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth
+      x >= 0 && x < this.width && y >= 0 && y < this.depth
     );
-    return Terrain.isFlat(this.surface.at(x, y).shape);
+    return Terrain.isFlat(this._shapeGrid[y][x]);
   }
 
   biomeAt(x: number, y: number): Biome {
     console.assert(
-      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth
+      x >= 0 && x < this.width && y >= 0 && y < this.depth
     );
-    return this.surface.at(x, y).biome;
+    return this._biomeGrid[y][x];
   }
 
-  relativeHeightAt(x: number, y: number): number {
+  heightAt(x: number, y: number): number {
     console.assert(
-      x >= 0 && x < this.surface.width && y >= 0 && y < this.surface.depth
+      x >= 0 && x < this.width && y >= 0 && y < this.depth
     );
-    return this.surface.at(x, y).terrace;
+    return this._heightGrid[y][x];
   }
 
   generateMap(context: ContextImpl): TerrainGrid {
@@ -520,7 +357,11 @@ export class TerrainBuilder {
       this.setShapes();
     }
     if (this.config.rainfall > 0) {
-      this.addRain(
+      this._moistureGrid = addRain(
+        this.width,
+        this.depth,
+        this._heightGrid,
+        this._terraceGrid,
         this.config.rainDirection,
         this.config.rainfall,
         this.config.waterLine
@@ -532,44 +373,35 @@ export class TerrainBuilder {
     this.setEdges();
     const grid = new TerrainGrid(
       context,
-      this.surface.width,
-      this.surface.depth
+      this.width,
+      this.depth
     );
 
-    for (let y = 0; y < this.surface.depth; y++) {
-      for (let x = 0; x < this.surface.width; x++) {
-        const surface = this.surface.at(x, y);
-        // Add terrain objects that will be visible.
-        console.assert(
-          surface.terrace <= this.config.numTerraces && surface.terrace >= 0,
-          "terrace out-of-range",
-          surface.terrace
-        );
+    for (let y = 0; y < this.depth; y++) {
+      for (let x = 0; x < this.width; x++) {
         grid.addSurfaceTerrain(
           x,
           y,
-          surface.terrace,
-          surface.type,
-          surface.shape
+          this.terraceAt(x, y),
+          this.terrainTypeAt(x, y),
+          this.terrainShapeAt(x, y)
         );
       }
     }
 
     // Create a column of visible terrain below the surface tile.
-    for (let y = 0; y < this.surface.depth; y++) {
-      for (let x = 0; x < this.surface.width; x++) {
-        let z = this.surface.at(x, y).terrace;
+    for (let y = 0; y < this.depth; y++) {
+      for (let x = 0; x < this.width; x++) {
+        let z = this.terraceAt(x, y);
         const zStop = z - this.calcRelativeHeight(x, y);
-        const terrain = grid.getSurfaceTerrainAt(x, y)!;
-        if (terrain == null) {
-          console.error("didn't find terrain in map at", x, y, z);
-        }
-        const shape = Terrain.isFlat(terrain.shape)
-          ? terrain.shape
+        const terrainShape = this.terrainShapeAt(x, y);
+        const terrainType = this.terrainTypeAt(x, y);
+        const shape = Terrain.isFlat(terrainShape)
+          ? terrainShape
           : TerrainShape.Flat;
         while (z > zStop) {
           z--;
-          grid.addSubSurfaceTerrain(x, y, z, terrain.type, shape);
+          grid.addSubSurfaceTerrain(x, y, z, terrainType, shape);
         }
       }
     }
@@ -595,37 +427,40 @@ export class TerrainBuilder {
     // and then find their adjacent locations that are higher terraces. Set
     // those locations to be ramps.
     let totalRamps = 0;
-    for (let y = this.surface.depth - 3; y > 1; y--) {
-      for (let x = 2; x < this.surface.width - 2; x++) {
-        const centre: TerrainAttributes = this.surface.at(x, y);
-        if (!Terrain.isFlat(centre.shape)) {
+    let fixed = new Set<string>();
+    for (let y = this.depth - 3; y > 1; y--) {
+      for (let x = 2; x < this.width - 2; x++) {
+        const centreShape: TerrainShape = this.terrainShapeAt(x, y);
+        if (!Terrain.isFlat(centreShape)) {
           continue;
         }
 
-        const roundUpHeight = centre.height + this.terraceSpacing / 2;
-        if (roundUpHeight != (centre.terrace + 1) * this.terraceSpacing) {
+        const centreHeight = this.heightAt(x, y);
+        const centreTerrace = this.terraceAt(x, y);
+        const roundUpHeight = centreHeight + this.terraceSpacing / 2;
+        if (roundUpHeight != (centreTerrace + 1) * this.terraceSpacing) {
           continue;
         }
 
         for (const i in coordOffsets) {
           const offset: Point2D = coordOffsets[i];
-          const neighbour: TerrainAttributes = this.surface.at(
-            centre.x + offset.x,
-            centre.y + offset.y
-          );
-          const nextNeighbour: TerrainAttributes = this.surface.at(
-            neighbour.x + offset.x,
-            neighbour.y + offset.y
-          );
+          const neighbourX = x + offset.x;
+          const neighbourY = y + offset.y;
+          const nextNeighbourX = neighbourX + offset.x;
+          const nextNeighbourY = neighbourY + offset.y;
+          const neighbourKey = new Point2D(neighbourX, neighbourY).toString();
+          const nextNeighbourKey = new Point2D(nextNeighbourX, nextNeighbourY).toString();
+          const neighbourTerrace = this.terraceAt(neighbourX, neighbourY);
+          const nextNeighbourTerrace = this.terraceAt(nextNeighbourX, nextNeighbourY);
           if (
-            !neighbour.fixed &&
-            !nextNeighbour.fixed &&
-            neighbour.terrace == centre.terrace + 1 &&
-            neighbour.terrace == nextNeighbour.terrace
+            !fixed.has(neighbourKey) &&
+            !fixed.has(nextNeighbourKey) &&
+            neighbourTerrace == centreTerrace + 1 &&
+            neighbourTerrace == nextNeighbourTerrace
           ) {
-            neighbour.shape = ramps[i];
-            neighbour.fixed = true;
-            nextNeighbour.fixed = true;
+            this.shapeGrid[neighbourY][neighbourX] = ramps[i];
+            fixed.add(neighbourKey);
+            fixed.add(nextNeighbourKey);
             totalRamps++;
           }
         }
@@ -633,64 +468,81 @@ export class TerrainBuilder {
     }
   }
 
+  inbounds(x: number, y: number): boolean {
+    return x >= 0 && x < this.width &&
+           y >= 0 && y < this.depth;
+  }
+
   setEdges(): void {
-    for (let y = 0; y < this.surface.depth; y++) {
-      for (let x = 0; x < this.surface.width; x++) {
-        const centre = this.surface.at(x, y);
-        if (centre.type == TerrainType.Water) {
+    for (let y = 0; y < this.depth; y++) {
+      for (let x = 0; x < this.width; x++) {
+        if (this.terrainTypeAt(x, y) == TerrainType.Water) {
           continue;
         }
-
-        const neighbours = this.surface.getNeighbours(x, y);
-        let shapeType = centre.shape;
+        const centrePos = new Point2D(x, y);
+        const centreTerrace = this.terraceAt(x, y);
+        let centreShape = this.terrainShapeAt(x, y);
+        let centreType = this.terrainTypeAt(x, y);
+        let shapeType = this.terrainShapeAt(x, y);
         let northEdge = false;
         let eastEdge = false;
         let southEdge = false;
         let westEdge = false;
+        const isPerimeter = x == 0 || x == this.width -1 ||
+                            y == 0 || y == this.depth - 1; 
 
-        for (const neighbour of neighbours) {
+        for (const offset of Navigation.neighbourOffsets) {
+          const neighbourX = x + offset.x;
+          const neighbourY = y + offset.y;
+          if (!this.inbounds(neighbourX, neighbourY)) {
+            continue;
+          }
+          const neighbourPos = new Point2D(neighbourX, neighbourY);
+          const neighbourTerrace = this.terraceAt(neighbourX, neighbourY);
+          const neighbourShape = this.terrainShapeAt(neighbourX, neighbourY);
+
           // Only look at lower neighbours
-          if (neighbour.terrace > centre.terrace) {
+          if (neighbourTerrace > centreTerrace) {
             continue;
           }
           // Don't look at diagonal neighbours.
-          if (neighbour.x != centre.x && neighbour.y != centre.y) {
+          if (neighbourPos.x != x && neighbourPos.y != y) {
             continue;
           }
 
           if (
-            neighbour.terrace == centre.terrace &&
-            Terrain.isFlat(centre.shape) == Terrain.isFlat(neighbour.shape)
+            neighbourTerrace == centreTerrace &&
+            Terrain.isFlat(centreShape) == Terrain.isFlat(neighbourShape)
           ) {
             continue;
           }
 
           // We want to enable edges, just not at the point where the ramp
           // joins the upper terrace.
-          if (!Terrain.isFlat(neighbour.shape)) {
-            const direction = Navigation.getDirectionFromPoints(neighbour.pos, centre.pos);
+          if (!Terrain.isFlat(neighbourShape)) {
+            const direction = Navigation.getDirectionFromPoints(neighbourPos, centrePos);
             switch (direction) {
             default:
               break;
             case Direction.North:
-              if (neighbour.shape == TerrainShape.RampUpNorth) continue;
+              if (neighbourShape == TerrainShape.RampUpNorth) continue;
               break;
             case Direction.East:
-              if (neighbour.shape == TerrainShape.RampUpEast) continue;
+              if (neighbourShape == TerrainShape.RampUpEast) continue;
               break;
             case Direction.South:
-              if (neighbour.shape == TerrainShape.RampUpSouth) continue;
+              if (neighbourShape == TerrainShape.RampUpSouth) continue;
               break;
             case Direction.West:
-              if (neighbour.shape == TerrainShape.RampUpWest) continue;
+              if (neighbourShape == TerrainShape.RampUpWest) continue;
               break;
             }
           }
 
-          northEdge = northEdge || neighbour.y < centre.y;
-          southEdge = southEdge || neighbour.y > centre.y;
-          eastEdge = eastEdge || neighbour.x > centre.x;
-          westEdge = westEdge || neighbour.x < centre.x;
+          northEdge = northEdge || neighbourY < y;
+          southEdge = southEdge || neighbourY > y;
+          eastEdge = eastEdge || neighbourX > x;
+          westEdge = westEdge || neighbourX < x;
           if (northEdge && eastEdge && southEdge && westEdge) {
             break;
           }
@@ -730,25 +582,25 @@ export class TerrainBuilder {
           }
         } else if (shapeType == TerrainShape.RampUpNorth && eastEdge) {
           if (
-            Terrain.isSupportedShape(centre.type, TerrainShape.RampUpNorthEdge)
+            Terrain.isSupportedShape(centreType, TerrainShape.RampUpNorthEdge)
           ) {
             shapeType = TerrainShape.RampUpNorthEdge;
           }
         } else if (shapeType == TerrainShape.RampUpEast && northEdge) {
           if (
-            Terrain.isSupportedShape(centre.type, TerrainShape.RampUpEastEdge)
+            Terrain.isSupportedShape(centreType, TerrainShape.RampUpEastEdge)
           ) {
             shapeType = TerrainShape.RampUpEastEdge;
           }
         } else if (shapeType == TerrainShape.RampUpSouth && eastEdge) {
           if (
-            Terrain.isSupportedShape(centre.type, TerrainShape.RampUpSouthEdge)
+            Terrain.isSupportedShape(centreType, TerrainShape.RampUpSouthEdge)
           ) {
             shapeType = TerrainShape.RampUpSouthEdge;
           }
         } else if (shapeType == TerrainShape.RampUpWest && northEdge) {
           if (
-            Terrain.isSupportedShape(centre.type, TerrainShape.RampUpWestEdge)
+            Terrain.isSupportedShape(centreType, TerrainShape.RampUpWestEdge)
           ) {
             shapeType = TerrainShape.RampUpWestEdge;
           }
@@ -756,24 +608,23 @@ export class TerrainBuilder {
 
         // Fixup the sides of the map.
         if (
-          shapeType == TerrainShape.Flat &&
-          neighbours.length != 8
+          shapeType == TerrainShape.Flat && isPerimeter
         ) {
           if (x == 0 &&  y == 0) {
             shapeType = TerrainShape.FlatNorthWest;
-          } else if (x == 0 &&  y == this.surface.depth - 1) {
+          } else if (x == 0 &&  y == this.depth - 1) {
             shapeType = TerrainShape.FlatSouthWest;
-          } else if (x == this.surface.width - 1 && y == 0) {
+          } else if (x == this.width - 1 && y == 0) {
             shapeType = TerrainShape.FlatNorthEast;
           } else if (x == 0) {
             shapeType = TerrainShape.FlatWest;
           } else if (y == 0) {
             shapeType = TerrainShape.FlatNorth;
-          } else if (x == this.surface.width - 1 && y == this.surface.depth - 1) {
+          } else if (x == this.width - 1 && y == this.depth - 1) {
             shapeType = TerrainShape.FlatSouthEast;
-          } else if (x == this.surface.width - 1) {
+          } else if (x == this.width - 1) {
             shapeType = TerrainShape.FlatEast;
-          } else if (y == this.surface.depth - 1) {
+          } else if (y == this.depth - 1) {
             shapeType = TerrainShape.FlatSouth;
           }
         }
@@ -783,16 +634,16 @@ export class TerrainBuilder {
         if (Terrain.isFlat(shapeType) && Terrain.isEdge(shapeType)) {
           // if we not having biomes, use the default wall type.
           if (!this.config.biomes) {
-            centre.type = this.config.wall;
+            centreType = this.config.wall;
           }
-          if (!Terrain.isSupportedShape(centre.type, shapeType)) {
+          if (!Terrain.isSupportedShape(centreType, shapeType)) {
             switch (shapeType) {
               default:
                 shapeType = TerrainShape.Wall;
                 break;
               case TerrainShape.FlatNorthOut:
                 if (
-                  Terrain.isSupportedShape(centre.type, TerrainShape.FlatNorth)
+                  Terrain.isSupportedShape(centreType, TerrainShape.FlatNorth)
                 ) {
                   shapeType = TerrainShape.FlatNorth;
                 } else {
@@ -802,7 +653,7 @@ export class TerrainBuilder {
               case TerrainShape.FlatNorthEast:
               case TerrainShape.FlatSouthEast:
                 if (
-                  Terrain.isSupportedShape(centre.type, TerrainShape.FlatEast)
+                  Terrain.isSupportedShape(centreType, TerrainShape.FlatEast)
                 ) {
                   shapeType = TerrainShape.FlatEast;
                 } else {
@@ -812,7 +663,7 @@ export class TerrainBuilder {
               case TerrainShape.FlatNorthWest:
                 if (
                   Terrain.isSupportedShape(
-                    centre.type,
+                    centreType,
                     TerrainShape.FlatWestOut
                   )
                 ) {
@@ -823,7 +674,7 @@ export class TerrainBuilder {
                 break;
               case TerrainShape.FlatSouthWest:
                 if (
-                  Terrain.isSupportedShape(centre.type, TerrainShape.FlatWest)
+                  Terrain.isSupportedShape(centreType, TerrainShape.FlatWest)
                 ) {
                   shapeType = TerrainShape.FlatWest;
                 } else {
@@ -836,7 +687,7 @@ export class TerrainBuilder {
 
         // Avoid introducing Wall tiles for the floor around the edge of the
         // map.
-        if (centre.terrace == 0 && shapeType == TerrainShape.Wall) {
+        if (centreTerrace == 0 && shapeType == TerrainShape.Wall) {
           shapeType = TerrainShape.Flat;
         }
 
@@ -844,79 +695,65 @@ export class TerrainBuilder {
         // the ramp shape for a default terrain type.
         if (
           !Terrain.isFlat(shapeType) &&
-          !Terrain.isSupportedShape(centre.type, shapeType)
+          !Terrain.isSupportedShape(centreType, shapeType)
         ) {
           if (Terrain.isSupportedShape(this.config.floor, shapeType)) {
-            centre.type = this.config.floor;
+            centreType = this.config.floor;
           } else if (Terrain.isSupportedShape(this.config.wall, shapeType)) {
-            centre.type = this.config.wall;
+            centreType = this.config.wall;
           }
         }
 
         // And if that fails, fallback to the base flat tile.
-        if (!Terrain.isSupportedShape(centre.type, shapeType)) {
+        if (!Terrain.isSupportedShape(centreType, shapeType)) {
           shapeType = TerrainShape.Flat;
         }
-        centre.shape = shapeType;
+        this.typeGrid[y][x] = centreType;
+        this.shapeGrid[y][x] = shapeType;
       }
     }
   }
 
   calcRelativeHeight(x: number, y: number): number {
-    const neighbours = this.surface.getNeighbours(x, y);
     let relativeHeight = 0;
-    const centre = this.surface.at(x, y);
+    const centreTerrace = this.terraceAt(x, y);
 
-    for (const neighbour of neighbours) {
+    for (let offset of Navigation.neighbourOffsets) {
+      const neighbourX = x + offset.x;
+      const neighbourY = y + offset.y;
+      if (!this.inbounds(neighbourX, neighbourY)) {
+        continue;
+      }
+      const neighbourTerrace = this.terraceAt(neighbourX, neighbourY);
       console.assert(
-        neighbour.terrace >= 0,
+        neighbourTerrace >= 0,
         "Found neighbour with negative terrace!",
-        neighbour.terrace
+        neighbourTerrace
       );
-      const height = centre.terrace - neighbour.terrace;
+      const height = centreTerrace - neighbourTerrace;
       relativeHeight = Math.max(height, relativeHeight);
     }
-    console.assert(
-      relativeHeight <= this.config.numTerraces,
-      "impossible relative height:",
-      relativeHeight,
-      "\ncentre:",
-      centre
-    );
     return relativeHeight;
-  }
-
-  addRain(towards: Direction, water: number, waterLine: number): void {
-    const rain = new Rain(this.surface, waterLine, water, towards);
-    rain.run();
-    const blurred = gaussianBlur(
-      rain.moistureGrid,
-      this.surface.width,
-      this.surface.depth
-    );
-    for (let y = 0; y < this.surface.depth; y++) {
-      for (let x = 0; x < this.surface.width; x++) {
-        const surface = this.surface.at(x, y);
-        surface.moisture = blurred[y][x]; //rain.moistureAt(x, y);
-      }
-    }
   }
 
   setBiomes(): void {
     const moistureRange = 6;
-    for (let y = 0; y < this.surface.depth; y++) {
-      for (let x = 0; x < this.surface.width; x++) {
-        const surface = this.surface.at(x, y);
+    for (let y = 0; y < this.depth; y++) {
+      this._biomeGrid[y] = new Array<Biome>();
+      this._typeGrid[y] = new Array<TerrainType>();
+      for (let x = 0; x < this.width; x++) {
         let biome: Biome = Biome.Water;
         let terrain: TerrainType = TerrainType.Water;
-        const moisturePercent = Math.min(1, surface.moisture / moistureRange);
+        const moisture = this.moistureAt(x, y);
+        const moisturePercent = Math.min(1, moisture / moistureRange);
         // Split into six biomes based on moisture.
         const moistureScaled = Math.floor(5 * moisturePercent);
+        const surfaceHeight = this.heightAt(x, y);
 
-        if (surface.height <= this.config.waterLine) {
+        if (surfaceHeight <= this.config.waterLine) {
           biome = Biome.Water;
           terrain = TerrainType.Water;
-        } else if (surface.height >= this.config.uplandThreshold) {
+        } else if (surfaceHeight >= this.config.uplandThreshold) {
           switch (moistureScaled) {
             default:
               console.error("unhandled moisture scale");
@@ -981,14 +818,14 @@ export class TerrainBuilder {
         // fallback to the default which is set in the constructor.
         // TODO: What about default wall tiles?
         if (Terrain.isSupportedType(terrain)) {
-          surface.type = terrain;
+          this.typeGrid[y][x] = terrain;
         } else {
           console.log(
             "unsupported biome terrain type:",
             Terrain.getTypeName(terrain)
           );
         }
-        surface.biome = biome;
+        this.biomeGrid[y][x] = biome;
       }
     }
   }

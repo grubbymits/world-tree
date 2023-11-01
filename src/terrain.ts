@@ -1,6 +1,7 @@
 import { Direction } from "./navigation.ts";
 import { Dimensions } from "./physics.ts";
 import { PhysicalEntity } from "./entity.ts";
+import { Navigation } from "./navigation.ts";
 import {
   GraphicComponent,
   Sprite,
@@ -445,17 +446,6 @@ export class Terrain extends PhysicalEntity {
 }
 
 export class TerrainGrid {
-  static readonly neighbourOffsets: Array<Point2D> = [
-    new Point2D(-1, -1),
-    new Point2D(0, -1),
-    new Point2D(1, -1),
-    new Point2D(-1, 0),
-    new Point2D(1, 0),
-    new Point2D(-1, 1),
-    new Point2D(0, 1),
-    new Point2D(1, 1),
-  ];
-
   private _surfaceTerrain: Array<Array<Terrain>> = new Array<Array<Terrain>>();
   private _totalSurface = 0;
   private _totalSubSurface = 0;
@@ -534,7 +524,7 @@ export class TerrainGrid {
   getNeighbours(centre: Terrain): Array<Terrain> {
     const neighbours = new Array<Terrain>();
 
-    for (const offset of TerrainGrid.neighbourOffsets) {
+    for (const offset of Navigation.neighbourOffsets) {
       const scaled: Point3D = Terrain.scaleLocation(centre.surfaceLocation);
       const neighbour = this.getSurfaceTerrainAt(
         scaled.x + offset.x,

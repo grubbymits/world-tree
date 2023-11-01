@@ -103,6 +103,17 @@ export class Navigation {
   static getOppositeDirection(direction: Direction): Direction {
     return (direction + Direction.Max / 2) % Direction.Max;
   }
+
+  static readonly neighbourOffsets: Array<Point2D> = [
+    new Point2D(-1, -1),
+    new Point2D(0, -1),
+    new Point2D(1, -1),
+    new Point2D(-1, 0),
+    new Point2D(1, 0),
+    new Point2D(-1, 1),
+    new Point2D(0, 1),
+    new Point2D(1, 1),
+  ];
 }
 
 class PathNode {
