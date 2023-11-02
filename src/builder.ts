@@ -263,6 +263,7 @@ export class TerrainBuilder {
     // Calculate the terraces.
     for (let y = 0; y < this.depth; y++) {
       this._terraceGrid[y] = new Array<number>();
+      this._moistureGrid[y] = new Array<number>();
       this._shapeGrid[y] = new Array<TerrainShape>();
       this._typeGrid[y] = new Array<TerrainType>();
       for (let x = 0; x < this.width; x++) {
@@ -427,7 +428,7 @@ export class TerrainBuilder {
     // and then find their adjacent locations that are higher terraces. Set
     // those locations to be ramps.
     let totalRamps = 0;
-    let fixed = new Set<string>();
+    let fixed = new Map<number, Set<number>>();
     for (let y = this.depth - 3; y > 1; y--) {
       for (let x = 2; x < this.width - 2; x++) {
         const centreShape: TerrainShape = this.terrainShapeAt(x, y);
@@ -446,21 +447,34 @@ export class TerrainBuilder {
           const offset: Point2D = coordOffsets[i];
           const neighbourX = x + offset.x;
           const neighbourY = y + offset.y;
+
+          if (fixed.has(neighbourX) &&
+              fixed.get(neighbourX)!.has(neighbourY)) {
+            continue;
+          }
           const nextNeighbourX = neighbourX + offset.x;
           const nextNeighbourY = neighbourY + offset.y;
-          const neighbourKey = new Point2D(neighbourX, neighbourY).toString();
-          const nextNeighbourKey = new Point2D(nextNeighbourX, nextNeighbourY).toString();
+          if (fixed.has(nextNeighbourX) &&
+              fixed.get(nextNeighbourX)!.has(nextNeighbourY)) {
+            continue;
+          }
           const neighbourTerrace = this.terraceAt(neighbourX, neighbourY);
           const nextNeighbourTerrace = this.terraceAt(nextNeighbourX, nextNeighbourY);
           if (
-            !fixed.has(neighbourKey) &&
-            !fixed.has(nextNeighbourKey) &&
             neighbourTerrace == centreTerrace + 1 &&
             neighbourTerrace == nextNeighbourTerrace
           ) {
             this.shapeGrid[neighbourY][neighbourX] = ramps[i];
-            fixed.add(neighbourKey);
-            fixed.add(nextNeighbourKey);
+            if (fixed.has(neighbourX)) {
+              fixed.get(neighbourX)!.add(neighbourY);
+            } else {
+              fixed.set(neighbourX, new Set<number>([neighbourY]));
+            }
+            if (fixed.has(nextNeighbourX)) {
+              fixed.get(nextNeighbourX)!.add(nextNeighbourY);
+            } else {
+              fixed.set(nextNeighbourX, new Set<number>([nextNeighbourY]));
+            }
             totalRamps++;
           }
         }
@@ -740,7 +754,6 @@ export class TerrainBuilder {
     const moistureRange = 6;
     for (let y = 0; y < this.depth; y++) {
       this._biomeGrid[y] = new Array<Biome>();
-      this._typeGrid[y] = new Array<TerrainType>();
       for (let x = 0; x < this.width; x++) {
         let biome: Biome = Biome.Water;
         let terrain: TerrainType = TerrainType.Water;
