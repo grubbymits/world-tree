@@ -64,22 +64,16 @@ export enum TerrainType {
 }
 
 export class Terrain extends PhysicalEntity {
-  private static _dimensions: Dimensions;
   private static _terrainGraphics = new Map<
     TerrainType,
     Map<TerrainShape, GraphicComponent>
   >();
 
   static reset(): void {
-    this._dimensions = new Dimensions(0, 0, 0);
     this._terrainGraphics = new Map<
       TerrainType,
       Map<TerrainShape, GraphicComponent>
     >();
-  }
-
-  static getDimensions(): Dimensions {
-    return this._dimensions;
   }
 
   static graphics(
@@ -128,52 +122,6 @@ export class Terrain extends PhysicalEntity {
   static isSupportedShape(type: TerrainType, shape: TerrainShape): boolean {
     return (
       this.isSupportedType(type) && this._terrainGraphics.get(type)!.has(shape)
-    );
-  }
-
-  static init(dims: Dimensions) {
-    this._dimensions = dims;
-  }
-
-  static get width(): number {
-    return this._dimensions.width;
-  }
-  static get depth(): number {
-    return this._dimensions.depth;
-  }
-  static get height(): number {
-    return this._dimensions.height;
-  }
-
-  static scaleLocation(loc: Point3D): Point3D {
-    // round down
-    const x = loc.x - (loc.x % this.width);
-    const y = loc.y - (loc.y % this.depth);
-    const z = loc.z - (loc.z % this.height);
-    // then scale to grid
-    return new Point3D(
-      Math.floor(x / this.width),
-      Math.floor(y / this.depth),
-      Math.floor(z / this.height)
-    );
-  }
-
-  static create(
-    context: ContextImpl,
-    x: number,
-    y: number,
-    z: number,
-    type: TerrainType,
-    shape: TerrainShape,
-  ): Terrain {
-    return new Terrain(
-      context,
-      x,
-      y,
-      z,
-      this._dimensions,
-      type,
-      shape
     );
   }
 
@@ -370,20 +318,14 @@ export class Terrain extends PhysicalEntity {
 
   constructor(
     context: ContextImpl,
-    private readonly _gridX: number,
-    private readonly _gridY: number,
-    private readonly _gridZ: number,
+    position: Point3D,
     dimensions: Dimensions,
     private readonly _type: TerrainType,
     private readonly _shape: TerrainShape
   ) {
     super(
       context,
-      new Point3D(
-        _gridX * dimensions.width,
-        _gridY * dimensions.depth,
-        _gridZ * dimensions.height
-      ),
+      position,
       dimensions
     );
     this.addGraphic(Terrain.graphics(_type, _shape));
@@ -412,14 +354,14 @@ export class Terrain extends PhysicalEntity {
     this._surfaceLocation = new Point3D(x, y, z);
   }
 
-  get gridX(): number {
-    return this._gridX;
+  get width(): number {
+    return this.dimensions.width;
   }
-  get gridY(): number {
-    return this._gridY;
+  get depth(): number {
+    return this.dimensions.depth;
   }
-  get gridZ(): number {
-    return this._gridZ;
+  get height(): number {
+    return this.dimensions.height;
   }
   get shape(): TerrainShape {
     return this._shape;
@@ -445,26 +387,95 @@ export class Terrain extends PhysicalEntity {
   }
 }
 
+export interface TerrainGridDescriptor {
+  cellHeightGrid: Array<Array<number>>;
+  typeGrid: Array<Array<TerrainType>>;
+  shapeGrid: Array<Array<TerrainShape>>;
+  tileDimensions: Dimensions;
+  cellsX: number;
+  cellsY: number;
+  cellsZ: number;
+}
+
+export class TerrainGridDescriptorImpl implements TerrainGridDescriptor {
+  constructor (private readonly _cellHeightGrid: Array<Array<number>>,
+               private readonly _typeGrid: Array<Array<TerrainType>>,
+               private readonly _shapeGrid: Array<Array<TerrainShape>>,
+               private readonly _tileDimensions: Dimensions,
+               private readonly _cellsX: number,
+               private readonly _cellsY: number,
+               private readonly _cellsZ: number) { }
+  get cellHeightGrid(): Array<Array<number>> {
+    return this._cellHeightGrid;
+  }
+  get typeGrid(): Array<Array<TerrainType>> {
+    return this._typeGrid;
+  }
+  get shapeGrid(): Array<Array<TerrainShape>> {
+    return this._shapeGrid;
+  }
+  get tileDimensions(): Dimensions {
+    return this._tileDimensions;
+  }
+  get cellsX(): number {
+    return this._cellsX;
+  }
+  get cellsY(): number {
+    return this._cellsY;
+  }
+  get cellsZ(): number {
+    return this._cellsZ;
+  }
+}
+
 export class TerrainGrid {
   private _surfaceTerrain: Array<Array<Terrain>> = new Array<Array<Terrain>>();
+  private readonly _cellsX: number;
+  private readonly _cellsY: number;
+  private readonly _dimensions: Dimensions;
   private _totalSurface = 0;
   private _totalSubSurface = 0;
 
   constructor(
     private readonly _context: ContextImpl,
-    private readonly _width: number,
-    private readonly _depth: number
+    descriptor: TerrainGridDescriptor,
   ) {
-    for (let y = 0; y < this.depth; ++y) {
-      this.surfaceTerrain.push(new Array<Terrain>(this.width));
+    this._cellsX = descriptor.cellsX;
+    this._cellsY = descriptor.cellsY;
+    this._dimensions  = descriptor.tileDimensions;
+    for (let y = 0; y < descriptor.cellsY; ++y) {
+      this.surfaceTerrain.push(new Array<Terrain>(descriptor.cellsX));
+      for (let x = 0; x < descriptor.cellsX; ++x) {
+        let z = descriptor.cellHeightGrid[y][x];
+        const terrainShape = descriptor.shapeGrid[y][x];
+        const terrainType = descriptor.typeGrid[y][x];
+        const position = this.scaleGridToWorld(x, y, z);
+        const terrain = new Terrain(this._context, position, this.dimensions, terrainType, terrainShape);
+        this.surfaceTerrain[y][x] = terrain;
+        this._totalSurface++;
+
+        const zStop = z - this.calcRelativeHeight(x, y, descriptor);
+        const shape = Terrain.isFlat(terrainShape)
+          ? terrainShape
+          : TerrainShape.Flat;
+        while (z > zStop) {
+          z--;
+          const subSurfacePosition = this.scaleGridToWorld(x, y, z);
+          new Terrain(this._context, subSurfacePosition, this.dimensions, terrainType, shape);
+          this._totalSubSurface++;
+        }
+      }
     }
   }
 
-  get width(): number {
-    return this._width;
+  get cellsX(): number {
+    return this._cellsX;
   }
-  get depth(): number {
-    return this._depth;
+  get cellsY(): number {
+    return this._cellsY;
+  }
+  get dimensions(): Dimensions {
+    return this._dimensions;
   }
   get totalSurface(): number {
     return this._totalSurface;
@@ -476,42 +487,64 @@ export class TerrainGrid {
     return this._surfaceTerrain;
   }
 
-  addSurfaceTerrain(
-    x: number,
-    y: number,
-    z: number,
-    ty: TerrainType,
-    shape: TerrainShape,
-  ): void {
-    const terrain = Terrain.create(this._context, x, y, z, ty, shape);
-    this.surfaceTerrain[y][x] = terrain;
-    this._totalSurface++;
+  scaleGridToWorld(x: number, y: number, z: number): Point3D {
+    return new Point3D(x * this.dimensions.width,
+                       y * this.dimensions.depth,
+                       z * this.dimensions.height);
   }
 
-  addSubSurfaceTerrain(
-    x: number,
-    y: number,
-    z: number,
-    ty: TerrainType,
-    shape: TerrainShape
-  ): void {
-    console.assert(
-      this.getSurfaceTerrainAt(x, y)!.z > z,
-      "adding sub-surface terrain which is above surface!"
+  scaleWorldToGrid(loc: Point3D): Point3D {
+    // round down
+    const width = this.dimensions.width;
+    const depth = this.dimensions.depth;
+    const height = this.dimensions.height;
+    const x = loc.x - (loc.x % width);
+    const y = loc.y - (loc.y % depth);
+    const z = loc.z - (loc.z % height);
+    // then scale to grid
+    return new Point3D(
+      Math.floor(x / width),
+      Math.floor(y / depth),
+      Math.floor(z / height)
     );
-    Terrain.create(this._context, x, y, z, ty, shape);
-    this._totalSubSurface++;
+  }
+
+  calcRelativeHeight(x: number, y: number, descriptor: TerrainGridDescriptor): number {
+    let relativeHeight = 0;
+    const centreTerrace = descriptor.cellHeightGrid[y][x];
+
+    for (let offset of Navigation.neighbourOffsets) {
+      const neighbourX = x + offset.x;
+      const neighbourY = y + offset.y;
+      if (!this.inbounds(neighbourX, neighbourY)) {
+        continue;
+      }
+      const neighbourTerrace = descriptor.cellHeightGrid[neighbourY][neighbourX];
+      console.assert(
+        neighbourTerrace >= 0,
+        "Found neighbour with negative terrace!",
+        neighbourTerrace
+      );
+      const height = centreTerrace - neighbourTerrace;
+      relativeHeight = Math.max(height, relativeHeight);
+    }
+    return relativeHeight;
+  }
+
+  inbounds(x: number, y: number): boolean {
+    return x >= 0 && x < this.cellsX &&
+           y >= 0 && y < this.cellsY;
   }
 
   getSurfaceTerrainAt(x: number, y: number): Terrain | null {
-    if (x < 0 || x >= this.width || y < 0 || y >= this.depth) {
+    if (!this.inbounds(x, y)) {
       return null;
     }
     return this.surfaceTerrain[y][x];
   }
 
   getSurfaceTerrainAtPoint(loc: Point3D): Terrain | null {
-    const scaled: Point3D = Terrain.scaleLocation(loc);
+    const scaled: Point3D = this.scaleWorldToGrid(loc);
     const terrain = this.getSurfaceTerrainAt(scaled.x, scaled.y);
     if (terrain != null) {
       if (terrain.surfaceLocation.z == loc.z) {
@@ -525,7 +558,7 @@ export class TerrainGrid {
     const neighbours = new Array<Terrain>();
 
     for (const offset of Navigation.neighbourOffsets) {
-      const scaled: Point3D = Terrain.scaleLocation(centre.surfaceLocation);
+      const scaled: Point3D = this.scaleWorldToGrid(centre.surfaceLocation);
       const neighbour = this.getSurfaceTerrainAt(
         scaled.x + offset.x,
         scaled.y + offset.y

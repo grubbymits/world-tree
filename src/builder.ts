@@ -1,5 +1,6 @@
 import {
   Terrain,
+  TerrainGridDescriptorImpl,
   TerrainGrid,
   TerrainShape,
   TerrainType,
@@ -231,9 +232,8 @@ export class TerrainBuilder {
     private readonly _depth: number,
     private _heightGrid: Array<Array<number>>,
     private readonly _config: TerrainBuilderConfig,
-    physicalDims: Dimensions
+    private readonly _tileDimensions: Dimensions
   ) {
-    Terrain.init(physicalDims);
 
     // Normalise heights, minimum = 0;
     let minHeight = 0;
@@ -278,6 +278,9 @@ export class TerrainBuilder {
 
   get config(): TerrainBuilderConfig {
     return this._config;
+  }
+  get tileDimensions(): Dimensions {
+    return this._tileDimensions;
   }
   get terraceSpacing(): number {
     return this._terraceSpacing;
@@ -372,40 +375,20 @@ export class TerrainBuilder {
       this.setBiomes();
     }
     this.setEdges();
-    const grid = new TerrainGrid(
-      context,
+    const descriptor = new TerrainGridDescriptorImpl(
+      this.terraceGrid,
+      this.typeGrid,
+      this.shapeGrid,
+      this.tileDimensions,
       this.width,
-      this.depth
+      this.depth,
+      this.config.numTerraces
     );
 
-    for (let y = 0; y < this.depth; y++) {
-      for (let x = 0; x < this.width; x++) {
-        grid.addSurfaceTerrain(
-          x,
-          y,
-          this.terraceAt(x, y),
-          this.terrainTypeAt(x, y),
-          this.terrainShapeAt(x, y)
-        );
-      }
-    }
-
-    // Create a column of visible terrain below the surface tile.
-    for (let y = 0; y < this.depth; y++) {
-      for (let x = 0; x < this.width; x++) {
-        let z = this.terraceAt(x, y);
-        const zStop = z - this.calcRelativeHeight(x, y);
-        const terrainShape = this.terrainShapeAt(x, y);
-        const terrainType = this.terrainTypeAt(x, y);
-        const shape = Terrain.isFlat(terrainShape)
-          ? terrainShape
-          : TerrainShape.Flat;
-        while (z > zStop) {
-          z--;
-          grid.addSubSurfaceTerrain(x, y, z, terrainType, shape);
-        }
-      }
-    }
+    const grid = new TerrainGrid(
+      context,
+      descriptor
+    );
     return grid;
   }
 
@@ -726,28 +709,6 @@ export class TerrainBuilder {
         this.shapeGrid[y][x] = shapeType;
       }
     }
-  }
-
-  calcRelativeHeight(x: number, y: number): number {
-    let relativeHeight = 0;
-    const centreTerrace = this.terraceAt(x, y);
-
-    for (let offset of Navigation.neighbourOffsets) {
-      const neighbourX = x + offset.x;
-      const neighbourY = y + offset.y;
-      if (!this.inbounds(neighbourX, neighbourY)) {
-        continue;
-      }
-      const neighbourTerrace = this.terraceAt(neighbourX, neighbourY);
-      console.assert(
-        neighbourTerrace >= 0,
-        "Found neighbour with negative terrace!",
-        neighbourTerrace
-      );
-      const height = centreTerrace - neighbourTerrace;
-      relativeHeight = Math.max(height, relativeHeight);
-    }
-    return relativeHeight;
   }
 
   setBiomes(): void {

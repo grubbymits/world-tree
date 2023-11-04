@@ -146,15 +146,15 @@ export class PathFinder {
 
   constructor(private readonly _grid: TerrainGrid) {
     // Create path nodes for all surface locations.
-    for (let y = 0; y < this.grid.depth; y++) {
-      for (let x = 0; x < this.grid.width; x++) {
+    for (let y = 0; y < this.grid.cellsY; y++) {
+      for (let x = 0; x < this.grid.cellsX; x++) {
         const centre = this.grid.getSurfaceTerrainAt(x, y)!;
         this._nodes.set(centre, new PathNode(centre));
       }
     }
 
-    for (let y = 0; y < this.grid.depth; y++) {
-      for (let x = 0; x < this.grid.width; x++) {
+    for (let y = 0; y < this.grid.cellsY; y++) {
+      for (let x = 0; x < this.grid.cellsX; x++) {
         const centre = this.grid.getSurfaceTerrainAt(x, y)!;
         this.addNeighbours(centre);
       }
