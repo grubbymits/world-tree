@@ -4,9 +4,6 @@ import { ContextImpl } from "./context.ts";
 import { Renderer } from "./render.ts";
 
 export const DummySpriteSheet = {
-  addForValidation: function (_sprite: Sprite): boolean {
-    return true;
-  },
   addBitmap: function (
     id: number,
     x: number,
@@ -187,20 +184,6 @@ export class Sprite {
       this.offset.x + this.width,
       this.offset.y + this.height
     );
-    //console.assert(
-    //  maxOffset.x <= this.sheet.width,
-    //  "sprite id:",
-    //  this.id,
-    //  "sprite max X offset too large",
-    //  maxOffset.x,
-    //);
-    //console.assert(
-    //  maxOffset.y <= this.sheet.height,
-    //  "sprite id:",
-    //  this.id,
-    //  "sprite max Y offset too large",
-    //  maxOffset.y,
-    //);
     this._id = Sprite.sprites.length;
     Sprite.sprites.push(this);
     this.sheet.addBitmap(

@@ -63,6 +63,14 @@ export enum TerrainType {
   Upland5,
 }
 
+export interface TerrainSpriteDescriptor {
+  spriteWidth: number;
+  spriteHeight: number;
+  spriteSheet: SpriteSheet;
+  tileRows: Array<TerrainType>;
+  tileColumns: Array<TerrainShape>;
+};
+
 export class Terrain extends PhysicalEntity {
   private static _terrainGraphics = new Map<
     TerrainType,
@@ -113,6 +121,17 @@ export class Terrain extends PhysicalEntity {
       );
     }
     this._terrainGraphics.get(terrainType)!.set(terrainShape, component);
+  }
+
+  static generateSprites(descriptor: TerrainSpriteDescriptor): void {
+    for (let y = 0; y < descriptor.tileRows.length; ++y) {
+      const terrainType = descriptor.tileRows[y];
+      for (let x = 0; x < descriptor.tileColumns.length; ++x) {
+        const terrainShape = descriptor.tileColumns[x];
+        this.addGraphic(terrainType, terrainShape, descriptor.spriteSheet, x, y,
+                        descriptor.spriteWidth, descriptor.spriteHeight);
+      }
+    }
   }
 
   static isSupportedType(type: TerrainType): boolean {
