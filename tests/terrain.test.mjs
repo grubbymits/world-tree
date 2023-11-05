@@ -98,6 +98,7 @@ test("terrain sprites", () => {
     spriteHeight: 125,
     tileRows: [
       WT.TerrainType.Lowland0,
+      WT.TerrainType.Upland5,
     ],
     tileColumns: [
       WT.TerrainShape.Flat,
@@ -123,24 +124,9 @@ test("terrain sprites", () => {
     ]
   };
   WT.Terrain.generateSprites(spriteConfig);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.Flat)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.FlatWest)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.FlatNorth)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.FlatEast)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.FlatSouth)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.FlatNorthWest)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.FlatNorthEast)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.FlatSouthEast)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.FlatSouthWest)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.FlatWestOut)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.FlatNorthOut)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.FlatEastOut)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.FlatSouthOut)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.FlatAloneOut)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.FlatNorthSouth)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.FlatEastWest)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.RampUpSouth)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.RampUpWest)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.RampUpEast)).toBe(true);
-  expect(WT.Terrain.isSupportedShape(WT.TerrainType.Lowland0, WT.TerrainShape.RampUpNorth)).toBe(true);
+  for (let terrainType of spriteConfig.tileRows) {
+    for (let terrainShape of spriteConfig.tileColumns) {
+      expect(WT.Terrain.isSupportedShape(terrainType, terrainShape)).toBe(true);
+    }
+  }
 });
