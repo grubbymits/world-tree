@@ -80,6 +80,9 @@ export class MoveDestination extends MoveAction {
   get destination(): Point3D {
     return this._destination;
   }
+  get d(): Vector3D {
+    return this._d;
+  }
   set destination(destination: Point3D) {
     this._destination = destination;
     const currentPos = this.actor.bounds.minLocation;
@@ -140,11 +143,19 @@ export class MoveDestination extends MoveAction {
         dz = adjacent == maxD.z ? adjDiff : oppDiff;
       }
     }
+    if (maxD.x < 0) {
+      dx = -dx;
+    }
+    if (maxD.y < 0) {
+      dy = -dy;
+    }
+    if (maxD.z < 0) {
+      dz = -dz;
+    }
     this._d = new Vector3D(dx, dy, dz);
   }
 
   perform(): boolean {
-    console.log("perform action");
     // Make sure we don't overshoot the destination.
     const bounds: BoundingCuboid = this.actor.bounds;
     const location: Point3D = bounds.minLocation;
