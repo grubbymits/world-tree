@@ -13,4 +13,3 @@ export * from "./action.ts";
 export * from "./events.ts";
 export * from "./sound.ts";
 export * from "./geometry.ts";
-export * from "./debug.ts";
