@@ -13,6 +13,8 @@ import { ContextImpl } from "./context.ts";
 import { Biome, BiomeConfig, generateBiomeGrid } from "./biomes.ts";
 
 
+// TODO: Remove TerrainBuilderConfig in favour of BiomeConfig. TerrainBuilder
+// can then directly hold numTerraces, defaultFloor and defaultWall.
 export class TerrainBuilderConfig {
   private _waterLine = 0;
   private _wetLimit = 0;
@@ -279,7 +281,7 @@ export class TerrainBuilder {
         biomeConfig.rainDirection = this.config.rainDirection;
       }
       this._biomeGrid = buildBiomes(generateMoisture, biomeConfig, this.terraceGrid);
-      this.setTerrainTypes(this.biomeGrid);
+      setTerrainTypes(this.biomeGrid, this.typeGrid);
     }
 
     setEdges(this._terraceGrid, this._shapeGrid, this._typeGrid, this.config.floor,
@@ -301,66 +303,6 @@ export class TerrainBuilder {
     return grid;
   }
 
-  setTerrainTypes(biomeGrid: Array<Array<Biome>>): void {
-    for (let y = 0; y < this.depth; y++) {
-      for (let x = 0; x < this.width; x++) {
-        const biome = biomeGrid[y][x];
-        let terrain = TerrainType.Water;
-        switch (biome) {
-          default:
-            console.error("unhandled moisture scale");
-            break;
-          case Biome.Rock:
-            terrain = TerrainType.Upland0;
-            break;
-          case Biome.Tundra:
-            terrain = TerrainType.Upland1;
-            break;
-          case Biome.AlpineGrassland:
-            terrain = TerrainType.Upland2;
-            break;
-          case Biome.AlpineMeadow:
-            terrain = TerrainType.Upland3;
-            break;
-          case Biome.AlpineForest:
-            terrain = TerrainType.Upland4;
-            break;
-          case Biome.Taiga:
-            terrain = TerrainType.Upland5;
-            break;
-          case Biome.Desert:
-            terrain = TerrainType.Lowland0;
-            break;
-          case Biome.Grassland:
-            terrain = TerrainType.Lowland1;
-            break;
-          case Biome.Shrubland:
-            terrain = TerrainType.Lowland2;
-            break;
-          case Biome.MoistForest:
-            terrain = TerrainType.Lowland3;
-            break;
-          case Biome.WetForest:
-            terrain = TerrainType.Lowland4;
-            break;
-          case Biome.RainForest:
-            terrain = TerrainType.Lowland5;
-            break;
-        }
-        // Only change the type if it's supported, otherwise we'll just
-        // fallback to the default which is set in the constructor.
-        // TODO: What about default wall tiles?
-        if (Terrain.isSupportedType(terrain)) {
-          this.typeGrid[y][x] = terrain;
-        } else {
-          console.log(
-            "unsupported biome terrain type:",
-            Terrain.getTypeName(terrain)
-          );
-        }
-      }
-    }
-  }
 }
 
 export function setRamps(heightGrid: Array<Array<number>>,
@@ -458,248 +400,312 @@ export function setEdges(terraceGrid: Array<Array<number>>,
                          floor: TerrainType,
                          wall: TerrainType,
                          indoors: boolean): void {
-    const depth = terraceGrid.length;
-    const width = terraceGrid[0].length;
-    const inbounds = function(x: number, y: number): boolean {
-      return x >= 0 && x < width &&
-             y >= 0 && y < depth;
-    };
+  const depth = terraceGrid.length;
+  const width = terraceGrid[0].length;
+  const inbounds = function(x: number, y: number): boolean {
+    return x >= 0 && x < width &&
+           y >= 0 && y < depth;
+  };
 
-    for (let y = 0; y < depth; y++) {
-      for (let x = 0; x < width; x++) {
-        if (typeGrid[y][x] == TerrainType.Water) {
+  for (let y = 0; y < depth; y++) {
+    for (let x = 0; x < width; x++) {
+      if (typeGrid[y][x] == TerrainType.Water) {
+        continue;
+      }
+      const centrePos = new Point2D(x, y);
+      const centreTerrace = terraceGrid[y][x];
+      let centreShape = shapeGrid[y][x];
+      let centreType = typeGrid[y][x];
+      let shapeType = shapeGrid[y][x];
+      let northEdge = false;
+      let eastEdge = false;
+      let southEdge = false;
+      let westEdge = false;
+      const isPerimeter = x == 0 || x == width -1 ||
+                          y == 0 || y == depth - 1; 
+
+      for (const offset of Navigation.neighbourOffsets) {
+        const neighbourX = x + offset.x;
+        const neighbourY = y + offset.y;
+        if (!inbounds(neighbourX, neighbourY)) {
           continue;
         }
-        const centrePos = new Point2D(x, y);
-        const centreTerrace = terraceGrid[y][x];
-        let centreShape = shapeGrid[y][x];
-        let centreType = typeGrid[y][x];
-        let shapeType = shapeGrid[y][x];
-        let northEdge = false;
-        let eastEdge = false;
-        let southEdge = false;
-        let westEdge = false;
-        const isPerimeter = x == 0 || x == width -1 ||
-                            y == 0 || y == depth - 1; 
+        const neighbourPos = new Point2D(neighbourX, neighbourY);
+        const neighbourTerrace = terraceGrid[neighbourY][neighbourX];
+        const neighbourShape = shapeGrid[neighbourY][neighbourX];
 
-        for (const offset of Navigation.neighbourOffsets) {
-          const neighbourX = x + offset.x;
-          const neighbourY = y + offset.y;
-          if (!inbounds(neighbourX, neighbourY)) {
-            continue;
-          }
-          const neighbourPos = new Point2D(neighbourX, neighbourY);
-          const neighbourTerrace = terraceGrid[neighbourY][neighbourX];
-          const neighbourShape = shapeGrid[neighbourY][neighbourX];
+        // Only look at lower neighbours
+        if (neighbourTerrace > centreTerrace) {
+          continue;
+        }
+        // Don't look at diagonal neighbours.
+        if (neighbourPos.x != x && neighbourPos.y != y) {
+          continue;
+        }
 
-          // Only look at lower neighbours
-          if (neighbourTerrace > centreTerrace) {
-            continue;
-          }
-          // Don't look at diagonal neighbours.
-          if (neighbourPos.x != x && neighbourPos.y != y) {
-            continue;
-          }
+        if (
+          neighbourTerrace == centreTerrace &&
+          Terrain.isFlat(centreShape) == Terrain.isFlat(neighbourShape)
+        ) {
+          continue;
+        }
 
-          if (
-            neighbourTerrace == centreTerrace &&
-            Terrain.isFlat(centreShape) == Terrain.isFlat(neighbourShape)
-          ) {
-            continue;
-          }
-
-          // We want to enable edges, just not at the point where the ramp
-          // joins the upper terrace.
-          if (!Terrain.isFlat(neighbourShape)) {
-            const direction = Navigation.getDirectionFromPoints(neighbourPos, centrePos);
-            switch (direction) {
-            default:
-              break;
-            case Direction.North:
-              if (neighbourShape == TerrainShape.RampUpNorth) continue;
-              break;
-            case Direction.East:
-              if (neighbourShape == TerrainShape.RampUpEast) continue;
-              break;
-            case Direction.South:
-              if (neighbourShape == TerrainShape.RampUpSouth) continue;
-              break;
-            case Direction.West:
-              if (neighbourShape == TerrainShape.RampUpWest) continue;
-              break;
-            }
-          }
-
-          northEdge = northEdge || neighbourY < y;
-          southEdge = southEdge || neighbourY > y;
-          eastEdge = eastEdge || neighbourX > x;
-          westEdge = westEdge || neighbourX < x;
-          if (northEdge && eastEdge && southEdge && westEdge) {
+        // We want to enable edges, just not at the point where the ramp
+        // joins the upper terrace.
+        if (!Terrain.isFlat(neighbourShape)) {
+          const direction = Navigation.getDirectionFromPoints(neighbourPos, centrePos);
+          switch (direction) {
+          default:
+            break;
+          case Direction.North:
+            if (neighbourShape == TerrainShape.RampUpNorth) continue;
+            break;
+          case Direction.East:
+            if (neighbourShape == TerrainShape.RampUpEast) continue;
+            break;
+          case Direction.South:
+            if (neighbourShape == TerrainShape.RampUpSouth) continue;
+            break;
+          case Direction.West:
+            if (neighbourShape == TerrainShape.RampUpWest) continue;
             break;
           }
         }
 
-        if (shapeType == TerrainShape.Flat) {
-          if (northEdge && eastEdge && southEdge && westEdge) {
-            shapeType = TerrainShape.FlatAloneOut;
-          } else if (northEdge && eastEdge && westEdge) {
-            shapeType = TerrainShape.FlatNorthOut;
-          } else if (northEdge && eastEdge && southEdge) {
-            shapeType = TerrainShape.FlatEastOut;
-          } else if (eastEdge && southEdge && westEdge) {
-            shapeType = TerrainShape.FlatSouthOut;
-          } else if (southEdge && westEdge && northEdge) {
-            shapeType = TerrainShape.FlatWestOut;
-          } else if (northEdge && eastEdge) {
-            shapeType = TerrainShape.FlatNorthEast;
-          } else if (northEdge && westEdge) {
-            shapeType = TerrainShape.FlatNorthWest;
-          } else if (southEdge && eastEdge) {
-            shapeType = TerrainShape.FlatSouthEast;
-          } else if (southEdge && westEdge) {
-            shapeType = TerrainShape.FlatSouthWest;
-          } else if (southEdge && northEdge) {
-            shapeType = TerrainShape.FlatNorthSouth;
-          } else if (eastEdge && westEdge) {
-            shapeType = TerrainShape.FlatEastWest;
-          } else if (northEdge) {
-            shapeType = TerrainShape.FlatNorth;
-          } else if (southEdge) {
-            shapeType = TerrainShape.FlatSouth;
-          } else if (eastEdge) {
-            shapeType = TerrainShape.FlatEast;
-          } else if (westEdge) {
-            shapeType = TerrainShape.FlatWest;
-          }
-        } else if (shapeType == TerrainShape.RampUpNorth && eastEdge) {
-          if (
-            Terrain.isSupportedShape(centreType, TerrainShape.RampUpNorthEdge)
-          ) {
-            shapeType = TerrainShape.RampUpNorthEdge;
-          }
-        } else if (shapeType == TerrainShape.RampUpEast && northEdge) {
-          if (
-            Terrain.isSupportedShape(centreType, TerrainShape.RampUpEastEdge)
-          ) {
-            shapeType = TerrainShape.RampUpEastEdge;
-          }
-        } else if (shapeType == TerrainShape.RampUpSouth && eastEdge) {
-          if (
-            Terrain.isSupportedShape(centreType, TerrainShape.RampUpSouthEdge)
-          ) {
-            shapeType = TerrainShape.RampUpSouthEdge;
-          }
-        } else if (shapeType == TerrainShape.RampUpWest && northEdge) {
-          if (
-            Terrain.isSupportedShape(centreType, TerrainShape.RampUpWestEdge)
-          ) {
-            shapeType = TerrainShape.RampUpWestEdge;
-          }
+        northEdge = northEdge || neighbourY < y;
+        southEdge = southEdge || neighbourY > y;
+        eastEdge = eastEdge || neighbourX > x;
+        westEdge = westEdge || neighbourX < x;
+        if (northEdge && eastEdge && southEdge && westEdge) {
+          break;
         }
+      }
 
-        // Fixup the sides of the map.
+      if (shapeType == TerrainShape.Flat) {
+        if (northEdge && eastEdge && southEdge && westEdge) {
+          shapeType = TerrainShape.FlatAloneOut;
+        } else if (northEdge && eastEdge && westEdge) {
+          shapeType = TerrainShape.FlatNorthOut;
+        } else if (northEdge && eastEdge && southEdge) {
+          shapeType = TerrainShape.FlatEastOut;
+        } else if (eastEdge && southEdge && westEdge) {
+          shapeType = TerrainShape.FlatSouthOut;
+        } else if (southEdge && westEdge && northEdge) {
+          shapeType = TerrainShape.FlatWestOut;
+        } else if (northEdge && eastEdge) {
+          shapeType = TerrainShape.FlatNorthEast;
+        } else if (northEdge && westEdge) {
+          shapeType = TerrainShape.FlatNorthWest;
+        } else if (southEdge && eastEdge) {
+          shapeType = TerrainShape.FlatSouthEast;
+        } else if (southEdge && westEdge) {
+          shapeType = TerrainShape.FlatSouthWest;
+        } else if (southEdge && northEdge) {
+          shapeType = TerrainShape.FlatNorthSouth;
+        } else if (eastEdge && westEdge) {
+          shapeType = TerrainShape.FlatEastWest;
+        } else if (northEdge) {
+          shapeType = TerrainShape.FlatNorth;
+        } else if (southEdge) {
+          shapeType = TerrainShape.FlatSouth;
+        } else if (eastEdge) {
+          shapeType = TerrainShape.FlatEast;
+        } else if (westEdge) {
+          shapeType = TerrainShape.FlatWest;
+        }
+      } else if (shapeType == TerrainShape.RampUpNorth && eastEdge) {
         if (
-          shapeType == TerrainShape.Flat && isPerimeter
+          Terrain.isSupportedShape(centreType, TerrainShape.RampUpNorthEdge)
         ) {
-          if (x == 0 &&  y == 0) {
-            shapeType = TerrainShape.FlatNorthWest;
-          } else if (x == 0 &&  y == depth - 1) {
-            shapeType = TerrainShape.FlatSouthWest;
-          } else if (x == width - 1 && y == 0) {
-            shapeType = TerrainShape.FlatNorthEast;
-          } else if (x == 0) {
-            shapeType = TerrainShape.FlatWest;
-          } else if (y == 0) {
-            shapeType = TerrainShape.FlatNorth;
-          } else if (x == width - 1 && y == depth - 1) {
-            shapeType = TerrainShape.FlatSouthEast;
-          } else if (x == width - 1) {
-            shapeType = TerrainShape.FlatEast;
-          } else if (y == depth - 1) {
-            shapeType = TerrainShape.FlatSouth;
-          }
+          shapeType = TerrainShape.RampUpNorthEdge;
         }
-
-        // If we don't support edge, try the basic wall tile and use the
-        // default wall type.
-        if (Terrain.isFlat(shapeType) && Terrain.isEdge(shapeType)) {
-          if (indoors) {
-            centreType = wall;
-          }
-          if (!Terrain.isSupportedShape(centreType, shapeType)) {
-            switch (shapeType) {
-              default:
-                shapeType = TerrainShape.Wall;
-                break;
-              case TerrainShape.FlatNorthOut:
-                if (
-                  Terrain.isSupportedShape(centreType, TerrainShape.FlatNorth)
-                ) {
-                  shapeType = TerrainShape.FlatNorth;
-                } else {
-                  shapeType = TerrainShape.Wall;
-                }
-                break;
-              case TerrainShape.FlatNorthEast:
-              case TerrainShape.FlatSouthEast:
-                if (
-                  Terrain.isSupportedShape(centreType, TerrainShape.FlatEast)
-                ) {
-                  shapeType = TerrainShape.FlatEast;
-                } else {
-                  shapeType = TerrainShape.Wall;
-                }
-                break;
-              case TerrainShape.FlatNorthWest:
-                if (
-                  Terrain.isSupportedShape(
-                    centreType,
-                    TerrainShape.FlatWestOut
-                  )
-                ) {
-                  shapeType = TerrainShape.FlatWestOut;
-                } else {
-                  shapeType = TerrainShape.Wall;
-                }
-                break;
-              case TerrainShape.FlatSouthWest:
-                if (
-                  Terrain.isSupportedShape(centreType, TerrainShape.FlatWest)
-                ) {
-                  shapeType = TerrainShape.FlatWest;
-                } else {
-                  shapeType = TerrainShape.Wall;
-                }
-                break;
-            }
-          }
-        }
-
-        // Avoid introducing Wall tiles for the floor around the edge of the
-        // map.
-        if (centreTerrace == 0 && shapeType == TerrainShape.Wall) {
-          shapeType = TerrainShape.Flat;
-        }
-
-        // If we have a unsupported shape, such as a ramp, check whether we have
-        // the ramp shape for a default terrain type.
+      } else if (shapeType == TerrainShape.RampUpEast && northEdge) {
         if (
-          !Terrain.isFlat(shapeType) &&
-          !Terrain.isSupportedShape(centreType, shapeType)
+          Terrain.isSupportedShape(centreType, TerrainShape.RampUpEastEdge)
         ) {
-          if (Terrain.isSupportedShape(floor, shapeType)) {
-            centreType = floor;
-          } else if (Terrain.isSupportedShape(wall, shapeType)) {
-            centreType = wall;
-          }
+          shapeType = TerrainShape.RampUpEastEdge;
         }
+      } else if (shapeType == TerrainShape.RampUpSouth && eastEdge) {
+        if (
+          Terrain.isSupportedShape(centreType, TerrainShape.RampUpSouthEdge)
+        ) {
+          shapeType = TerrainShape.RampUpSouthEdge;
+        }
+      } else if (shapeType == TerrainShape.RampUpWest && northEdge) {
+        if (
+          Terrain.isSupportedShape(centreType, TerrainShape.RampUpWestEdge)
+        ) {
+          shapeType = TerrainShape.RampUpWestEdge;
+        }
+      }
 
-        // And if that fails, fallback to the base flat tile.
+      // Fixup the sides of the map.
+      if (
+        shapeType == TerrainShape.Flat && isPerimeter
+      ) {
+        if (x == 0 &&  y == 0) {
+          shapeType = TerrainShape.FlatNorthWest;
+        } else if (x == 0 &&  y == depth - 1) {
+          shapeType = TerrainShape.FlatSouthWest;
+        } else if (x == width - 1 && y == 0) {
+          shapeType = TerrainShape.FlatNorthEast;
+        } else if (x == 0) {
+          shapeType = TerrainShape.FlatWest;
+        } else if (y == 0) {
+          shapeType = TerrainShape.FlatNorth;
+        } else if (x == width - 1 && y == depth - 1) {
+          shapeType = TerrainShape.FlatSouthEast;
+        } else if (x == width - 1) {
+          shapeType = TerrainShape.FlatEast;
+        } else if (y == depth - 1) {
+          shapeType = TerrainShape.FlatSouth;
+        }
+      }
+
+      // If we don't support edge, try the basic wall tile and use the
+      // default wall type.
+      if (Terrain.isFlat(shapeType) && Terrain.isEdge(shapeType)) {
+        if (indoors) {
+          centreType = wall;
+        }
         if (!Terrain.isSupportedShape(centreType, shapeType)) {
-          shapeType = TerrainShape.Flat;
+          switch (shapeType) {
+            default:
+              shapeType = TerrainShape.Wall;
+              break;
+            case TerrainShape.FlatNorthOut:
+              if (
+                Terrain.isSupportedShape(centreType, TerrainShape.FlatNorth)
+              ) {
+                shapeType = TerrainShape.FlatNorth;
+              } else {
+                shapeType = TerrainShape.Wall;
+              }
+              break;
+            case TerrainShape.FlatNorthEast:
+            case TerrainShape.FlatSouthEast:
+              if (
+                Terrain.isSupportedShape(centreType, TerrainShape.FlatEast)
+              ) {
+                shapeType = TerrainShape.FlatEast;
+              } else {
+                shapeType = TerrainShape.Wall;
+              }
+              break;
+            case TerrainShape.FlatNorthWest:
+              if (
+                Terrain.isSupportedShape(
+                  centreType,
+                  TerrainShape.FlatWestOut
+                )
+              ) {
+                shapeType = TerrainShape.FlatWestOut;
+              } else {
+                shapeType = TerrainShape.Wall;
+              }
+              break;
+            case TerrainShape.FlatSouthWest:
+              if (
+                Terrain.isSupportedShape(centreType, TerrainShape.FlatWest)
+              ) {
+                shapeType = TerrainShape.FlatWest;
+              } else {
+                shapeType = TerrainShape.Wall;
+              }
+              break;
+          }
         }
-        typeGrid[y][x] = centreType;
-        shapeGrid[y][x] = shapeType;
+      }
+
+      // Avoid introducing Wall tiles for the floor around the edge of the
+      // map.
+      if (centreTerrace == 0 && shapeType == TerrainShape.Wall) {
+        shapeType = TerrainShape.Flat;
+      }
+
+      // If we have a unsupported shape, such as a ramp, check whether we have
+      // the ramp shape for a default terrain type.
+      if (
+        !Terrain.isFlat(shapeType) &&
+        !Terrain.isSupportedShape(centreType, shapeType)
+      ) {
+        if (Terrain.isSupportedShape(floor, shapeType)) {
+          centreType = floor;
+        } else if (Terrain.isSupportedShape(wall, shapeType)) {
+          centreType = wall;
+        }
+      }
+
+      // And if that fails, fallback to the base flat tile.
+      if (!Terrain.isSupportedShape(centreType, shapeType)) {
+        shapeType = TerrainShape.Flat;
+      }
+      typeGrid[y][x] = centreType;
+      shapeGrid[y][x] = shapeType;
+    }
+  }
+}
+
+export function setTerrainTypes(biomeGrid: Array<Array<Biome>>,
+                                typeGrid: Array<Array<TerrainType>>): void {
+  const cellsY = biomeGrid.length;
+  const cellsX = biomeGrid[0].length;
+  for (let y = 0; y < cellsY; y++) {
+    for (let x = 0; x < cellsX; x++) {
+      const biome = biomeGrid[y][x];
+      let terrain = TerrainType.Water;
+      switch (biome) {
+        default:
+          console.error("unhandled moisture scale");
+          break;
+        case Biome.Rock:
+          terrain = TerrainType.Upland0;
+          break;
+        case Biome.Tundra:
+          terrain = TerrainType.Upland1;
+          break;
+        case Biome.AlpineGrassland:
+          terrain = TerrainType.Upland2;
+          break;
+        case Biome.AlpineMeadow:
+          terrain = TerrainType.Upland3;
+          break;
+        case Biome.AlpineForest:
+          terrain = TerrainType.Upland4;
+          break;
+        case Biome.Taiga:
+          terrain = TerrainType.Upland5;
+          break;
+        case Biome.Desert:
+          terrain = TerrainType.Lowland0;
+          break;
+        case Biome.Grassland:
+          terrain = TerrainType.Lowland1;
+          break;
+        case Biome.Shrubland:
+          terrain = TerrainType.Lowland2;
+          break;
+        case Biome.MoistForest:
+          terrain = TerrainType.Lowland3;
+          break;
+        case Biome.WetForest:
+          terrain = TerrainType.Lowland4;
+          break;
+        case Biome.RainForest:
+          terrain = TerrainType.Lowland5;
+          break;
+      }
+      // Only change the type if it's supported, otherwise we'll just
+      // fallback to the default which is set in the constructor.
+      // TODO: What about default wall tiles?
+      if (Terrain.isSupportedType(terrain)) {
+        typeGrid[y][x] = terrain;
+      } else {
+        console.log(
+          "unsupported biome terrain type:",
+          Terrain.getTypeName(terrain)
+        );
       }
     }
   }
+}
