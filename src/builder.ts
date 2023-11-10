@@ -244,9 +244,9 @@ export class TerrainBuilder {
   }
 
   generateMap(context: ContextImpl): TerrainGrid {
-    if (this.config.ramps) {
-      this.setShapes();
-    }
+    setRamps(this._heightGrid, this._terraceGrid, this._shapeGrid,
+             this._terraceSpacing, 0);
+
     if (this.config.rainfall > 0) {
       this._moistureGrid = addRain(
         this.width,
@@ -288,78 +288,6 @@ export class TerrainBuilder {
     return grid;
   }
 
-  setShapes(): void {
-    const coordOffsets: Array<Point2D> = [
-      new Point2D(0, 1),
-      new Point2D(-1, 0),
-      new Point2D(0, -1),
-      new Point2D(1, 0),
-    ];
-
-    const ramps: Array<TerrainShape> = [
-      TerrainShape.RampUpSouth,
-      TerrainShape.RampUpWest,
-      TerrainShape.RampUpNorth,
-      TerrainShape.RampUpEast,
-    ];
-
-    // Find locations that have heights that sit exactly between two terraces
-    // and then find their adjacent locations that are higher terraces. Set
-    // those locations to be ramps.
-    let totalRamps = 0;
-    let fixed = new Map<number, Set<number>>();
-    for (let y = this.depth - 3; y > 1; y--) {
-      for (let x = 2; x < this.width - 2; x++) {
-        const centreShape: TerrainShape = this.terrainShapeAt(x, y);
-        if (!Terrain.isFlat(centreShape)) {
-          continue;
-        }
-
-        const centreHeight = this.heightAt(x, y);
-        const centreTerrace = this.terraceAt(x, y);
-        const roundUpHeight = centreHeight + this.terraceSpacing / 2;
-        if (roundUpHeight != (centreTerrace + 1) * this.terraceSpacing) {
-          continue;
-        }
-
-        for (const i in coordOffsets) {
-          const offset: Point2D = coordOffsets[i];
-          const neighbourX = x + offset.x;
-          const neighbourY = y + offset.y;
-
-          if (fixed.has(neighbourX) &&
-              fixed.get(neighbourX)!.has(neighbourY)) {
-            continue;
-          }
-          const nextNeighbourX = neighbourX + offset.x;
-          const nextNeighbourY = neighbourY + offset.y;
-          if (fixed.has(nextNeighbourX) &&
-              fixed.get(nextNeighbourX)!.has(nextNeighbourY)) {
-            continue;
-          }
-          const neighbourTerrace = this.terraceAt(neighbourX, neighbourY);
-          const nextNeighbourTerrace = this.terraceAt(nextNeighbourX, nextNeighbourY);
-          if (
-            neighbourTerrace == centreTerrace + 1 &&
-            neighbourTerrace == nextNeighbourTerrace
-          ) {
-            this.shapeGrid[neighbourY][neighbourX] = ramps[i];
-            if (fixed.has(neighbourX)) {
-              fixed.get(neighbourX)!.add(neighbourY);
-            } else {
-              fixed.set(neighbourX, new Set<number>([neighbourY]));
-            }
-            if (fixed.has(nextNeighbourX)) {
-              fixed.get(nextNeighbourX)!.add(nextNeighbourY);
-            } else {
-              fixed.set(nextNeighbourX, new Set<number>([nextNeighbourY]));
-            }
-            totalRamps++;
-          }
-        }
-      }
-    }
-  }
 
   inbounds(x: number, y: number): boolean {
     return x >= 0 && x < this.width &&
@@ -667,4 +595,93 @@ export class TerrainBuilder {
       }
     }
   }
+}
+
+export function setRamps(heightGrid: Array<Array<number>>,
+                         terraceGrid: Array<Array<number>>,
+                         shapeGrid: Array<Array<TerrainShape>>,
+                         terraceSpacing: number,
+                         rampTolerance: number): number {
+  const coordOffsets: Array<Point2D> = [
+    new Point2D(0, 1),
+    new Point2D(-1, 0),
+    new Point2D(0, -1),
+    new Point2D(1, 0),
+  ];
+
+  const ramps: Array<TerrainShape> = [
+    TerrainShape.RampUpSouth,
+    TerrainShape.RampUpWest,
+    TerrainShape.RampUpNorth,
+    TerrainShape.RampUpEast,
+  ];
+  const depth = heightGrid.length;
+  const width = heightGrid[0].length;
+
+  const isRampHeight = function(centreHeight: number, centreTerrace: number,
+                                terraceSpacing: number) {
+    const roundUpHeight = centreHeight + terraceSpacing / 2;
+    const lower = roundUpHeight - rampTolerance;
+    const upper = roundUpHeight + rampTolerance;
+    const middle = (centreTerrace + 1) * terraceSpacing;
+    return middle >= lower && middle <= upper;
+  };
+
+  // Find locations that have heights that sit exactly between two terraces
+  // and then find their adjacent locations that are higher terraces. Set
+  // those locations to be ramps.
+  let totalRamps = 0;
+  let fixed = new Map<number, Set<number>>();
+  for (let y = depth - 3; y > 1; y--) {
+    for (let x = 2; x < width - 2; x++) {
+      const centreShape: TerrainShape = shapeGrid[y][x];
+      if (!Terrain.isFlat(centreShape)) {
+        continue;
+      }
+
+      const centreHeight = heightGrid[y][x];
+      const centreTerrace = terraceGrid[y][x];
+
+      if (!isRampHeight(centreHeight, centreTerrace, terraceSpacing)) {
+        continue;
+      }
+
+      for (const i in coordOffsets) {
+        const offset: Point2D = coordOffsets[i];
+        const neighbourX = x + offset.x;
+        const neighbourY = y + offset.y;
+
+        if (fixed.has(neighbourX) &&
+            fixed.get(neighbourX)!.has(neighbourY)) {
+          continue;
+        }
+        const nextNeighbourX = neighbourX + offset.x;
+        const nextNeighbourY = neighbourY + offset.y;
+        if (fixed.has(nextNeighbourX) &&
+            fixed.get(nextNeighbourX)!.has(nextNeighbourY)) {
+          continue;
+        }
+        const neighbourTerrace = terraceGrid[neighbourY][neighbourX];
+        const nextNeighbourTerrace = terraceGrid[nextNeighbourY][nextNeighbourX];
+        if (
+          neighbourTerrace == centreTerrace + 1 &&
+          neighbourTerrace == nextNeighbourTerrace
+        ) {
+          shapeGrid[neighbourY][neighbourX] = ramps[i];
+          if (fixed.has(neighbourX)) {
+            fixed.get(neighbourX)!.add(neighbourY);
+          } else {
+            fixed.set(neighbourX, new Set<number>([neighbourY]));
+          }
+          if (fixed.has(nextNeighbourX)) {
+            fixed.get(nextNeighbourX)!.add(nextNeighbourY);
+          } else {
+            fixed.set(nextNeighbourX, new Set<number>([nextNeighbourY]));
+          }
+          totalRamps++;
+        }
+      }
+    }
+  }
+  return totalRamps;
 }
