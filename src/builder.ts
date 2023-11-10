@@ -98,6 +98,23 @@ export class TerrainBuilderConfig {
   }
 }
 
+function buildBiomes(generateMoisture: boolean,
+                     biomeConfig: BiomeConfig,
+                     terraceGrid: Array<Array<number>>): Array<Array<Biome>> {
+  if (generateMoisture) {
+    biomeConfig.moistureGrid = addRain(
+      biomeConfig.cellsX,
+      biomeConfig.cellsY,
+      biomeConfig.heightGrid,
+      terraceGrid,
+      biomeConfig.rainDirection,
+      biomeConfig.rainfall,
+      biomeConfig.waterLine
+    );
+  }
+  return generateBiomeGrid(biomeConfig);
+}
+
 export class TerrainBuilder {
   protected readonly _terraceSpacing: number;
 
@@ -247,17 +264,6 @@ export class TerrainBuilder {
     setRamps(this._heightGrid, this._terraceGrid, this._shapeGrid,
              this._terraceSpacing, 0);
 
-    if (this.config.rainfall > 0) {
-      this._moistureGrid = addRain(
-        this.width,
-        this.depth,
-        this._heightGrid,
-        this._terraceGrid,
-        this.config.rainDirection,
-        this.config.rainfall,
-        this.config.waterLine
-      );
-    }
     if (this.config.biomes || this.config.hasWater) {
       const biomeConfig = new BiomeConfig(
         this.config.waterLine,
@@ -267,9 +273,15 @@ export class TerrainBuilder {
         this.heightGrid,
         this.moistureGrid
       );
-      this._biomeGrid = generateBiomeGrid(biomeConfig, this.width, this.depth);
+      const generateMoisture = this.config.rainfall > 0;
+      if (generateMoisture) {
+        biomeConfig.rainfall = this.config.rainfall;
+        biomeConfig.rainDirection = this.config.rainDirection;
+      }
+      this._biomeGrid = buildBiomes(generateMoisture, biomeConfig, this.terraceGrid);
       this.setTerrainTypes(this.biomeGrid);
     }
+
     setEdges(this._terraceGrid, this._shapeGrid, this._typeGrid, this.config.floor,
              this.config.wall, !this.config.biomes);
     const descriptor = new TerrainGridDescriptorImpl(

@@ -1,3 +1,5 @@
+import { Direction } from "./navigation.ts"
+
 export enum Biome {
   Water,
   Desert,
@@ -47,31 +49,42 @@ export function getBiomeName(biome: Biome): string {
 }
 
 export class BiomeConfig {
+  private _rainfall = 0;
+  private _rainDirection = Direction.North;
+
   constructor(private readonly _waterLine: number,
               private readonly _wetLimit: number,
               private readonly _dryLimit: number,
               private readonly _uplandThreshold: number,
               private readonly _heightGrid: Array<Array<number>>,
-              private readonly _moistureGrid: Array<Array<number>>) { }
+              private _moistureGrid: Array<Array<number>>) { }
 
+  get cellsX(): number { return this._heightGrid[0].length; }
+  get cellsY(): number { return this._heightGrid.length; }
   get waterLine(): number { return this._waterLine; }
   get wetLimit(): number { return this._wetLimit; }
   get dryLimit(): number { return this._dryLimit; }
   get uplandThreshold(): number { return this._uplandThreshold; }
   get heightGrid(): Array<Array<number>> { return this._heightGrid; }
   get moistureGrid(): Array<Array<number>> { return this._moistureGrid; }
+  set moistureGrid(grid: Array<Array<number>>) {
+    this._moistureGrid = grid;
+  }
+  get rainfall(): number { return this._rainfall; }
+  set rainfall(r: number) { this._rainfall = r; }
+  get rainDirection(): Direction { return this._rainDirection; }
+  set rainDirection(d: Direction) { this._rainDirection = d; }
 
   moistureAt(x: number, y: number) { return this.moistureGrid[y][x]; }
   heightAt(x: number, y: number) { return this._heightGrid[y][x]; }
 }
 
-export function generateBiomeGrid(config: BiomeConfig,
-                                  cellsX: number, cellsY: number): Array<Array<Biome>> {
+export function generateBiomeGrid(config: BiomeConfig): Array<Array<Biome>> {
   const moistureRange = 6;
   let biomeGrid: Array<Array<Biome>> = new Array<Array<Biome>>();
-  for (let y = 0; y < cellsY; y++) {
+  for (let y = 0; y < config.cellsY; y++) {
     biomeGrid[y] = new Array<Biome>();
-    for (let x = 0; x < cellsX; x++) {
+    for (let x = 0; x < config.cellsX; x++) {
       let biome: Biome = Biome.Water;
       const moisture = config.moistureAt(x, y);
       const moisturePercent = Math.min(1, moisture / moistureRange);
