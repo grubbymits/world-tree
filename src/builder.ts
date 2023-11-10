@@ -10,54 +10,8 @@ import { Dimensions } from "./physics.ts";
 import { Direction, Navigation } from "./navigation.ts";
 import { Point2D } from "./geometry.ts";
 import { ContextImpl } from "./context.ts";
+import { Biome, BiomeConfig, generateBiomeGrid } from "./biomes.ts";
 
-export enum Biome {
-  Water,
-  Desert,
-  Grassland,
-  Shrubland,
-  MoistForest,
-  WetForest,
-  RainForest,
-  Rock,
-  Tundra,
-  AlpineGrassland,
-  AlpineMeadow,
-  AlpineForest,
-  Taiga,
-}
-
-export function getBiomeName(biome: Biome): string {
-  switch (biome) {
-    default:
-      console.error("unhandled biome type:", biome);
-      return "invalid biome";
-    case Biome.Water:
-      return "water";
-    case Biome.Desert:
-      return "desert";
-    case Biome.Grassland:
-      return "grassland";
-    case Biome.Shrubland:
-      return "shrubland";
-    case Biome.MoistForest:
-      return "moist forest";
-    case Biome.WetForest:
-      return "wet forest";
-    case Biome.RainForest:
-      return "rain forest";
-    case Biome.Tundra:
-      return "tundra";
-    case Biome.AlpineGrassland:
-      return "alpine grassland";
-    case Biome.AlpineMeadow:
-      return "alpine meadow";
-    case Biome.AlpineForest:
-      return "alpine forest";
-    case Biome.Taiga:
-      return "taiga";
-  }
-}
 
 export class TerrainBuilderConfig {
   private _waterLine = 0;
@@ -147,11 +101,11 @@ export class TerrainBuilderConfig {
 export class TerrainBuilder {
   protected readonly _terraceSpacing: number;
 
+  private _biomeGrid = new Array<Array<Biome>>();
   private _terraceGrid: Array<Array<number>> =
     new Array<Array<number>>();
   private _moistureGrid: Array<Array<number>> =
     new Array<Array<number>>();
-  private _biomeGrid: Array<Array<Biome>> = new Array<Array<Biome>>();
   private _typeGrid: Array<Array<TerrainType>> =
     new Array<Array<TerrainType>>();
   private _shapeGrid: Array<Array<TerrainShape>> =
@@ -223,6 +177,9 @@ export class TerrainBuilder {
   }
   get heightGrid(): Array<Array<number>> {
     return this._heightGrid;
+  }
+  get moistureGrid(): Array<Array<number>> {
+    return this._moistureGrid;
   }
   get terraceGrid(): Array<Array<number>> {
     return this._terraceGrid;
@@ -302,7 +259,16 @@ export class TerrainBuilder {
       );
     }
     if (this.config.biomes || this.config.hasWater) {
-      this.setBiomes();
+      const biomeConfig = new BiomeConfig(
+        this.config.waterLine,
+        this.config.wetLimit,
+        this.config.dryLimit,
+        this.config.uplandThreshold,
+        this.heightGrid,
+        this.moistureGrid
+      );
+      this._biomeGrid = generateBiomeGrid(biomeConfig, this.width, this.depth);
+      this.setTerrainTypes(this.biomeGrid);
     }
     this.setEdges();
     const descriptor = new TerrainGridDescriptorImpl(
@@ -641,82 +607,51 @@ export class TerrainBuilder {
     }
   }
 
-  setBiomes(): void {
-    const moistureRange = 6;
+  setTerrainTypes(biomeGrid: Array<Array<Biome>>): void {
     for (let y = 0; y < this.depth; y++) {
-      this._biomeGrid[y] = new Array<Biome>();
       for (let x = 0; x < this.width; x++) {
-        let biome: Biome = Biome.Water;
-        let terrain: TerrainType = TerrainType.Water;
-        const moisture = this.moistureAt(x, y);
-        const moisturePercent = Math.min(1, moisture / moistureRange);
-        // Split into six biomes based on moisture.
-        const moistureScaled = Math.floor(5 * moisturePercent);
-        const surfaceHeight = this.heightAt(x, y);
-
-        if (surfaceHeight <= this.config.waterLine) {
-          biome = Biome.Water;
-          terrain = TerrainType.Water;
-        } else if (surfaceHeight >= this.config.uplandThreshold) {
-          switch (moistureScaled) {
-            default:
-              console.error("unhandled moisture scale");
-              break;
-            case 0:
-              biome = Biome.Rock;
-              terrain = TerrainType.Upland0;
-              break;
-            case 1:
-              biome = Biome.Tundra;
-              terrain = TerrainType.Upland1;
-              break;
-            case 2:
-              biome = Biome.AlpineGrassland;
-              terrain = TerrainType.Upland2;
-              break;
-            case 3:
-              biome = Biome.AlpineMeadow;
-              terrain = TerrainType.Upland3;
-              break;
-            case 4:
-              biome = Biome.AlpineForest;
-              terrain = TerrainType.Upland4;
-              break;
-            case 5:
-              biome = Biome.Taiga;
-              terrain = TerrainType.Upland5;
-              break;
-          }
-        } else {
-          switch (moistureScaled) {
-            default:
-              console.error("unhandled moisture scale");
-              break;
-            case 0:
-              biome = Biome.Desert;
-              terrain = TerrainType.Lowland0;
-              break;
-            case 1:
-              biome = Biome.Grassland;
-              terrain = TerrainType.Lowland1;
-              break;
-            case 2:
-              biome = Biome.Shrubland;
-              terrain = TerrainType.Lowland2;
-              break;
-            case 3:
-              biome = Biome.MoistForest;
-              terrain = TerrainType.Lowland3;
-              break;
-            case 4:
-              biome = Biome.WetForest;
-              terrain = TerrainType.Lowland4;
-              break;
-            case 5:
-              biome = Biome.RainForest;
-              terrain = TerrainType.Lowland5;
-              break;
-          }
+        const biome = biomeGrid[y][x];
+        let terrain = TerrainType.Water;
+        switch (biome) {
+          default:
+            console.error("unhandled moisture scale");
+            break;
+          case Biome.Rock:
+            terrain = TerrainType.Upland0;
+            break;
+          case Biome.Tundra:
+            terrain = TerrainType.Upland1;
+            break;
+          case Biome.AlpineGrassland:
+            terrain = TerrainType.Upland2;
+            break;
+          case Biome.AlpineMeadow:
+            terrain = TerrainType.Upland3;
+            break;
+          case Biome.AlpineForest:
+            terrain = TerrainType.Upland4;
+            break;
+          case Biome.Taiga:
+            terrain = TerrainType.Upland5;
+            break;
+          case Biome.Desert:
+            terrain = TerrainType.Lowland0;
+            break;
+          case Biome.Grassland:
+            terrain = TerrainType.Lowland1;
+            break;
+          case Biome.Shrubland:
+            terrain = TerrainType.Lowland2;
+            break;
+          case Biome.MoistForest:
+            terrain = TerrainType.Lowland3;
+            break;
+          case Biome.WetForest:
+            terrain = TerrainType.Lowland4;
+            break;
+          case Biome.RainForest:
+            terrain = TerrainType.Lowland5;
+            break;
         }
         // Only change the type if it's supported, otherwise we'll just
         // fallback to the default which is set in the constructor.
@@ -729,7 +664,6 @@ export class TerrainBuilder {
             Terrain.getTypeName(terrain)
           );
         }
-        this.biomeGrid[y][x] = biome;
       }
     }
   }
