@@ -148,6 +148,22 @@ export function normaliseHeightGrid(heightGrid: Array<Array<number>>,
   return terraceSpacing;
 }
 
+export function setTerraces(heightGrid: Array<Array<number>>,
+                            terraceSpacing: number): Array<Array<number>> {
+  const cellsY = heightGrid.length;
+  const cellsX = heightGrid[0].length;
+  const terraceGrid = new Array<Array<number>>();
+  for (let y = 0; y < cellsY; y++) {
+    terraceGrid[y] = new Array<number>();
+    for (let x = 0; x < cellsX; x++) {
+      const surfaceHeight = heightGrid[y][x];
+      terraceGrid[y][x] =
+        Math.floor(surfaceHeight / terraceSpacing);
+    }
+  }
+  return terraceGrid;
+}
+
 export class TerrainBuilder {
   protected readonly _terraceSpacing: number;
 
@@ -171,17 +187,13 @@ export class TerrainBuilder {
 
     this._terraceSpacing =
       normaliseHeightGrid(this.heightGrid, this.config.numTerraces);
+    this._terraceGrid = setTerraces(this.heightGrid, this.terraceSpacing);
 
-    // Calculate the terraces.
     for (let y = 0; y < this.depth; y++) {
-      this._terraceGrid[y] = new Array<number>();
       this._moistureGrid[y] = new Array<number>();
       this._shapeGrid[y] = new Array<TerrainShape>();
       this._typeGrid[y] = new Array<TerrainType>();
       for (let x = 0; x < this.width; x++) {
-        const surfaceHeight = this.heightAt(x, y);
-        this.terraceGrid[y][x] =
-          Math.floor(surfaceHeight / this._terraceSpacing);
         this.shapeGrid[y][x] = TerrainShape.Flat;
         this.typeGrid[y][x] = this.config.floor;
       }

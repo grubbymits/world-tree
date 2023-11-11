@@ -57,6 +57,8 @@ test("terrace spacing with non-positive heights", () => {
 });
 
 test("terrace spacing with positive and negative heights", () => {
+  const cellsX = 5;
+  const cellsY = 5;
   const numTerraces = 3;
   const heightMap = [
     [-1.5, -1, -1, -1, -1],
@@ -66,23 +68,21 @@ test("terrace spacing with positive and negative heights", () => {
     [0, 1, 2, 1, 0],
     [0, 0, 0, 0, 0],
   ];
-  expect(WT.normaliseHeightGrid(heightMap, numTerraces)).toBe(1.5);
+  const terraceSpacing = WT.normaliseHeightGrid(heightMap, numTerraces);
+  expect(terraceSpacing).toBe(1.5);
+  const terraceGrid = WT.setTerraces(heightMap, terraceSpacing);
+  for (let y = 0; y < cellsY; ++y) {
+    for (let x = 0; x < cellsX; ++x) {
+      expect(terraceGrid[y][x]).toBe(Math.floor(heightMap[y][x] / terraceSpacing));
+    }
+  }
 });
 
-test("ramps", () => {
-  const dims = new WT.Dimensions(5, 5, 5);
-  const width = 11;
-  const depth = 11;
+test("zero tolerance ramps", () => {
+  const tolerance = 0;
+  const cellsX = 11;
+  const cellsY = 11;
   const numTerraces = 3;
-  const worldDims = new WT.Dimensions(
-    dims.width * width,
-    dims.depth * depth,
-    dims.height * (numTerraces + 1)
-  );
-  let context = WT.createTestContext(
-    worldDims,
-    WT.Perspective.TwoByOneIsometric
-  );
   const heightMap = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
@@ -96,22 +96,21 @@ test("ramps", () => {
     [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   ];
-  for (let type of types) {
-    for (let shape of shapes) {
-      addDummyGraphic(dummySheet, type, shape);
+
+  const terraceSpacing = WT.normaliseHeightGrid(heightMap, numTerraces);
+  const terraceGrid = WT.setTerraces(heightMap, terraceSpacing);
+  const shapeGrid = new Array();
+  for (let y = 0; y < cellsY; ++y) {
+    shapeGrid[y] = new Array();
+    for (let x = 0; x < cellsX; ++x) {
+      shapeGrid[y][x] = WT.TerrainShape.Flat;
     }
   }
-  let config = new WT.TerrainBuilderConfig(
-    numTerraces,
-    WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
-  );
-  config.hasRamps = true;
-  let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
-  builder.generateMap(context);
 
-  for (let y = 0; y < depth; ++y) {
-    for (let x = 0; x < width; ++x) {
+  const numRamps = WT.setRamps(heightMap, terraceGrid, shapeGrid, terraceSpacing, tolerance);
+
+  for (let y = 0; y < cellsY; ++y) {
+    for (let x = 0; x < cellsX; ++x) {
       let shape = WT.TerrainShape.Flat;
       let geometry = "CuboidGeometry";
 
@@ -146,10 +145,49 @@ test("ramps", () => {
         shape = WT.TerrainShape.RampUpSouth;
         geometry = "RampUpSouthGeometry";
       }
-      expect(builder.terrainShapeAt(x, y)).toBe(shape);
+      expect(shapeGrid[y][x]).toBe(shape);
       //expect(builder.terrainGeometryName(x, y), geometry);
     }
   }
+});
+
+test("0.5 tolerance ramps", () => {
+  const tolerance = 0;
+  const cellsX = 5;
+  const cellsY = 7;
+  const numTerraces = 2;
+  const heightMap = [
+    [3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3],
+    [3, 2, 2, 2, 3],
+    [3, 2, 2, 2, 3],
+    [3, 1, 1, 1, 3],
+    [3, 1, 1, 1, 3],
+    [3, 1, 1, 1, 3],
+  ];
+
+  const terraceSpacing = WT.normaliseHeightGrid(heightMap, numTerraces);
+  expect(terraceSpacing).toBe(1.5);
+  const terraceGrid = WT.setTerraces(heightMap, terraceSpacing);
+  const shapeGrid = new Array();
+  for (let y = 0; y < cellsY; ++y) {
+    shapeGrid[y] = new Array();
+    for (let x = 0; x < cellsX; ++x) {
+      shapeGrid[y][x] = WT.TerrainShape.Flat;
+    }
+  }
+
+  const numRamps = WT.setRamps(heightMap, terraceGrid, shapeGrid, terraceSpacing, 0.5);
+  const expected = [
+    [ 0, 0, 0, 0, 0 ],
+    [ 0, 0, WT.Terrain.RampUpNorth, 0, 0 ],
+    [ 0, 0, 0, 0, 0 ],
+    [ 0, 0, WT.Terrain.RampUpNorth, 0, 0 ],
+    [ 0, 0, 0, 0, 0 ],
+    [ 0, 0, 0, 0, 0 ],
+    [ 0, 0, 0, 0, 0 ]
+  ];
+  expect(numRamps).toBe(3);
 });
 
 test("walls", () => {
