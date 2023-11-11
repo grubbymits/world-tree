@@ -117,6 +117,37 @@ function buildBiomes(generateMoisture: boolean,
   return generateBiomeGrid(biomeConfig);
 }
 
+export function normaliseHeightGrid(heightGrid: Array<Array<number>>,
+                                    numTerraces: number): number {
+  // Normalise heights, minimum = 0;
+  let minHeight = 0;
+  let maxHeight = 0;
+  for (let y = 0; y < heightGrid.length; y++) {
+    const row: Array<number> = heightGrid[y];
+    const max = row.reduce(function (a, b) {
+      return Math.max(a, b);
+    });
+    const min = row.reduce(function (a, b) {
+      return Math.min(a, b);
+    });
+    minHeight = Math.min(minHeight, min);
+    maxHeight = Math.max(maxHeight, max);
+  }
+  if (minHeight < 0) {
+    minHeight = Math.abs(minHeight);
+    const cellsY = heightGrid.length;
+    const cellsX = heightGrid[0].length;
+    for (let y = 0; y < cellsY; y++) {
+      for (let x = 0; x < cellsX; x++) {
+        heightGrid[y][x] += minHeight;
+      }
+    }
+    maxHeight += minHeight;
+  }
+  const terraceSpacing = maxHeight / numTerraces;
+  return terraceSpacing;
+}
+
 export class TerrainBuilder {
   protected readonly _terraceSpacing: number;
 
@@ -138,30 +169,8 @@ export class TerrainBuilder {
     private readonly _tileDimensions: Dimensions
   ) {
 
-    // Normalise heights, minimum = 0;
-    let minHeight = 0;
-    let maxHeight = 0;
-    for (let y = 0; y < this.depth; y++) {
-      const row: Array<number> = this.heightGrid[y];
-      const max = row.reduce(function (a, b) {
-        return Math.max(a, b);
-      });
-      const min = row.reduce(function (a, b) {
-        return Math.min(a, b);
-      });
-      minHeight = Math.min(minHeight, min);
-      maxHeight = Math.max(maxHeight, max);
-    }
-    if (minHeight < 0) {
-      minHeight = Math.abs(minHeight);
-      for (let y = 0; y < this.depth; y++) {
-        for (let x = 0; x < this.width; x++) {
-          this.heightGrid[y][x] += minHeight;
-        }
-      }
-      maxHeight += minHeight;
-    }
-    this._terraceSpacing = maxHeight / this.config.numTerraces;
+    this._terraceSpacing =
+      normaliseHeightGrid(this.heightGrid, this.config.numTerraces);
 
     // Calculate the terraces.
     for (let y = 0; y < this.depth; y++) {

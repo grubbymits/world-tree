@@ -31,9 +31,6 @@ const shapes = [
 ];
 
 test("terrace spacing with non-negative heights", () => {
-  const dims = new WT.Dimensions(5, 5, 5);
-  const width = 5;
-  const depth = 5;
   const numTerraces = 3;
   const heightMap = [
     [0, 0, 0, 0, 0],
@@ -43,22 +40,10 @@ test("terrace spacing with non-negative heights", () => {
     [0, 1, 2, 1, 0],
     [0, 0, 0, 0, 0],
   ];
-  for (let type of types) {
-    addDummyGraphic(dummySheet, type, WT.TerrainShape.Wall);
-  }
-  const config = new WT.TerrainBuilderConfig(
-    numTerraces,
-    WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
-  );
-  let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
-  expect(builder.terraceSpacing).toBe(1);
+  expect(WT.normaliseHeightGrid(heightMap, numTerraces)).toBe(1);
 });
 
 test("terrace spacing with non-positive heights", () => {
-  const dims = new WT.Dimensions(5, 5, 5);
-  const width = 5;
-  const depth = 6;
   const numTerraces = 3;
   const heightMap = [
     [0, 0, 0, 0, 0],
@@ -68,22 +53,10 @@ test("terrace spacing with non-positive heights", () => {
     [0, -1, -2, -1, 0],
     [0, 0, 0, 0, 0],
   ];
-  for (let type of types) {
-    addDummyGraphic(dummySheet, type, WT.TerrainShape.Wall);
-  }
-  const config = new WT.TerrainBuilderConfig(
-    numTerraces,
-    WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
-  );
-  let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
-  expect(builder.terraceSpacing).toBe(1);
+  expect(WT.normaliseHeightGrid(heightMap, numTerraces)).toBe(1);
 });
 
 test("terrace spacing with positive and negative heights", () => {
-  const dims = new WT.Dimensions(5, 5, 5);
-  const width = 5;
-  const depth = 6;
   const numTerraces = 3;
   const heightMap = [
     [-1.5, -1, -1, -1, -1],
@@ -93,16 +66,7 @@ test("terrace spacing with positive and negative heights", () => {
     [0, 1, 2, 1, 0],
     [0, 0, 0, 0, 0],
   ];
-  for (let type of types) {
-    addDummyGraphic(dummySheet, type, WT.TerrainShape.Wall);
-  }
-  const config = new WT.TerrainBuilderConfig(
-    numTerraces,
-    WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
-  );
-  let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
-  expect(builder.terraceSpacing).toBe(1.5);
+  expect(WT.normaliseHeightGrid(heightMap, numTerraces)).toBe(1.5);
 });
 
 test("ramps", () => {
