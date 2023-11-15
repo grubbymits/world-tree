@@ -1,45 +1,5 @@
 import * as WT from "../../../dist/world-tree.mjs";
-const spriteWidth = 161;
-const spriteHeight = 125;
-const tileRows = [
-  WT.TerrainType.Lowland0,
-];
-const tileColumns = [
-  WT.TerrainShape.Flat,
-  WT.TerrainShape.FlatWest,
-  WT.TerrainShape.FlatNorth,
-  WT.TerrainShape.FlatEast,
-  WT.TerrainShape.FlatSouth,
-  WT.TerrainShape.FlatNorthWest,
-  WT.TerrainShape.FlatNorthEast,
-  WT.TerrainShape.FlatSouthEast,
-  WT.TerrainShape.FlatSouthWest,
-  WT.TerrainShape.FlatWestOut,
-  WT.TerrainShape.FlatNorthOut,
-  WT.TerrainShape.FlatEastOut,
-  WT.TerrainShape.FlatSouthOut,
-  WT.TerrainShape.FlatAloneOut,
-  WT.TerrainShape.FlatNorthSouth,
-  WT.TerrainShape.FlatEastWest,
-  WT.TerrainShape.RampUpSouth,
-  WT.TerrainShape.RampUpWest,
-  WT.TerrainShape.RampUpEast,
-  WT.TerrainShape.RampUpNorth,
-];
 
-function addGraphic(column, row, sheet) {
-  const shape = tileColumns[column];
-  const type = tileRows[row];
-  WT.Terrain.addGraphic(
-    /*terrainType*/ type,
-    /*terrainShape*/ shape,
-    /*spriteSheet*/ sheet,
-    /*coord.x*/ spriteWidth * column,
-    /*coord.y*/ spriteHeight * row,
-    /*width*/ spriteWidth,
-    /*height*/ spriteHeight,
-  );
-}
 
 const cellsX = 11;
 const cellsY = 11;
@@ -59,6 +19,8 @@ let heightMap = [
 ];
 
 window.onload = (event) => {
+  const spriteWidth = 161;
+  const spriteHeight = 125;
   const physicalDims = WT.TwoByOneIsometric.getDimensions(
     spriteWidth,
     spriteHeight,
@@ -78,17 +40,48 @@ window.onload = (event) => {
     "graphics/png/outside-tiles-muted-161x125",
     context
   );
+  const terrainSpriteDescriptor = {
+    spriteWidth: spriteWidth,
+    spriteHeight: spriteHeight,
+    spriteSheet: sheet,
+    tileRows: [
+      WT.TerrainType.Lowland0,
+    ],
+    tileColumns: [
+      WT.TerrainShape.Flat,
+      WT.TerrainShape.FlatWest,
+      WT.TerrainShape.FlatNorth,
+      WT.TerrainShape.FlatEast,
+      WT.TerrainShape.FlatSouth,
+      WT.TerrainShape.FlatNorthWest,
+      WT.TerrainShape.FlatNorthEast,
+      WT.TerrainShape.FlatSouthEast,
+      WT.TerrainShape.FlatSouthWest,
+      WT.TerrainShape.FlatWestOut,
+      WT.TerrainShape.FlatNorthOut,
+      WT.TerrainShape.FlatEastOut,
+      WT.TerrainShape.FlatSouthOut,
+      WT.TerrainShape.FlatAloneOut,
+      WT.TerrainShape.FlatNorthSouth,
+      WT.TerrainShape.FlatEastWest,
+      WT.TerrainShape.RampUpSouth,
+      WT.TerrainShape.RampUpWest,
+      WT.TerrainShape.RampUpEast,
+      WT.TerrainShape.RampUpNorth,
+    ],
+  };
+  WT.generateTerrainSprites(terrainSpriteDescriptor);
 
-  for (let row in tileRows) {
-    if (tileRows[row] == WT.TerrainType.Water) {
-      // Only supporting flat water and sand tiles.
-      addGraphic(tileColumns[0], row, sheet);
-      continue;
-    }
-    for (let column in tileColumns) {
-      addGraphic(column, row, sheet);
-    }
-  }
+  //for (let row in tileRows) {
+  //  if (tileRows[row] == WT.TerrainType.Water) {
+  //    // Only supporting flat water and sand tiles.
+  //    addGraphic(tileColumns[0], row, sheet);
+  //    continue;
+  //  }
+  //  for (let column in tileColumns) {
+  //    addGraphic(column, row, sheet);
+  //  }
+  //}
 
   const config = new WT.TerrainBuilderConfig(
     numTerraces,

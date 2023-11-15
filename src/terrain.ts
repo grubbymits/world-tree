@@ -71,6 +71,29 @@ export interface TerrainSpriteDescriptor {
   tileColumns: Array<TerrainShape>;
 };
 
+export function generateTerrainSprites(desc: TerrainSpriteDescriptor): void {
+  const width = desc.spriteWidth;
+  const height = desc.spriteHeight;
+  const columns = desc.tileColumns.length;
+  const rows = desc.tileColumns.length;
+  for (let column = 0; column < columns; ++column) {
+    const columnOffset = width * column;
+    const terrainShape = desc.tileColumns[column];
+    for (let row = 0; row < rows; ++row) {
+      const terrainType = desc.tileRows[row];
+      Terrain.addGraphic(
+        terrainType,
+        terrainShape,
+        desc.spriteSheet,
+        columnOffset,
+        height * row,
+        width,
+        height
+      );
+    }
+  }
+}
+
 export class Terrain extends PhysicalEntity {
   private static _terrainGraphics = new Map<
     TerrainType,

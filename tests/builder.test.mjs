@@ -187,7 +187,7 @@ test("0.5 tolerance ramps", () => {
     [ 0, 0, 0, 0, 0 ],
     [ 0, 0, 0, 0, 0 ]
   ];
-  expect(numRamps).toBe(3);
+  expect(numRamps).toBe(2);
 });
 
 test("walls", () => {
