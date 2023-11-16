@@ -221,7 +221,7 @@ test("walls", () => {
     WT.TerrainType.Lowland0,
     WT.TerrainType.Lowland0
   );
-  let builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
+  let builder = new WT.TerrainBuilder(heightMap, config, dims);
   builder.generateMap(context);
   for (let y = 0; y < depth; ++y) {
     for (let x = 0; x < width; ++x) {

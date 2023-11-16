@@ -158,7 +158,9 @@ export function setTerraces(heightGrid: Array<Array<number>>,
 }
 
 export class TerrainBuilder {
-  protected readonly _terraceSpacing: number;
+  private readonly _terraceSpacing: number;
+  private readonly _depth: number;
+  private readonly _width: number;
 
   private _biomeGrid = new Array<Array<Biome>>();
   private _terraceGrid: Array<Array<number>> =
@@ -171,13 +173,12 @@ export class TerrainBuilder {
     new Array<Array<TerrainShape>>();
 
   constructor(
-    private readonly _width: number,
-    private readonly _depth: number,
     private _heightGrid: Array<Array<number>>,
     private readonly _config: TerrainBuilderConfig,
     private readonly _tileDimensions: Dimensions
   ) {
-
+    this._depth = this.heightGrid.length;
+    this._width = this.heightGrid[0].length;
     this._terraceSpacing =
       normaliseHeightGrid(this.heightGrid, this.config.numTerraces);
     this._terraceGrid = setTerraces(this.heightGrid, this.terraceSpacing);

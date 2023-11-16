@@ -79,8 +79,6 @@ window.onload = (event) => {
 
   // Use the height map to construct a terrain.
   let builder = new WT.TerrainBuilder(
-    cellsX,
-    cellsY,
     heightMap,
     config,
     physicalDims,

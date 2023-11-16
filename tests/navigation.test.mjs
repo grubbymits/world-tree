@@ -39,7 +39,7 @@ test("3x3 neighbours", () => {
     WT.TerrainType.Lowland0,
     WT.TerrainType.Lowland0
   );
-  const builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
+  const builder = new WT.TerrainBuilder(heightMap, config, dims);
   const grid = builder.generateMap(context);
 
   // at x, y
@@ -79,7 +79,7 @@ test("eight neighbours", () => {
     WT.TerrainType.Lowland0,
     WT.TerrainType.Lowland0
   );
-  const builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
+  const builder = new WT.TerrainBuilder(heightMap, config, dims);
   const grid = builder.generateMap(context);
   const surface = grid.surfaceTerrain;
   const centre = surface[1][1];
@@ -115,7 +115,7 @@ test("move north from centre", () => {
     WT.TerrainType.Lowland0,
     WT.TerrainType.Lowland0
   );
-  const builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
+  const builder = new WT.TerrainBuilder(heightMap, config, dims);
   const grid = builder.generateMap(context);
   const surface = grid.surfaceTerrain;
   const start = surface[1][1];
@@ -152,7 +152,7 @@ test("path north from points", () => {
     WT.TerrainType.Lowland0,
     WT.TerrainType.Lowland0
   );
-  const builder = new WT.TerrainBuilder(width, depth, heightMap, config, dims);
+  const builder = new WT.TerrainBuilder(heightMap, config, dims);
   const grid = builder.generateMap(context);
   const pathFinder = new WT.PathFinder(grid);
   // centre.
