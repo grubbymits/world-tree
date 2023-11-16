@@ -21,7 +21,6 @@ export class TerrainBuilderConfig {
   private _dryLimit = 0;
   private _uplandThreshold = 0;
   private _hasWater = false;
-  private _hasRamps = false;
   private _hasBiomes = false;
   private _rainfall = 0;
   private _rainDirection: Direction = Direction.North;
@@ -76,9 +75,6 @@ export class TerrainBuilderConfig {
   set hasWater(enable: boolean) {
     this._hasWater = enable;
   }
-  set hasRamps(enable: boolean) {
-    this._hasRamps = enable;
-  }
   set hasBiomes(enable: boolean) {
     this._hasBiomes = enable;
   }
@@ -91,9 +87,6 @@ export class TerrainBuilderConfig {
   }
   get wall(): TerrainType {
     return this._defaultWall;
-  }
-  get ramps(): boolean {
-    return this._hasRamps;
   }
   get biomes(): boolean {
     return this._hasBiomes;

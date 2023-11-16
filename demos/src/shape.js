@@ -1,6 +1,5 @@
 import * as WT from "../../../dist/world-tree.mjs";
 
-
 const cellsX = 11;
 const cellsY = 11;
 const numTerraces = 3;
@@ -72,29 +71,11 @@ window.onload = (event) => {
   };
   WT.generateTerrainSprites(terrainSpriteDescriptor);
 
-  //for (let row in tileRows) {
-  //  if (tileRows[row] == WT.TerrainType.Water) {
-  //    // Only supporting flat water and sand tiles.
-  //    addGraphic(tileColumns[0], row, sheet);
-  //    continue;
-  //  }
-  //  for (let column in tileColumns) {
-  //    addGraphic(column, row, sheet);
-  //  }
-  //}
-
   const config = new WT.TerrainBuilderConfig(
     numTerraces,
     WT.TerrainType.Lowland0,
     WT.TerrainType.Lowland0,
   );
-  config.hasWater = true;
-  config.waterLine = 0;
-  //config.hasBiomes = true;
-  config.hasRamps = true;
-  //config.rainfall = 30;
-  //config.rainDirection = WT.Direction.North;
-  //config.uplandThreshold = 4;
 
   // Use the height map to construct a terrain.
   let builder = new WT.TerrainBuilder(
