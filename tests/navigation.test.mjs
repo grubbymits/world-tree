@@ -34,12 +34,13 @@ test("3x3 neighbours", () => {
     WT.Perspective.TwoByOneIsometric
   );
   addDummyGraphic(dummySheet, WT.TerrainType.Lowland0, WT.TerrainShape.Flat);
-  const config = new WT.TerrainBuilderConfig(
+  const builder = new WT.TerrainBuilder(
+    heightMap,
     numTerraces,
     WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
+    WT.TerrainType.Lowland0,
+    dims
   );
-  const builder = new WT.TerrainBuilder(heightMap, config, dims);
   const grid = builder.generateMap(context);
 
   // at x, y
@@ -74,12 +75,13 @@ test("eight neighbours", () => {
     WT.Perspective.TwoByOneIsometric
   );
   addDummyGraphic(dummySheet, WT.TerrainType.Lowland0, WT.TerrainShape.Flat);
-  const config = new WT.TerrainBuilderConfig(
+  const builder = new WT.TerrainBuilder(
+    heightMap,
     numTerraces,
     WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
+    WT.TerrainType.Lowland0,
+    dims
   );
-  const builder = new WT.TerrainBuilder(heightMap, config, dims);
   const grid = builder.generateMap(context);
   const surface = grid.surfaceTerrain;
   const centre = surface[1][1];
@@ -110,12 +112,13 @@ test("move north from centre", () => {
     WT.Perspective.TwoByOneIsometric
   );
   addDummyGraphic(dummySheet, WT.TerrainType.Lowland0, WT.TerrainShape.Flat);
-  const config = new WT.TerrainBuilderConfig(
+  const builder = new WT.TerrainBuilder(
+    heightMap,
     numTerraces,
     WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
+    WT.TerrainType.Lowland0,
+    dims
   );
-  const builder = new WT.TerrainBuilder(heightMap, config, dims);
   const grid = builder.generateMap(context);
   const surface = grid.surfaceTerrain;
   const start = surface[1][1];
@@ -147,12 +150,13 @@ test("path north from points", () => {
     WT.Perspective.TwoByOneIsometric
   );
   addDummyGraphic(dummySheet, WT.TerrainType.Lowland0, WT.TerrainShape.Flat);
-  const config = new WT.TerrainBuilderConfig(
+  const builder = new WT.TerrainBuilder(
+    heightMap,
     numTerraces,
     WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
+    WT.TerrainType.Lowland0,
+    dims
   );
-  const builder = new WT.TerrainBuilder(heightMap, config, dims);
   const grid = builder.generateMap(context);
   const pathFinder = new WT.PathFinder(grid);
   // centre.

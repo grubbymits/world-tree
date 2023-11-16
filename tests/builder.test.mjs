@@ -216,12 +216,13 @@ test("walls", () => {
     addDummyGraphic(dummySheet, type, WT.TerrainShape.Wall);
     addDummyGraphic(dummySheet, type, WT.TerrainShape.Flat);
   }
-  const config = new WT.TerrainBuilderConfig(
+  let builder = new WT.TerrainBuilder(
+    heightMap,
     numTerraces,
     WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0
+    WT.TerrainType.Lowland0,
+    dims
   );
-  let builder = new WT.TerrainBuilder(heightMap, config, dims);
   builder.generateMap(context);
   for (let y = 0; y < depth; ++y) {
     for (let x = 0; x < width; ++x) {

@@ -71,16 +71,12 @@ window.onload = (event) => {
   };
   WT.generateTerrainSprites(terrainSpriteDescriptor);
 
-  const config = new WT.TerrainBuilderConfig(
-    numTerraces,
-    WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0,
-  );
-
   // Use the height map to construct a terrain.
   let builder = new WT.TerrainBuilder(
     heightMap,
-    config,
+    numTerraces,
+    WT.TerrainType.Lowland0,
+    WT.TerrainType.Lowland0,
     physicalDims,
   );
   builder.generateMap(context);

@@ -311,11 +311,12 @@ function gaussianBlur(
 }
 
 // Take a height map and return a moisture map.
-export function addRain(cellsX: number, cellsY: number,
-                        heightGrid: Array<Array<number>>,
+export function addRain(heightGrid: Array<Array<number>>,
                         terraceGrid: Array<Array<number>>,
                         towards: Direction, water: number, waterLine: number):
                         Array<Array<number>> {
+  const cellsX = heightGrid[0].length;
+  const cellsY = heightGrid.length;
   const rain = new Rain(cellsX, cellsY, heightGrid, terraceGrid, waterLine, water, towards);
   rain.run();
   return gaussianBlur(
