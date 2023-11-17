@@ -1,5 +1,45 @@
 import * as WT from "../dist/world-tree.mjs";
 
+test("rain", () => {
+  const heightGrid = [
+    [0, 0, 0, 0, 0 ],
+    [0, 0, 0, 0, 0 ],
+    [0, 1, 1, 1, 0 ],
+    [0, 1, 2, 1, 0 ],
+    [0, 1, 2, 1, 0 ],
+    [0, 1, 1, 1, 0 ],
+    [0, 0, 0, 0, 0 ],
+  ];
+  const terraceGrid = [
+    [0, 0, 0, 0, 0 ],
+    [0, 0, 0, 0, 0 ],
+    [0, 0, 0, 0, 0 ],
+    [0, 0, 1, 0, 0 ],
+    [0, 0, 1, 0, 0 ],
+    [0, 0, 0, 0, 0 ],
+    [0, 0, 0, 0, 0 ],
+  ];
+  const towards = WT.Direction.North;
+  const waterLine = 0;
+  const water = 10;
+  const moistureGrid = WT.addRain(
+    heightGrid,
+    terraceGrid,
+    towards,
+    water,
+    waterLine);
+  const expected = [
+    [ 1, 1, 0.81, 1, 1 ],
+    [ 0, 0, 0, 0, 0 ],
+    [ 0, 0, 0.05705606717275993, 0, 0 ],
+    [ 0, 0, 2.7829154042059856, 0, 0 ],
+    [ 0, 0, 3.091948624864835, 0, 0 ],
+    [ 0, 0, 0, 0, 0 ],
+    [ 0, 0, 0, 0, 0 ]
+  ];
+  expect(moistureGrid).toEqual(expected);
+});
+
 test("no moisture", () => {
   const waterLine = 0;
   const uplandThreshold = 2;
