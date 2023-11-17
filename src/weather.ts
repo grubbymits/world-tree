@@ -99,7 +99,7 @@ export class Rain {
     direction: Direction
   ) {
     for (let y = 0; y < this.cellsY; y++) {
-      this._moistureGrid.push(new Array<number>(this.cellsX));
+      this._moistureGrid.push(new Array<number>(this.cellsX).fill(0));
     }
 
     switch (direction) {

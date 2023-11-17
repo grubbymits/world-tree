@@ -10,7 +10,7 @@ import { Dimensions } from "./physics.ts";
 import { Direction, Navigation } from "./navigation.ts";
 import { Point2D } from "./geometry.ts";
 import { ContextImpl } from "./context.ts";
-import { Biome, BiomeConfig, generateBiomeGrid } from "./biomes.ts";
+import { Biome, BiomeConfig, generateBiomeGrid, getBiomeName } from "./biomes.ts";
 
 function buildBiomes(biomeConfig: BiomeConfig,
                      moistureGrid: Array<Array<number>>,
@@ -589,7 +589,9 @@ export function setTerrainTypes(biomeGrid: Array<Array<Biome>>,
       let terrain = TerrainType.Water;
       switch (biome) {
         default:
-          console.error("unhandled moisture scale");
+          console.error("unhandled biome:", getBiomeName(biome));
+          break;
+        case Biome.Water:
           break;
         case Biome.Rock:
           terrain = TerrainType.Upland0;

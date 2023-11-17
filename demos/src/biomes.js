@@ -1,40 +1,11 @@
-import * as WT from "../../dist/world-tree.mjs";
+import * as WT from "../../../dist/world-tree.mjs";
 const spriteWidth = 322;
 const spriteHeight = 270;
-const tileRows = [
-  WT.TerrainType.Lowland5,
-  WT.TerrainType.Lowland4,
-  WT.TerrainType.Lowland3,
-  WT.TerrainType.Lowland2,
-  WT.TerrainType.Lowland1,
-  WT.TerrainType.Lowland0,
-  WT.TerrainType.Upland5,
-  WT.TerrainType.Upland4,
-  WT.TerrainType.Upland3,
-  WT.TerrainType.Upland2,
-  WT.TerrainType.Upland1,
-  WT.TerrainType.Upland0,
-  WT.TerrainType.Water,
-];
-
-function addGraphic(sheet, column, row) {
-  const shape = WT.TerrainShape.Flat;
-  const type = tileRows[row];
-  WT.Terrain.addGraphic(
-    /*terrainType*/ type,
-    /*terrainShape*/ shape,
-    /*spriteSheet*/ sheet,
-    /*coord.x*/ spriteWidth * column,
-    /*coord.y*/ spriteHeight * row,
-    /*width*/ spriteWidth,
-    /*height*/ spriteHeight,
-  );
-}
 
 const cellsX = 11;
 const cellsY = 11;
 const numTerraces = 3;
-let heightMap = [
+const heightMap = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
   [0, 1, 2, 2, 2, 2, 1, 1, 1, 1, 0],
@@ -68,31 +39,49 @@ window.onload = (event) => {
   console.log("attempting to construct SpriteSheet");
   const sheet =
     new WT.SpriteSheet("graphics/png/outside-terrain-tiles-muted", context);
-  for (let row in tileRows) {
-    addGraphic(sheet, /*column*/ 0, row);
-  }
-
-  const config = new WT.TerrainBuilderConfig(
-    numTerraces,
-    WT.TerrainType.Lowland3,
-    WT.TerrainType.Lowland3,
-  );
-  config.hasWater = true;
-  config.waterLine = 0;
-  config.hasBiomes = true;
-  config.rainfall = 50;
-  config.rainDirection = WT.Direction.North;
-  config.uplandThreshold = 4;
+  const terrainSpriteDescriptor = {
+    spriteWidth: spriteWidth,
+    spriteHeight: spriteHeight,
+    spriteSheet: sheet,
+    tileRows: [
+      WT.TerrainType.Lowland5,
+      WT.TerrainType.Lowland4,
+      WT.TerrainType.Lowland3,
+      WT.TerrainType.Lowland2,
+      WT.TerrainType.Lowland1,
+      WT.TerrainType.Lowland0,
+      WT.TerrainType.Upland5,
+      WT.TerrainType.Upland4,
+      WT.TerrainType.Upland3,
+      WT.TerrainType.Upland2,
+      WT.TerrainType.Upland1,
+      WT.TerrainType.Upland0,
+      WT.TerrainType.Water,
+    ],
+    tileColumns: [
+      WT.TerrainShape.Flat,
+    ],
+  };
+  WT.generateTerrainSprites(terrainSpriteDescriptor);
 
   // Use the height map to construct a terrain.
   let builder = new WT.TerrainBuilder(
-    cellsX,
-    cellsY,
     heightMap,
-    config,
-    physicalDims,
+    numTerraces,
+    WT.TerrainType.Lowland3,
+    WT.TerrainType.Lowland3,
+    physicalDims
   );
+
+  const biomeConfig = {
+    waterLine: 0,
+    rainfall: 50,
+    rainDirection: WT.Direction.North,
+    uplandThreshold: 4,
+  };
+  builder.generateBiomes(biomeConfig);
   builder.generateMap(context);
+
   let camera = new WT.MouseCamera(
     context.scene,
     canvas,

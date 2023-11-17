@@ -100,10 +100,19 @@ export class Terrain extends PhysicalEntity {
     Map<TerrainShape, GraphicComponent>
   >();
 
+  private static _supported = new Map<
+    TerrainType,
+    Set<TerrainShape>
+  >();
+
   static reset(): void {
     this._terrainGraphics = new Map<
       TerrainType,
       Map<TerrainShape, GraphicComponent>
+    >();
+    this._supported = new Map<
+      TerrainType,
+      Set<TerrainShape>
     >();
   }
 
@@ -142,8 +151,10 @@ export class Terrain extends PhysicalEntity {
         terrainType,
         new Map<TerrainShape, GraphicComponent>()
       );
+      this._supported.set(terrainType, new Set<TerrainShape>());
     }
     this._terrainGraphics.get(terrainType)!.set(terrainShape, component);
+    this._supported.get(terrainType)!.add(terrainShape);
   }
 
   static generateSprites(descriptor: TerrainSpriteDescriptor): void {
@@ -158,12 +169,12 @@ export class Terrain extends PhysicalEntity {
   }
 
   static isSupportedType(type: TerrainType): boolean {
-    return this._terrainGraphics.has(type);
+    return this._supported.has(type);
   }
 
   static isSupportedShape(type: TerrainType, shape: TerrainShape): boolean {
     return (
-      this.isSupportedType(type) && this._terrainGraphics.get(type)!.has(shape)
+      this.isSupportedType(type) && this._supported.get(type)!.has(shape)
     );
   }
 

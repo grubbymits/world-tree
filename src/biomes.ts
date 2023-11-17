@@ -50,15 +50,11 @@ export function getBiomeName(biome: Biome): string {
 
 export class BiomeConfig {
   constructor(private readonly _waterLine: number,
-              private readonly _wetLimit: number,
-              private readonly _dryLimit: number,
               private readonly _uplandThreshold: number,
               private readonly _rainfall: number,
               private readonly _rainDirection: Direction) { }
 
   get waterLine(): number { return this._waterLine; }
-  get wetLimit(): number { return this._wetLimit; }
-  get dryLimit(): number { return this._dryLimit; }
   get uplandThreshold(): number { return this._uplandThreshold; }
   get rainfall(): number { return this._rainfall; }
   get rainDirection(): Direction { return this._rainDirection; }
@@ -86,7 +82,7 @@ export function generateBiomeGrid(config: BiomeConfig,
       } else if (surfaceHeight >= config.uplandThreshold) {
         switch (moistureScaled) {
           default:
-            console.error("unhandled moisture scale");
+            console.error("unhandled moisture scale:", moistureScaled);
             break;
           case 0:
             biome = Biome.Rock;
@@ -110,7 +106,7 @@ export function generateBiomeGrid(config: BiomeConfig,
       } else {
         switch (moistureScaled) {
           default:
-            console.error("unhandled moisture scale");
+            console.error("unhandled moisture scale:", moistureScaled);
             break;
           case 0:
             biome = Biome.Desert;
