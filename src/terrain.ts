@@ -71,29 +71,6 @@ export interface TerrainSpriteDescriptor {
   tileColumns: Array<TerrainShape>;
 };
 
-export function generateTerrainSprites(desc: TerrainSpriteDescriptor): void {
-  const width = desc.spriteWidth;
-  const height = desc.spriteHeight;
-  const columns = desc.tileColumns.length;
-  const rows = desc.tileColumns.length;
-  for (let column = 0; column < columns; ++column) {
-    const columnOffset = width * column;
-    const terrainShape = desc.tileColumns[column];
-    for (let row = 0; row < rows; ++row) {
-      const terrainType = desc.tileRows[row];
-      Terrain.addGraphic(
-        terrainType,
-        terrainShape,
-        desc.spriteSheet,
-        columnOffset,
-        height * row,
-        width,
-        height
-      );
-    }
-  }
-}
-
 export class Terrain extends PhysicalEntity {
   private static _terrainGraphics = new Map<
     TerrainType,
@@ -157,13 +134,24 @@ export class Terrain extends PhysicalEntity {
     this._supported.get(terrainType)!.add(terrainShape);
   }
 
-  static generateSprites(descriptor: TerrainSpriteDescriptor): void {
-    for (let y = 0; y < descriptor.tileRows.length; ++y) {
-      const terrainType = descriptor.tileRows[y];
-      for (let x = 0; x < descriptor.tileColumns.length; ++x) {
-        const terrainShape = descriptor.tileColumns[x];
-        this.addGraphic(terrainType, terrainShape, descriptor.spriteSheet, x, y,
-                        descriptor.spriteWidth, descriptor.spriteHeight);
+  static generateSprites(desc: TerrainSpriteDescriptor): void {
+    const width = desc.spriteWidth;
+    const height = desc.spriteHeight;
+    const columns = desc.tileColumns.length;
+    const rows = desc.tileColumns.length;
+    for (let row = 0; row < rows; ++row) {
+      const terrainType = desc.tileRows[row];
+      for (let column = 0; column < columns; ++column) {
+        const terrainShape = desc.tileColumns[column];
+        this.addGraphic(
+          terrainType,
+          terrainShape,
+          desc.spriteSheet,
+          width * column,
+          height * row,
+          width,
+          height
+        );
       }
     }
   }

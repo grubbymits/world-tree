@@ -69,7 +69,7 @@ window.onload = (event) => {
       WT.TerrainShape.RampUpNorth,
     ],
   };
-  WT.generateTerrainSprites(terrainSpriteDescriptor);
+  WT.Terrain.generateSprites(terrainSpriteDescriptor);
 
   // Use the height map to construct a terrain.
   let builder = new WT.TerrainBuilder(
