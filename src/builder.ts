@@ -5,12 +5,11 @@ import {
   TerrainShape,
   TerrainType,
 } from "./terrain.ts";
-import { Rain, addRain } from "./weather.ts";
 import { Dimensions } from "./physics.ts";
 import { Direction, Navigation } from "./navigation.ts";
 import { Point2D } from "./geometry.ts";
 import { ContextImpl } from "./context.ts";
-import { Biome, BiomeConfig, generateBiomeGrid, getBiomeName } from "./biomes.ts";
+import { Biome, BiomeConfig, generateBiomeGrid, getBiomeName, addRain } from "./biomes.ts";
 
 function buildBiomes(biomeConfig: BiomeConfig,
                      moistureGrid: Array<Array<number>>,

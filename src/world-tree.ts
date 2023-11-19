@@ -14,4 +14,3 @@ export * from "./events.ts";
 export * from "./sound.ts";
 export * from "./geometry.ts";
 export * from "./biomes.ts";
-export * from "./weather.ts";
