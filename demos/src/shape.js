@@ -35,63 +35,61 @@ window.onload = (event) => {
     worldDims,
     WT.Perspective.TwoByOneIsometric,
   );
-  const sheet = new WT.SpriteSheet(
-    "graphics/png/outside-tiles-muted-161x125",
-    context
-  );
-  const terrainSpriteDescriptor = {
-    spriteWidth: spriteWidth,
-    spriteHeight: spriteHeight,
-    spriteSheet: sheet,
-    tileRows: [
+  WT.SpriteSheet.create("graphics/png/outside-tiles-muted-161x125", context).then((sheet) => {
+    const terrainSpriteDescriptor = {
+      spriteWidth: spriteWidth,
+      spriteHeight: spriteHeight,
+      spriteSheet: sheet,
+      tileRows: [
+        WT.TerrainType.Lowland0,
+      ],
+      tileColumns: [
+        WT.TerrainShape.Flat,
+        WT.TerrainShape.FlatWest,
+        WT.TerrainShape.FlatNorth,
+        WT.TerrainShape.FlatEast,
+        WT.TerrainShape.FlatSouth,
+        WT.TerrainShape.FlatNorthWest,
+        WT.TerrainShape.FlatNorthEast,
+        WT.TerrainShape.FlatSouthEast,
+        WT.TerrainShape.FlatSouthWest,
+        WT.TerrainShape.FlatWestOut,
+        WT.TerrainShape.FlatNorthOut,
+        WT.TerrainShape.FlatEastOut,
+        WT.TerrainShape.FlatSouthOut,
+        WT.TerrainShape.FlatAloneOut,
+        WT.TerrainShape.FlatNorthSouth,
+        WT.TerrainShape.FlatEastWest,
+        WT.TerrainShape.RampUpSouth,
+        WT.TerrainShape.RampUpWest,
+        WT.TerrainShape.RampUpEast,
+        WT.TerrainShape.RampUpNorth,
+      ],
+    };
+    WT.Terrain.generateSprites(terrainSpriteDescriptor);
+
+    // Use the height map to construct a terrain.
+    let builder = new WT.TerrainBuilder(
+      heightMap,
+      numTerraces,
       WT.TerrainType.Lowland0,
-    ],
-    tileColumns: [
-      WT.TerrainShape.Flat,
-      WT.TerrainShape.FlatWest,
-      WT.TerrainShape.FlatNorth,
-      WT.TerrainShape.FlatEast,
-      WT.TerrainShape.FlatSouth,
-      WT.TerrainShape.FlatNorthWest,
-      WT.TerrainShape.FlatNorthEast,
-      WT.TerrainShape.FlatSouthEast,
-      WT.TerrainShape.FlatSouthWest,
-      WT.TerrainShape.FlatWestOut,
-      WT.TerrainShape.FlatNorthOut,
-      WT.TerrainShape.FlatEastOut,
-      WT.TerrainShape.FlatSouthOut,
-      WT.TerrainShape.FlatAloneOut,
-      WT.TerrainShape.FlatNorthSouth,
-      WT.TerrainShape.FlatEastWest,
-      WT.TerrainShape.RampUpSouth,
-      WT.TerrainShape.RampUpWest,
-      WT.TerrainShape.RampUpEast,
-      WT.TerrainShape.RampUpNorth,
-    ],
-  };
-  WT.Terrain.generateSprites(terrainSpriteDescriptor);
+      WT.TerrainType.Lowland0,
+      physicalDims,
+    );
+    builder.generateMap(context);
+    let camera = new WT.MouseCamera(
+      context.scene,
+      canvas,
+      canvas.width,
+      canvas.height,
+    );
 
-  // Use the height map to construct a terrain.
-  let builder = new WT.TerrainBuilder(
-    heightMap,
-    numTerraces,
-    WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0,
-    physicalDims,
-  );
-  builder.generateMap(context);
-  let camera = new WT.MouseCamera(
-    context.scene,
-    canvas,
-    canvas.width,
-    canvas.height,
-  );
-
-  var update = function update() {
-    if (document.hasFocus()) {
-      context.update(camera);
-    }
+    var update = function update() {
+      if (document.hasFocus()) {
+        context.update(camera);
+      }
+      window.requestAnimationFrame(update);
+    };
     window.requestAnimationFrame(update);
-  };
-  window.requestAnimationFrame(update);
+  });
 };

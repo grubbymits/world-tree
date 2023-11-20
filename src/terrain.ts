@@ -112,7 +112,7 @@ export class Terrain extends PhysicalEntity {
     return this._terrainGraphics.get(terrainType)!.get(shape)!;
   }
 
-  static addGraphic(
+  private static addGraphic(
     terrainType: TerrainType,
     terrainShape: TerrainShape,
     sheet: SpriteSheet,
@@ -121,8 +121,8 @@ export class Terrain extends PhysicalEntity {
     width: number,
     height: number
   ) {
-    const sprite = new Sprite(sheet, x, y, width, height);
-    const component = new StaticGraphicComponent(sprite.id);
+    const spriteId = Sprite.create(sheet, x, y, width, height);
+    const component = new StaticGraphicComponent(spriteId);
     if (!this._terrainGraphics.has(terrainType)) {
       this._terrainGraphics.set(
         terrainType,
@@ -139,6 +139,7 @@ export class Terrain extends PhysicalEntity {
     const height = desc.spriteHeight;
     const columns = desc.tileColumns.length;
     const rows = desc.tileColumns.length;
+    const promises = new Array<Promise<void>>();
     for (let row = 0; row < rows; ++row) {
       const terrainType = desc.tileRows[row];
       for (let column = 0; column < columns; ++column) {

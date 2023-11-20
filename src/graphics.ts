@@ -4,6 +4,7 @@ import { ContextImpl } from "./context.ts";
 import { Renderer } from "./render.ts";
 
 export const DummySpriteSheet = {
+  loaded: true,
   addBitmap: function (
     id: number,
     x: number,
@@ -59,42 +60,40 @@ export class SpriteSheet {
   private _loaded = false;
   private _bitmapsToLoad: Array<SpriteBitmap> = new Array<SpriteBitmap>();
 
-  constructor(name: string, context: ContextImpl) {
+  private constructor(context: ContextImpl) {
     this._renderer = context.renderer;
     this._image = new Image();
+  }
 
-    this._image.onload = async () => {
-      this.canvas = new OffscreenCanvas(this.width, this.height);
-      this.context2D = this.canvas.getContext("2d", {
-        willReadFrequently: true,
-      })!;
-      this.context2D.drawImage(this.image, 0, 0, this.width, this.height);
-      await this.canvas.convertToBlob().then(
-        (blob) => {
-          this.canvasBlob = blob;
-        },
-        (error) => {
-          console.log("failed to convert to blob:", error);
-        }
-      );
-      this.loaded = true;
-      for (let bitmap of this.bitmapsToLoad) {
-        this.addBitmap(
-          bitmap.id,
-          bitmap.x,
-          bitmap.y,
-          bitmap.width,
-          bitmap.height
-        );
+  private async generateBlob() {
+    this.canvas = new OffscreenCanvas(this.width, this.height);
+    this.context2D = this.canvas.getContext("2d", {
+      willReadFrequently: true,
+    })!;
+    this.context2D.drawImage(this.image, 0, 0, this.width, this.height);
+    await this.canvas.convertToBlob().then(
+      (blob) => {
+        this.canvasBlob = blob;
+      },
+      (error) => {
+        console.log("failed to convert to blob:", error);
       }
-    };
+    );
+    this.loaded = true;
+  }
 
-    if (name) {
-      this._image.src = name + ".png";
-    } else {
-      throw new Error("No filename passed");
-    }
-    SpriteSheet.add(this);
+  private static load(sheet: SpriteSheet, name: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      sheet.image.onload = () => resolve(sheet.generateBlob())
+      sheet.image.src = name + ".png";
+    });
+  }
+
+  public static async create(name: string, context: ContextImpl): Promise<SpriteSheet> {
+    const sheet = new SpriteSheet(context);
+    await this.load(sheet, name);
+    this.add(sheet);
+    return sheet;
   }
 
   get image(): HTMLImageElement {
@@ -150,18 +149,15 @@ export class SpriteSheet {
     width: number,
     height: number
   ): Promise<void> {
-    if (this.loaded) {
-      createImageBitmap(this.canvasBlob, x, y, width, height).then(
-        (bitmap) => {
-          this._renderer.addBitmap(id, bitmap);
-        },
-        (error) => {
-          console.log("failed to createImageBitmap:", error);
-        }
-      );
-    } else {
-      this.bitmapsToLoad.push(new SpriteBitmap(id, x, y, width, height));
-    }
+    console.assert(this.loaded, "sheet not loaded!");
+    createImageBitmap(this.canvasBlob, x, y, width, height).then(
+      (bitmap) => {
+        this._renderer.addBitmap(id, bitmap);
+      },
+      (error) => {
+        console.log("failed to createImageBitmap:", error);
+      }
+    );
   }
 }
 
@@ -170,7 +166,7 @@ export class Sprite {
   private readonly _id: number;
   private readonly _offset: Point2D;
 
-  constructor(
+  private constructor(
     private readonly _sheet: SpriteSheet,
     x: number,
     y: number,
@@ -185,14 +181,25 @@ export class Sprite {
       this.offset.y + this.height
     );
     this._id = Sprite.sprites.length;
-    Sprite.sprites.push(this);
-    this.sheet.addBitmap(
-      this.id,
-      this.offset.x,
-      this.offset.y,
-      this.width,
-      this.height
+  }
+
+  public static create(
+    sheet: SpriteSheet,
+    x: number,
+    y: number,
+    width: number,
+    height: number): number {
+    console.assert(sheet.loaded, "sheet is not loaded yet!");
+    const sprite = new Sprite(sheet, x, y, width, height);
+    this.sprites.push(sprite);
+    sheet.addBitmap(
+      sprite.id,
+      sprite.offset.x,
+      sprite.offset.y,
+      sprite.width,
+      sprite.height
     );
+    return sprite.id;
   }
 
   isTransparentAt(x: number, y: number): boolean {
@@ -239,26 +246,6 @@ export class DrawElement {
   }
 }
 
-export function generateSprites(
-  sheet: SpriteSheet,
-  width: number,
-  height: number,
-  xBegin: number,
-  yBegin: number,
-  columns: number,
-  rows: number
-): Array<Sprite> {
-  const sprites = new Array<Sprite>();
-  const xEnd = xBegin + columns;
-  const yEnd = yBegin + rows;
-  for (let y = yBegin; y < yEnd; y++) {
-    for (let x = xBegin; x < xEnd; x++) {
-      sprites.push(new Sprite(sheet, x * width, y * height, width, height));
-    }
-  }
-  return sprites;
-}
-
 export abstract class GraphicComponent {
   constructor(protected _currentSpriteId: number) {}
 
@@ -300,27 +287,6 @@ export class StaticGraphicComponent extends GraphicComponent {
   update(): number {
     return this._currentSpriteId;
   }
-}
-
-export function generateStaticGraphics(
-  sheet: SpriteSheet,
-  width: number,
-  height: number,
-  xBegin: number,
-  yBegin: number,
-  columns: number,
-  rows: number
-): Array<StaticGraphicComponent> {
-  const graphics = new Array<StaticGraphicComponent>();
-  const xEnd = xBegin + columns;
-  const yEnd = yBegin + rows;
-  for (let y = yBegin; y < yEnd; y++) {
-    for (let x = xBegin; x < xEnd; x++) {
-      const sprite = new Sprite(sheet, x * width, y * height, width, height);
-      graphics.push(new StaticGraphicComponent(sprite.id));
-    }
-  }
-  return graphics;
 }
 
 export class AnimatedGraphicComponent extends GraphicComponent {
