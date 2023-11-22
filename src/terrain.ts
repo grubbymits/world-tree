@@ -77,19 +77,10 @@ export class Terrain extends PhysicalEntity {
     Map<TerrainShape, GraphicComponent>
   >();
 
-  private static _supported = new Map<
-    TerrainType,
-    Set<TerrainShape>
-  >();
-
   static reset(): void {
     this._terrainGraphics = new Map<
       TerrainType,
       Map<TerrainShape, GraphicComponent>
-    >();
-    this._supported = new Map<
-      TerrainType,
-      Set<TerrainShape>
     >();
   }
 
@@ -128,18 +119,15 @@ export class Terrain extends PhysicalEntity {
         terrainType,
         new Map<TerrainShape, GraphicComponent>()
       );
-      this._supported.set(terrainType, new Set<TerrainShape>());
     }
     this._terrainGraphics.get(terrainType)!.set(terrainShape, component);
-    this._supported.get(terrainType)!.add(terrainShape);
   }
 
   static generateSprites(desc: TerrainSpriteDescriptor): void {
     const width = desc.spriteWidth;
     const height = desc.spriteHeight;
     const columns = desc.tileColumns.length;
-    const rows = desc.tileColumns.length;
-    const promises = new Array<Promise<void>>();
+    const rows = desc.tileRows.length;
     for (let row = 0; row < rows; ++row) {
       const terrainType = desc.tileRows[row];
       for (let column = 0; column < columns; ++column) {
@@ -157,13 +145,13 @@ export class Terrain extends PhysicalEntity {
     }
   }
 
-  static isSupportedType(type: TerrainType): boolean {
-    return this._supported.has(type);
+  static isSupportedType(ty: TerrainType): boolean {
+    return this._terrainGraphics.has(ty);
   }
 
-  static isSupportedShape(type: TerrainType, shape: TerrainShape): boolean {
+  static isSupportedShape(ty: TerrainType, shape: TerrainShape): boolean {
     return (
-      this.isSupportedType(type) && this._supported.get(type)!.has(shape)
+      this.isSupportedType(ty) && this._terrainGraphics.get(ty)!.has(shape)
     );
   }
 
