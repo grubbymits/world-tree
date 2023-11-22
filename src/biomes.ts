@@ -453,9 +453,10 @@ export function addRain(heightGrid: Array<Array<number>>,
   const cellsY = heightGrid.length;
   const rain = new Rain(cellsX, cellsY, heightGrid, terraceGrid, waterLine, water, towards);
   rain.run();
-  return gaussianBlur(
+  const moisture = gaussianBlur(
     rain.moistureGrid,
     cellsX,
     cellsY
   );
+  return moisture;
 }
