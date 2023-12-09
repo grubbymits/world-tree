@@ -66,7 +66,7 @@ export enum TerrainType {
 export interface TerrainSpriteDescriptor {
   spriteWidth: number;
   spriteHeight: number;
-  spriteSheet: SpriteSheet;
+  spriteSheetName: string;
   tileRows: Array<TerrainType>;
   tileColumns: Array<TerrainShape>;
 };
@@ -123,26 +123,29 @@ export class Terrain extends PhysicalEntity {
     this._terrainGraphics.get(terrainType)!.set(terrainShape, component);
   }
 
-  static generateSprites(desc: TerrainSpriteDescriptor): void {
-    const width = desc.spriteWidth;
-    const height = desc.spriteHeight;
-    const columns = desc.tileColumns.length;
-    const rows = desc.tileRows.length;
-    for (let row = 0; row < rows; ++row) {
-      const terrainType = desc.tileRows[row];
-      for (let column = 0; column < columns; ++column) {
-        const terrainShape = desc.tileColumns[column];
-        this.addGraphic(
-          terrainType,
-          terrainShape,
-          desc.spriteSheet,
-          width * column,
-          height * row,
-          width,
-          height
-        );
+  static async generateSprites(desc: TerrainSpriteDescriptor,
+                               context: ContextImpl): Promise<void> {
+    await SpriteSheet.create(desc.spriteSheetName, context).then((sheet) => {
+      const width = desc.spriteWidth;
+      const height = desc.spriteHeight;
+      const columns = desc.tileColumns.length;
+      const rows = desc.tileRows.length;
+      for (let row = 0; row < rows; ++row) {
+        const terrainType = desc.tileRows[row];
+        for (let column = 0; column < columns; ++column) {
+          const terrainShape = desc.tileColumns[column];
+          this.addGraphic(
+            terrainType,
+            terrainShape,
+            sheet,
+            width * column,
+            height * row,
+            width,
+            height
+          );
+        }
       }
-    }
+    });
   }
 
   static isSupportedType(ty: TerrainType): boolean {

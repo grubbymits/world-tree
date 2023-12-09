@@ -36,33 +36,30 @@ window.onload = (event) => {
     worldDims,
     WT.Perspective.TwoByOneIsometric,
   );
-  console.log("attempting to construct SpriteSheet");
-  WT.SpriteSheet.create("graphics/png/outside-terrain-tiles-muted", context).then((sheet) => {
-    const terrainSpriteDescriptor = {
-      spriteWidth: spriteWidth,
-      spriteHeight: spriteHeight,
-      spriteSheet: sheet,
-      tileRows: [
-        WT.TerrainType.Lowland5,
-        WT.TerrainType.Lowland4,
-        WT.TerrainType.Lowland3,
-        WT.TerrainType.Lowland2,
-        WT.TerrainType.Lowland1,
-        WT.TerrainType.Lowland0,
-        WT.TerrainType.Upland5,
-        WT.TerrainType.Upland4,
-        WT.TerrainType.Upland3,
-        WT.TerrainType.Upland2,
-        WT.TerrainType.Upland1,
-        WT.TerrainType.Upland0,
-        WT.TerrainType.Water,
-      ],
-      tileColumns: [
-        WT.TerrainShape.Flat,
-      ],
-    };
-    WT.Terrain.generateSprites(terrainSpriteDescriptor);
-
+  const terrainSpriteDescriptor = {
+    spriteWidth: spriteWidth,
+    spriteHeight: spriteHeight,
+    spriteSheetName: "graphics/png/outside-terrain-tiles-muted",
+    tileRows: [
+      WT.TerrainType.Lowland5,
+      WT.TerrainType.Lowland4,
+      WT.TerrainType.Lowland3,
+      WT.TerrainType.Lowland2,
+      WT.TerrainType.Lowland1,
+      WT.TerrainType.Lowland0,
+      WT.TerrainType.Upland5,
+      WT.TerrainType.Upland4,
+      WT.TerrainType.Upland3,
+      WT.TerrainType.Upland2,
+      WT.TerrainType.Upland1,
+      WT.TerrainType.Upland0,
+      WT.TerrainType.Water,
+    ],
+    tileColumns: [
+      WT.TerrainShape.Flat,
+    ],
+  };
+  WT.Terrain.generateSprites(terrainSpriteDescriptor, context).then(() => {
     // Use the height map to construct a terrain.
     let builder = new WT.TerrainBuilder(
       heightMap,
