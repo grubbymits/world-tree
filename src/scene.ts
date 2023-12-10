@@ -664,3 +664,28 @@ export class TwoByOneIsometric extends SceneGraph {
     return TwoByOneIsometric.drawOrder(first, second);
   }
 }
+
+export function getDimensionsFromPerspective(spriteWidth: number,
+                                             spriteHeight: number,
+                                             perspective: Perspective): Dimensions {
+  switch (perspective) {
+    default:
+      throw new Error('unsupported perspective');
+      break;
+    case Perspective.TwoByOneIsometric:
+      return TwoByOneIsometric.getDimensions(spriteWidth, spriteHeight);
+  }
+}
+
+export function getPerspectiveFromString(name: string): Perspective {
+  switch (name) {
+    default:
+      throw new Error('unsupported perspective name');
+      break;
+    case 'TrueIsometric':
+      return Perspective.TrueIsometric;
+    case 'TwoByOneIsometric':
+      return Perspective.TwoByOneIsometric;
+  }
+}
+

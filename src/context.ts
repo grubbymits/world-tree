@@ -1,11 +1,15 @@
 import { MovableEntity, PhysicalEntity } from "./entity.ts";
-import { Terrain } from "./terrain.ts";
+import { Terrain, TerrainType, TerrainSpriteDescriptor } from "./terrain.ts";
+import { TerrainBuilder } from "./builder.ts";
 import { EntityEvent } from "./events.ts";
+import { BiomeConfig } from "./biomes.ts";
 import {
   Perspective,
   Scene,
   TrueIsometric,
   TwoByOneIsometric,
+  getPerspectiveFromString,
+  getDimensionsFromPerspective,
 } from "./scene.ts";
 import {
   Renderer,
@@ -152,7 +156,7 @@ export function createContext(
   canvas: HTMLCanvasElement,
   worldDims: Dimensions,
   perspective: Perspective
-): Context {
+): ContextImpl {
   ContextImpl.reset();
   const context = new ContextImpl(worldDims, perspective);
   context.addOnscreenRenderer(canvas);
@@ -162,8 +166,53 @@ export function createContext(
 export function createTestContext(
   worldDims: Dimensions,
   perspective: Perspective
-): Context {
+): ContextImpl {
   ContextImpl.reset();
   const context = new ContextImpl(worldDims, perspective);
+  return context;
+}
+
+export interface WorldDescriptor {
+  canvasName: string;
+  projection: string;
+  heightMap: Array<Array<number>>;
+  numTerraces: number;
+  floor: TerrainType,
+  wall: TerrainType,
+  biomeConfig: BiomeConfig;
+  terrainSpriteDescriptor: TerrainSpriteDescriptor;
+};
+
+export async function createWorld(worldDesc: WorldDescriptor): Promise<ContextImpl>{
+  const terrainSpriteDesc = worldDesc.terrainSpriteDescriptor;
+  const spriteWidth = terrainSpriteDesc.spriteWidth;
+  const spriteHeight = terrainSpriteDesc.spriteHeight;
+  const perspective = getPerspectiveFromString(worldDesc.projection);
+  const physicalDims = getDimensionsFromPerspective(spriteWidth, spriteHeight, perspective);
+  const cellsY = worldDesc.heightMap.length;
+  const cellsX = worldDesc.heightMap[0].length;
+  const cellsZ = 1 + worldDesc.numTerraces;
+  const worldDims = new Dimensions(
+    physicalDims.width * cellsX,
+    physicalDims.depth * cellsY,
+    physicalDims.height * cellsZ
+  );
+  const canvas = <HTMLCanvasElement>document.getElementById(worldDesc.canvasName)!;
+  const context = createContext(
+    canvas,
+    worldDims,
+    perspective,
+  );
+  await Terrain.generateSprites(terrainSpriteDesc, context).then(() => {
+    const builder = new TerrainBuilder(
+      worldDesc.heightMap,
+      worldDesc.numTerraces,
+      worldDesc.floor,
+      worldDesc.wall,
+      physicalDims
+    );
+    builder.generateBiomes(worldDesc.biomeConfig);
+    builder.generateMap(context);
+  });
   return context;
 }

@@ -1,44 +1,33 @@
 import * as WT from "../../../dist/world-tree.mjs";
-const spriteWidth = 322;
-const spriteHeight = 270;
 
-const cellsX = 11;
-const cellsY = 11;
-const numTerraces = 3;
-const heightMap = [
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 1, 2, 2, 2, 2, 1, 1, 1, 1, 0],
-  [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
-  [0, 1, 2, 2, 3, 3, 3, 2, 2, 1, 0],
-  [0, 1, 2, 3, 3, 4, 3, 2, 2, 1, 0],
-  [0, 1, 2, 2, 3, 3, 3, 2, 2, 1, 0],
-  [0, 1, 2, 2, 2, 2, 2, 2, 2, 1, 0],
-  [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-];
-
-window.onload = (event) => {
-  console.log("biome window loaded");
-  const physicalDims = WT.TwoByOneIsometric.getDimensions(
-    spriteWidth,
-    spriteHeight,
-  );
-  const worldDims = new WT.Dimensions(
-    physicalDims.width * cellsX,
-    physicalDims.depth * cellsY,
-    physicalDims.height * (1 + numTerraces),
-  );
-  let canvas = document.getElementById("demoCanvas");
-  let context = WT.createContext(
-    canvas,
-    worldDims,
-    WT.Perspective.TwoByOneIsometric,
-  );
-  const terrainSpriteDescriptor = {
-    spriteWidth: spriteWidth,
-    spriteHeight: spriteHeight,
+const worldDescriptor = {
+  canvasName: "demoCanvas",
+  projection: "TwoByOneIsometric",
+  heightMap: [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 1, 2, 2, 2, 2, 1, 1, 1, 1, 0],
+    [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
+    [0, 1, 2, 2, 3, 3, 3, 2, 2, 1, 0],
+    [0, 1, 2, 3, 3, 4, 3, 2, 2, 1, 0],
+    [0, 1, 2, 2, 3, 3, 3, 2, 2, 1, 0],
+    [0, 1, 2, 2, 2, 2, 2, 2, 2, 1, 0],
+    [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ],
+  numTerraces: 3,
+  floor: WT.TerrainType.Lowland3,
+  wall: WT.TerrainType.Lowland3,
+  biomeConfig: {
+    waterLine: 0,
+    rainfall: 50,
+    rainDirection: WT.Direction.North,
+    uplandThreshold: 4,
+  },
+  terrainSpriteDescriptor: {
+    spriteWidth: 322,
+    spriteHeight: 270,
     spriteSheetName: "graphics/png/outside-terrain-tiles-muted",
     tileRows: [
       WT.TerrainType.Lowland5,
@@ -58,39 +47,24 @@ window.onload = (event) => {
     tileColumns: [
       WT.TerrainShape.Flat,
     ],
-  };
-  WT.Terrain.generateSprites(terrainSpriteDescriptor, context).then(() => {
-    // Use the height map to construct a terrain.
-    let builder = new WT.TerrainBuilder(
-      heightMap,
-      numTerraces,
-      WT.TerrainType.Lowland3,
-      WT.TerrainType.Lowland3,
-      physicalDims
-    );
+  },
+};
 
-    const biomeConfig = {
-      waterLine: 0,
-      rainfall: 50,
-      rainDirection: WT.Direction.North,
-      uplandThreshold: 4,
-    };
-    builder.generateBiomes(biomeConfig);
-    builder.generateMap(context);
+window.onload = async (event) => {
+  const context = await WT.createWorld(worldDescriptor);
+  const canvas = document.getElementById("demoCanvas");
+  const camera = new WT.MouseCamera(
+    context.scene,
+    canvas,
+    canvas.width,
+    canvas.height,
+  );
 
-    let camera = new WT.MouseCamera(
-      context.scene,
-      canvas,
-      canvas.width,
-      canvas.height,
-    );
-
-    var update = function update() {
-      if (document.hasFocus()) {
-        context.update(camera);
-      }
-      window.requestAnimationFrame(update);
-    };
+  const update = function() {
+    if (document.hasFocus()) {
+      context.update(camera);
+    }
     window.requestAnimationFrame(update);
-  });
+  };
+  window.requestAnimationFrame(update);
 };
