@@ -41,7 +41,8 @@ test("3x3 neighbours", () => {
     WT.TerrainType.Lowland0,
     dims
   );
-  const grid = builder.generateMap(context);
+  builder.generateMap(context);
+  const grid = context.grid;
 
   // at x, y
   expect(grid.getNeighbours(grid.getSurfaceTerrainAt(0, 0)).length).toBe(3);
@@ -82,7 +83,8 @@ test("eight neighbours", () => {
     WT.TerrainType.Lowland0,
     dims
   );
-  const grid = builder.generateMap(context);
+  builder.generateMap(context);
+  const grid = context.grid;
   const surface = grid.surfaceTerrain;
   const centre = surface[1][1];
   expect(grid.getNeighbours(centre).length).toBe(8);
@@ -119,7 +121,8 @@ test("move north from centre", () => {
     WT.TerrainType.Lowland0,
     dims
   );
-  const grid = builder.generateMap(context);
+  builder.generateMap(context);
+  const grid = context.grid;
   const surface = grid.surfaceTerrain;
   const start = surface[1][1];
   const end = surface[1][0];
@@ -157,7 +160,8 @@ test("path north from points", () => {
     WT.TerrainType.Lowland0,
     dims
   );
-  const grid = builder.generateMap(context);
+  builder.generateMap(context);
+  const grid = context.grid;
   const pathFinder = new WT.PathFinder(grid);
   // centre.
   const start = new WT.Point3D(

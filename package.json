@@ -1,8 +1,8 @@
 {
   "scripts": {
     "compile": "tsc --noEmit --project .",
-    "build": "esbuild src/world-tree.ts --bundle --minify --target=es2017 --format=esm --outfile=dist/world-tree.mjs",
-    "build-dev": "esbuild src/world-tree.ts --bundle --sourcemap --target=es2017 --format=esm --outfile=dist/world-tree.mjs",
+    "build": "esbuild src/world-tree.ts --bundle --minify --target=es2022 --format=esm --outfile=dist/world-tree.mjs",
+    "build-dev": "esbuild src/world-tree.ts --bundle --sourcemap --target=es2022 --format=esm --outfile=dist/world-tree.mjs",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage",
     "benchmark": "node --experimental-vm-modules benchmarks/all.mjs",
     "lint": "npx prettier --check --parser typescript 'src/*.ts'",

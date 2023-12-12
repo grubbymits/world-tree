@@ -212,7 +212,7 @@ export class TerrainBuilder {
     setTerrainTypes(this.biomeGrid, this.typeGrid);
   }
 
-  generateMap(context: ContextImpl): TerrainGrid {
+  generateMap(context: ContextImpl): void {
     setRamps(this._heightGrid, this._terraceGrid, this._shapeGrid,
              this._terraceSpacing, 0);
     setEdges(this._terraceGrid, this._shapeGrid, this._typeGrid, this.floor,
@@ -228,13 +228,11 @@ export class TerrainBuilder {
       this.numTerraces
     );
 
-    const grid = new TerrainGrid(
+    new TerrainGrid(
       context,
       descriptor
     );
-    return grid;
   }
-
 }
 
 export function setRamps(heightGrid: Array<Array<number>>,

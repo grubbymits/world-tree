@@ -1,5 +1,5 @@
 import { MovableEntity, PhysicalEntity } from "./entity.ts";
-import { Terrain, TerrainType, TerrainSpriteDescriptor } from "./terrain.ts";
+import { Terrain, TerrainGrid, TerrainType, TerrainSpriteDescriptor } from "./terrain.ts";
 import { TerrainBuilder } from "./builder.ts";
 import { EntityEvent } from "./events.ts";
 import { BiomeConfig } from "./biomes.ts";
@@ -29,6 +29,7 @@ import {
 
 export interface Context {
   update(camera: Camera): void;
+  grid: TerrainGrid | null;
   addController(controller: Controller): void;
   verify(): boolean;
 }
@@ -47,6 +48,7 @@ export class ContextImpl implements Context {
   private _controllers: Array<Controller> = new Array<Controller>();
   private _spatialGraph: Octree;
   private _totalEntities = 0;
+  private _grid: TerrainGrid|null;
 
   static reset(): void {
     PhysicalEntity.reset();
@@ -88,6 +90,12 @@ export class ContextImpl implements Context {
   }
   get controllers(): Array<Controller> {
     return this._controllers;
+  }
+  set grid(g: TerrainGrid|null) {
+    this._grid = g;
+  }
+  get grid(): TerrainGrid | null {
+    return this._grid;
   }
 
   verify(): boolean {
@@ -211,7 +219,9 @@ export async function createWorld(worldDesc: WorldDescriptor): Promise<ContextIm
       worldDesc.wall,
       physicalDims
     );
-    builder.generateBiomes(worldDesc.biomeConfig);
+    if (Object.hasOwn(worldDesc, 'biomeConfig')) {
+      builder.generateBiomes(worldDesc.biomeConfig);
+    }
     builder.generateMap(context);
   });
   return context;

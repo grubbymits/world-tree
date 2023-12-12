@@ -473,6 +473,7 @@ export class TerrainGrid {
     private readonly _context: ContextImpl,
     descriptor: TerrainGridDescriptor,
   ) {
+    this._context.grid = this;
     this._cellsX = descriptor.cellsX;
     this._cellsY = descriptor.cellsY;
     this._dimensions  = descriptor.tileDimensions;
@@ -574,6 +575,13 @@ export class TerrainGrid {
       return null;
     }
     return this.surfaceTerrain[y][x];
+  }
+
+  getSurfaceLocationAt(x: number, y: number): Point3D | null {
+    if (!this.inbounds(x, y)) {
+      return null;
+    }
+    return this.surfaceTerrain[y][x]!.surfaceLocation;
   }
 
   getSurfaceTerrainAtPoint(loc: Point3D): Terrain | null {
