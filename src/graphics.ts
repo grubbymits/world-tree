@@ -402,6 +402,48 @@ export class DirectionalGraphicComponent extends GraphicComponent {
   }
 }
 
+export interface GraphicsDescriptor {
+  spriteSheet: SpriteSheet;
+  spriteSheetName: string;
+  spriteWidth: number;
+  spriteHeight: number;
+  columns: Array<Direction>;
+  numFrames: number;
+};
+
+export async function
+createDirectionalGraphics(desc: GraphicsDescriptor,
+                          context: ContextImpl): Promise<DirectionalGraphicComponent> {
+  const generate = function(sheet: SpriteSheet) {
+    const directionGraphicsMap = new Map();
+    for (let y = 0; y < desc.numFrames; ++y) {
+      for (let x = 0; x < desc.columns.length; ++x) {
+        const direction = desc.columns[x];
+        const spriteId = Sprite.create(
+          sheet,
+          x * desc.spriteWidth,
+          y * desc.spriteHeight,
+          desc.spriteWidth,
+          desc.spriteHeight,
+        );
+        const graphic = new StaticGraphicComponent(spriteId);
+        directionGraphicsMap.set(direction, graphic);
+      }
+    }
+    return new DirectionalGraphicComponent(directionGraphicsMap);
+  }
+  if (Object.hasOwn(desc, 'spriteSheet')) {
+    return generate(desc.spriteSheet);
+  }
+  if (!Object.hasOwn(desc, 'spriteSheetName')) {
+    throw new Error('expected spriteSheetName');
+  }
+  const graphics = await SpriteSheet.create(desc.spriteSheetName, context).then((sheet) => {
+    return generate(sheet);
+  });
+  return graphics;
+}
+
 export class AnimatedDirectionalGraphicComponent extends GraphicComponent {
   protected _stationary = true;
   protected _direction: Direction = Direction.North;

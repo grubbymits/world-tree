@@ -1,32 +1,24 @@
 import * as WT from "../../dist/world-tree.mjs";
 
-function createDroid(context, position) {
-  const directions = [
-    WT.Direction.West,
-    WT.Direction.South,
-    WT.Direction.East,
-    WT.Direction.North,
-  ];
+async function createDroid(context, position) {
   const spriteWidth = 58;
   const spriteHeight = 107;
   const dimensions = WT.TwoByOneIsometric.getDimensions(
     spriteWidth, spriteHeight,
   );
-  const sheet = new WT.SpriteSheet("graphics/png/levitate-droid", context);
-  const directionGraphicsMap = new Map();
-  for (let x in directions) {
-    let direction = directions[x];
-    let sprite = new WT.Sprite(
-      sheet,
-      x * spriteWidth,
-      0,
-      spriteWidth,
-      spriteHeight,
-    );
-    let graphic = new WT.StaticGraphicComponent(sprite.id);
-    directionGraphicsMap.set(direction, graphic);
-  }
-  const graphics = new WT.DirectionalGraphicComponent(directionGraphicsMap);
+  const graphicsDescriptor = {
+    spriteSheetName: "graphics/png/levitate-droid",
+    spriteWidth: spriteWidth,
+    spriteHeight: spriteHeight,
+    columns: [
+      WT.Direction.West,
+      WT.Direction.South,
+      WT.Direction.East,
+      WT.Direction.North,
+    ],
+    numFrames: 1,
+  };
+  const graphics = await WT.createDirectionalGraphics(graphicsDescriptor, context);
   const droid = WT.createGraphicalActor(
     context, position, dimensions, graphics);
 
@@ -35,7 +27,7 @@ function createDroid(context, position) {
     () => graphics.direction = droid.direction,
   );
 
-  let moveRandomDirection = () => {
+  const moveRandomDirection = () => {
     let dx = Math.round(Math.random() * 2) - 1;
     let dy = 0;
     let dz = 0;
@@ -97,21 +89,19 @@ const worldDescriptor = {
 
 window.onload = async (event) => {
   const context = await WT.createWorld(worldDescriptor);
-  const canvas = document.getElementById("demoCanvas");
+  const canvas = document.getElementById(worldDescriptor.canvasName);
 
   // Place the droid in the middle of the map.
   const x = 4;
-  const y = 5;
-  const droidPosition = context.grid.getSurfaceLocationAt(x, y);
-  console.log('droidPosition', droidPosition);
-  const droid = createDroid(context, droidPosition);
+  const y = 4;
+  const droidPosition = context.grid.getSurfaceLocationAt(x, y).add(new WT.Vector3D(0, 0, 1));
+  const droid = await createDroid(context, droidPosition);
   const camera = new WT.TrackerCamera(
     context.scene,
     canvas.width,
     canvas.height,
     droid,
   );
-  console.log('droid and camera constructed');
   const update = function() {
     if (document.hasFocus()) {
       context.update(camera);
