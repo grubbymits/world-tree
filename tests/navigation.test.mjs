@@ -89,8 +89,7 @@ test("eight neighbours", () => {
   const centre = surface[1][1];
   expect(grid.getNeighbours(centre).length).toBe(8);
 
-  const pathFinder = new WT.PathFinder(grid);
-  const accessibleNeighbours = pathFinder.getAccessibleNeighbours(centre);
+  const accessibleNeighbours = grid.getAccessibleNeighbours(centre);
   expect(accessibleNeighbours.length).toBe(8);
 });
 
@@ -126,8 +125,7 @@ test("move north from centre", () => {
   const surface = grid.surfaceTerrain;
   const start = surface[1][1];
   const end = surface[1][0];
-  const pathFinder = new WT.PathFinder(grid);
-  const path = pathFinder.findPath(start.surfaceLocation, end.surfaceLocation);
+  const path = grid.findPath(start.surfaceLocation, end.surfaceLocation);
   expect(path.length).toBe(1);
 });
 
@@ -162,7 +160,6 @@ test("path north from points", () => {
   );
   builder.generateMap(context);
   const grid = context.grid;
-  const pathFinder = new WT.PathFinder(grid);
   // centre.
   const start = new WT.Point3D(
     (dims.width * width) / 2,
@@ -171,7 +168,7 @@ test("path north from points", () => {
   );
   // top middle.
   const end = new WT.Point3D((dims.width * width) / 2, 0, dims.height * 2);
-  const path = pathFinder.findPath(start, end);
+  const path = grid.findPath(start, end);
   expect(path.length).toBe(2);
 });
 

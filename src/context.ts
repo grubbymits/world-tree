@@ -1,5 +1,6 @@
 import { MovableEntity, PhysicalEntity } from "./entity.ts";
-import { Terrain, TerrainGrid, TerrainType, TerrainSpriteDescriptor } from "./terrain.ts";
+import { Terrain, TerrainType, TerrainSpriteDescriptor } from "./terrain.ts";
+import { TerrainGrid } from "./grid.ts";
 import { TerrainBuilder } from "./builder.ts";
 import { EntityEvent } from "./events.ts";
 import { BiomeConfig } from "./biomes.ts";

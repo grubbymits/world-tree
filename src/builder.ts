@@ -1,10 +1,12 @@
 import {
   Terrain,
-  TerrainGridDescriptorImpl,
-  TerrainGrid,
   TerrainShape,
   TerrainType,
 } from "./terrain.ts";
+import {
+  TerrainGridDescriptorImpl,
+  TerrainGrid,
+} from "./grid.ts";
 import { Dimensions } from "./physics.ts";
 import { Direction, Navigation } from "./navigation.ts";
 import { Point2D } from "./geometry.ts";
