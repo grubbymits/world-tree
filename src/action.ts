@@ -1,7 +1,10 @@
 import { Actor } from "./entity.ts";
+import { ContextImpl } from "./context.ts";
+import { Camera } from "./camera.ts";
 import { EntityEvent } from "./events.ts";
 import { BoundingCuboid, CollisionDetector, CollisionInfo } from "./physics.ts";
-import { Point3D, Vector3D } from "./geometry.ts";
+import { Point3D, Vector2D, Vector3D } from "./geometry.ts";
+import { Navigation } from "./navigation.ts";
 
 export abstract class Action {
   constructor(protected _actor: Actor) {}
@@ -85,85 +88,27 @@ export class MoveDestination extends MoveAction {
   }
   set destination(destination: Point3D) {
     this._destination = destination;
-    const currentPos = this.actor.bounds.minLocation;
-    const maxD = destination.vec_diff(currentPos);
-
-    console.assert(
-      maxD.x == 0 || maxD.y == 0 || maxD.z == 0,
-      "can only change distance along two axes simultaneously"
-    );
-
-    let dx = 0;
-    let dy = 0;
-    let dz = 0;
-    // Handle simple changes on one axis.
-    if (maxD.x == 0 && maxD.y == 0 && maxD.z == 0) {
-      return;
-    } else if (maxD.x == 0 && maxD.z == 0) {
-      dx = 0;
-      dy = this._step;
-      dz = 0;
-    } else if (maxD.y == 0 && maxD.z == 0) {
-      dy = 0;
-      dx = this._step;
-      dz = 0;
-    } else if (maxD.x == 0 && maxD.y == 0) {
-      dx = 0;
-      dy = 0;
-      dz = this._step;
-    } else {
-      // H == step;
-      // tan-1(O/A) = theta;
-      // sin(theta) = O/H;
-      // cos(theta) = A/H;
-      let adjacent = 0;
-      let opposite = 0;
-      if (maxD.z == 0) {
-        adjacent = maxD.y > 0 ? maxD.y : maxD.x;
-        opposite = maxD.y > 0 ? maxD.x : maxD.y;
-      } else if (maxD.x == 0) {
-        adjacent = maxD.z > 0 ? maxD.y : maxD.z;
-        opposite = maxD.z > 0 ? maxD.z : maxD.y;
-      } else if (maxD.y == 0) {
-        adjacent = maxD.z > 0 ? maxD.x : maxD.z;
-        opposite = maxD.z > 0 ? maxD.z : maxD.x;
-      }
-      const theta = (Math.atan(opposite / adjacent) * 180) / Math.PI;
-      const oppDiff = Math.sin(theta) * this._step;
-      const adjDiff = Math.cos(theta) * this._step;
-
-      if (maxD.z == 0) {
-        dx = adjacent == maxD.y ? oppDiff : adjDiff;
-        dy = adjacent == maxD.y ? adjDiff : oppDiff;
-      } else if (maxD.x == 0) {
-        dz = adjacent == maxD.y ? oppDiff : adjDiff;
-        dy = adjacent == maxD.y ? adjDiff : oppDiff;
-      } else if (maxD.y == 0) {
-        dx = adjacent == maxD.z ? oppDiff : adjDiff;
-        dz = adjacent == maxD.z ? adjDiff : oppDiff;
-      }
-    }
-    if (maxD.x < 0) {
-      dx = -dx;
-    }
-    if (maxD.y < 0) {
-      dy = -dy;
-    }
-    if (maxD.z < 0) {
-      dz = -dz;
-    }
-    this._d = new Vector3D(dx, dy, dz);
+    const currentPos = this.actor.bounds.bottomCentre;
+    this._d = destination.vec_diff(currentPos).norm().mulScalar(this._step);
+    const direction = Navigation.getDirectionFromVector(new Vector2D(this._d.x, this._d.y));
+    this.actor.direction = direction;
   }
 
   perform(): boolean {
-    // Make sure we don't overshoot the destination.
     const bounds: BoundingCuboid = this.actor.bounds;
-    const location: Point3D = bounds.minLocation;
+    const location: Point3D = bounds.bottomCentre;
+    // Check for obstruction.
+    if (this.obstructed(location, location.add(this._d))) {
+      return true;
+    }
+    // Make sure we don't overshoot the destination.
     const maxD: Vector3D = this.destination.vec_diff(location);
-    const minD: Vector3D = maxD.absMin(this._d);
-    this.actor.updatePosition(minD);
+    if (maxD.mag() < this._step) {
+      return true;
+    }
+    this.actor.updatePosition(this._d);
     this.actor.postEvent(EntityEvent.Moving);
-    return bounds.minLocation.isSameAsRounded(this.destination);
+    return false;
   }
 }
 
@@ -178,10 +123,10 @@ export class Navigate extends Action {
     private readonly _destination: Point3D
   ) {
     super(actor);
-    //this._waypoints = this.findPath();
-    //if (this._waypoints.length != 0) {
-    //  this._currentStep = new MoveDestination(actor, _step, this._waypoints[0]);
-    //}
+    this._waypoints = actor.context.grid!.findPath(actor.bounds.bottomCentre, _destination);
+    if (this._waypoints.length != 0) {
+      this._currentStep = new MoveDestination(actor, _step, this._waypoints[0]);
+    }
   }
 
   perform(): boolean {
@@ -230,4 +175,28 @@ export class Navigate extends Action {
     );
     return false;
   }
+}
+
+export function TouchOrClickNav(context: ContextImpl,
+                                canvas: HTMLCanvasElement,
+                                camera: Camera,
+                                actor: Actor,
+                                speed: number): void {
+  console.assert(context.grid && 'expected grid');
+  canvas.addEventListener("mousedown", (e) => {
+    if (e.button == 0) {
+      console.log('mouse click');
+      const destination = context.scene.getLocationAt(e.offsetX, e.offsetY, camera);
+      if (destination) {
+        actor.action = new Navigate(actor, speed, destination!);
+      }
+    }
+  });
+  canvas.addEventListener("touchstart", (e) => {
+    const touch = e.touches[0];
+    const destination = context.scene.getLocationAt(touch.pageX, touch.pageY, camera);
+    if (destination) {
+      actor.action = new Navigate(actor, speed, destination!);
+    }
+  });
 }

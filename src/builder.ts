@@ -356,7 +356,7 @@ export function setEdges(terraceGrid: Array<Array<number>>,
       const isPerimeter = x == 0 || x == width -1 ||
                           y == 0 || y == depth - 1; 
 
-      for (const offset of Navigation.neighbourOffsets) {
+      for (const offset of Navigation.neighbourOffsets.values()) {
         const neighbourX = x + offset.x;
         const neighbourY = y + offset.y;
         if (!inbounds(neighbourX, neighbourY)) {

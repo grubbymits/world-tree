@@ -133,8 +133,10 @@ export class MovableEntity extends PhysicalEntity {
   protected readonly _canSwim = false;
   protected _direction: Direction;
 
-  constructor(context: ContextImpl, location: Point3D, dimensions: Dimensions) {
+  constructor(context: ContextImpl, location: Point3D, dimensions: Dimensions,
+              graphics: GraphicComponent) {
     super(context, location, dimensions);
+    this.addGraphic(graphics);
     context.addMovableEntity(this);
   }
 
@@ -159,8 +161,9 @@ export class MovableEntity extends PhysicalEntity {
 export class Actor extends MovableEntity {
   protected _action: Action | null;
 
-  constructor(context: ContextImpl, location: Point3D, dimensions: Dimensions) {
-    super(context, location, dimensions);
+  constructor(context: ContextImpl, location: Point3D, dimensions: Dimensions,
+              graphics: GraphicComponent) {
+    super(context, location, dimensions, graphics);
     context.addUpdateableEntity(this);
   }
 
@@ -185,26 +188,4 @@ export function createGraphicalEntity(
   const entity = new PhysicalEntity(context, location, dimensions);
   entity.addGraphic(graphicComponent);
   return entity;
-}
-
-export function createGraphicalMovableEntity(
-  context: ContextImpl,
-  location: Point3D,
-  dimensions: Dimensions,
-  graphicComponent: GraphicComponent
-) {
-  const entity = new MovableEntity(context, location, dimensions);
-  entity.addGraphic(graphicComponent);
-  return entity;
-}
-
-export function createGraphicalActor(
-  context: ContextImpl,
-  location: Point3D,
-  dimensions: Dimensions,
-  graphicComponent: GraphicComponent
-) {
-  const actor = new Actor(context, location, dimensions);
-  actor.addGraphic(graphicComponent);
-  return actor;
 }

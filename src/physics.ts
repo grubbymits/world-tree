@@ -29,6 +29,7 @@ export class BoundingCuboid {
   private _minLocation: Point3D;
   private _maxLocation: Point3D;
   private _bottomCentre: Point3D;
+  private _topCentre: Point3D;
 
   constructor(private _centre: Point3D, private _dimensions: Dimensions) {
     this.centre = _centre;
@@ -61,6 +62,9 @@ export class BoundingCuboid {
   get bottomCentre(): Point3D {
     return this._bottomCentre;
   }
+  get topCentre(): Point3D {
+    return this._topCentre;
+  }
   get width(): number {
     return this._dimensions.width;
   }
@@ -87,6 +91,7 @@ export class BoundingCuboid {
     let y = centre.y - depth;
     let z = centre.z - height;
     this._bottomCentre = new Point3D(centre.x, centre.y, z);
+    this._topCentre = new Point3D(centre.x, centre.y, centre.z + height);
     this._minLocation = new Point3D(x, y, z);
 
     x = centre.x + width;

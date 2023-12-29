@@ -304,8 +304,7 @@ export class Scene {
   getLocationAt(x: number, y: number, camera: Camera): Point3D | null {
     const entity: PhysicalEntity | null = this.getEntityDrawnAt(x, y, camera);
     if (entity != null) {
-      // FIXME: This is not a surface location.
-      return entity.bounds.minLocation;
+      return entity.bounds.centre;
     }
     return null;
   }

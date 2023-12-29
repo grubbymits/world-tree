@@ -52,6 +52,12 @@ function createMap() {
   return context;
 }
 
+function getTileSurfaceCentre(x, y) {
+  return new WT.Point3D(x * squareTileSize + squareTileSize / 2,
+                        y * squareTileSize + squareTileSize / 2,
+                        squareTileSize + 1);
+}
+
 const entityDims = new WT.Dimensions(5, 5, 5);
 test("move direction south flat", () => {
   const idx = 1;
@@ -83,83 +89,56 @@ test("move direction west flat obstructed", () => {
   expect(actor.y).toBe(pos.y);
   expect(actor.z).toBe(pos.z);
 });
+
 test("move destination north flat", () => {
-  const idx = 1;
-  const idy = 3;
-  const posx = 1 + squareTileSize * idx;
-  const posy = squareTileSize * idy;
-  let pos = new WT.Point3D(posx, posy, 1);
-  const destination = new WT.Point3D(posx, posy - 6, 1);
+  const beginPos = getTileSurfaceCentre(1, 3);
+  const destination = getTileSurfaceCentre(1, 1);
   const context = createMap();
-  const actor = new WT.Actor(context, pos, entityDims);
-  const action = new WT.MoveDestination(actor, 2, destination);
+  const actor = new WT.Actor(context, beginPos, entityDims);
+  const velocity = 2;
+  const action = new WT.MoveDestination(actor, velocity, destination);
   actor.action = action;
-  const moveVector = new WT.Vector3D(0, -2, 0);
+  let moveVector = destination.vec_diff(actor.bounds.bottomCentre);
 
-  expect(action.d.x).toBe(moveVector.x);
-  expect(action.d.y).toBe(moveVector.y);
-  expect(action.d.z).toBe(moveVector.z);
+  expect(action.d.mag()).toBeCloseTo(velocity, 5);
+  const expectedVector = new WT.Vector3D(
+    -entityDims.width / 2,
+    -2 * squareTileSize - entityDims.depth / 2,
+    0
+  ); 
+  expect(moveVector).toStrictEqual(expectedVector);
 
+  moveVector = moveVector.norm().mulScalar(velocity);
+  expect(action.d).toStrictEqual(moveVector);
+
+  const expectedPos = actor.bounds.minLocation.add(moveVector);
   actor.update();
-  expect(actor.x).toBe(pos.x + moveVector.x);
-  expect(actor.y).toBe(pos.y + moveVector.y);
-  expect(actor.z).toBe(pos.z + moveVector.z);
-  pos = actor.bounds.minLocation;
-
-  actor.update();
-  expect(actor.x).toBe(pos.x + moveVector.x);
-  expect(actor.y).toBe(pos.y + moveVector.y);
-  expect(actor.z).toBe(pos.z + moveVector.z);
-  pos = actor.bounds.minLocation;
-
-  actor.update();
-  expect(actor.x).toBe(pos.x + moveVector.x);
-  expect(actor.y).toBe(pos.y + moveVector.y);
-  expect(actor.z).toBe(pos.z + moveVector.z);
-  pos = actor.bounds.minLocation;
-
-  actor.update();
-  expect(actor.x).toBe(pos.x);
-  expect(actor.y).toBe(pos.y);
-  expect(actor.z).toBe(pos.z);
+  expect(actor.bounds.minLocation).toStrictEqual(expectedPos);
 });
-test("move destination south south east flat", () => {
-  const idx = 1;
-  const idy = 3;
-  const posx = 1 + squareTileSize * idx;
-  const posy = squareTileSize * idy;
-  let pos = new WT.Point3D(posx, posy, 1);
-  const destination = new WT.Point3D(posx - 2, posy + 4, 1);
+
+test("move destination south east", () => {
+  const beginPos = getTileSurfaceCentre(1, 1);
+  const destination = getTileSurfaceCentre(3, 2);
   const context = createMap();
-  const actor = new WT.Actor(context, pos, entityDims);
-  const action = new WT.MoveDestination(actor, 2, destination);
+  const actor = new WT.Actor(context, beginPos, entityDims);
+  const velocity = 2;
+  const action = new WT.MoveDestination(actor, velocity, destination);
   actor.action = action;
-  const moveVector = new WT.Vector3D(1, 2, 0);
+  let moveVector = destination.vec_diff(actor.bounds.bottomCentre);
 
-  //expect(action.d.x).toBe(moveVector.x);
-  //expect(action.d.y).toBe(moveVector.y);
-  //expect(action.d.z).toBe(moveVector.z);
+  expect(action.d.mag()).toBeCloseTo(velocity, 5);
+  const expectedVector = new WT.Vector3D(
+    2 * squareTileSize - entityDims.width / 2,
+    squareTileSize - entityDims.depth / 2,
+    0
+  ); 
+  expect(moveVector).toStrictEqual(expectedVector);
 
+  moveVector = moveVector.norm().mulScalar(velocity);
+  expect(action.d).toStrictEqual(moveVector);
+
+  const expectedPos = actor.bounds.minLocation.add(moveVector);
   actor.update();
-  //expect(actor.x).toBe(pos.x + moveVector.x);
-  //expect(actor.y).toBe(pos.y + moveVector.y);
-  //expect(actor.z).toBe(pos.z + moveVector.z);
-  pos = actor.bounds.minLocation;
-
-  actor.update();
-  //expect(actor.x).toBe(pos.x + moveVector.x);
-  //expect(actor.y).toBe(pos.y + moveVector.y);
-  //expect(actor.z).toBe(pos.z + moveVector.z);
-  pos = actor.bounds.minLocation;
-
-  actor.update();
-  //expect(actor.x).toBe(pos.x + moveVector.x);
-  //expect(actor.y).toBe(pos.y + moveVector.y);
-  //expect(actor.z).toBe(pos.z + moveVector.z);
-  pos = actor.bounds.minLocation;
-
-  actor.update();
-  //expect(actor.x).toBe(pos.x);
-  //expect(actor.y).toBe(pos.y);
-  //expect(actor.z).toBe(pos.z);
+  expect(actor.bounds.minLocation).toStrictEqual(expectedPos);
 });
+

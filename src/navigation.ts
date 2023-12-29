@@ -38,47 +38,8 @@ export class Navigation {
     return "error";
   }
 
-  static getVector2D(direction: Direction): Vector2D {
-    let xDiff = 0;
-    let yDiff = 0;
-    switch (direction) {
-      default:
-        console.error("unhandled direction");
-        break;
-      case Direction.North:
-        yDiff = -1;
-        break;
-      case Direction.NorthEast:
-        xDiff = 1;
-        yDiff = -1;
-        break;
-      case Direction.East:
-        xDiff = 1;
-        break;
-      case Direction.SouthEast:
-        xDiff = 1;
-        yDiff = 1;
-        break;
-      case Direction.South:
-        yDiff = 1;
-        break;
-      case Direction.SouthWest:
-        xDiff = -1;
-        yDiff = 1;
-        break;
-      case Direction.West:
-        xDiff = -1;
-        break;
-      case Direction.NorthWest:
-        xDiff = -1;
-        yDiff = -1;
-        break;
-    }
-    return new Vector2D(xDiff, yDiff);
-  }
-
   static getAdjacentCoord(p: Point2D, direction: Direction): Point2D {
-    const v = this.getVector2D(direction);
+    const v = this.neighbourOffsets.get(direction)!;
     return p.add(v);
   }
 
@@ -89,12 +50,13 @@ export class Navigation {
   static getDirectionFromVector(w: Vector2D): Direction {
     const mag = w.mag();
     const u = new Vector2D(0, -mag); // 'north'
-    let theta = (180 * u.angle(w)) / Math.PI;
+    // Add 22.5 to allow north to cover -22.5 - 22.5 deg.
+    let theta = ((180 * u.angle(w)) / Math.PI) + 22.5;
     if (theta < 0) {
       const rotate = 180 + theta;
       theta = 180 + rotate;
     }
-    const direction = Math.round(theta / 45);
+    const direction = Math.floor(theta / 45);
     return <Direction>direction;
   }
 
@@ -102,14 +64,20 @@ export class Navigation {
     return (direction + Direction.Max / 2) % Direction.Max;
   }
 
-  static readonly neighbourOffsets: Array<Point2D> = [
-    new Point2D(-1, -1),
-    new Point2D(0, -1),
-    new Point2D(1, -1),
-    new Point2D(-1, 0),
-    new Point2D(1, 0),
-    new Point2D(-1, 1),
-    new Point2D(0, 1),
-    new Point2D(1, 1),
-  ];
+  static getAdjacentDirections(direction: Direction): Array<Direction> {
+    const anticlockwise = (direction + Direction.Max - 1) % Direction.Max;
+    const clockwise = (direction + 1) % Direction.Max;
+    return [ anticlockwise, clockwise ];
+  }
+
+  static readonly neighbourOffsets: Map<Direction, Vector2D> = new Map([
+    [ Direction.North, new Vector2D(0, -1) ],
+    [ Direction.East, new Vector2D(1, 0) ],
+    [ Direction.South, new Vector2D(0, 1) ],
+    [ Direction.West, new Vector2D(-1, 0) ],
+    [ Direction.NorthWest, new Vector2D(-1, -1) ],
+    [ Direction.NorthEast, new Vector2D(1, -1) ],
+    [ Direction.SouthEast, new Vector2D(1, 1) ],
+    [ Direction.SouthWest, new Vector2D(-1, 1) ],
+  ]);
 }

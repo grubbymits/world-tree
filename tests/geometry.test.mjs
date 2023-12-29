@@ -112,6 +112,17 @@ test("3D point arithmetic", () => {
   expect(sub.z).toBe(4);
 });
 
+test("Vector3D magnitude", () => {
+  const vec = new WT.Vector3D(4, 2, 4);
+  expect(vec.mag()).toBe(6);
+});
+
+test("Vector3D norm", () => {
+  const vec = new WT.Vector3D(4, 2, 4);
+  const expected = new WT.Vector3D(4 / 6, 2 / 6, 4 / 6);
+  expect(vec.norm()).toStrictEqual(expected);
+});
+
 test("compare 3D points", () => {
   const p0 = new WT.Point3D(1.5, 2.5, 3.5);
   const p1 = new WT.Point3D(1.5, 2.5, 3.5);

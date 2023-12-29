@@ -24,7 +24,14 @@ export class Vector2D {
   }
 
   mag(): number {
-    return this.dot(this);
+    return Math.sqrt(this.dot(this));
+  }
+
+  normalise(): Vector2D {
+    const mag = this.mag();
+    const x = this.x / mag;
+    const y = this.y / mag;
+    return new Vector2D(x, y);
   }
 
   angle(other: Vector2D): number {
@@ -245,7 +252,15 @@ export class Vector3D {
   }
 
   mag(): number {
-    return this.dot(this);
+    return Math.sqrt(this.dot(this));
+  }
+
+  norm(): Vector3D {
+    const mag = this.mag();
+    const x = this.x / mag;
+    const y = this.y / mag;
+    const z = this.z / mag;
+    return new Vector3D(x, y, z);
   }
 
   cross(other: Vector3D): Vector3D {
@@ -253,10 +268,6 @@ export class Vector3D {
     const y = this.z * other.x - this.x * other.z;
     const z = this.x * other.y - this.y * other.x;
     return new Vector3D(x, y, z);
-  }
-
-  norm(): number {
-    return Math.sqrt(this.dot(this));
   }
 
   angle(other: Vector3D): number {
@@ -322,7 +333,7 @@ export class Vertex3D {
     const sd: number = this.normal.dot(this.normal);
     const sb: number = sn / sd;
     const closest: Point3D = p.addScalar(sb).mul(this.normal);
-    const d: number = p.vec_diff(closest).norm();
+    const d: number = p.vec_diff(closest).mag();
     return d;
   }
 

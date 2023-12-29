@@ -61,28 +61,6 @@ async function createDroid(context, position) {
     () => graphics.direction = droid.direction,
   );
 
-  const moveRandomDirection = () => {
-    let dx = Math.round(Math.random() * 2) - 1;
-    let dy = 0;
-    let dz = 0;
-    // Move along either the x or y axis.
-    // Choose values between: -1, 0, 1
-    if (dx == 0) {
-      dy = Math.round(Math.random() * 2) - 1;
-    }
-    if (dx == 0 && dy == 0) {
-      dy = 1;
-    }
-    const moveVector = new WT.Vector3D(dx, dy, dz);
-    droid.direction = WT.Navigation.getDirectionFromVector(moveVector);
-    droid.action = new WT.MoveDirection(droid, moveVector, context.bounds);
-  };
-
-  // Choose another direction when it can't move anymore.
-  droid.addEventListener(WT.EntityEvent.EndMove, moveRandomDirection);
-  // Initialise movement.
-  moveRandomDirection();
-
   return droid;
 }
 
@@ -102,6 +80,7 @@ window.onload = async (event) => {
     canvas.height,
     droid,
   );
+  WT.TouchOrClickNav(context, canvas, camera, droid, 1);
   const update = function() {
     if (document.hasFocus()) {
       context.update(camera);

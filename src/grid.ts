@@ -184,7 +184,7 @@ export class TerrainGrid {
     let relativeHeight = 0;
     const centreTerrace = descriptor.cellHeightGrid[y][x];
 
-    for (let offset of Navigation.neighbourOffsets) {
+    for (let offset of Navigation.neighbourOffsets.values()) {
       const neighbourX = x + offset.x;
       const neighbourY = y + offset.y;
       if (!this.inbounds(neighbourX, neighbourY)) {
@@ -225,9 +225,9 @@ export class TerrainGrid {
     const scaled: Point3D = this.scaleWorldToGrid(loc);
     const terrain = this.getSurfaceTerrainAt(scaled.x, scaled.y);
     if (terrain != null) {
-      if (terrain.surfaceLocation.z == loc.z) {
+      //if (terrain.centre.z == scaled.z) {
         return terrain;
-      }
+      //}
     }
     return null;
   }
@@ -265,6 +265,8 @@ export class TerrainGrid {
   }
 
   getAccessibleNeighbours(centre: Terrain): Array<Terrain> {
+    const neighbours = new Map<Direction, Terrain>();
+
     // Blocked by different Z values, other than when:
     // direction, entering non-blocking tile
     // north,     RampUpNorth
@@ -279,50 +281,70 @@ export class TerrainGrid {
     // south,     RampUpNorth
     // west,      RampUpEast
 
-    const neighbours = this.getNeighbours(centre);
-    const centrePoint: Point2D = new Point2D(centre.x, centre.y);
-    return neighbours.filter(function (to: Terrain) {
-      if (Math.abs(centre.z - to.z) > 1) {
-        return false;
-      }
+    for (const neighbourOffset of Navigation.neighbourOffsets) {
+      const direction = neighbourOffset[0];
+      const vector = neighbourOffset[1];
 
-      const toPoint: Point2D = new Point2D(to.x, to.y);
-      const direction: Direction = Navigation.getDirectionFromPoints(
-        centrePoint,
-        toPoint
-      );
-      const diagonal =
-        direction != Direction.North &&
-        direction != Direction.East &&
-        direction != Direction.South &&
-        direction != Direction.West;
-      const oppositeDir: Direction = Navigation.getOppositeDirection(direction);
-      if (to.z == centre.z) {
-        return true;
-      } else if (to.z > centre.z && !diagonal) {
-        return Terrain.isRampUp(to.shape, direction);
-      } else if (to.z < centre.z && !diagonal) {
-        return Terrain.isRampUp(to.shape, oppositeDir);
-      }
-      return false;
-    });
-  }
-
-  getNeighbours(centre: Terrain): Array<Terrain> {
-    const neighbours = new Array<Terrain>();
-
-    for (const offset of Navigation.neighbourOffsets) {
       const scaled: Point3D = this.scaleWorldToGrid(centre.surfaceLocation);
       const neighbour = this.getSurfaceTerrainAt(
-        scaled.x + offset.x,
-        scaled.y + offset.y
+        scaled.x + vector.x,
+        scaled.y + vector.y
       );
       if (!neighbour) {
         continue;
       }
-      neighbours.push(neighbour);
+      if (Math.abs(centre.z - neighbour.z) > 1) {
+        continue;
+      }
+
+      let diagonal = true;
+      switch (direction) {
+      default:
+        diagonal = false;
+        break;
+      case Direction.NorthWest:
+        if (!neighbours.has(Direction.North) ||
+            !neighbours.has(Direction.West)) {
+          continue;
+        }
+        break;
+      case Direction.NorthEast:
+        if (!neighbours.has(Direction.North) ||
+            !neighbours.has(Direction.East)) {
+          continue;
+        }
+        break;
+      case Direction.SouthEast:
+        if (!neighbours.has(Direction.South) ||
+            !neighbours.has(Direction.East)) {
+          continue;
+        }
+        break;
+      case Direction.SouthWest:
+        if (!neighbours.has(Direction.South) ||
+            !neighbours.has(Direction.West)) {
+          continue;
+        }
+        break;
+      }
+
+      const oppositeDir: Direction = Navigation.getOppositeDirection(direction);
+      if (neighbour.z == centre.z) {
+        //return true;
+      } else if (neighbour.z > centre.z && !diagonal) {
+        if (!Terrain.isRampUp(neighbour.shape, direction)) {
+          continue;
+        }
+      } else if (neighbour.z < centre.z && !diagonal) {
+        if (!Terrain.isRampUp(neighbour.shape, oppositeDir)) {
+          continue;
+        }
+      } else {
+        continue;
+      }
+      neighbours.set(direction, neighbour);
     }
-    return neighbours;
+    return Array.from(neighbours.values());
   }
 
   findPath(startPoint: Point3D, endPoint: Point3D): Array<Point3D> {
@@ -380,3 +402,4 @@ export class TerrainGrid {
     return path.splice(1);
   }
 }
+
