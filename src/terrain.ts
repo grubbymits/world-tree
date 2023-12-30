@@ -90,11 +90,10 @@ export class Terrain extends PhysicalEntity {
   ): GraphicComponent {
     if (!this._terrainGraphics.has(terrainType)) {
       console.error(
-        "missing graphics for TerrainType",
+        "missing graphics for TerrainType:",
         Terrain.getTypeName(terrainType)
       );
-    }
-    if (!this._terrainGraphics.get(terrainType)!.has(shape)) {
+    } else if (!this._terrainGraphics.get(terrainType)!.has(shape)) {
       console.error(
         "missing graphics for TerrainShape:",
         Terrain.getShapeName(shape)

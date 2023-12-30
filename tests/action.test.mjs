@@ -1,4 +1,5 @@
 import * as WT from "../dist/world-tree.mjs";
+import * as Utils from "./utils.mjs";
 
 const numTilesWide = 5;
 const numTilesDeep = 5;
@@ -140,5 +141,71 @@ test("move destination south east", () => {
   const expectedPos = actor.bounds.minLocation.add(moveVector);
   actor.update();
   expect(actor.bounds.minLocation).toStrictEqual(expectedPos);
+});
+
+test("move around object", () => {
+  const context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric
+  );
+  const terrainType = WT.TerrainType.Lowland0;
+  const terrainShape = WT.TerrainShape.Flat;
+  const terrainTypes = new Array(5).fill(terrainType);
+  const terrainShapes = new Array(5).fill(terrainShape);
+  const terrainGridDescriptor = {
+    cellHeightGrid: [
+      [1, 1, 1, 1, 1],
+      [1, 0, 0, 0, 1],
+      [1, 0, 1, 0, 1],
+      [1, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1],
+    ],
+    typeGrid: new Array(5).fill(terrainTypes),
+    shapeGrid: new Array(5).fill(terrainShapes),
+    tileDimensions: tileDims,
+    cellsX: 5,
+    cellsY: 5,
+    cellsZ: 2,
+  };
+  Utils.addDummyTerrainGraphic(terrainType, terrainShape);
+  const grid = new WT.TerrainGrid(context, terrainGridDescriptor);
+
+  const minLocation = new WT.Point3D(2 * squareTileSize, 2 * squareTileSize, 0);
+  new WT.PhysicalEntity(context, minLocation, tileDims);
+  const beginPos = getTileSurfaceCentre(1, 1);
+  const destination = getTileSurfaceCentre(3, 3);
+  const actor = new WT.Actor(context, beginPos, entityDims);
+  const velocity = 5;
+  const action = new WT.Navigate(actor, velocity, destination);
+  actor.action = action;
+  expect(action.waypoints.length).toBe(4);
+  expect(action.index).toBe(0);
+
+  actor.update();
+  actor.update();
+  expect(context.grid.scaleWorldToGrid(actor.bounds.bottomCentre)).toStrictEqual(
+    new WT.Point3D(2, 1, 1));
+  expect(action.index).toBe(1);
+
+  actor.update();
+  actor.update();
+  actor.update();
+  expect(context.grid.scaleWorldToGrid(actor.bounds.bottomCentre)).toStrictEqual(
+    new WT.Point3D(3, 1, 1));
+  expect(action.index).toBe(2);
+
+  actor.update();
+  actor.update();
+  actor.update();
+  expect(context.grid.scaleWorldToGrid(actor.bounds.bottomCentre)).toStrictEqual(
+    new WT.Point3D(3, 2, 1));
+  expect(action.index).toBe(3);
+
+  actor.update();
+  actor.update();
+  actor.update();
+  expect(context.grid.scaleWorldToGrid(actor.bounds.bottomCentre)).toStrictEqual(
+    new WT.Point3D(3, 3, 1));
+  expect(action.index).toBe(4);
 });
 

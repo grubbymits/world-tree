@@ -124,14 +124,24 @@ export class Navigate extends Action {
   ) {
     super(actor);
     this._waypoints = actor.context.grid!.findPath(actor.bounds.bottomCentre, _destination);
-    if (this._waypoints.length != 0) {
-      this._currentStep = new MoveDestination(actor, _step, this._waypoints[0]);
+    if (this.waypoints.length != 0) {
+      this._currentStep = new MoveDestination(actor, this.step, this.waypoints[0]);
     }
+  }
+
+  get step(): number {
+    return this._step;
+  }
+  get index(): number {
+    return this._index;
+  }
+  get waypoints(): Array<Point3D> {
+    return this._waypoints;
   }
 
   perform(): boolean {
     // Maybe there's no path to the destination.
-    if (this._waypoints.length == 0) {
+    if (this.waypoints.length == 0) {
       return true;
     }
 
@@ -142,35 +152,15 @@ export class Navigate extends Action {
       return false;
     }
 
-    // If the step is reporting that it's done, check whether it completed or
-    // failed. If it failed, try to recompute the path.
-    if (
-      !this._currentStep.destination.isSameAsRounded(
-        this._actor.bounds.minLocation
-      )
-    ) {
-      //this._waypoints = this.findPath();
-      //if (this._waypoints.length != 0) {
-      //  this._index = 0;
-      //  this._currentStep = new MoveDestination(
-      //    this._actor,
-      //    this._step,
-      //    this._waypoints[0],
-      //  );
-      //  return false;
-      //}
-      return true; // can no longer reach the destination.
-    }
-
     this._index++;
-    if (this._index == this._waypoints.length) {
+    if (this.index == this.waypoints.length) {
       return true;
     }
 
-    const nextLocation = this._waypoints[this._index];
+    const nextLocation = this.waypoints[this.index];
     this._currentStep = new MoveDestination(
       this._actor,
-      this._step,
+      this.step,
       nextLocation
     );
     return false;

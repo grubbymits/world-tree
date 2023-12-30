@@ -1,18 +1,6 @@
 import * as WT from "../dist/world-tree.mjs";
+import * as Utils from "./utils.mjs";
 
-function addDummyGraphic(sheet, type, shape) {
-  WT.Terrain.addGraphic(
-    /*terrainType*/ type,
-    /*terrainShape*/ shape,
-    /*spriteSheet*/ sheet,
-    /*coord.x*/ 1,
-    1,
-    1,
-    1
-  );
-}
-const dummySheet = WT.DummySpriteSheet;
-const dummySprite = {};
 const types = [
   WT.TerrainType.Lowland0,
   WT.TerrainType.Lowland1,
@@ -213,8 +201,8 @@ test("walls", () => {
     [0, 0, 0, 0, 1],
   ];
   for (let type of types) {
-    addDummyGraphic(dummySheet, type, WT.TerrainShape.Wall);
-    addDummyGraphic(dummySheet, type, WT.TerrainShape.Flat);
+    Utils.addDummyTerrainGraphic(type, WT.TerrainShape.Wall);
+    Utils.addDummyTerrainGraphic(type, WT.TerrainShape.Flat);
   }
   let builder = new WT.TerrainBuilder(
     heightMap,
