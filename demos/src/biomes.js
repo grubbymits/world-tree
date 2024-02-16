@@ -29,7 +29,7 @@ const worldDescriptor = {
     spriteWidth: 322,
     spriteHeight: 270,
     spriteSheetName: "graphics/png/outside-terrain-tiles-muted",
-    tileRows: [
+    tileRowsTypes: [
       WT.TerrainType.Lowland5,
       WT.TerrainType.Lowland4,
       WT.TerrainType.Lowland3,
@@ -44,7 +44,7 @@ const worldDescriptor = {
       WT.TerrainType.Upland0,
       WT.TerrainType.Water,
     ],
-    tileColumns: [
+    tileColumnShapes: [
       WT.TerrainShape.Flat,
     ],
   },

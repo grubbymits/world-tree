@@ -49,6 +49,7 @@ export enum TerrainShape {
 
 export enum TerrainType {
   Water,
+  Inside,
   Lowland0,
   Lowland1,
   Lowland2,
@@ -67,8 +68,8 @@ export interface TerrainSpriteDescriptor {
   spriteWidth: number;
   spriteHeight: number;
   spriteSheetName: string;
-  tileRows: Array<TerrainType>;
-  tileColumns: Array<TerrainShape>;
+  tileRowTypes: Array<TerrainType>;
+  tileColumnShapes: Array<TerrainShape>;
 };
 
 export class Terrain extends PhysicalEntity {
@@ -124,15 +125,16 @@ export class Terrain extends PhysicalEntity {
 
   static async generateSprites(desc: TerrainSpriteDescriptor,
                                context: ContextImpl): Promise<void> {
+    console.log('generateSprites');
     await SpriteSheet.create(desc.spriteSheetName, context).then((sheet) => {
       const width = desc.spriteWidth;
       const height = desc.spriteHeight;
-      const columns = desc.tileColumns.length;
-      const rows = desc.tileRows.length;
+      const columns = desc.tileColumnShapes.length;
+      const rows = desc.tileRowTypes.length;
       for (let row = 0; row < rows; ++row) {
-        const terrainType = desc.tileRows[row];
+        const terrainType = desc.tileRowTypes[row];
         for (let column = 0; column < columns; ++column) {
-          const terrainShape = desc.tileColumns[column];
+          const terrainShape = desc.tileColumnShapes[column];
           this.addGraphic(
             terrainType,
             terrainShape,
@@ -208,6 +210,10 @@ export class Terrain extends PhysicalEntity {
         return "TerrainShape.FlatSouthOut";
       case TerrainShape.FlatAloneOut:
         return "TerrainShape.FlatAloneOut";
+      case TerrainShape.FlatNorthSouth:
+        return "TerrainShape.FlatNorthSouth";
+      case TerrainShape.FlatEastWest:
+        return "TerrainShape.FlatEastWest";
     }
   }
 
@@ -218,6 +224,8 @@ export class Terrain extends PhysicalEntity {
         return "invalid terrain";
       case TerrainType.Water:
         return "TerrainType.Water";
+      case TerrainType.Inside:
+        return "TerrainType.Inside";
       case TerrainType.Lowland0:
         return "TerrainType.Lowland0";
       case TerrainType.Lowland1:

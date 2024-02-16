@@ -413,7 +413,7 @@ export interface GraphicsDescriptor {
   spriteSheetName: string;
   spriteWidth: number;
   spriteHeight: number;
-  columns: Array<Direction>;
+  columnDirections: Array<Direction>;
   numFrames: number;
 };
 
@@ -423,8 +423,8 @@ createDirectionalGraphics(desc: GraphicsDescriptor,
   const generate = function(sheet: SpriteSheet) {
     const directionGraphicsMap = new Map();
     for (let y = 0; y < desc.numFrames; ++y) {
-      for (let x = 0; x < desc.columns.length; ++x) {
-        const direction = desc.columns[x];
+      for (let x = 0; x < desc.columnDirections.length; ++x) {
+        const direction = desc.columnDirections[x];
         const spriteId = Sprite.create(
           sheet,
           x * desc.spriteWidth,
