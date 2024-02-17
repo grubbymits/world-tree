@@ -1,4 +1,5 @@
 import { ContextImpl } from './context.ts';
+import { Biome } from './biomes.ts';
 import {
   Terrain,
   TerrainShape,
@@ -19,6 +20,7 @@ export interface TerrainGridDescriptor {
   cellHeightGrid: Array<Array<number>>;
   typeGrid: Array<Array<TerrainType>>;
   shapeGrid: Array<Array<TerrainShape>>;
+  biomeGrid: Array<Array<Biome>>;
   tileDimensions: Dimensions;
   cellsX: number;
   cellsY: number;
@@ -29,6 +31,7 @@ export class TerrainGridDescriptorImpl implements TerrainGridDescriptor {
   constructor (private readonly _cellHeightGrid: Array<Array<number>>,
                private readonly _typeGrid: Array<Array<TerrainType>>,
                private readonly _shapeGrid: Array<Array<TerrainShape>>,
+               private readonly _biomeGrid: Array<Array<Biome>>,
                private readonly _tileDimensions: Dimensions,
                private readonly _cellsX: number,
                private readonly _cellsY: number,
@@ -41,6 +44,9 @@ export class TerrainGridDescriptorImpl implements TerrainGridDescriptor {
   }
   get shapeGrid(): Array<Array<TerrainShape>> {
     return this._shapeGrid;
+  }
+  get biomeGrid(): Array<Array<Biome>> {
+    return this._biomeGrid;
   }
   get tileDimensions(): Dimensions {
     return this._tileDimensions;
@@ -92,18 +98,16 @@ export class TerrainGrid {
 
   constructor(
     private readonly _context: ContextImpl,
-    descriptor: TerrainGridDescriptor,
+    private readonly _descriptor: TerrainGridDescriptor,
   ) {
     this._context.grid = this;
-    this._cellsX = descriptor.cellsX;
-    this._cellsY = descriptor.cellsY;
-    this._dimensions  = descriptor.tileDimensions;
+    this._dimensions = this.descriptor.tileDimensions;
     for (let y = 0; y < this.cellsY; ++y) {
       this.surfaceTerrain.push(new Array<Terrain>(this.cellsX));
       for (let x = 0; x < this.cellsX; ++x) {
-        let z = descriptor.cellHeightGrid[y][x];
-        const terrainShape = descriptor.shapeGrid[y][x];
-        const terrainType = descriptor.typeGrid[y][x];
+        let z = this.descriptor.cellHeightGrid[y][x];
+        const terrainShape = this.terrainShapeAt(x, y);
+        const terrainType = this.terrainTypeAt(x, y);
         const position = this.scaleGridToWorld(x, y, z);
         const terrain = new Terrain(
           this._context,
@@ -116,7 +120,7 @@ export class TerrainGrid {
         this.surfaceTerrain[y][x] = terrain;
         this._totalSurface++;
 
-        const zStop = z - this.calcRelativeHeight(x, y, descriptor);
+        const zStop = z - this.calcRelativeHeight(x, y, this.descriptor);
         const shape = Terrain.isFlat(terrainShape)
           ? terrainShape
           : TerrainShape.Flat;
@@ -136,11 +140,14 @@ export class TerrainGrid {
     }
   }
 
+  get descriptor(): TerrainGridDescriptor {
+    return this._descriptor;
+  }
   get cellsX(): number {
-    return this._cellsX;
+    return this.descriptor.cellsX;
   }
   get cellsY(): number {
-    return this._cellsY;
+    return this.descriptor.cellsY;
   }
   get dimensions(): Dimensions {
     return this._dimensions;
@@ -156,6 +163,16 @@ export class TerrainGrid {
   }
   get nodes(): Map<Terrain, PathNode> {
     return this._nodes;
+  }
+
+  terrainShapeAt(x: number, y: number): TerrainShape {
+    return this.descriptor.shapeGrid[y][x];
+  }
+  terrainTypeAt(x: number, y: number): TerrainType {
+    return this.descriptor.typeGrid[y][x];
+  }
+  biomeAt(x: number, y: number): Biome {
+    return this.descriptor.biomeGrid[y][x];
   }
 
   scaleGridToWorld(x: number, y: number, z: number): Point3D {

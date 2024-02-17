@@ -1,213 +1,163 @@
 import * as WT from "../../../dist/world-tree.mjs";
-const spriteWidth = 322;
-const spriteHeight = 270;
-const tileRows = [
-  WT.TerrainType.Lowland5,
-  WT.TerrainType.Lowland4,
-  WT.TerrainType.Lowland3,
-  WT.TerrainType.Lowland2,
-  WT.TerrainType.Lowland1,
-  WT.TerrainType.Lowland0,
-  WT.TerrainType.Upland5,
-  WT.TerrainType.Upland4,
-  WT.TerrainType.Upland3,
-  WT.TerrainType.Upland2,
-  WT.TerrainType.Upland1,
-  WT.TerrainType.Upland0,
-  WT.TerrainType.Water,
-];
-const tileColumns = [
-  WT.TerrainShape.Flat,
-  WT.TerrainShape.RampUpSouth,
-  WT.TerrainShape.RampUpWest,
-  WT.TerrainShape.RampUpEast,
-  WT.TerrainShape.RampUpNorth,
-  WT.TerrainShape.Wall,
-  WT.TerrainShape.FlatAloneOut,
-  WT.TerrainShape.FlatWestOut,
-  WT.TerrainShape.FlatSouthOut,
-  WT.TerrainShape.FlatSouthWest,
-  WT.TerrainShape.FlatNorthEast,
-  WT.TerrainShape.FlatNorth,
-  WT.TerrainShape.FlatEastOut,
-  WT.TerrainShape.FlatEast,
-];
 
-function addGraphic(column, row, sheet) {
-  const shape = tileColumns[column];
-  const type = tileRows[row];
-  WT.Terrain.addGraphic(
-    /*terrainType*/ type,
-    /*terrainShape*/ shape,
-    /*spriteSheet*/ sheet,
-    /*coord.x*/ spriteWidth * column,
-    /*coord.y*/ spriteHeight * row,
-    /*width*/ spriteWidth,
-    /*height*/ spriteHeight,
-  );
-}
-
-const cellsX = 11;
-const cellsY = 11;
-const numTerraces = 3;
-const heightMap = [
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 1, 2, 2, 2, 2, 1, 1, 1, 1, 0],
-  [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
-  [0, 1, 2, 3, 4, 6, 3, 2, 2, 1, 0],
-  [0, 1, 2, 3, 4, 4, 3, 2, 2, 1, 0],
-  [0, 1, 2, 3, 4, 6, 3, 2, 2, 1, 0],
-  [0, 1, 2, 3, 3, 2, 2, 2, 2, 1, 0],
-  [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-];
+const worldDescriptor = {
+  canvasName: "demoCanvas",
+  projection: "TwoByOneIsometric",
+  heightMap: [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 1, 2, 2, 2, 2, 1, 1, 1, 1, 0],
+    [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
+    [0, 1, 2, 3, 3, 4, 3, 2, 2, 1, 0],
+    [0, 1, 2, 3, 4, 6, 4, 2, 2, 1, 0],
+    [0, 1, 2, 3, 4, 4, 3, 2, 2, 1, 0],
+    [0, 1, 2, 3, 3, 2, 2, 2, 2, 1, 0],
+    [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ],
+  numTerraces: 3,
+  floor: WT.TerrainType.Lowland0,
+  wall: WT.TerrainType.Lowland0,
+  biomeConfig: {
+    waterLine: 0,
+    rainfall: 50,
+    rainDirection: WT.Direction.North,
+    uplandThreshold: 4,
+  },
+  terrainSpriteDescriptor: {
+    spriteWidth: 161,
+    spriteHeight: 125,
+    spriteSheetName: "graphics/png/outside-tiles-muted-161x125",
+    tileRowTypes: [
+      WT.TerrainType.Lowland0,
+    ],
+    tileColumnShapes: [
+      WT.TerrainShape.Flat,
+      WT.TerrainShape.FlatWest,
+      WT.TerrainShape.FlatNorth,
+      WT.TerrainShape.FlatEast,
+      WT.TerrainShape.FlatSouth,
+      WT.TerrainShape.FlatNorthWest,
+      WT.TerrainShape.FlatNorthEast,
+      WT.TerrainShape.FlatSouthEast,
+      WT.TerrainShape.FlatSouthWest,
+      WT.TerrainShape.FlatWestOut,
+      WT.TerrainShape.FlatNorthOut,
+      WT.TerrainShape.FlatEastOut,
+      WT.TerrainShape.FlatSouthOut,
+      WT.TerrainShape.FlatAloneOut,
+      WT.TerrainShape.FlatNorthSouth,
+      WT.TerrainShape.FlatEastWest,
+      WT.TerrainShape.RampUpSouth,
+      WT.TerrainShape.RampUpWest,
+      WT.TerrainShape.RampUpEast,
+      WT.TerrainShape.RampUpNorth,
+    ],
+  },
+};
 
 function random_inrange(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-function addTrees(totalTrees, terrainDims, context, builder) {
-  const treeSheet = new WT.SpriteSheet("graphics/png/trees", context);
-  const treeSpriteWidth = 114;
-  const treeSpriteHeight = 171;
-
-  // Ask WorldTree to chop the spritesheet into an array of
-  // StaticGraphicComponent.
-  const treeGraphics = WT.generateStaticGraphics(
-    treeSheet,
-    treeSpriteWidth,
-    treeSpriteHeight,
-    /*xBegin*/ 0,
-    /*yBegin*/ 0,
-    /*columns*/ 8,
-    /*rows*/ 5,
-  );
+async function addTrees(totalTrees, context) {
+  const treeSpriteWidth = 79;
+  const treeSpriteHeight = 158;
   const treeDims = WT.TwoByOneIsometric.getDimensions(
     treeSpriteWidth,
     treeSpriteHeight,
   );
-  let inserted = 0;
-  let insertedAt = new Map();
-  let attempts = 0;
-  const maxAttempts = 1000;
-  let waterOrTooDry = function (biome) {
-    return biome == WT.Biome.Water ||
-      biome == WT.Biome.Desert ||
-      biome == WT.Biome.Rock ||
-      biome == WT.Biome.Tundra;
-  };
-  while (inserted < totalTrees && attempts < maxAttempts) {
-    // Choose a random spot on the map and check whether it seems wet
-    // enough to support a tree.
-    attempts++;
-    const x = Math.floor(Math.random() * cellsX);
-    const y = Math.floor(Math.random() * cellsY);
-    const biome = builder.biomeAt(x, y);
-    // Don't place a tree where it would be out of place.
-    if (waterOrTooDry(biome)) {
-      continue;
-    }
-    // Don't place on a ramp.
-    if (!builder.isFlatAt(x, y)) {
-      continue;
-    }
-    // Don't place two trees in the same place.
-    if (insertedAt.has(y) && insertedAt.get(y).has(x)) {
-      continue;
-    } else if (insertedAt.has(y)) {
-      insertedAt.get(y).add(x);
-    } else {
-      insertedAt.set(y, new Set());
-      insertedAt.get(y).add(x);
-    }
+  const terrainDims = WT.TwoByOneIsometric.getDimensions(
+    worldDescriptor.terrainSpriteDescriptor.spriteWidth,
+    worldDescriptor.terrainSpriteDescriptor.spriteHeight
+  );
+  const graphics =
+    await WT.SpriteSheet.create("graphics/png/tall-trees-muted", context).then((sheet) => {
+      const rows = 2;
+      const columns = 2;
+      const treeGraphics = new Array();
+      for (let y = 0; y < rows; ++y) {
+        for (let x = 0; x < columns; ++x) {
+          const spriteId = WT.Sprite.create(
+            sheet,
+            x * treeSpriteWidth,
+            y * treeSpriteHeight,
+            treeSpriteWidth,
+            treeSpriteHeight
+          );
+          treeGraphics.push(new WT.StaticGraphicComponent(spriteId));
+        }
+      }
+      let inserted = 0;
+      let insertedAt = new Map();
+      let attempts = 0;
+      const maxAttempts = 1000;
+      const waterOrTooDry = function (biome) {
+        return biome == WT.Biome.Water ||
+          biome == WT.Biome.Desert ||
+          biome == WT.Biome.Rock ||
+          biome == WT.Biome.Tundra;
+      };
+      const cellsX = context.grid.cellsX;
+      const cellsY = context.grid.cellsY;
+      while (inserted < totalTrees && attempts < maxAttempts) {
+        // Choose a random spot on the map and check whether it seems wet
+        // enough to support a tree.
+        attempts++;
+        const x = Math.floor(Math.random() * cellsX);
+        const y = Math.floor(Math.random() * cellsY);
+        const biome = context.grid.biomeAt(x, y);
+        // Don't place a tree where it would be out of place.
+        if (waterOrTooDry(biome)) {
+          continue;
+        }
+        // Don't place on a ramp.
+        if (!WT.Terrain.isFlat(context.grid.terrainShapeAt(x, y))) {
+          continue;
+        }
+        if (WT.Terrain.isEdge(context.grid.terrainShapeAt(x, y))) {
+          continue;
+        }
+        // Don't place two trees in the same place.
+        if (insertedAt.has(y) && insertedAt.get(y).has(x)) {
+          continue;
+        } else if (insertedAt.has(y)) {
+          insertedAt.get(y).add(x);
+        } else {
+          insertedAt.set(y, new Set());
+          insertedAt.get(y).add(x);
+        }
 
-    // Try not the place the tree in the exact same relative spot within a tile.
-    let offsetX = random_inrange(treeDims.width / -4, treeDims.width / 4);
-    let offsetY = random_inrange(treeDims.depth / -4, treeDims.depth / 4);
-    const centreX = Math.floor(
-      (x * terrainDims.width) +
-        (terrainDims.width / 2) + offsetX,
-    );
-    const centreY = Math.floor(
-      (y * terrainDims.depth) +
-        (terrainDims.depth / 2) + offsetY,
-    );
-    const z = terrainDims.height * (1 + builder.relativeHeightAt(x, y));
-    const loc = new WT.Point3D(centreX, centreY, z);
+        // Try not the place the tree in the exact same relative spot within a tile.
+        const offsetX = random_inrange(treeDims.width / -4, treeDims.width / 4);
+        const offsetY = random_inrange(treeDims.depth / -4, treeDims.depth / 4);
+        const loc =
+          context.grid.getSurfaceLocationAt(x, y).add(new WT.Vector3D(offsetX, offsetY, 1));
 
-    // Choose a random graphic.
-    const idx = Math.floor(Math.random() * Math.floor(treeGraphics.length));
-    const graphic = treeGraphics[idx];
-    const tree = new WT.createGraphicalEntity(context, loc, treeDims, graphic);
-    inserted++;
-  }
+        // Choose a random graphic.
+        const idx = Math.floor(random_inrange(0, treeGraphics.length - 1));
+        const graphic = treeGraphics[idx];
+        const tree = new WT.createGraphicalEntity(context, loc, treeDims, graphic);
+        inserted++;
+      }
+      console.log('number of trees added:', inserted);
+  });
 }
 
-window.onload = (event) => {
-  const terrainDims = WT.TwoByOneIsometric.getDimensions(
-    spriteWidth,
-    spriteHeight,
-  );
-  const worldDims = new WT.Dimensions(
-    terrainDims.width * cellsX,
-    terrainDims.depth * cellsY,
-    terrainDims.height * 2 * numTerraces,
-  );
-  let canvas = document.getElementById("demoCanvas");
-  let context = new WT.createContext(
-    canvas,
-    worldDims,
-    WT.Perspective.TwoByOneIsometric,
-  );
-  const sheet = new WT.SpriteSheet(
-    "graphics/png/outside-terrain-tiles-muted-textured",
-    context
-  );
-  for (let row in tileRows) {
-    if (tileRows[row] == WT.TerrainType.Water) {
-      // Only supporting flat water and sand tiles.
-      addGraphic(tileColumns[0], row, sheet);
-      continue;
-    }
-    for (let column in tileColumns) {
-      addGraphic(column, row, sheet);
-    }
-  }
-
-  const defaultFloor = WT.TerrainType.Lowland3;
-  const defaultWall = WT.TerrainType.Lowland2;
-  // Use the height map to construct a terrain.
-  const config = new WT.TerrainBuilderConfig(
-    numTerraces,
-    defaultFloor,
-    defaultWall,
-  );
-  config.hasWater = true;
-  config.hasBiomes = true;
-  config.hasRamps = true;
-  config.waterLine = 0;
-  config.rainfall = 30;
-  config.rainDirection = WT.Direction.North;
-
-  let builder = new WT.TerrainBuilder(
-    cellsX,
-    cellsY,
-    heightMap,
-    config,
-    terrainDims,
-  );
-  builder.generateMap(context);
-  let camera = new WT.MouseCamera(
+window.onload = async (event) => {
+  const context = await WT.createWorld(worldDescriptor);
+  const canvas = document.getElementById("demoCanvas");
+  const camera = new WT.MouseCamera(
     context.scene,
     canvas,
     canvas.width,
     canvas.height,
   );
 
-  addTrees(20, terrainDims, context, builder);
-  var update = function update() {
+  await addTrees(10, context);
+
+  const update = function() {
     if (document.hasFocus()) {
       context.update(camera);
     }

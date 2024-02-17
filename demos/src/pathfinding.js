@@ -21,7 +21,7 @@ const worldDescriptor = {
     spriteWidth: 322,
     spriteHeight: 270,
     spriteSheetName: "graphics/png/outside-terrain-tiles-muted-textured",
-    tileRows: [
+    tileRowTypes: [
       WT.TerrainType.Upland5,
       WT.TerrainType.Upland4,
       WT.TerrainType.Upland3,
@@ -29,7 +29,7 @@ const worldDescriptor = {
       WT.TerrainType.Upland1,
       WT.TerrainType.Upland0,
     ],
-    tileColumns: [
+    tileColumnShapes: [
       WT.TerrainShape.Flat,
     ],
   },
@@ -40,7 +40,7 @@ async function createDroid(context, position) {
     spriteSheetName: "graphics/png/levitate-droid",
     spriteWidth: 58,
     spriteHeight: 107,
-    columns: [
+    columnDirections: [
       WT.Direction.West,
       WT.Direction.South,
       WT.Direction.East,

@@ -211,6 +211,7 @@ export class TerrainBuilder {
       this.heightGrid,
       this.terraceGrid
     );
+    console.log('generated biomes');
     setTerrainTypes(this.biomeGrid, this.typeGrid);
   }
 
@@ -224,6 +225,7 @@ export class TerrainBuilder {
       this.terraceGrid,
       this.typeGrid,
       this.shapeGrid,
+      this.biomeGrid,
       this.tileDimensions,
       this.width,
       this.depth,
