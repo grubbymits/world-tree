@@ -79,7 +79,7 @@ async function addTrees(totalTrees, context) {
   const graphics =
     await WT.SpriteSheet.create("graphics/png/tall-trees-muted", context).then((sheet) => {
       const rows = 2;
-      const columns = 2;
+      const columns = 6;
       const treeGraphics = new Array();
       for (let y = 0; y < rows; ++y) {
         for (let x = 0; x < columns; ++x) {
