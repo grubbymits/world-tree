@@ -408,7 +408,7 @@ export class DirectionalGraphicComponent extends GraphicComponent {
   }
 }
 
-export interface GraphicsDescriptor {
+export interface DirectionalGraphicsDescriptor {
   spriteSheet: SpriteSheet;
   spriteSheetName: string;
   spriteWidth: number;
@@ -418,7 +418,7 @@ export interface GraphicsDescriptor {
 };
 
 export async function
-createDirectionalGraphics(desc: GraphicsDescriptor,
+createDirectionalGraphics(desc: DirectionalGraphicsDescriptor,
                           context: ContextImpl): Promise<DirectionalGraphicComponent> {
   const generate = function(sheet: SpriteSheet) {
     const directionGraphicsMap = new Map();
