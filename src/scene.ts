@@ -206,9 +206,11 @@ export abstract class SceneGraph {
     const entity: PhysicalEntity = node.entity;
     if (entity.visible && entity.drawable) {
       // FIXME: Is using the graphics data the right/best thing to do?
-      const width = entity.graphics[0].width;
-      const height = entity.graphics[0].height;
-      return camera.isOnScreen(node.drawCoord, width, height);
+      // Over-estimate the draw area to make up for any rounding issues.
+      const width = entity.graphics[0].width + 2;
+      const height = entity.graphics[0].height + 2;
+      const draw = node.drawCoord.add(new Vector2D(-1, -1));
+      return camera.isOnScreen(draw, width, height);
     } else {
       return false;
     }
