@@ -40,7 +40,7 @@ async function createDroid(context, position) {
     spriteSheetName: "graphics/png/levitate-droid",
     spriteWidth: 58,
     spriteHeight: 107,
-    columns: [
+    columnDirections: [
       WT.Direction.West,
       WT.Direction.South,
       WT.Direction.East,

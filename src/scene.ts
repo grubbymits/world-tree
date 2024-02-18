@@ -626,14 +626,6 @@ export class TwoByOneIsometric extends SceneGraph {
     // - smaller world y.
     // - larger world x.
 
-    // Draw smaller Z first.
-    if (first.entity.bounds.maxZ <= second.entity.bounds.minZ) {
-      return RenderOrder.Before;
-    }
-    if (second.entity.bounds.maxZ <= first.entity.bounds.minZ) {
-      return RenderOrder.After;
-    }
-
     // Draw smaller Y first.
     if (first.entity.bounds.maxY <= second.entity.bounds.minY) {
       return RenderOrder.Before;
@@ -648,6 +640,14 @@ export class TwoByOneIsometric extends SceneGraph {
     if (second.entity.bounds.minX >= first.entity.bounds.maxX) {
       return RenderOrder.After;
     }
+    // Draw smaller Z first.
+    if (first.entity.bounds.maxZ <= second.entity.bounds.minZ) {
+      return RenderOrder.Before;
+    }
+    if (second.entity.bounds.maxZ <= first.entity.bounds.minZ) {
+      return RenderOrder.After;
+    }
+
 
     return RenderOrder.Any;
   }
