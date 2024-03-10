@@ -424,9 +424,6 @@ export class QuadFace3D extends Face3D {
 
   constructor(vertexA: Vertex3D, vertexB: Vertex3D) {
     super(vertexA);
-    if (!vertexA.normal.equal(vertexB.normal)) {
-      throw "Expected QuadFace3D vertices to have equilavent normals";
-    }
     this._triangleA = new TriangleFace3D(vertexA);
     this._triangleB = new TriangleFace3D(vertexB);
   }

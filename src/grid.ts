@@ -176,9 +176,13 @@ export class TerrainGrid {
   }
 
   scaleGridToWorld(x: number, y: number, z: number): Point3D {
-    return new Point3D(x * this.dimensions.width,
-                       y * this.dimensions.depth,
-                       z * this.dimensions.height);
+    const gap = 0.001;
+    const gapX = x * gap;
+    const gapY = y * gap;
+    const gapZ = z * gap;
+    return new Point3D(x * this.dimensions.width + gapX,
+                       y * this.dimensions.depth + gapY,
+                       z * this.dimensions.height + gapZ);
   }
 
   scaleWorldToGrid(loc: Point3D): Point3D {

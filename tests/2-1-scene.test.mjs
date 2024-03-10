@@ -37,7 +37,7 @@ test("draw order of single row", () => {
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
-    let minLocation = new WT.Point3D(i * entityDimensions.width, 0, 0);
+    let minLocation = new WT.Point3D(i * (entityDimensions.width + 0.01), 0, 0);
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, scene);
     nodes.push(node);
@@ -163,9 +163,9 @@ test("draw order of (x, y, z) eight in a cube", () => {
     for (let y = 0; y < 2; ++y) {
       for (let x = 0; x < 2; ++x) {
         let minLocation = new WT.Point3D(
-          x * entityDimensions.width,
-          y * entityDimensions.depth,
-          z * entityDimensions.height
+          x * (entityDimensions.width + 0.001),
+          y * (entityDimensions.depth + 0.001),
+          z * (entityDimensions.height + 0.001)
         );
         let entity = new WT.PhysicalEntity(
           context,
@@ -181,10 +181,6 @@ test("draw order of (x, y, z) eight in a cube", () => {
   camera.location = new WT.Point3D(0, 0, 0);
   context.scene.render(camera, false);
 
-  //expect(context.scene.graph.initialised).toBe(true);
-  //expect(context.scene.graph.levels.length).toBe(2);
-
-  //let level = context.scene.graph.levels[0];
   let drawOrder = context.scene.graph.order.slice(); //level.order.slice();
   drawOrder.reverse();
   expect(drawOrder.length).toBe(8);
@@ -210,9 +206,9 @@ test("draw order of (x, y, z) updating eight in a cube", () => {
     for (let y = 0; y < 2; ++y) {
       for (let x = 0; x < 2; ++x) {
         let minLocation = new WT.Point3D(
-          x * entityDimensions.width,
-          y * entityDimensions.depth,
-          z * entityDimensions.height
+          x * (entityDimensions.width + 0.001),
+          y * (entityDimensions.depth + 0.001),
+          z * (entityDimensions.height + 0.001)
         );
         let entity = new WT.PhysicalEntity(
           context,
@@ -262,9 +258,9 @@ test("draw order of (x, y, z) updating level in a cube", () => {
 
   let addEntityAt = (x, y, z) => {
     let minLocation = new WT.Point3D(
-      x * entityDimensions.width,
-      y * entityDimensions.depth,
-      z * entityDimensions.height
+      x * (entityDimensions.width + 0.001),
+      y * (entityDimensions.depth + 0.001),
+      z * (entityDimensions.height + 0.001)
     );
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     entity.addGraphic(dummyGraphic);
@@ -317,9 +313,9 @@ test("draw order of short and tall", () => {
 
   const addEntityAt = (x, y, z, entityDimensions) => {
     const minLocation = new WT.Point3D(
-      x * terrainDims.width,
-      y * terrainDims.depth,
-      z * terrainDims.height
+      x * (terrainDims.width + 0.001),
+      y * (terrainDims.depth + 0.001),
+      z * (terrainDims.height + 0.001)
     );
     const entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     entity.addGraphic(dummyGraphic);

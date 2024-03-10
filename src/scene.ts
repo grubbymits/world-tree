@@ -236,7 +236,6 @@ export abstract class SceneGraph {
     // directed acyclic graphs, in which there is an arc xy in the graph whenever
     // there is an order relation x < y between the given pair of elements of the
     // partial order.
-    toDraw.sort((a, b) => this.drawOrder(a, b));
     toDraw.forEach((node) => node.clear());
 
     for (let i = 0; i < toDraw.length; i++) {
@@ -588,16 +587,6 @@ export class TwoByOneIsometric extends SceneGraph {
   }
 
   static drawOrder(first: SceneNode, second: SceneNode): RenderOrder {
-    if (
-      !first.entity.bounds.axisOverlapX(second.entity.bounds) &&
-      !first.entity.bounds.axisOverlapY(second.entity.bounds) &&
-      !first.entity.bounds.axisOverlapZ(second.entity.bounds) &&
-      !first.overlapDrawX(second) &&
-      !first.overlapDrawY(second)
-    ) {
-      return RenderOrder.Any;
-    }
-
     // https://shaunlebron.github.io/IsometricBlocks/
     // draw coords
     // (0, 0) ______________ x
@@ -627,30 +616,31 @@ export class TwoByOneIsometric extends SceneGraph {
     // - smaller world z.
     // - smaller world y.
     // - larger world x.
-
-    // Draw smaller Y first.
-    if (first.entity.bounds.maxY <= second.entity.bounds.minY) {
-      return RenderOrder.Before;
+    if (first.entity.bounds.axisOverlapZ(second.entity.bounds))  {
+      // Draw smaller Y first.
+      if (first.entity.bounds.maxY <= second.entity.bounds.minY) {
+        return RenderOrder.Before;
+      }
+      if (second.entity.bounds.maxY <= first.entity.bounds.minY) {
+        return RenderOrder.After;
+      }
+      // Draw larger X first
+      if (first.entity.bounds.minX >= second.entity.bounds.maxX) {
+        return RenderOrder.Before;
+      }
+      if (second.entity.bounds.minX >= first.entity.bounds.maxX) {
+        return RenderOrder.After;
+      }
+    } else if (first.entity.bounds.axisOverlapX(second.entity.bounds) &&
+               first.entity.bounds.axisOverlapY(second.entity.bounds)) {
+      // Draw smaller Z first.
+      if (first.entity.bounds.maxZ <= second.entity.bounds.minZ) {
+        return RenderOrder.Before;
+      }
+      if (second.entity.bounds.maxZ <= first.entity.bounds.minZ) {
+        return RenderOrder.After;
+      }
     }
-    if (second.entity.bounds.maxY <= first.entity.bounds.minY) {
-      return RenderOrder.After;
-    }
-    // Draw larger X first
-    if (first.entity.bounds.minX >= second.entity.bounds.maxX) {
-      return RenderOrder.Before;
-    }
-    if (second.entity.bounds.minX >= first.entity.bounds.maxX) {
-      return RenderOrder.After;
-    }
-    // Draw smaller Z first.
-    if (first.entity.bounds.maxZ <= second.entity.bounds.minZ) {
-      return RenderOrder.Before;
-    }
-    if (second.entity.bounds.maxZ <= first.entity.bounds.minZ) {
-      return RenderOrder.After;
-    }
-
-
     return RenderOrder.Any;
   }
 
