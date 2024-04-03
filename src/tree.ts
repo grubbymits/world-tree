@@ -1,6 +1,7 @@
 import { BoundingCuboid, Dimensions } from "./physics.ts";
 import { PhysicalEntity } from "./entity.ts";
 import { Point3D } from "./geometry.ts";
+import { EntityBounds } from "./bounds.ts";
 
 // TODO Templates/Generics..?
 
@@ -47,13 +48,14 @@ class OctNode {
 
   insert(entity: PhysicalEntity): boolean {
     let inserted = false;
+    const entityBounds = EntityBounds.toBoundingCuboid(entity.id);
     if (this.children.length == 0) {
       // For a leaf node, insert it into the entity list and check that we're
       // within the size limit.
       this.entities.push(entity);
       // Allow the bounds to grow to completely contain the entity. This means
       // that some of the nodes could overlap.
-      this.bounds.insert(entity.bounds);
+      this.bounds.insert(entityBounds);
       if (this.entities.length > OctNode.MaxEntities) {
         inserted = this.split();
       } else {
@@ -64,7 +66,7 @@ class OctNode {
       // First try inserting an entity that is fully contained by an existing
       // boundary.
       for (const child of this.children) {
-        if (child.bounds.containsBounds(entity.bounds)) {
+        if (child.bounds.containsBounds(entityBounds)) {
           inserted = child.insert(entity);
           break;
         }
@@ -73,7 +75,7 @@ class OctNode {
       // grow the bounds.
       if (!inserted) {
         for (const child of this.children) {
-          if (child.containsLocation(entity.centre)) {
+          if (child.containsLocation(entityBounds.centre)) {
             inserted = child.insert(entity);
             break;
           }
@@ -115,7 +117,7 @@ class OctNode {
     }
 
     const insertIntoChild = function (child: OctNode, entity: PhysicalEntity) {
-      if (child.containsLocation(entity.bounds.centre)) {
+      if (child.containsLocation(EntityBounds.centre(entity.id))) {
         return child.insert(entity);
       }
       return false;
@@ -133,7 +135,7 @@ class OctNode {
       console.assert(
         inserted,
         "failed to insert into children, entity centred at:",
-        entity.bounds.centre
+        EntityBounds.centre(entity.id)
       );
     }
 

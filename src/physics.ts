@@ -3,6 +3,7 @@ import { Geometry, IntersectInfo, Point3D, Vector3D } from "./geometry.ts";
 import { Octree } from "./tree.ts";
 import { EntityEvent } from "./events.ts";
 import { ContextImpl } from "./context.ts";
+import { EntityBounds } from "./bounds.ts";
 
 export class Dimensions {
   constructor(
@@ -412,7 +413,7 @@ export class Gravity {
     if (this._force < 0) {
       const path = new Vector3D(0, 0, this._force);
       entities.forEach((movable) => {
-        const bounds = movable.bounds;
+        const bounds = EntityBounds.toBoundingCuboid(movable.id);
         // Create a bounds to contain the current location and the destination.
         const area = new BoundingCuboid(
           bounds.centre.add(path),

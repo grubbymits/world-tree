@@ -1,10 +1,10 @@
-import { Dimensions, BoundingCuboid } from "./physics.ts";\
+import { Dimensions, BoundingCuboid } from "./physics.ts";
 import { Point3D, Vector3D } from "./geometry.ts";
 
-class EntityBounds {
+export class EntityBounds {
   private static readonly MAX_ENTITIES = 1024;
-  private static readonly NUM_ELEMENTS=3;
-  private static data: Float64Array(this.MAX_ENTITIES * this.NUM_ELEMENTS * 2);
+  private static readonly NUM_ELEMENTS = 3;
+  private static data: Float64Array = new Float64Array(this.MAX_ENTITIES * this.NUM_ELEMENTS * 2);
 
   static toBoundingCuboid(id: number): BoundingCuboid {
     return new BoundingCuboid(this.centre(id), this.dimensions(id));
@@ -16,38 +16,45 @@ class EntityBounds {
     return id * 2 * this.NUM_ELEMENTS + this.NUM_ELEMENTS;
   }
   static minLocation(id: number): Point3D {
-    const start = this.minStartIdx(id);
-    return new Point3D(this.data[start], this.data[start+1], this.data[start+2]); 
+    return new Point3D(this.minX(id), this.minY(id), this.minZ(id));
   }
   static maxLocation(id: number): Point3D {
-    const start = this.maxStartIdx(id);
-    return new Point3D(this.data[start], this.data[start+1], this.data[start+2]); 
+    return new Point3D(this.maxX(id), this.maxY(id), this.maxZ(id));
   }
   static centre(id: number): Point3D {
     const dimensions = this.dimensions(id);
     return new Point3D(
-      this.minX + dimensions.width / 2,
-      this.minY + dimensions.depth / 2,
-      this.minZ + dimensions.height / 2
+      this.minX(id) + dimensions.width / 2,
+      this.minY(id) + dimensions.depth / 2,
+      this.minZ(id) + dimensions.height / 2
     );                
   }
-  static minX(): number {
-    return this.minLocation.x;
+  static minX(id: number): number {
+    return this.data[this.minStartIdx(id)];
   }
-  static minY(): number {
-    return this.minLocation.y;
+  static minY(id: number): number {
+    return this.data[this.minStartIdx(id) + 1];
   }
-  static minZ(): number {
-    return this.minLocation.z;
+  static minZ(id: number): number {
+    return this.data[this.minStartIdx(id) + 2];
   }
-  static maxX(): number {
-    return this.maxLocation.x;
+  static maxX(id: number): number {
+    return this.data[this.maxStartIdx(id)];
   }
-  static maxY(): number {
-    return this.maxLocation.y;
+  static maxY(id: number): number {
+    return this.data[this.maxStartIdx(id) + 1];
   }
-  static maxZ(): number {
-    return this.maxLocation.z;
+  static maxZ(id: number): number {
+    return this.data[this.maxStartIdx(id) + 2];
+  }
+  static centreX(id: number): number {
+    return this.minX(id) + this.width(id) / 2;
+  }
+  static centreY(id: number): number {
+    return this.minY(id) + this.depth(id) / 2;
+  }
+  static centreZ(id: number): number {
+    return this.minZ(id) + this.height(id) / 2;
   }
   static width(id: number): number {
     return this.maxX(id) - this.minX(id);
@@ -62,7 +69,7 @@ class EntityBounds {
     const width = this.width(id);
     const depth = this.depth(id);
     const height = this.height(id);
-    return new Dimension(width, depth, height);
+    return new Dimensions(width, depth, height);
   }
   static addEntity(id: number, min: Point3D, dims: Dimensions): void {
     const minStart = this.minStartIdx(id);
@@ -84,7 +91,85 @@ class EntityBounds {
     this.data[maxStart+1] += d.y;
     this.data[maxStart+2] += d.z;
   }
+  static contains(id: number, p: Point3D): boolean {
+    if (
+      p.x < this.minX(id) ||
+      p.y < this.minY(id) ||
+      p.z < this.minZ(id)
+    ) {
+      return false;
+    }
+
+    if (
+      p.x > this.maxX(id) ||
+      p.y > this.maxY(id) ||
+      p.z > this.maxZ(id)
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+  static intersects(ida: number, idb: number): boolean {
+    if (
+      this.minX(idb) > this.maxX(ida) ||
+      this.maxX(idb) < this.minX(ida)
+    ) {
+      return false;
+    }
+
+    if (
+      this.minY(idb) > this.maxY(ida) ||
+      this.maxY(idb) < this.minY(ida)
+    ) {
+      return false;
+    }
+
+    if (
+      this.minZ(idb) > this.maxZ(ida) ||
+      this.maxZ(idb) < this.minZ(ida)
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+  static axisOverlapX(ida: number, idb: number): boolean {
+    if (
+      (this.minX(idb) >= this.minX(ida) &&
+        this.minX(idb) <= this.maxX(ida)) ||
+      (this.maxX(idb) >= this.minX(ida) &&
+        this.maxX(idb) <= this.maxX(ida))
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  static axisOverlapY(ida: number, idb: number): boolean {
+    if (
+      (this.minY(idb) >= this.minY(ida) &&
+        this.minY(idb) <= this.maxY(ida)) ||
+      (this.maxY(idb) >= this.minY(ida) &&
+        this.maxY(idb) <= this.maxY(ida))
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  static axisOverlapZ(ida: number, idb: number): boolean {
+    if (
+      (this.minZ(idb) >= this.minZ(ida) &&
+        this.minZ(idb) <= this.maxZ(ida)) ||
+      (this.maxZ(idb) >= this.minZ(ida) &&
+        this.maxZ(idb) <= this.maxZ(ida))
+    ) {
+      return true;
+    }
+    return false;
+  }
   static copyData(): ArrayBuffer {
-    return this.data.splice();
+    return this.data.slice();
   }
 }

@@ -7,6 +7,7 @@ import { GraphicComponent } from "./graphics.ts";
 import { ContextImpl } from "./context.ts";
 import { Action } from "./action.ts";
 import { EntityEvent, EventHandler } from "./events.ts";
+import { EntityBounds } from "./bounds.ts";
 
 export class PhysicalEntity {
   private static _ids = 0;
@@ -43,6 +44,7 @@ export class PhysicalEntity {
     );
     const bounds = new BoundingCuboid(centre, dimensions);
     this._geometry = new CuboidGeometry(bounds);
+    EntityBounds.addEntity(this.id, minLocation, dimensions);
     this._context.addEntity(this);
   }
 
@@ -52,32 +54,32 @@ export class PhysicalEntity {
   get geometry(): Geometry {
     return this._geometry;
   }
-  get bounds(): BoundingCuboid {
-    return this._geometry.bounds;
-  }
+  //get bounds(): BoundingCuboid {
+  //  return this._geometry.bounds;
+  //}
   get dimensions(): Dimensions {
-    return this.bounds.dimensions;
+    return EntityBounds.dimensions(this.id);
   }
   get x(): number {
-    return this.bounds.minX;
+    return EntityBounds.minX(this.id);
   }
   get y(): number {
-    return this.bounds.minY;
+    return EntityBounds.minY(this.id);
   }
   get z(): number {
-    return this.bounds.minZ;
+    return EntityBounds.minZ(this.id);
   }
   get width(): number {
-    return this.bounds.width;
+    return EntityBounds.width(this.id);
   }
   get depth(): number {
-    return this.bounds.depth;
+    return EntityBounds.depth(this.id);
   }
   get height(): number {
-    return this.bounds.height;
+    return EntityBounds.height(this.id);
   }
   get centre(): Point3D {
-    return this.bounds.centre;
+    return EntityBounds.centre(this.id);
   }
   get id(): number {
     return this._id;
@@ -107,7 +109,8 @@ export class PhysicalEntity {
   }
 
   updatePosition(d: Vector3D): void {
-    this.bounds.update(d);
+    //this.bounds.update(d);
+    EntityBounds.update(this.id, d);
     this.geometry.transform(d);
   }
 
@@ -141,7 +144,7 @@ export class MovableEntity extends PhysicalEntity {
   }
 
   updatePosition(d: Vector3D): void {
-    this.bounds.update(d);
+    EntityBounds.update(this.id, d);
     this.geometry.transform(d);
     this.postEvent(EntityEvent.Moving);
   }

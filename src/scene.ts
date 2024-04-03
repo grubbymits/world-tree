@@ -5,6 +5,7 @@ import { GraphicComponent, Sprite } from "./graphics.ts";
 import { Dimensions } from "./physics.ts";
 import { TimedEventHandler } from "./events.ts";
 import { DrawElementList } from "./render.ts";
+import { EntityBounds } from "./bounds.ts";
 
 export enum RenderOrder {
   Before = -1,
@@ -103,12 +104,6 @@ export class SceneNode {
   get succs(): Array<SceneNode> {
     return this._succs;
   }
-  get minZ(): number {
-    return this._entity.bounds.minZ;
-  }
-  get maxZ(): number {
-    return this._entity.bounds.maxZ;
-  }
 }
 
 type NodeCompare = (firstId: number, secondId: number) => RenderOrder;
@@ -127,7 +122,7 @@ export abstract class SceneGraph {
 
   updateDrawOutline(node: SceneNode): void {
     const entity: PhysicalEntity = node.entity;
-    const min: Point3D = entity.bounds.minLocation;
+    const min: Point3D = EntityBounds.minLocation(entity.id);
     const minDraw: Point2D = this.getDrawCoord(min);
     const diff: Vector2D = minDraw.diff(node.min2D);
     node.updateOutline(diff);
@@ -135,8 +130,8 @@ export abstract class SceneGraph {
 
   setDrawOutline(node: SceneNode): void {
     const entity: PhysicalEntity = node.entity;
-    const min: Point3D = entity.bounds.minLocation;
-    const max: Point3D = entity.bounds.maxLocation;
+    const min: Point3D = EntityBounds.minLocation(entity.id);
+    const max: Point3D = EntityBounds.maxLocation(entity.id);
     node.min2D = this.getDrawCoord(min);
     node.max2D = this.getDrawCoord(max);
     node.top2D = this.getDrawCoord(new Point3D(max.x, min.y, max.z));
@@ -305,7 +300,7 @@ export class Scene {
   getLocationAt(x: number, y: number, camera: Camera): Point3D | null {
     const entity: PhysicalEntity | null = this.getEntityDrawnAt(x, y, camera);
     if (entity != null) {
-      return entity.bounds.centre;
+      return EntityBounds.centre(entity.id);
     }
     return null;
   }
@@ -616,28 +611,28 @@ export class TwoByOneIsometric extends SceneGraph {
     // - smaller world z.
     // - smaller world y.
     // - larger world x.
-    if (first.entity.bounds.axisOverlapZ(second.entity.bounds))  {
+    if (EntityBounds.axisOverlapZ(first.entity.id, second.entity.id))  {
       // Draw smaller Y first.
-      if (first.entity.bounds.maxY <= second.entity.bounds.minY) {
+      if (EntityBounds.maxY(first.entity.id) <= EntityBounds.minY(second.entity.id)) {
         return RenderOrder.Before;
       }
-      if (second.entity.bounds.maxY <= first.entity.bounds.minY) {
+      if (EntityBounds.maxY(second.entity.id) <= EntityBounds.minY(first.entity.id)) {
         return RenderOrder.After;
       }
       // Draw larger X first
-      if (first.entity.bounds.minX >= second.entity.bounds.maxX) {
+      if (EntityBounds.minX(first.entity.id) >= EntityBounds.maxX(second.entity.id)) {
         return RenderOrder.Before;
       }
-      if (second.entity.bounds.minX >= first.entity.bounds.maxX) {
+      if (EntityBounds.minX(second.entity.id) >= EntityBounds.maxX(first.entity.id)) {
         return RenderOrder.After;
       }
-    } else if (first.entity.bounds.axisOverlapX(second.entity.bounds) &&
-               first.entity.bounds.axisOverlapY(second.entity.bounds)) {
+    } else if (EntityBounds.axisOverlapX(first.entity.id, second.entity.id) &&
+               EntityBounds.axisOverlapY(first.entity.id, second.entity.id)) {
       // Draw smaller Z first.
-      if (first.entity.bounds.maxZ <= second.entity.bounds.minZ) {
+      if (EntityBounds.maxZ(first.entity.id) <= EntityBounds.minZ(second.entity.id)) {
         return RenderOrder.Before;
       }
-      if (second.entity.bounds.maxZ <= first.entity.bounds.minZ) {
+      if (EntityBounds.maxZ(second.entity.id) <= EntityBounds.minZ(first.entity.id)) {
         return RenderOrder.After;
       }
     }

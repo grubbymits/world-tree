@@ -17,6 +17,7 @@ import {
   RampUpSouthGeometry,
   RampUpWestGeometry,
 } from "./geometry.ts";
+import { EntityBounds } from "./bounds.ts";
 
 export enum TerrainShape {
   Flat,             // 0
@@ -388,9 +389,9 @@ export class Terrain extends PhysicalEntity {
       this._geometry = new RampUpNorthGeometry(this.geometry.bounds);
     }
 
-    const x = this.bounds.centre.x;
-    const y = this.bounds.centre.y;
-    const z = this.heightAt(this.bounds.centre)!;
+    const x = EntityBounds.centreX(this.id);
+    const y = EntityBounds.centreY(this.id);
+    const z = this.heightAt(EntityBounds.centre(this.id))!;
     this._surfaceLocation = new Point3D(x, y, z);
   }
 
@@ -417,7 +418,7 @@ export class Terrain extends PhysicalEntity {
     // Given a world location, does this terrain define what the minimum z
     // coordinate?
     // If the locations is outside of the bounding cuboid, just return null.
-    if (!this.bounds.contains(location)) {
+    if (!EntityBounds.contains(this.id, location)) {
       return null;
     }
     if (Terrain.isFlat(this._shape)) {
