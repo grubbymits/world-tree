@@ -11,7 +11,7 @@ export * from "./entity.ts";
 export * from "./camera.ts";
 export * from "./action.ts";
 export * from "./events.ts";
-export * from "./sound.ts";
 export * from "./geometry.ts";
 export * from "./biomes.ts";
 export * from "./grid.ts";
+export * from "./bounds.ts";

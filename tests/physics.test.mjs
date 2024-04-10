@@ -10,9 +10,6 @@ test("initial locations", () => {
   expect(bounds.width).toBe(5);
   expect(bounds.depth).toBe(7);
   expect(bounds.height).toBe(8);
-  expect(bounds.bottomCentre.x).toBe(10);
-  expect(bounds.bottomCentre.y).toBe(15);
-  expect(bounds.bottomCentre.z).toBe(16);
   expect(bounds.minLocation.x).toBe(7.5);
   expect(bounds.minLocation.y).toBe(11.5);
   expect(bounds.minLocation.z).toBe(16);
@@ -21,21 +18,46 @@ test("initial locations", () => {
   expect(bounds.maxLocation.z).toBe(24);
 });
 
-test("update position", () => {
-  const centre = new WT.Point3D(10, 15, 20);
+test("initial entity bounds locations", () => {
+  const min = new WT.Point3D(7.5, 11.5, 16);
   const dims = new WT.Dimensions(5, 7, 8);
-  const bounds = new WT.BoundingCuboid(centre, dims);
+  const id = 0;
+
+  WT.EntityBounds.addEntity(id, min, dims);
+  expect(WT.EntityBounds.centreX(id)).toBe(10);
+  expect(WT.EntityBounds.centreY(id)).toBe(15);
+  expect(WT.EntityBounds.centreZ(id)).toBe(20);
+  expect(WT.EntityBounds.width(id)).toBe(5);
+  expect(WT.EntityBounds.depth(id)).toBe(7);
+  expect(WT.EntityBounds.height(id)).toBe(8);
+  expect(WT.EntityBounds.bottomCentre(id).x).toBe(10);
+  expect(WT.EntityBounds.bottomCentre(id).y).toBe(15);
+  expect(WT.EntityBounds.bottomCentre(id).z).toBe(16);
+  expect(WT.EntityBounds.minX(id)).toBe(7.5);
+  expect(WT.EntityBounds.minY(id)).toBe(11.5);
+  expect(WT.EntityBounds.minZ(id)).toBe(16);
+  expect(WT.EntityBounds.maxX(id)).toBe(12.5);
+  expect(WT.EntityBounds.maxY(id)).toBe(18.5);
+  expect(WT.EntityBounds.maxZ(id)).toBe(24);
+});
+
+test("update entity bounds position", () => {
+  const min = new WT.Point3D(7.5, 11.5, 16);
+  const dims = new WT.Dimensions(5, 7, 8);
   const move = new WT.Vector3D(3, 2, 1);
-  bounds.update(move);
-  expect(bounds.bottomCentre.x).toBe(13);
-  expect(bounds.bottomCentre.y).toBe(17);
-  expect(bounds.bottomCentre.z).toBe(17);
-  expect(bounds.minLocation.x).toBe(10.5);
-  expect(bounds.minLocation.y).toBe(13.5);
-  expect(bounds.minLocation.z).toBe(17);
-  expect(bounds.maxLocation.x).toBe(15.5);
-  expect(bounds.maxLocation.y).toBe(20.5);
-  expect(bounds.maxLocation.z).toBe(25);
+  const id = 0;
+
+  WT.EntityBounds.addEntity(id, min, dims);
+  WT.EntityBounds.update(id, move);
+  expect(WT.EntityBounds.bottomCentre(id).x).toBe(13);
+  expect(WT.EntityBounds.bottomCentre(id).y).toBe(17);
+  expect(WT.EntityBounds.bottomCentre(id).z).toBe(17);
+  expect(WT.EntityBounds.minX(id)).toBe(10.5);
+  expect(WT.EntityBounds.minY(id)).toBe(13.5);
+  expect(WT.EntityBounds.minZ(id)).toBe(17);
+  expect(WT.EntityBounds.maxX(id)).toBe(15.5);
+  expect(WT.EntityBounds.maxY(id)).toBe(20.5);
+  expect(WT.EntityBounds.maxZ(id)).toBe(25);
 });
 
 test("contains location", () => {

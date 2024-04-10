@@ -24,10 +24,18 @@ export class EntityBounds {
   static centre(id: number): Point3D {
     const dimensions = this.dimensions(id);
     return new Point3D(
-      this.minX(id) + dimensions.width / 2,
-      this.minY(id) + dimensions.depth / 2,
-      this.minZ(id) + dimensions.height / 2
-    );                
+      this.minX(id) + dimensions.width * 0.5,
+      this.minY(id) + dimensions.depth * 0.5,
+      this.minZ(id) + dimensions.height * 0.5
+    );
+  }
+  static bottomCentre(id: number): Point3D {
+    const dimensions = this.dimensions(id);
+    return new Point3D(
+      this.minX(id) + dimensions.width * 0.5,
+      this.minY(id) + dimensions.depth * 0.5,
+      this.minZ(id)
+    );
   }
   static minX(id: number): number {
     return this.data[this.minStartIdx(id)];
@@ -48,13 +56,13 @@ export class EntityBounds {
     return this.data[this.maxStartIdx(id) + 2];
   }
   static centreX(id: number): number {
-    return this.minX(id) + this.width(id) / 2;
+    return this.minX(id) + this.width(id) * 0.5;
   }
   static centreY(id: number): number {
-    return this.minY(id) + this.depth(id) / 2;
+    return this.minY(id) + this.depth(id) * 0.5;
   }
   static centreZ(id: number): number {
-    return this.minZ(id) + this.height(id) / 2;
+    return this.minZ(id) + this.height(id) * 0.5;
   }
   static width(id: number): number {
     return this.maxX(id) - this.minX(id);
@@ -128,6 +136,30 @@ export class EntityBounds {
     if (
       this.minZ(idb) > this.maxZ(ida) ||
       this.maxZ(idb) < this.minZ(ida)
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+  static intersectsBounds(id: number, min: Point3D, max: Point3D): boolean {
+    if (
+      min.x > this.maxX(id) ||
+      max.x < this.minX(id)
+    ) {
+      return false;
+    }
+
+    if (
+      min.y > this.maxY(id) ||
+      max.y < this.minY(id)
+    ) {
+      return false;
+    }
+
+    if (
+      min.z > this.maxZ(id) ||
+      max.z < this.minZ(id)
     ) {
       return false;
     }

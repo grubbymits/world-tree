@@ -5,6 +5,7 @@ import { EntityEvent } from "./events.ts";
 import { BoundingCuboid, CollisionDetector, CollisionInfo } from "./physics.ts";
 import { Point3D, Vector2D, Vector3D } from "./geometry.ts";
 import { Navigation } from "./navigation.ts";
+import { EntityBounds } from "./bounds.ts";
 
 export abstract class Action {
   constructor(protected _actor: Actor) {}
@@ -24,12 +25,8 @@ class MoveAction extends Action {
   }
 
   obstructed(from: Point3D, to: Point3D): CollisionInfo | null {
-    const bounds = this._actor.bounds;
-    // Create a bounds to contain the current location and the destination.
     const path: Vector3D = to.vec_diff(from);
-    const area = new BoundingCuboid(to, bounds.dimensions);
-    area.insert(bounds);
-    return CollisionDetector.detectInArea(this._actor, path, area);
+    return CollisionDetector.detectInArea(this._actor, path);
   }
 
   perform(): boolean {
@@ -47,7 +44,7 @@ export class MoveDirection extends MoveAction {
   }
 
   perform(): boolean {
-    const currentPos = this.actor.bounds.bottomCentre;
+    const currentPos = EntityBounds.bottomCentre(this.actor.id);
     const nextPos = currentPos.add(this._d);
     const obstruction = this.obstructed(currentPos, nextPos);
     if (obstruction == null) {
@@ -88,15 +85,14 @@ export class MoveDestination extends MoveAction {
   }
   set destination(destination: Point3D) {
     this._destination = destination;
-    const currentPos = this.actor.bounds.bottomCentre;
+    const currentPos = EntityBounds.bottomCentre(this.actor.id);
     this._d = destination.vec_diff(currentPos).norm().mulScalar(this._step);
     const direction = Navigation.getDirectionFromVector(new Vector2D(this._d.x, this._d.y));
     this.actor.direction = direction;
   }
 
   perform(): boolean {
-    const bounds: BoundingCuboid = this.actor.bounds;
-    const location: Point3D = bounds.bottomCentre;
+    const location: Point3D = EntityBounds.bottomCentre(this.actor.id);
     // Check for obstruction.
     if (this.obstructed(location, location.add(this._d))) {
       return true;
@@ -123,7 +119,7 @@ export class Navigate extends Action {
     private readonly _destination: Point3D
   ) {
     super(actor);
-    this._waypoints = actor.context.grid!.findPath(actor.bounds.bottomCentre, _destination);
+    this._waypoints = actor.context.grid!.findPath(EntityBounds.bottomCentre(actor.id), _destination);
     if (this.waypoints.length != 0) {
       this._currentStep = new MoveDestination(actor, this.step, this.waypoints[0]);
     }

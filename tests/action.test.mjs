@@ -99,7 +99,7 @@ test("move destination north flat", () => {
   const velocity = 2;
   const action = new WT.MoveDestination(actor, velocity, destination);
   actor.action = action;
-  let moveVector = destination.vec_diff(actor.bounds.bottomCentre);
+  let moveVector = destination.vec_diff(WT.EntityBounds.bottomCentre(actor.id));
 
   expect(action.d.mag()).toBeCloseTo(velocity, 5);
   const expectedVector = new WT.Vector3D(
@@ -112,9 +112,9 @@ test("move destination north flat", () => {
   moveVector = moveVector.norm().mulScalar(velocity);
   expect(action.d).toStrictEqual(moveVector);
 
-  const expectedPos = actor.bounds.minLocation.add(moveVector);
+  const expectedPos = WT.EntityBounds.minLocation(actor.id).add(moveVector);
   actor.update();
-  expect(actor.bounds.minLocation).toStrictEqual(expectedPos);
+  expect(WT.EntityBounds.minLocation(actor.id)).toStrictEqual(expectedPos);
 });
 
 test("move destination south east", () => {
@@ -125,7 +125,7 @@ test("move destination south east", () => {
   const velocity = 2;
   const action = new WT.MoveDestination(actor, velocity, destination);
   actor.action = action;
-  let moveVector = destination.vec_diff(actor.bounds.bottomCentre);
+  let moveVector = destination.vec_diff(WT.EntityBounds.bottomCentre(actor.id));
 
   expect(action.d.mag()).toBeCloseTo(velocity, 5);
   const expectedVector = new WT.Vector3D(
@@ -138,9 +138,9 @@ test("move destination south east", () => {
   moveVector = moveVector.norm().mulScalar(velocity);
   expect(action.d).toStrictEqual(moveVector);
 
-  const expectedPos = actor.bounds.minLocation.add(moveVector);
+  const expectedPos = WT.EntityBounds.minLocation(actor.id).add(moveVector);
   actor.update();
-  expect(actor.bounds.minLocation).toStrictEqual(expectedPos);
+  expect(WT.EntityBounds.minLocation(actor.id)).toStrictEqual(expectedPos);
 });
 
 test("move around object", () => {
@@ -183,28 +183,28 @@ test("move around object", () => {
 
   actor.update();
   actor.update();
-  expect(context.grid.scaleWorldToGrid(actor.bounds.bottomCentre)).toStrictEqual(
+  expect(context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))).toStrictEqual(
     new WT.Point3D(2, 1, 1));
   expect(action.index).toBe(1);
 
   actor.update();
   actor.update();
   actor.update();
-  expect(context.grid.scaleWorldToGrid(actor.bounds.bottomCentre)).toStrictEqual(
+  expect(context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))).toStrictEqual(
     new WT.Point3D(3, 1, 1));
   expect(action.index).toBe(2);
 
   actor.update();
   actor.update();
   actor.update();
-  expect(context.grid.scaleWorldToGrid(actor.bounds.bottomCentre)).toStrictEqual(
+  expect(context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))).toStrictEqual(
     new WT.Point3D(3, 2, 1));
   expect(action.index).toBe(3);
 
   actor.update();
   actor.update();
   actor.update();
-  expect(context.grid.scaleWorldToGrid(actor.bounds.bottomCentre)).toStrictEqual(
+  expect(context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))).toStrictEqual(
     new WT.Point3D(3, 3, 1));
   expect(action.index).toBe(4);
 });
