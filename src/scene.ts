@@ -216,9 +216,6 @@ export class Scene {
   get nodes(): Map<number, SceneNode> {
     return this._nodes;
   }
-  get ctx(): CanvasRenderingContext2D | null {
-    return null;
-  }
 
   insertEntity(entity: PhysicalEntity): void {
     const node = new SceneNode(entity, this.graph.adjustedDrawCoord(entity));
@@ -548,28 +545,30 @@ export class TwoByOneIsometric extends SceneGraph {
     // - smaller world z.
     // - smaller world y.
     // - larger world x.
-    if (EntityBounds.axisOverlapZ(first.entity.id, second.entity.id))  {
+    const ida = first.entity.id;
+    const idb = second.entity.id;
+    if (EntityBounds.axisOverlapZ(ida, idb))  {
       // Draw smaller Y first.
-      if (EntityBounds.maxY(first.entity.id) <= EntityBounds.minY(second.entity.id)) {
+      if (EntityBounds.maxY(ida) <= EntityBounds.minY(idb)) {
         return RenderOrder.Before;
       }
-      if (EntityBounds.maxY(second.entity.id) <= EntityBounds.minY(first.entity.id)) {
+      if (EntityBounds.maxY(idb) <= EntityBounds.minY(ida)) {
         return RenderOrder.After;
       }
       // Draw larger X first
-      if (EntityBounds.minX(first.entity.id) >= EntityBounds.maxX(second.entity.id)) {
+      if (EntityBounds.minX(ida) >= EntityBounds.maxX(idb)) {
         return RenderOrder.Before;
       }
-      if (EntityBounds.minX(second.entity.id) >= EntityBounds.maxX(first.entity.id)) {
+      if (EntityBounds.minX(idb) >= EntityBounds.maxX(ida)) {
         return RenderOrder.After;
       }
-    } else if (EntityBounds.axisOverlapX(first.entity.id, second.entity.id) &&
-               EntityBounds.axisOverlapY(first.entity.id, second.entity.id)) {
+    } else if (EntityBounds.axisOverlapX(ida, idb) &&
+               EntityBounds.axisOverlapY(ida, idb)) {
       // Draw smaller Z first.
-      if (EntityBounds.maxZ(first.entity.id) <= EntityBounds.minZ(second.entity.id)) {
+      if (EntityBounds.maxZ(ida) <= EntityBounds.minZ(idb)) {
         return RenderOrder.Before;
       }
-      if (EntityBounds.maxZ(second.entity.id) <= EntityBounds.minZ(first.entity.id)) {
+      if (EntityBounds.maxZ(idb) <= EntityBounds.minZ(ida)) {
         return RenderOrder.After;
       }
     }
