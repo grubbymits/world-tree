@@ -19,38 +19,24 @@ function inRange(n: number, lower: number, upper: number): boolean {
 
 export class SceneNode {
   private _succs: Array<SceneNode> = new Array<SceneNode>();
-  private _min2D: Point2D;
-  private _max2D: Point2D;
-  private _top2D: Point2D;
-  private _bottom2D: Point2D;
-  private _drawCoord: Point2D;
 
-  constructor(private readonly _entity: PhysicalEntity, graph: SceneGraph) {
-    graph.setDrawOutline(this);
+  constructor(private readonly _entity: PhysicalEntity,
+              private _drawCoord: Point2D) { }
+  get id(): number {
+    return this._entity.id;
   }
-
-  updateOutline(diff: Vector2D): void {
-    this.min2D = this.min2D.add(diff);
-    this.max2D = this.max2D.add(diff);
-    this.top2D = this.top2D.add(diff);
-    this.bottom2D = this.bottom2D.add(diff);
-    this.drawCoord = this.drawCoord.add(diff);
+  get drawCoord(): Point2D {
+    return this._drawCoord;
   }
-
-  overlapDrawX(other: SceneNode): boolean {
-    return (
-      inRange(this.min2D.x, other.min2D.x, other.max2D.x) ||
-      inRange(this.max2D.x, other.min2D.x, other.max2D.x)
-    );
+  set drawCoord(coord: Point2D) {
+    this._drawCoord = coord;
   }
-
-  overlapDrawY(other: SceneNode): boolean {
-    return (
-      inRange(this.top2D.y, other.top2D.y, other.bottom2D.y) ||
-      inRange(this.bottom2D.y, other.top2D.y, other.bottom2D.y)
-    );
+  get entity(): PhysicalEntity {
+    return this._entity;
   }
-
+  get succs(): Array<SceneNode> {
+    return this._succs;
+  }
   clear(): void {
     this._succs = [];
   }
@@ -65,45 +51,6 @@ export class SceneNode {
     this._succs.splice(idx, 1);
   }
 
-  get id(): number {
-    return this._entity.id;
-  }
-  get drawCoord(): Point2D {
-    return this._drawCoord;
-  }
-  set drawCoord(coord: Point2D) {
-    this._drawCoord = coord;
-  }
-  get min2D(): Point2D {
-    return this._min2D;
-  }
-  set min2D(coord: Point2D) {
-    this._min2D = coord;
-  }
-  get max2D(): Point2D {
-    return this._max2D;
-  }
-  set max2D(coord: Point2D) {
-    this._max2D = coord;
-  }
-  get top2D(): Point2D {
-    return this._top2D;
-  }
-  set top2D(coord: Point2D) {
-    this._top2D = coord;
-  }
-  get bottom2D(): Point2D {
-    return this._bottom2D;
-  }
-  set bottom2D(coord: Point2D) {
-    this._bottom2D = coord;
-  }
-  get entity(): PhysicalEntity {
-    return this._entity;
-  }
-  get succs(): Array<SceneNode> {
-    return this._succs;
-  }
 }
 
 type NodeCompare = (firstId: number, secondId: number) => RenderOrder;
@@ -120,22 +67,18 @@ export abstract class SceneGraph {
 
   constructor() {}
 
-  updateDrawOutline(node: SceneNode): void {
+  update(node: SceneNode): void {
+    this.dirty = true;
     const entity: PhysicalEntity = node.entity;
-    const min: Point3D = EntityBounds.minLocation(entity.id);
-    const minDraw: Point2D = this.getDrawCoord(min);
-    const diff: Vector2D = minDraw.diff(node.min2D);
-    node.updateOutline(diff);
+    node.drawCoord = this.adjustedDrawCoord(entity);
   }
 
-  setDrawOutline(node: SceneNode): void {
-    const entity: PhysicalEntity = node.entity;
+  adjustedDrawCoord(entity: PhysicalEntity): Point2D {
     const min: Point3D = EntityBounds.minLocation(entity.id);
     const max: Point3D = EntityBounds.maxLocation(entity.id);
-    node.min2D = this.getDrawCoord(min);
-    node.max2D = this.getDrawCoord(max);
-    node.top2D = this.getDrawCoord(new Point3D(max.x, min.y, max.z));
-    node.bottom2D = this.getDrawCoord(new Point3D(min.x, max.y, min.z));
+    const min2D = this.getDrawCoord(min);
+    const max2D = this.getDrawCoord(max);
+    const top2D = this.getDrawCoord(new Point3D(max.x, min.y, max.z));
 
     //  'drawCoord' *   * 'top2D'
     //                / | \
@@ -149,12 +92,12 @@ export abstract class SceneGraph {
     //                \ | /
     //                  *
     //              'bottom2D'
-    const drawHeightOffset = node.min2D.diff(node.top2D);
+    const drawHeightOffset = min2D.diff(top2D);
     const adjustedCoord = new Point2D(
-      node.min2D.x,
-      node.min2D.y - drawHeightOffset.y
+      min2D.x,
+      min2D.y - drawHeightOffset.y
     );
-    node.drawCoord = adjustedCoord;
+    return adjustedCoord;
   }
 
   get nodes(): Array<SceneNode> {
@@ -173,15 +116,9 @@ export abstract class SceneGraph {
     this._dirty = d;
   }
 
-  updateNode(node: SceneNode): void {
-    this.updateDrawOutline(node);
-    this.dirty = true;
-  }
-
   insertNode(node: SceneNode): void {
     this.nodes.push(node);
-    this.setDrawOutline(node);
-    this.updateNode(node);
+    this.update(node);
   }
 
   cameraHasMoved(camera: Camera): boolean {
@@ -284,14 +221,14 @@ export class Scene {
   }
 
   insertEntity(entity: PhysicalEntity): void {
-    const node = new SceneNode(entity, this.graph);
+    const node = new SceneNode(entity, this.graph.adjustedDrawCoord(entity));
     this.nodes.set(node.id, node);
     this.graph.insertNode(node);
   }
   updateEntity(entity: PhysicalEntity): void {
     console.assert(this._nodes.has(entity.id));
     const node: SceneNode = this._nodes.get(entity.id)!;
-    this.graph.updateNode(node);
+    this.graph.update(node);
   }
   getNode(id: number): SceneNode {
     console.assert(this.nodes.has(id));

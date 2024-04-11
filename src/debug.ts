@@ -6,6 +6,7 @@ import { Face3D, IntersectInfo, Point2D } from "./geometry.ts";
 import { Camera } from "./camera.ts";
 import { SceneNode, Scene } from "./scene.ts";
 
+/*
 export class MovableEntityDebug {
   constructor(movable: MovableEntity, camera: Camera, debugCollision: boolean) {
     if (debugCollision) {
@@ -120,3 +121,4 @@ export class MovableEntityDebug {
     });
   }
 }
+*/
