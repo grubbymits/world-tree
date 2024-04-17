@@ -42,8 +42,7 @@ export class PhysicalEntity {
       minLocation.y + dimensions.depth / 2,
       minLocation.z + dimensions.height / 2
     );
-    const bounds = new BoundingCuboid(centre, dimensions);
-    this._geometry = new CuboidGeometry(bounds);
+    this._geometry = new CuboidGeometry(this.id);
     EntityBounds.addEntity(this.id, minLocation, dimensions);
     this._context.addEntity(this);
   }
@@ -54,9 +53,6 @@ export class PhysicalEntity {
   get geometry(): Geometry {
     return this._geometry;
   }
-  //get bounds(): BoundingCuboid {
-  //  return this._geometry.bounds;
-  //}
   get dimensions(): Dimensions {
     return EntityBounds.dimensions(this.id);
   }

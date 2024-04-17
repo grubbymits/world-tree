@@ -380,13 +380,13 @@ export class Terrain extends PhysicalEntity {
     }
 
     if (this._shape == TerrainShape.RampUpWest) {
-      this._geometry = new RampUpWestGeometry(this.geometry.bounds);
+      this._geometry = new RampUpWestGeometry(this.id);
     } else if (this._shape == TerrainShape.RampUpEast) {
-      this._geometry = new RampUpEastGeometry(this.geometry.bounds);
+      this._geometry = new RampUpEastGeometry(this.id);
     } else if (this._shape == TerrainShape.RampUpSouth) {
-      this._geometry = new RampUpSouthGeometry(this.geometry.bounds);
+      this._geometry = new RampUpSouthGeometry(this.id);
     } else if (this._shape == TerrainShape.RampUpNorth) {
-      this._geometry = new RampUpNorthGeometry(this.geometry.bounds);
+      this._geometry = new RampUpNorthGeometry(this.id);
     }
 
     const x = EntityBounds.centreX(this.id);

@@ -20,12 +20,12 @@ import {
 } from "./render.ts";
 import { SpriteSheet } from "./graphics.ts";
 import { Camera } from "./camera.ts";
-import { Octree } from "./tree.ts";
 import {
   BoundingCuboid,
   CollisionDetector,
   Dimensions,
   Gravity,
+  Octree,
 } from "./physics.ts";
 
 export interface Context {

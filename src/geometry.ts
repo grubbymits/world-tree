@@ -1,4 +1,4 @@
-import { BoundingCuboid } from "./physics.ts";
+import { EntityBounds } from "./bounds.ts";
 
 export enum Orientation {
   Colinear,
@@ -476,14 +476,14 @@ export class Geometry {
   protected _name: string;
   protected _cuboid: boolean = false;
 
-  constructor(protected _bounds: BoundingCuboid) {
-    this._widthVec3D = new Vector3D(_bounds.width, 0, 0);
-    this._depthVec3D = new Vector3D(0, _bounds.depth, 0);
-    this._heightVec3D = new Vector3D(0, 0, _bounds.height);
+  constructor(protected readonly _id: number) {
+    this._widthVec3D = new Vector3D(EntityBounds.width(_id), 0, 0);
+    this._depthVec3D = new Vector3D(0, EntityBounds.depth(_id), 0);
+    this._heightVec3D = new Vector3D(0, 0, EntityBounds.height(_id));
   }
 
-  get bounds(): BoundingCuboid {
-    return this._bounds;
+  get id(): number {
+    return this._id;
   }
   get widthVec3D(): Vector3D {
     return this._widthVec3D;
@@ -525,8 +525,8 @@ export class Geometry {
 }
 
 export class NoGeometry extends Geometry {
-  constructor(bounds: BoundingCuboid) {
-    super(bounds);
+  constructor(entityId: number) {
+    super(entityId);
     this._name = "NoGeometry";
   }
   obstructs(_begin: Point3D, _end: Point3D): IntersectInfo | null {
@@ -535,8 +535,8 @@ export class NoGeometry extends Geometry {
 }
 
 export class CuboidGeometry extends Geometry {
-  constructor(bounds: BoundingCuboid) {
-    super(bounds);
+  constructor(id: number) {
+    super(id);
     this._name = "CuboidGeometry";
     this._cuboid = true;
 
@@ -549,15 +549,17 @@ export class CuboidGeometry extends Geometry {
     //      \ |      |
     //       \|______|
     //       2        4
+    const minLocation = EntityBounds.minLocation(this.id);
+    const maxLocation = EntityBounds.maxLocation(this.id);
     const p: Array<Point3D> = [
-      this.bounds.minLocation, // 0
-      this.bounds.minLocation.add(this.heightVec3D), // 1
-      this.bounds.minLocation.add(this.depthVec3D), // 2
-      this.bounds.minLocation.add(this.widthVec3D), // 3
-      this.bounds.maxLocation.sub(this.heightVec3D), // 4
-      this.bounds.maxLocation.sub(this.depthVec3D), // 5
-      this.bounds.maxLocation.sub(this.widthVec3D), // 6
-      this.bounds.maxLocation, // 7
+      minLocation, // 0
+      minLocation.add(this.heightVec3D), // 1
+      minLocation.add(this.depthVec3D), // 2
+      minLocation.add(this.widthVec3D), // 3
+      maxLocation.sub(this.heightVec3D), // 4
+      maxLocation.sub(this.depthVec3D), // 5
+      maxLocation.sub(this.widthVec3D), // 6
+      maxLocation, // 7
     ];
 
     // left
@@ -593,8 +595,8 @@ export class CuboidGeometry extends Geometry {
 }
 
 export class RampUpWestGeometry extends Geometry {
-  constructor(bounds: BoundingCuboid) {
-    super(bounds);
+  constructor(id: number) {
+    super(id);
     this._name = "RampUpWestGeometry";
     //     4
     //     /\
@@ -606,13 +608,15 @@ export class RampUpWestGeometry extends Geometry {
     //  |   \  /
     //  |____\/
     //  1     3
+    const minLocation = EntityBounds.minLocation(this.id);
+    const maxLocation = EntityBounds.maxLocation(this.id);
     const p: Array<Point3D> = [
-      this.bounds.minLocation, // 0
-      this.bounds.minLocation.add(this.depthVec3D), // 1
-      this.bounds.minLocation.add(this.widthVec3D), // 2
-      this.bounds.maxLocation.sub(this.heightVec3D), // 3
-      this.bounds.minLocation.add(this.heightVec3D), // 4
-      this.bounds.maxLocation.sub(this.widthVec3D), // 5
+      minLocation, // 0
+      minLocation.add(this.depthVec3D), // 1
+      minLocation.add(this.widthVec3D), // 2
+      maxLocation.sub(this.heightVec3D), // 3
+      minLocation.add(this.heightVec3D), // 4
+      maxLocation.sub(this.widthVec3D), // 5
     ];
 
     // left
@@ -639,8 +643,8 @@ export class RampUpWestGeometry extends Geometry {
 }
 
 export class RampUpEastGeometry extends Geometry {
-  constructor(bounds: BoundingCuboid) {
-    super(bounds);
+  constructor(id: number) {
+    super(id);
     this._name = "RampUpEastGeometry";
     //         4
     //        / \
@@ -651,13 +655,15 @@ export class RampUpEastGeometry extends Geometry {
     //      \  /   |
     //       \/____|
     //       1      3
+    const minLocation = EntityBounds.minLocation(this.id);
+    const maxLocation = EntityBounds.maxLocation(this.id);
     const p: Array<Point3D> = [
-      this.bounds.minLocation, // 0
-      this.bounds.minLocation.add(this.depthVec3D), // 1
-      this.bounds.minLocation.add(this.widthVec3D), // 2
-      this.bounds.maxLocation.sub(this.heightVec3D), // 3
-      this.bounds.maxLocation.sub(this.depthVec3D), // 4
-      this.bounds.maxLocation, // 5
+      minLocation, // 0
+      minLocation.add(this.depthVec3D), // 1
+      minLocation.add(this.widthVec3D), // 2
+      maxLocation.sub(this.heightVec3D), // 3
+      maxLocation.sub(this.depthVec3D), // 4
+      maxLocation, // 5
     ];
 
     // left
@@ -689,8 +695,8 @@ export class RampUpEastGeometry extends Geometry {
 }
 
 export class RampUpNorthGeometry extends Geometry {
-  constructor(bounds: BoundingCuboid) {
-    super(bounds);
+  constructor(id: number) {
+    super(id);
     this._name = "RampUpNorthGeometry";
 
     //   2 ______  3
@@ -699,13 +705,15 @@ export class RampUpNorthGeometry extends Geometry {
     //    |___\____\
     //   0     1     4
 
+    const minLocation = EntityBounds.minLocation(this.id);
+    const maxLocation = EntityBounds.maxLocation(this.id);
     const p: Array<Point3D> = [
-      this.bounds.minLocation, // 0
-      this.bounds.minLocation.add(this.depthVec3D), // 1
-      this.bounds.minLocation.add(this.heightVec3D), // 2
-      this.bounds.maxLocation.sub(this.depthVec3D), // 3
-      this.bounds.maxLocation.sub(this.heightVec3D), // 4
-      this.bounds.minLocation.add(this.widthVec3D), // 5
+      minLocation, // 0
+      minLocation.add(this.depthVec3D), // 1
+      minLocation.add(this.heightVec3D), // 2
+      maxLocation.sub(this.depthVec3D), // 3
+      maxLocation.sub(this.heightVec3D), // 4
+      minLocation.add(this.widthVec3D), // 5
     ];
 
     // left
@@ -737,8 +745,8 @@ export class RampUpNorthGeometry extends Geometry {
 }
 
 export class RampUpSouthGeometry extends Geometry {
-  constructor(bounds: BoundingCuboid) {
-    super(bounds);
+  constructor(id: number) {
+    super(id);
     this._name = "RampUpSouthGeometry";
 
     //   2 ______  3
@@ -747,13 +755,15 @@ export class RampUpSouthGeometry extends Geometry {
     //  /__|_____|
     // 0   1     4
 
+    const minLocation = EntityBounds.minLocation(this.id);
+    const maxLocation = EntityBounds.maxLocation(this.id);
     const p: Array<Point3D> = [
-      this.bounds.minLocation, // 0
-      this.bounds.minLocation.add(this.depthVec3D), // 1
-      this.bounds.maxLocation.sub(this.widthVec3D), // 2
-      this.bounds.maxLocation, // 3
-      this.bounds.maxLocation.sub(this.heightVec3D), // 4
-      this.bounds.minLocation.add(this.widthVec3D), // 5
+      minLocation, // 0
+      minLocation.add(this.depthVec3D), // 1
+      maxLocation.sub(this.widthVec3D), // 2
+      maxLocation, // 3
+      maxLocation.sub(this.heightVec3D), // 4
+      minLocation.add(this.widthVec3D), // 5
     ];
 
     // left
