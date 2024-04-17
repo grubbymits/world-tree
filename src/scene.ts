@@ -45,12 +45,6 @@ export class SceneNode {
     if (idx != -1) return;
     this._succs.push(succ);
   }
-  removeSucc(succ: SceneNode) {
-    const idx = this._succs.indexOf(succ);
-    if (idx == -1) return;
-    this._succs.splice(idx, 1);
-  }
-
 }
 
 type NodeCompare = (firstId: number, secondId: number) => RenderOrder;
