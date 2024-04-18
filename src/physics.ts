@@ -239,26 +239,31 @@ export class CollisionDetector {
     movable: MovableEntity,
     path: Vector3D
   ): CollisionInfo | null {
-    const bounds = EntityBounds.toBoundingCuboid(movable.id);
-    const widthVec3D = new Vector3D(bounds.width, 0, 0);
-    const depthVec3D = new Vector3D(0, bounds.depth, 0);
-    const heightVec3D = new Vector3D(0, 0, bounds.height);
+    const dims = EntityBounds.dimensions(movable.id)
+    const widthVec3D = new Vector3D(dims.width, 0, 0);
+    const depthVec3D = new Vector3D(0, dims.depth, 0);
+    const heightVec3D = new Vector3D(0, 0, dims.height);
 
-    const newBounds = new BoundingCuboid(
-      bounds.centre.add(path),
-      bounds.dimensions
+    const area = new BoundingCuboid(
+      EntityBounds.centre(movable.id),
+      dims
     );
-    const area = EntityBounds.toBoundingCuboid(movable.id);
+    const newBounds = new BoundingCuboid(
+      EntityBounds.centre(movable.id).add(path),
+      dims
+    );
     area.insert(newBounds);
+    const minLocation = EntityBounds.minLocation(movable.id);
+    const maxLocation = EntityBounds.maxLocation(movable.id);
     const beginPoints: Array<Point3D> = [
-      bounds.minLocation,
-      bounds.minLocation.add(heightVec3D),
-      bounds.minLocation.add(depthVec3D),
-      bounds.minLocation.add(widthVec3D),
-      bounds.maxLocation.sub(heightVec3D),
-      bounds.maxLocation.sub(depthVec3D),
-      bounds.maxLocation.sub(widthVec3D),
-      bounds.maxLocation,
+      minLocation,
+      minLocation.add(heightVec3D),
+      minLocation.add(depthVec3D),
+      minLocation.add(widthVec3D),
+      maxLocation.sub(heightVec3D),
+      maxLocation.sub(depthVec3D),
+      maxLocation.sub(widthVec3D),
+      maxLocation,
     ];
 
     const misses: Array<PhysicalEntity> = new Array<PhysicalEntity>();
@@ -269,7 +274,7 @@ export class CollisionDetector {
         continue;
       }
 
-      // First check bounding box intersection.
+      // If the bounds do not intersect, they can't be colliding.
       if (!EntityBounds.intersectsBounds(
         entity.id,
         newBounds.minLocation,
@@ -278,7 +283,8 @@ export class CollisionDetector {
         continue;
       }
 
-      // If both geometries are cuboids, we don't have to check further.
+      // If both geometries are cuboids, the face the bounds intersect is
+      // enough to detect the collision.
       if (entity.geometry.cuboid && movable.geometry.cuboid) {
         // FIXME: Not all entities should block.
         const blocking = true;
@@ -312,14 +318,15 @@ export class CollisionDetector {
 }
 
 export class Gravity {
+  private static readonly _terminal = 10;
   private static _enabled = false;
-  private static _force = 0;
   private static _context: ContextImpl;
+  private static _movableSpeeds: Map<number, number>;
 
-  static init(force: number, context: ContextImpl) {
-    this._force = -force;
+  static init(context: ContextImpl) {
     this._context = context;
     this._enabled = true;
+    this._movableSpeeds = new Map<number, number>();
   }
 
   static update(entities: Array<MovableEntity>): void {
@@ -327,16 +334,28 @@ export class Gravity {
       return;
     }
 
-    if (this._force < 0) {
-      const path = new Vector3D(0, 0, this._force);
-      entities.forEach((movable) => {
-        const bounds = EntityBounds.toBoundingCuboid(movable.id);
+    // TODO: Remove entity from map when removed from context.
+    entities.forEach((movable) => {
+      if (movable.gravitySpeed != 0) {
+        if (!this._movableSpeeds.has(movable.id)) {
+          this._movableSpeeds.set(movable.id, 0);
+        }
+        let speed = this._movableSpeeds.get(movable.id)! + movable.gravitySpeed;
+        if (speed > this._terminal) {
+          speed = this._terminal;
+        }
+        const path = new Vector3D(0, 0, -speed);
+        const bounds = new BoundingCuboid(
+          EntityBounds.centre(movable.id),
+          EntityBounds.dimensions(movable.id)
+        );
         const collision = CollisionDetector.detectInArea(movable, path);
         if (collision == null) {
           movable.updatePosition(path);
         }
-      });
-    }
+        this._movableSpeeds.set(movable.id, speed);
+      }
+    });
   }
 }
 
@@ -385,7 +404,10 @@ class OctNode {
 
   insert(entity: PhysicalEntity): boolean {
     let inserted = false;
-    const entityBounds = EntityBounds.toBoundingCuboid(entity.id);
+    const entityBounds = new BoundingCuboid(
+      EntityBounds.centre(entity.id),
+      EntityBounds.dimensions(entity.id)
+    );
     if (this.children.length == 0) {
       // For a leaf node, insert it into the entity list and check that we're
       // within the size limit.

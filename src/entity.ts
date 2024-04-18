@@ -128,7 +128,7 @@ export class PhysicalEntity {
 }
 
 export class MovableEntity extends PhysicalEntity {
-  protected readonly _lift = 0;
+  protected _gravitySpeed = 0;
   protected readonly _canSwim = false;
   protected _direction: Direction;
 
@@ -145,8 +145,11 @@ export class MovableEntity extends PhysicalEntity {
     this.postEvent(EntityEvent.Moving);
   }
 
-  get lift(): number {
-    return this._lift;
+  get gravitySpeed(): number {
+    return this._gravitySpeed;
+  }
+  set gravitySpeed(s: number) {
+    this._gravitySpeed = s;
   }
   get direction(): Direction {
     return this._direction;

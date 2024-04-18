@@ -1,4 +1,4 @@
-import { Dimensions, BoundingCuboid } from "./physics.ts";
+import { Dimensions } from "./physics.ts";
 import { Point3D, Vector3D } from "./geometry.ts";
 
 export class EntityBounds {
@@ -6,9 +6,6 @@ export class EntityBounds {
   private static readonly NUM_ELEMENTS = 3;
   private static data: Float64Array = new Float64Array(this.MAX_ENTITIES * this.NUM_ELEMENTS * 2);
 
-  static toBoundingCuboid(id: number): BoundingCuboid {
-    return new BoundingCuboid(this.centre(id), this.dimensions(id));
-  }
   static minStartIdx(id: number): number {
     return id * 2 * this.NUM_ELEMENTS;
   }
