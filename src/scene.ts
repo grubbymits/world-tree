@@ -543,26 +543,26 @@ export class TwoByOneIsometric extends SceneGraph {
     const idb = second.entity.id;
     if (EntityBounds.axisOverlapZ(ida, idb))  {
       // Draw smaller Y first.
-      if (EntityBounds.maxY(ida) <= EntityBounds.minY(idb)) {
+      if (EntityBounds.maxY(ida) < EntityBounds.minY(idb)) {
         return RenderOrder.Before;
       }
-      if (EntityBounds.maxY(idb) <= EntityBounds.minY(ida)) {
+      if (EntityBounds.maxY(idb) < EntityBounds.minY(ida)) {
         return RenderOrder.After;
       }
       // Draw larger X first
-      if (EntityBounds.minX(ida) >= EntityBounds.maxX(idb)) {
+      if (EntityBounds.minX(ida) > EntityBounds.maxX(idb)) {
         return RenderOrder.Before;
       }
-      if (EntityBounds.minX(idb) >= EntityBounds.maxX(ida)) {
+      if (EntityBounds.minX(idb) > EntityBounds.maxX(ida)) {
         return RenderOrder.After;
       }
     } else if (EntityBounds.axisOverlapX(ida, idb) &&
                EntityBounds.axisOverlapY(ida, idb)) {
       // Draw smaller Z first.
-      if (EntityBounds.maxZ(ida) <= EntityBounds.minZ(idb)) {
+      if (EntityBounds.maxZ(ida) < EntityBounds.minZ(idb)) {
         return RenderOrder.Before;
       }
-      if (EntityBounds.maxZ(idb) <= EntityBounds.minZ(ida)) {
+      if (EntityBounds.maxZ(idb) < EntityBounds.minZ(ida)) {
         return RenderOrder.After;
       }
     }

@@ -375,18 +375,17 @@ export class Terrain extends PhysicalEntity {
     if (!Terrain.isFlat(_shape)) {
       const theta = (Math.atan(this.height / this.depth) * 180) / Math.PI;
       this._tanTheta = Math.tan(theta);
+      if (Terrain.isRampUp(this._shape, Direction.West)) {
+        this._geometry = new RampUpWestGeometry(this.id);
+      } else if (Terrain.isRampUp(this._shape, Direction.East)) {
+        this._geometry = new RampUpEastGeometry(this.id);
+      } else if (Terrain.isRampUp(this._shape, Direction.South)) {
+        this._geometry = new RampUpSouthGeometry(this.id);
+      } else if (Terrain.isRampUp(this._shape, Direction.North)) {
+        this._geometry = new RampUpNorthGeometry(this.id);
+      }
     } else {
       this._tanTheta = 0;
-    }
-
-    if (this._shape == TerrainShape.RampUpWest) {
-      this._geometry = new RampUpWestGeometry(this.id);
-    } else if (this._shape == TerrainShape.RampUpEast) {
-      this._geometry = new RampUpEastGeometry(this.id);
-    } else if (this._shape == TerrainShape.RampUpSouth) {
-      this._geometry = new RampUpSouthGeometry(this.id);
-    } else if (this._shape == TerrainShape.RampUpNorth) {
-      this._geometry = new RampUpNorthGeometry(this.id);
     }
 
     const x = EntityBounds.centreX(this.id);

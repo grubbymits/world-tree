@@ -283,7 +283,7 @@ export class CollisionDetector {
         continue;
       }
 
-      // If both geometries are cuboids, the face the bounds intersect is
+      // If both geometries are cuboids, if the bounds intersect is
       // enough to detect the collision.
       if (entity.geometry.cuboid && movable.geometry.cuboid) {
         // FIXME: Not all entities should block.

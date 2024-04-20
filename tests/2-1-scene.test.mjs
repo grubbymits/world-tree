@@ -60,7 +60,7 @@ test("draw order of single column", () => {
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
-    let minLocation = new WT.Point3D(0, i * entityDimensions.depth, 0);
+    let minLocation = new WT.Point3D(0, i * (entityDimensions.depth + 0.01), 0);
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, scene);
     nodes.push(node);
@@ -83,8 +83,8 @@ test("draw order of (x, y) increasing diagonal", () => {
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
     let minLocation = new WT.Point3D(
-      i * entityDimensions.width,
-      i * entityDimensions.depth,
+      i * (entityDimensions.width + 0.001),
+      i * (entityDimensions.depth + 0.001),
       0
     );
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
@@ -125,8 +125,8 @@ test("draw order of (x, y) four in a square", () => {
   for (let y = 0; y < 2; ++y) {
     for (let x = 0; x < 2; ++x) {
       let minLocation = new WT.Point3D(
-        x * entityDimensions.width,
-        y * entityDimensions.depth,
+        x * (entityDimensions.width + 0.001),
+        y * (entityDimensions.depth + 0.001),
         0
       );
       let entity = new WT.PhysicalEntity(
