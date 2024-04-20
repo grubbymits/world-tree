@@ -376,13 +376,13 @@ export class Terrain extends PhysicalEntity {
       const theta = (Math.atan(this.height / this.depth) * 180) / Math.PI;
       this._tanTheta = Math.tan(theta);
       if (Terrain.isRampUp(this._shape, Direction.West)) {
-        this._geometry = new RampUpWestGeometry(this.id);
+        this.geometry = new RampUpWestGeometry(this.id);
       } else if (Terrain.isRampUp(this._shape, Direction.East)) {
-        this._geometry = new RampUpEastGeometry(this.id);
+        this.geometry = new RampUpEastGeometry(this.id);
       } else if (Terrain.isRampUp(this._shape, Direction.South)) {
-        this._geometry = new RampUpSouthGeometry(this.id);
+        this.geometry = new RampUpSouthGeometry(this.id);
       } else if (Terrain.isRampUp(this._shape, Direction.North)) {
-        this._geometry = new RampUpNorthGeometry(this.id);
+        this.geometry = new RampUpNorthGeometry(this.id);
       }
     } else {
       this._tanTheta = 0;

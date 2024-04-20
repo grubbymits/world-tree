@@ -542,6 +542,14 @@ export class TwoByOneIsometric extends SceneGraph {
     const ida = first.entity.id;
     const idb = second.entity.id;
     if (EntityBounds.axisOverlapZ(ida, idb))  {
+      // For ramps, draw the lower entity first.
+      if (EntityBounds.axisOverlapX(ida, idb) &&
+          EntityBounds.axisOverlapY(ida, idb)) {
+        if (EntityBounds.minZ(ida) < EntityBounds.minZ(idb)) {
+          return RenderOrder.Before;
+        }
+        return RenderOrder.After;
+      }
       // Draw smaller Y first.
       if (EntityBounds.maxY(ida) < EntityBounds.minY(idb)) {
         return RenderOrder.Before;

@@ -53,6 +53,9 @@ export class PhysicalEntity {
   get geometry(): Geometry {
     return this._geometry;
   }
+  set geometry(g: Geometry) {
+    this._geometry = g;
+  }
   get dimensions(): Dimensions {
     return EntityBounds.dimensions(this.id);
   }

@@ -1,5 +1,6 @@
 import * as WT from "../dist/world-tree.mjs";
 
+const gap = 0.001;
 const width = 72;
 const depth = 72;
 const height = 97;
@@ -37,7 +38,7 @@ test("draw order of single row", () => {
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
-    let minLocation = new WT.Point3D(i * (entityDimensions.width + 0.01), 0, 0);
+    let minLocation = new WT.Point3D(i * (entityDimensions.width + gap), 0, 0);
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, scene);
     nodes.push(node);
@@ -60,7 +61,7 @@ test("draw order of single column", () => {
   let scene = new WT.TwoByOneIsometric();
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
-    let minLocation = new WT.Point3D(0, i * (entityDimensions.depth + 0.01), 0);
+    let minLocation = new WT.Point3D(0, i * (entityDimensions.depth + gap), 0);
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, scene);
     nodes.push(node);
@@ -83,8 +84,8 @@ test("draw order of (x, y) increasing diagonal", () => {
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
     let minLocation = new WT.Point3D(
-      i * (entityDimensions.width + 0.001),
-      i * (entityDimensions.depth + 0.001),
+      i * (entityDimensions.width + gap),
+      i * (entityDimensions.depth + gap),
       0
     );
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
@@ -125,8 +126,8 @@ test("draw order of (x, y) four in a square", () => {
   for (let y = 0; y < 2; ++y) {
     for (let x = 0; x < 2; ++x) {
       let minLocation = new WT.Point3D(
-        x * (entityDimensions.width + 0.001),
-        y * (entityDimensions.depth + 0.001),
+        x * (entityDimensions.width + gap),
+        y * (entityDimensions.depth + gap),
         0
       );
       let entity = new WT.PhysicalEntity(
@@ -163,9 +164,9 @@ test("draw order of (x, y, z) eight in a cube", () => {
     for (let y = 0; y < 2; ++y) {
       for (let x = 0; x < 2; ++x) {
         let minLocation = new WT.Point3D(
-          x * (entityDimensions.width + 0.001),
-          y * (entityDimensions.depth + 0.001),
-          z * (entityDimensions.height + 0.001)
+          x * (entityDimensions.width + gap),
+          y * (entityDimensions.depth + gap),
+          z * (entityDimensions.height + gap)
         );
         let entity = new WT.PhysicalEntity(
           context,
@@ -206,9 +207,9 @@ test("draw order of (x, y, z) updating eight in a cube", () => {
     for (let y = 0; y < 2; ++y) {
       for (let x = 0; x < 2; ++x) {
         let minLocation = new WT.Point3D(
-          x * (entityDimensions.width + 0.001),
-          y * (entityDimensions.depth + 0.001),
-          z * (entityDimensions.height + 0.001)
+          x * (entityDimensions.width + gap),
+          y * (entityDimensions.depth + gap),
+          z * (entityDimensions.height + gap)
         );
         let entity = new WT.PhysicalEntity(
           context,
@@ -258,9 +259,9 @@ test("draw order of (x, y, z) updating level in a cube", () => {
 
   let addEntityAt = (x, y, z) => {
     let minLocation = new WT.Point3D(
-      x * (entityDimensions.width + 0.001),
-      y * (entityDimensions.depth + 0.001),
-      z * (entityDimensions.height + 0.001)
+      x * (entityDimensions.width + gap),
+      y * (entityDimensions.depth + gap),
+      z * (entityDimensions.height + gap)
     );
     let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     entity.addGraphic(dummyGraphic);
@@ -269,31 +270,127 @@ test("draw order of (x, y, z) updating level in a cube", () => {
 
   for (let z = 0; z < 2; ++z) {
     for (let y = 0; y < 2; ++y) {
-      let xMax = y == 0 ? 2 : 1;
-      for (let x = 0; x < xMax; ++x) {
+      for (let x = 0; x < 2; ++x) {
+        if (z == 1 && y == 0 && x == 0) {
+          continue;
+        }
         addEntityAt(x, y, z);
       }
     }
   }
   // One cube above the rest
-  let movable = addEntityAt(0, 0, 2);
+  const movable = addEntityAt(0, 0, 2);
+  const moveDown = new WT.Vector3D(0, 0, -(height - 2));
 
-  let camera = new WT.Camera(context.scene, 1920, 1080);
+  // bottom layer
+  // | 0 | 1 |
+  // | 2 | 3 |
+  // top layer
+  // |   | 4 |
+  // | 5 | 6 |
+  // movable
+  // | 7 |
+  //
+  //
+  // | (0, 0, 2)
+  // |   __
+  // v  |__|__
+  //     __|__|
+  //    |__|__|
+  //
+  const camera = new WT.Camera(context.scene, 1920, 1080);
   camera.location = new WT.Point3D(0, 0, 0);
   context.scene.render(camera, false);
 
-  movable.updatePosition(new WT.Vector3D(0, 0, -95));
+  movable.updatePosition(moveDown);
   context.scene.updateEntity(movable);
   context.scene.render(camera, false);
 
-  let drawOrder = context.scene.graph.order.slice().reverse();
-  expect(drawOrder.length).toBe(7);
+  const drawOrder = context.scene.graph.order.slice().reverse();
+  expect(drawOrder.length).toBe(8);
+  expect(drawOrder[0].entity.id).toBe(1);
+  expect(drawOrder[1].entity.id).toBe(4);
+  expect(drawOrder[2].entity.id).toBe(0);
   expect(drawOrder[3].entity.id).toBe(movable.id);
   expect(drawOrder[4].entity.id).toBe(3);
-  expect(drawOrder[5].entity.id).toBe(2);
-  expect(drawOrder[6].entity.id).toBe(5);
+  expect(drawOrder[5].entity.id).toBe(6);
+  expect(drawOrder[6].entity.id).toBe(2);
+  expect(drawOrder[7].entity.id).toBe(5);
 });
 
+test("draw order of (x, y, z) levels with a ramp", () => {
+  const worldDims = new WT.Dimensions(width * 2, depth * 2, height * 3);
+  let context = WT.createTestContext(
+    worldDims,
+    WT.Perspective.TwoByOneIsometric
+  );
+
+  let addEntityAt = (x, y, z, dims) => {
+    let minLocation = new WT.Point3D(
+      x * (entityDimensions.width + gap),
+      y * (entityDimensions.depth + gap),
+      z * (entityDimensions.height + gap)
+    );
+    let entity = new WT.PhysicalEntity(context, minLocation, dims);
+    entity.addGraphic(dummyGraphic);
+    return entity;
+  };
+
+  for (let z = 0; z < 2; ++z) {
+    for (let y = 0; y < 2; ++y) {
+      for (let x = 0; x < 2; ++x) {
+        const entity = addEntityAt(x, y, z, entityDimensions);
+        if (z == 1 && y == 0 && x == 0) {
+          entity.geometry = new WT.RampUpSouthGeometry(entity.id);
+        }
+      }
+    }
+  }
+  // One cube above the rest
+  const movableDimensions = new WT.Dimensions(
+    entityDimensions.width / 2,
+    entityDimensions.depth / 2,
+    entityDimensions.height / 2
+  );
+  const movable = addEntityAt(0, 0, 2, movableDimensions);
+  const moveDown = new WT.Vector3D(0, 0, -2);
+
+  // bottom layer
+  // | 0 | 1 |
+  // | 2 | 3 |
+  // top layer
+  // | 4 | 5 |
+  // | 6 | 7 |
+  // movable
+  // | 8 |
+  //
+  //
+  // | (0, 0, 2)
+  // |   _
+  // v  |_| __
+  //      /|__|
+  //    |__|__|
+  //
+  const camera = new WT.Camera(context.scene, 1920, 1080);
+  camera.location = new WT.Point3D(0, 0, 0);
+  context.scene.render(camera, false);
+
+  movable.updatePosition(moveDown);
+  context.scene.updateEntity(movable);
+  context.scene.render(camera, false);
+
+  const drawOrder = context.scene.graph.order.slice().reverse();
+  expect(drawOrder.length).toBe(9);
+  expect(drawOrder[0].entity.id).toBe(1);
+  expect(drawOrder[1].entity.id).toBe(5);
+  expect(drawOrder[2].entity.id).toBe(0);
+  expect(drawOrder[3].entity.id).toBe(4);
+  expect(drawOrder[4].entity.id).toBe(movable.id);
+  expect(drawOrder[5].entity.id).toBe(3);
+  expect(drawOrder[6].entity.id).toBe(7);
+  expect(drawOrder[7].entity.id).toBe(2);
+  expect(drawOrder[8].entity.id).toBe(6);
+});
 
 test("draw order of short and tall", () => {
   const cellsX = 3;
@@ -313,9 +410,9 @@ test("draw order of short and tall", () => {
 
   const addEntityAt = (x, y, z, entityDimensions) => {
     const minLocation = new WT.Point3D(
-      x * (terrainDims.width + 0.001),
-      y * (terrainDims.depth + 0.001),
-      z * (terrainDims.height + 0.001)
+      x * (terrainDims.width + gap),
+      y * (terrainDims.depth + gap),
+      z * (terrainDims.height + gap)
     );
     const entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
     entity.addGraphic(dummyGraphic);
