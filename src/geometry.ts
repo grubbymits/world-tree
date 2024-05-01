@@ -312,7 +312,7 @@ export class Vertex3D {
     return this._v;
   }
 
-  transform(d: Vector3D): void {
+  translate(d: Vector3D): void {
     this._point = this.point.add(d);
   }
 
@@ -368,7 +368,7 @@ export abstract class Face3D {
   intersectsPlane(begin: Point3D, end: Point3D): Point3D | null {
     return this.plane.intersects(begin, end);
   }
-  abstract transform(d: Vector3D): void;
+  abstract translate(d: Vector3D): void;
   // Given that the segment 'begin' -> 'end' intersects the plane, test
   // whether it intersects this face.
   abstract intersects(end: Point3D): boolean;
@@ -397,8 +397,8 @@ class TriangleFace3D extends Face3D {
     return [this.vertex];
   }
 
-  transform(d: Vector3D): void {
-    this.vertex.transform(d);
+  translate(d: Vector3D): void {
+    this.vertex.translate(d);
   }
 
   // https://www.geomalgorithms.com/a06-_intersect-2.html
@@ -432,9 +432,9 @@ export class QuadFace3D extends Face3D {
     return [this._triangleA.vertex, this._triangleB.vertex];
   }
 
-  transform(d: Vector3D): void {
-    this._triangleA.transform(d);
-    this._triangleB.transform(d);
+  translate(d: Vector3D): void {
+    this._triangleA.translate(d);
+    this._triangleB.translate(d);
   }
 
   intersects(i: Point3D): boolean {
@@ -467,20 +467,24 @@ export class IntersectInfo {
   }
 }
 
-export class Geometry {
+export abstract class Geometry {
   protected _faces: Array<Face3D> = new Array<Face3D>();
   protected _intersectInfo: IntersectInfo | null;
-  protected readonly _widthVec3D: Vector3D;
-  protected readonly _depthVec3D: Vector3D;
-  protected readonly _heightVec3D: Vector3D;
+  protected _widthVec3D: Vector3D;
+  protected _depthVec3D: Vector3D;
+  protected _heightVec3D: Vector3D;
   protected _name: string;
   protected _cuboid: boolean = false;
 
-  constructor(protected readonly _id: number) {
-    this._widthVec3D = new Vector3D(EntityBounds.width(_id), 0, 0);
-    this._depthVec3D = new Vector3D(0, EntityBounds.depth(_id), 0);
-    this._heightVec3D = new Vector3D(0, 0, EntityBounds.height(_id));
+  constructor(protected readonly _id: number) {}
+
+  resetModel(): void {
+    this._widthVec3D = new Vector3D(EntityBounds.width(this.id), 0, 0);
+    this._depthVec3D = new Vector3D(0, EntityBounds.depth(this.id), 0);
+    this._heightVec3D = new Vector3D(0, 0, EntityBounds.height(this.id));
   }
+
+  abstract resetWorld(): void;
 
   get id(): number {
     return this._id;
@@ -504,9 +508,9 @@ export class Geometry {
     return this._cuboid;
   }
 
-  transform(d: Vector3D): void {
+  translate(d: Vector3D): void {
     for (const face of this._faces) {
-      face.transform(d);
+      face.translate(d);
     }
   }
 
@@ -532,6 +536,7 @@ export class NoGeometry extends Geometry {
   obstructs(_begin: Point3D, _end: Point3D): IntersectInfo | null {
     return null;
   }
+  resetWorld(): void { }
 }
 
 export class CuboidGeometry extends Geometry {
@@ -539,6 +544,11 @@ export class CuboidGeometry extends Geometry {
     super(id);
     this._name = "CuboidGeometry";
     this._cuboid = true;
+    this.resetWorld();
+  }
+
+  resetWorld() {
+    this.resetModel();
 
     //  1  ________ 5
     //    |\       \
@@ -598,6 +608,11 @@ export class RampUpWestGeometry extends Geometry {
   constructor(id: number) {
     super(id);
     this._name = "RampUpWestGeometry";
+    this.resetWorld();
+  }
+
+  resetWorld(): void {
+    this.resetModel();
     //     4
     //     /\
     //    /  \
@@ -646,6 +661,11 @@ export class RampUpEastGeometry extends Geometry {
   constructor(id: number) {
     super(id);
     this._name = "RampUpEastGeometry";
+    this.resetWorld();
+  }
+
+  resetWorld(): void {
+    this.resetModel();
     //         4
     //        / \
     //       /   \
@@ -698,7 +718,11 @@ export class RampUpNorthGeometry extends Geometry {
   constructor(id: number) {
     super(id);
     this._name = "RampUpNorthGeometry";
+    this.resetWorld();
+  }
 
+  resetWorld(): void {
+    this.resetModel();
     //   2 ______  3
     //    | \    \
     //    |  \    \
@@ -748,7 +772,11 @@ export class RampUpSouthGeometry extends Geometry {
   constructor(id: number) {
     super(id);
     this._name = "RampUpSouthGeometry";
+    this.resetWorld();
+  }
 
+  resetWorld(): void {
+    this.resetModel();
     //   2 ______  3
     //    /|     |
     //   / |     |

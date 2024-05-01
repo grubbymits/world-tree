@@ -86,7 +86,7 @@ export class EntityBounds {
     this.data[maxStart+1] = min.y + dims.depth;
     this.data[maxStart+2] = min.z + dims.height;
   }
-  static update(id: number, d: Vector3D): void {
+  static translate(id: number, d: Vector3D): void {
     const minStart = this.minStartIdx(id);
     const maxStart = this.maxStartIdx(id);
     this.data[minStart] += d.x;
@@ -95,6 +95,8 @@ export class EntityBounds {
     this.data[maxStart] += d.x;
     this.data[maxStart+1] += d.y;
     this.data[maxStart+2] += d.z;
+  }
+  static rotate(id: number, d: number): void {
   }
   static contains(id: number, p: Point3D): boolean {
     if (

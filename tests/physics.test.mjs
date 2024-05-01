@@ -48,7 +48,7 @@ test("update entity bounds position", () => {
   const id = 0;
 
   WT.EntityBounds.addEntity(id, min, dims);
-  WT.EntityBounds.update(id, move);
+  WT.EntityBounds.translate(id, move);
   expect(WT.EntityBounds.bottomCentre(id).x).toBe(13);
   expect(WT.EntityBounds.bottomCentre(id).y).toBe(17);
   expect(WT.EntityBounds.bottomCentre(id).z).toBe(17);

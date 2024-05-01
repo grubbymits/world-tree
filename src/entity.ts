@@ -108,9 +108,13 @@ export class PhysicalEntity {
   }
 
   updatePosition(d: Vector3D): void {
-    //this.bounds.update(d);
-    EntityBounds.update(this.id, d);
-    this.geometry.transform(d);
+    EntityBounds.translate(this.id, d);
+    this.geometry.translate(d);
+  }
+
+  rotateZAxis(d: number): void {
+    EntityBounds.rotate(this.id, d);
+    this.geometry.resetWorld();
   }
 
   addEventListener(event: EntityEvent, callback: any): void {
@@ -143,8 +147,8 @@ export class MovableEntity extends PhysicalEntity {
   }
 
   updatePosition(d: Vector3D): void {
-    EntityBounds.update(this.id, d);
-    this.geometry.transform(d);
+    EntityBounds.translate(this.id, d);
+    this.geometry.translate(d);
     this.postEvent(EntityEvent.Moving);
   }
 
