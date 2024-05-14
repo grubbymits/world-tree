@@ -352,8 +352,10 @@ export class Gravity {
         const collision = CollisionDetector.detectInArea(movable, path);
         if (collision == null) {
           movable.updatePosition(path);
+          this._movableSpeeds.set(movable.id, speed);
+        } else {
+          this._movableSpeeds.set(movable.id, 0);
         }
-        this._movableSpeeds.set(movable.id, speed);
       }
     });
   }
