@@ -96,7 +96,24 @@ export class EntityBounds {
     this.data[maxStart+1] += d.y;
     this.data[maxStart+2] += d.z;
   }
-  static rotate(id: number, d: number): void {
+  static quarterTurn(id: number): void {
+    const width = this.width(id);
+    const depth = this.depth(id);
+    if (width == depth) {
+      return;
+    }
+    const nextMinX = this.minX(id);
+    const nextMinY = this.minY(id) + depth;
+    const origin = this.bottomCentre(id);
+    const rotateX = -(nextMinY - origin.y);
+    const rotateY = nextMinX - origin.x;
+    const newMinLocation = new Point3D(
+      origin.x + rotateX,
+      origin.y + rotateY,
+      this.minZ(id)
+    );
+    const dimensions = new Dimensions(depth, width, this.height(id));
+    this.addEntity(id, newMinLocation, dimensions);
   }
   static contains(id: number, p: Point3D): boolean {
     if (

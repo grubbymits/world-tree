@@ -112,8 +112,8 @@ export class PhysicalEntity {
     this.geometry.translate(d);
   }
 
-  rotateZAxis(d: number): void {
-    EntityBounds.rotate(this.id, d);
+  quarterTurn(): void {
+    EntityBounds.quarterTurn(this.id);
     this.geometry.resetWorld();
   }
 

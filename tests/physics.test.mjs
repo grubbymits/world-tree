@@ -60,6 +60,23 @@ test("update entity bounds position", () => {
   expect(WT.EntityBounds.maxZ(id)).toBe(25);
 });
 
+test("quarter turn entity bounds", () => {
+  const width = 10;
+  const depth = 15;
+  const height = 10;
+  const x = 15;
+  const y = 15;
+  const z = 15;
+  const min = new WT.Point3D(x, y, z);
+  const dims = new WT.Dimensions(width, depth, height);
+  const id = 0;
+  WT.EntityBounds.addEntity(id, min, dims);
+  WT.EntityBounds.quarterTurn(id);
+  expect(WT.EntityBounds.minX(id)).toBeCloseTo(12.5);
+  expect(WT.EntityBounds.minY(id)).toBeCloseTo(17.5);
+  expect(WT.EntityBounds.minZ(id)).toBe(z);
+});
+
 test("contains location", () => {
   const centre = new WT.Point3D(0, 0, 0);
   const dims = new WT.Dimensions(2, 3, 4);
