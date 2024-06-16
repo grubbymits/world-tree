@@ -128,6 +128,13 @@ test("opposite direction", () => {
   );
 });
 
+test("direction vector round test", () => {
+  for (let direction = 0; direction < WT.Direction.Max; ++direction) {
+    const d = WT.Navigation.getDirectionVector(direction);
+    expect(WT.Navigation.getDirectionFromVector(new WT.Vector2D(d.x, d.y))).toBe(direction);
+  }
+});
+
 test("adjacent directions", () => {
   expect(WT.Navigation.getAdjacentDirections(WT.Direction.North)).toStrictEqual([WT.Direction.NorthWest, WT.Direction.NorthEast]);
   expect(WT.Navigation.getAdjacentDirections(WT.Direction.NorthEast)).toStrictEqual([WT.Direction.North, WT.Direction.East]);
@@ -157,6 +164,7 @@ test("3x3 neighbours", () => {
   const dims = new WT.Dimensions(4, 4, 4);
   const width = 3;
   const depth = 3;
+  const height = 2;
   const numTerraces = 1;
   const heightMap = [
     [1, 1, 1],
@@ -166,7 +174,7 @@ test("3x3 neighbours", () => {
   const worldDims = new WT.Dimensions(
     dims.width * width,
     dims.depth * depth,
-    dims.height
+    dims.height * height,
   );
   const context = WT.createTestContext(
     worldDims,
@@ -199,6 +207,7 @@ test("eight neighbours", () => {
   const dims = new WT.Dimensions(4, 4, 4);
   const width = 3;
   const depth = 3;
+  const height = 2;
   const numTerraces = 1;
   const heightMap = [
     [1, 1, 1],
@@ -208,7 +217,7 @@ test("eight neighbours", () => {
   const worldDims = new WT.Dimensions(
     dims.width * width,
     dims.depth * depth,
-    dims.height
+    dims.height * height,
   );
   const context = WT.createTestContext(
     worldDims,
@@ -236,6 +245,7 @@ test("move north from centre", () => {
   const dims = new WT.Dimensions(4, 4, 4);
   const width = 3;
   const depth = 3;
+  const height = 2;
   const numTerraces = 1;
   const heightMap = [
     [1, 1, 1],
@@ -245,7 +255,7 @@ test("move north from centre", () => {
   const worldDims = new WT.Dimensions(
     dims.width * width,
     dims.depth * depth,
-    dims.height
+    dims.height * height
   );
   const context = WT.createTestContext(
     worldDims,
@@ -272,6 +282,7 @@ test("path north from points", () => {
   const dims = new WT.Dimensions(4, 4, 4);
   const width = 5;
   const depth = 5;
+  const height = 2;
   const numTerraces = 1;
   const heightMap = [
     [1, 1, 1, 1, 1],
@@ -283,7 +294,7 @@ test("path north from points", () => {
   const worldDims = new WT.Dimensions(
     dims.width * width,
     dims.depth * depth,
-    dims.height
+    dims.height * height
   );
   const context = WT.createTestContext(
     worldDims,

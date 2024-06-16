@@ -3,7 +3,7 @@ import { ContextImpl } from "./context.ts";
 import { Camera } from "./camera.ts";
 import { EntityEvent } from "./events.ts";
 import { BoundingCuboid, CollisionDetector, CollisionInfo } from "./physics.ts";
-import { Point3D, Vector2D, Vector3D } from "./geometry.ts";
+import { Point3D, Vector2D, Vector3D, Vertex3D } from "./geometry.ts";
 import { Navigation } from "./navigation.ts";
 import { EntityBounds } from "./bounds.ts";
 
@@ -35,29 +35,72 @@ class MoveAction extends Action {
 }
 
 export class MoveDirection extends MoveAction {
+  private _adjustedD: Vector3D;
+  private _prevCollided: Vertex3D|null;
   constructor(
     actor: Actor,
     private readonly _d: Vector3D,
     private _bounds: BoundingCuboid
   ) {
     super(actor);
+    this._adjustedD = _d;
   }
+
+  get adjustedD(): Vector3D { return this._adjustedD; }
+  set adjustedD(d: Vector3D) { this._adjustedD = d; }
 
   perform(): boolean {
     const currentPos = EntityBounds.bottomCentre(this.actor.id);
     const nextPos = currentPos.add(this._d);
     const obstruction = this.obstructed(currentPos, nextPos);
-    if (obstruction == null) {
+    if (obstruction == null || !obstruction.blocking) {
       this.actor.updatePosition(this._d);
       return false;
     }
-    if (obstruction.blocking) {
-      this.actor.postEvent(EntityEvent.EndMove);
-      return true;
+
+    if (obstruction.intersectInfo) {
+      if (obstruction.intersectInfo!.face.vertex != this._prevCollided) {
+        // Calculate adjustment angle, if possible.
+        this._prevCollided = obstruction.intersectInfo!.face.vertex;
+        const obstructionNormal = obstruction.intersectInfo!.face.vertex.normal.norm();
+        if (obstructionNormal.mag() <= this._d.mag()) {
+          const theta = obstruction.intersectInfo!.theta;
+          const xyScale = theta;
+          const xyMag = new Vector2D(
+            this._d.x * xyScale,
+            this._d.y * xyScale).mag();
+          // Assume we're perpendicular, so subtract theta to calculate the
+          // angle of the slope, not the angle between the actor and the slope.
+          const angle = 0.5 * Math.PI - theta;
+          const z = Math.tan(angle) * xyMag;
+          this.adjustedD = new Vector3D(
+            this._d.x * xyScale,
+            this._d.y * xyScale,
+            z
+          );
+        }
+      }
+      if (this.adjustedD.mag() < 0.01) {
+        return true;
+      }
+      const adjustedNextPos = currentPos.add(this.adjustedD);
+      const adjustedObstruction = this.obstructed(currentPos, adjustedNextPos);
+      if (adjustedObstruction == null) {
+        this.actor.updatePosition(this.adjustedD);
+        return false;
+      }
+    } else {
+      // Without any collision info, just try the previous adjustment angle,
+      const adjustedNextPos = currentPos.add(this.adjustedD);
+      const adjustedObstruction = this.obstructed(currentPos, adjustedNextPos);
+      if (adjustedObstruction == null) {
+        this.actor.updatePosition(this.adjustedD);
+        return false;
+      }
     }
-    console.log("adjusting movement with max angle");
-    this.actor.updatePosition(this._d);
-    return false;
+    this.adjustedD = new Vector3D(0, 0, 0);
+    this.actor.postEvent(EntityEvent.EndMove);
+    return true;
   }
 }
 
@@ -86,7 +129,7 @@ export class MoveDestination extends MoveAction {
   set destination(destination: Point3D) {
     this._destination = destination;
     const currentPos = EntityBounds.bottomCentre(this.actor.id);
-    this._d = destination.vec_diff(currentPos).norm().mulScalar(this._step);
+    this._d = destination.vec_diff(currentPos).norm().scale(this._step);
     const direction = Navigation.getDirectionFromVector(new Vector2D(this._d.x, this._d.y));
     this.actor.direction = direction;
   }

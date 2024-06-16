@@ -4,17 +4,12 @@ const worldDescriptor = {
   canvasName: "demoCanvas",
   projection: "TwoByOneIsometric",
   heightMap: [
-    [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4],
-    [2, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4],
     [2, 0, 2, 2, 2, 2, 2, 1, 0, 0, 4],
     [2, 0, 1, 2, 2, 2, 2, 1, 0, 0, 4],
     [2, 0, 1, 2, 2, 2, 2, 1, 0, 0, 4],
     [2, 4, 1, 2, 2, 2, 2, 1, 0, 4, 4],
     [2, 0, 1, 2, 2, 2, 2, 1, 0, 0, 4],
     [2, 0, 1, 2, 2, 2, 2, 1, 0, 0, 4],
-    [2, 0, 1, 1, 1, 1, 1, 1, 0, 0, 4],
-    [2, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4],
-    [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
   ],
   numTerraces: 2,
   floor: WT.TerrainType.Upland0,
@@ -85,17 +80,14 @@ async function createDroid(context, position) {
   );
 
   const moveRandomDirection = () => {
+    const dz = 0;
     let dx = Math.round(Math.random() * 2) - 1;
-    let dy = 0;
-    let dz = 0;
     // Move along either the x or y axis.
     // Choose values between: -1, 0, 1
     if (dx == 0) {
-      dy = Math.round(Math.random() * 2) - 1;
+      dx = 1;
     }
-    if (dx == 0 && dy == 0) {
-      dy = 1;
-    }
+    const dy = 0;
     const moveVector = new WT.Vector3D(dx, dy, dz);
     droid.direction = WT.Navigation.getDirectionFromVector(moveVector);
     droid.action = new WT.MoveDirection(droid, moveVector, context.bounds);
@@ -116,7 +108,7 @@ window.onload = async (event) => {
 
   // Place the droid in the middle(ish) of the map.
   const x = 4;
-  const y = 4;
+  const y = 2;
   const droidPosition =
     context.grid.getSurfaceLocationAt(x, y).add(new WT.Vector3D(0, 0, 1));
   const droid = await createDroid(context, droidPosition);

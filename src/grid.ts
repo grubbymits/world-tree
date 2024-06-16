@@ -14,6 +14,7 @@ import { Dimensions } from './physics.ts';
 import {
   Point2D,
   Point3D,
+  Vector3D,
 } from './geometry.ts';
 
 export interface TerrainGridDescriptor {
@@ -109,6 +110,11 @@ export class TerrainGrid {
         const terrainShape = this.terrainShapeAt(x, y);
         const terrainType = this.terrainTypeAt(x, y);
         const position = this.scaleGridToWorld(x, y, z);
+
+        if (!this._context.bounds.contains(position)) {
+          console.error('terrain out-of-bounds:', position);
+        }
+
         const terrain = new Terrain(
           this._context,
           position,
@@ -239,7 +245,9 @@ export class TerrainGrid {
     if (!this.inbounds(x, y)) {
       return null;
     }
-    return this.surfaceTerrain[y][x]!.surfaceLocation;
+    return this.surfaceTerrain[y][x]!.surfaceLocation.add(
+      new Vector3D(0, 0, 0.1)
+    );
   }
 
   getSurfaceTerrainAtPoint(loc: Point3D): Terrain | null {

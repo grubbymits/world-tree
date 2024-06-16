@@ -237,7 +237,7 @@ export class Vector3D {
     return new Vector3D(x, y, z);
   }
 
-  mulScalar(factor: number): Vector3D {
+  scale(factor: number): Vector3D {
     const x = this.x * factor;
     const y = this.y * factor;
     const z = this.z * factor;
@@ -353,7 +353,7 @@ export class Vertex3D {
     if (r < 0 || r > 1) {
       return null;
     }
-    return begin.add(dir.mulScalar(r));
+    return begin.add(dir.scale(r));
   }
 }
 

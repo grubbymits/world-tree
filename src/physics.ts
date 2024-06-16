@@ -354,6 +354,7 @@ export class Gravity {
           movable.updatePosition(path);
           this._movableSpeeds.set(movable.id, speed);
         } else {
+          // FIXME: Calculate the movable distance and do it.
           this._movableSpeeds.set(movable.id, 0);
         }
       }

@@ -20,6 +20,7 @@ const worldCentre = new WT.Point3D(
   worldDims.depth / 2,
   worldDims.height / 2
 );
+const entityDims = new WT.Dimensions(5, 5, 5);
 function createMap() {
   // *  *  *  *  *
   // *           *
@@ -59,7 +60,6 @@ function getTileSurfaceCentre(x, y) {
                         squareTileSize + 1);
 }
 
-const entityDims = new WT.Dimensions(5, 5, 5);
 test("move direction south flat", () => {
   const idx = 1;
   const idy = 1;
@@ -109,7 +109,7 @@ test("move destination north flat", () => {
   ); 
   expect(moveVector).toStrictEqual(expectedVector);
 
-  moveVector = moveVector.norm().mulScalar(velocity);
+  moveVector = moveVector.norm().scale(velocity);
   expect(action.d).toStrictEqual(moveVector);
 
   const expectedPos = WT.EntityBounds.minLocation(actor.id).add(moveVector);
@@ -135,7 +135,7 @@ test("move destination south east", () => {
   ); 
   expect(moveVector).toStrictEqual(expectedVector);
 
-  moveVector = moveVector.norm().mulScalar(velocity);
+  moveVector = moveVector.norm().scale(velocity);
   expect(action.d).toStrictEqual(moveVector);
 
   const expectedPos = WT.EntityBounds.minLocation(actor.id).add(moveVector);
@@ -144,8 +144,15 @@ test("move destination south east", () => {
 });
 
 test("move around object", () => {
+  const cellsX = 5;
+  const cellsY = 5;
+  const cellsZ = 2;
   const context = WT.createTestContext(
-    worldDims,
+    new WT.Dimensions(
+      cellsX * squareTileSize,
+      cellsY * squareTileSize,
+      cellsZ * squareTileSize
+    ),
     WT.Perspective.TwoByOneIsometric
   );
   const terrainType = WT.TerrainType.Lowland0;
@@ -163,9 +170,9 @@ test("move around object", () => {
     typeGrid: new Array(5).fill(terrainTypes),
     shapeGrid: new Array(5).fill(terrainShapes),
     tileDimensions: tileDims,
-    cellsX: 5,
-    cellsY: 5,
-    cellsZ: 2,
+    cellsX: cellsX,
+    cellsY: cellsY,
+    cellsZ: cellsZ,
   };
   Utils.addDummyTerrainGraphic(terrainType, terrainShape);
   const grid = new WT.TerrainGrid(context, terrainGridDescriptor);
@@ -209,3 +216,182 @@ test("move around object", () => {
   expect(action.index).toBe(4);
 });
 
+test("move down ramp", () => {
+  const cellsX = 5;
+  const cellsY = 5;
+  const cellsZ = 3;
+  const context = WT.createTestContext(
+    new WT.Dimensions(
+      cellsX * squareTileSize,
+      cellsY * squareTileSize,
+      cellsZ * squareTileSize
+    ),
+    WT.Perspective.TwoByOneIsometric
+  );
+  WT.Gravity.init(context);
+
+  const terrainType = WT.TerrainType.Lowland0;
+  const terrainShape = WT.TerrainShape.Flat;
+  const terrainTypes = new Array(5).fill(terrainType);
+  const shapeGrid = new Array(cellsY);
+  for (let y = 0; y < cellsY; ++y) {
+    shapeGrid[y] = new Array(cellsX);
+    for (let x = 0; x < cellsX; ++x) {
+      if (y == 2 && x == 2) {
+        shapeGrid[2][2] = WT.TerrainShape.RampUpNorth;
+      } else {
+        shapeGrid[y][x] = WT.TerrainShape.Flat;
+      }
+    }
+  }
+
+  const terrainGridDescriptor = {
+    cellHeightGrid: [
+      [1, 1, 1, 1, 1],
+      [1, 0, 1, 0, 1],
+      [1, 0, 1, 0, 1],
+      [1, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1],
+    ],
+    typeGrid: new Array(5).fill(terrainTypes),
+    shapeGrid: shapeGrid,
+    tileDimensions: tileDims,
+    cellsX: cellsX,
+    cellsY: cellsY,
+    cellsZ: cellsZ,
+  };
+
+  Utils.addDummyTerrainGraphic(terrainType, terrainShape);
+  Utils.addDummyTerrainGraphic(terrainType, WT.TerrainShape.RampUpNorth);
+  const grid = new WT.TerrainGrid(context, terrainGridDescriptor);
+
+  const beginPos = context.grid.getSurfaceLocationAt(2, 1);
+  const actor = new WT.Actor(context, beginPos, entityDims);
+  actor.gravitySpeed = 0.1;
+  const d = WT.Navigation.getDirectionVector(WT.Direction.South).scale(2);
+  actor.action = new WT.MoveDirection(actor, d, context.bounds);
+
+  expect(
+    context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))
+  ).toStrictEqual(new WT.Point3D(2, 1, 2));
+
+  expect(actor.action.perform()).toBe(false);
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  WT.Gravity.update(context.movables);
+  expect(
+    context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))
+  ).toStrictEqual(new WT.Point3D(2, 2, 2));
+
+  expect(actor.action.perform()).toBe(false);
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  WT.Gravity.update(context.movables);
+  expect(
+    context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))
+  ).toStrictEqual(new WT.Point3D(2, 3, 1));
+});
+
+test("move up ramp", () => {
+  const cellsX = 5;
+  const cellsY = 5;
+  const cellsZ = 3;
+  const context = WT.createTestContext(
+    new WT.Dimensions(
+      cellsX * squareTileSize,
+      cellsY * squareTileSize,
+      cellsZ * squareTileSize
+    ),
+    WT.Perspective.TwoByOneIsometric
+  );
+  WT.Gravity.init(context);
+
+  const terrainType = WT.TerrainType.Lowland0;
+  const terrainShape = WT.TerrainShape.Flat;
+  const terrainTypes = new Array(5).fill(terrainType);
+  const shapeGrid = new Array(cellsY);
+  for (let y = 0; y < cellsY; ++y) {
+    shapeGrid[y] = new Array(cellsX);
+    for (let x = 0; x < cellsX; ++x) {
+      if (y == 2 && x == 2) {
+        shapeGrid[2][2] = WT.TerrainShape.RampUpNorth;
+      } else {
+        shapeGrid[y][x] = WT.TerrainShape.Flat;
+      }
+    }
+  }
+
+  const terrainGridDescriptor = {
+    cellHeightGrid: [
+      [1, 1, 1, 1, 1],
+      [1, 0, 1, 0, 1],
+      [1, 0, 1, 0, 1],
+      [1, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1],
+    ],
+    typeGrid: new Array(5).fill(terrainTypes),
+    shapeGrid: shapeGrid,
+    tileDimensions: tileDims,
+    cellsX: cellsX,
+    cellsY: cellsY,
+    cellsZ: cellsZ,
+  };
+
+  Utils.addDummyTerrainGraphic(terrainType, terrainShape);
+  Utils.addDummyTerrainGraphic(terrainType, WT.TerrainShape.RampUpNorth);
+  const grid = new WT.TerrainGrid(context, terrainGridDescriptor);
+
+  const beginPos = context.grid.getSurfaceLocationAt(2, 3);
+  const actor = new WT.Actor(context, beginPos, entityDims);
+  actor.gravitySpeed = 0.1;
+  const d = WT.Navigation.getDirectionVector(WT.Direction.North).scale(2);
+  actor.action = new WT.MoveDirection(actor, d, context.bounds);
+
+  expect(
+    context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))
+  ).toStrictEqual(new WT.Point3D(2, 3, 1));
+
+  expect(actor.action.perform()).toBe(false);
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  WT.Gravity.update(context.movables);
+  expect(actor.action.adjustedD.y).toBeCloseTo(-1.57);
+  expect(actor.action.adjustedD.z).toBeCloseTo(1.57);
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  expect(
+    context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))
+  ).toStrictEqual(new WT.Point3D(2, 2, 2));
+
+  expect(actor.action.perform()).toBe(false);
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  WT.Gravity.update(context.movables);
+  actor.action.perform();
+  WT.Gravity.update(context.movables);
+  expect(
+    context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))
+  ).toStrictEqual(new WT.Point3D(2, 1, 2));
+});

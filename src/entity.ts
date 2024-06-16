@@ -183,6 +183,9 @@ export class Actor extends MovableEntity {
     }
   }
 
+  get action(): Action {
+    return this._action!;
+  }
   set action(action: Action) {
     this._action = action;
   }

@@ -83,6 +83,9 @@ export class ContextImpl implements Context {
   get entities(): Array<PhysicalEntity> {
     return this._entities;
   }
+  get movables(): Array<MovableEntity> {
+    return this._movables;
+  }
   get bounds(): BoundingCuboid {
     return this._spatialGraph.bounds;
   }
@@ -137,7 +140,7 @@ export class ContextImpl implements Context {
   }
 
   addMovableEntity(entity: MovableEntity): void {
-    this._movables.push(entity);
+    this.movables.push(entity);
     entity.addEventListener(EntityEvent.Moving, () => {
       this.spatial.update(entity);
       this.scene.updateEntity(entity);
@@ -149,7 +152,7 @@ export class ContextImpl implements Context {
     const elements = this._scene.render(camera, false);
     this.renderer.draw(elements);
 
-    Gravity.update(this._movables);
+    Gravity.update(this.movables);
 
     this._updateables.forEach((entity) => {
       entity.update();
@@ -198,6 +201,7 @@ export async function createWorld(worldDesc: WorldDescriptor): Promise<ContextIm
   const spriteHeight = terrainSpriteDesc.spriteHeight;
   const perspective = getPerspectiveFromString(worldDesc.projection);
   const physicalDims = getDimensionsFromPerspective(spriteWidth, spriteHeight, perspective);
+  console.log('physical dimensions:', physicalDims);
   const cellsY = worldDesc.heightMap.length;
   const cellsX = worldDesc.heightMap[0].length;
   const cellsZ = 1 + worldDesc.numTerraces;

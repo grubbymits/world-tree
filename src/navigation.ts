@@ -1,4 +1,4 @@
-import { Point2D, Point3D, Vector2D } from "./geometry.ts";
+import { Point2D, Point3D, Vector2D, Vector3D } from "./geometry.ts";
 
 export enum Direction {
   North,
@@ -36,6 +36,31 @@ export class Navigation {
     }
     console.error("unhandled direction when getting name:", direction);
     return "error";
+  }
+
+  static getDirectionVector(direction: Direction): Vector3D {
+    switch (direction) {
+      default:
+        break;
+      case Direction.North:
+        return new Vector3D(0, -1, 0);
+      case Direction.NorthEast:
+        return new Vector3D(1, -1, 0); 
+      case Direction.East:
+        return new Vector3D(1, 0, 0);
+      case Direction.SouthEast:
+        return new Vector3D(1, 1, 0);
+      case Direction.South:
+        return new Vector3D(0, 1, 0);
+      case Direction.SouthWest:
+        return new Vector3D(-1, 1, 0);
+      case Direction.West:
+        return new Vector3D(-1, 0, 0);
+      case Direction.NorthWest:
+        return new Vector3D(-1, -1, 0);
+    }
+    console.error("unhandled direction:", direction);
+    return new Vector3D(0, 0, 0);
   }
 
   static getAdjacentCoord(p: Point2D, direction: Direction): Point2D {
