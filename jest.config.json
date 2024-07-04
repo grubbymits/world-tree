@@ -1,5 +1,6 @@
 {
   "transform": {},
   "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(mjs?|jsx?|js?|tsx?|ts?)$",
-  "moduleFileExtensions": ["js", "mjs"]
+  "moduleFileExtensions": ["js", "mjs"],
+  "testEnvironment": "jsdom"
 }

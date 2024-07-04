@@ -15,3 +15,4 @@ export * from "./geometry.ts";
 export * from "./biomes.ts";
 export * from "./grid.ts";
 export * from "./bounds.ts";
+export * from "./audio.ts";
