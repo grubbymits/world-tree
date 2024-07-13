@@ -1,8 +1,8 @@
 //deno-lint-ignore-file no-explicit-any
 
-import { Direction } from "./navigation.ts";
+import { Direction, Navigation } from "./navigation.ts";
 import { BoundingCuboid, Dimensions } from "./physics.ts";
-import { CuboidGeometry, Geometry, Point3D, Vector3D } from "./geometry.ts";
+import { CuboidGeometry, Geometry, Point3D, Vector2D, Vector3D } from "./geometry.ts";
 import { GraphicComponent } from "./graphics.ts";
 import { ContextImpl } from "./context.ts";
 import { Action } from "./action.ts";
@@ -150,6 +150,9 @@ export class MovableEntity extends PhysicalEntity {
     EntityBounds.translate(this.id, d);
     this.geometry.translate(d);
     this.postEvent(EntityEvent.Moving);
+    const direction = Navigation.getDirectionFromVector(new Vector2D(d.x, d.y));
+    this.direction = direction;
+    this.postEvent(EntityEvent.FaceDirection);
   }
 
   get gravitySpeed(): number {

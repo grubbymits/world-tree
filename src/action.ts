@@ -2,9 +2,9 @@ import { Actor } from "./entity.ts";
 import { ContextImpl } from "./context.ts";
 import { Camera } from "./camera.ts";
 import { EntityEvent } from "./events.ts";
-import { BoundingCuboid, CollisionDetector, CollisionInfo } from "./physics.ts";
+import { CollisionDetector, CollisionInfo } from "./physics.ts";
 import { Point3D, Vector2D, Vector3D, Vertex3D } from "./geometry.ts";
-import { Navigation } from "./navigation.ts";
+import { Direction, Navigation } from "./navigation.ts";
 import { EntityBounds } from "./bounds.ts";
 
 export abstract class Action {
@@ -39,8 +39,7 @@ export class MoveDirection extends MoveAction {
   private _prevCollided: Vertex3D|null;
   constructor(
     actor: Actor,
-    private readonly _d: Vector3D,
-    private _bounds: BoundingCuboid
+    private readonly _d: Vector3D
   ) {
     super(actor);
     this._adjustedD = _d;
@@ -50,6 +49,10 @@ export class MoveDirection extends MoveAction {
   set adjustedD(d: Vector3D) { this._adjustedD = d; }
 
   perform(): boolean {
+    if (this._d.zero) {
+      this.actor.postEvent(EntityEvent.EndMove);
+      return true;
+    }
     const currentPos = EntityBounds.bottomCentre(this.actor.id);
     const nextPos = currentPos.add(this._d);
     const obstruction = this.obstructed(currentPos, nextPos);
@@ -81,6 +84,7 @@ export class MoveDirection extends MoveAction {
         }
       }
       if (this.adjustedD.mag() < 0.01) {
+        this.actor.postEvent(EntityEvent.EndMove);
         return true;
       }
       const adjustedNextPos = currentPos.add(this.adjustedD);
@@ -130,23 +134,22 @@ export class MoveDestination extends MoveAction {
     this._destination = destination;
     const currentPos = EntityBounds.bottomCentre(this.actor.id);
     this._d = destination.vec_diff(currentPos).norm().scale(this._step);
-    const direction = Navigation.getDirectionFromVector(new Vector2D(this._d.x, this._d.y));
-    this.actor.direction = direction;
   }
 
   perform(): boolean {
     const location: Point3D = EntityBounds.bottomCentre(this.actor.id);
     // Check for obstruction.
     if (this.obstructed(location, location.add(this._d))) {
+      this.actor.postEvent(EntityEvent.EndMove);
       return true;
     }
     // Make sure we don't overshoot the destination.
     const maxD: Vector3D = this.destination.vec_diff(location);
     if (maxD.mag() < this._step) {
+      this.actor.postEvent(EntityEvent.EndMove);
       return true;
     }
     this.actor.updatePosition(this._d);
-    this.actor.postEvent(EntityEvent.Moving);
     return false;
   }
 }
@@ -227,5 +230,60 @@ export function TouchOrClickNav(context: ContextImpl,
     if (destination) {
       actor.action = new Navigate(actor, speed, destination!);
     }
+  });
+}
+
+const activeArrowKeys = new Set<Direction>();
+export function ArrowKeyMovement(canvas: HTMLCanvasElement,
+                                 actor: Actor,
+                                 speed: number): void {
+
+  const actionFromKeys = (actor: Actor) => {
+    let d = new Vector3D(0, 0, 0);
+    for (let direction of activeArrowKeys) {
+      d = d.add(Navigation.getDirectionVector(direction));
+    }
+    if (!d.zero) {
+      actor.action = new MoveDirection(actor, d.norm().scale(speed));
+    } else {
+      actor.action = new MoveDirection(actor, d);
+    }
+  };
+
+  canvas.addEventListener('keydown', (e) => {
+    switch (e.key) {
+    default: return;
+    case 'ArrowUp':
+      activeArrowKeys.add(Direction.North);
+      break;
+    case 'ArrowDown':
+      activeArrowKeys.add(Direction.South);
+      break;
+    case 'ArrowLeft':
+      activeArrowKeys.add(Direction.West);
+      break;
+    case 'ArrowRight':
+      activeArrowKeys.add(Direction.East);
+      break;
+    }
+    actionFromKeys(actor);
+  });
+  canvas.addEventListener('keyup', (e) => {
+    switch (e.key) {
+    default: return;
+    case 'ArrowUp':
+      activeArrowKeys.delete(Direction.North);
+      break;
+    case 'ArrowDown':
+      activeArrowKeys.delete(Direction.South);
+      break;
+    case 'ArrowLeft':
+      activeArrowKeys.delete(Direction.West);
+      break;
+    case 'ArrowRight':
+      activeArrowKeys.delete(Direction.East);
+      break;
+    }
+    actionFromKeys(actor);
   });
 }

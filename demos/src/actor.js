@@ -74,8 +74,7 @@ async function createDroid(context, position) {
       dy = 1;
     }
     const moveVector = new WT.Vector3D(dx, dy, dz);
-    droid.direction = WT.Navigation.getDirectionFromVector(moveVector);
-    droid.action = new WT.MoveDirection(droid, moveVector, context.bounds);
+    droid.action = new WT.MoveDirection(droid, moveVector);
   };
 
   // Choose another direction when it can't move anymore.

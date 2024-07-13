@@ -40,13 +40,15 @@ export class AudioController {
   public static play(id: number, volume = 1, loop = false) {
     this.ensureEnabled();
     console.assert(this._sources.has(id));
+    const source = this._sources.get(id)!;
     source.loop = loop;
+    const gainNode = this._context.createGain();
     gainNode.gain.value = volume;
     source.connect(gainNode).connect(this._context.destination);
     source.start();
   }
 
-  public static loopPanningBackground(id: number, Array<number> entitiyIds, volume: number) {
+  public static loopPanningBackground(id: number, entityIds: Array<number>, volume: number) {
     this.ensureEnabled();
     console.assert(this._sources.has(id));
     const source = this._sources.get(id)!;

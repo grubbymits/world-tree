@@ -69,7 +69,7 @@ test("move direction south flat", () => {
   const moveVector = new WT.Vector3D(0, 1, 0);
   const context = createMap();
   const actor = new WT.Actor(context, pos, entityDims);
-  actor.action = new WT.MoveDirection(actor, moveVector, context.bounds);
+  actor.action = new WT.MoveDirection(actor, moveVector);
   actor.update();
   expect(actor.x).toBe(pos.x + moveVector.x);
   expect(actor.y).toBe(pos.y + moveVector.y);
@@ -84,7 +84,7 @@ test("move direction west flat obstructed", () => {
   const moveVector = new WT.Vector3D(-1, 0, 0);
   const context = createMap();
   const actor = new WT.Actor(context, pos, entityDims);
-  actor.action = new WT.MoveDirection(actor, moveVector, context.bounds);
+  actor.action = new WT.MoveDirection(actor, moveVector);
   actor.update();
   expect(actor.x).toBe(pos.x);
   expect(actor.y).toBe(pos.y);
@@ -269,7 +269,7 @@ test("move down ramp", () => {
   const actor = new WT.Actor(context, beginPos, entityDims);
   actor.gravitySpeed = 0.1;
   const d = WT.Navigation.getDirectionVector(WT.Direction.South).scale(2);
-  actor.action = new WT.MoveDirection(actor, d, context.bounds);
+  actor.action = new WT.MoveDirection(actor, d);
 
   expect(
     context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))
@@ -351,7 +351,7 @@ test("move up ramp", () => {
   const actor = new WT.Actor(context, beginPos, entityDims);
   actor.gravitySpeed = 0.1;
   const d = WT.Navigation.getDirectionVector(WT.Direction.North).scale(2);
-  actor.action = new WT.MoveDirection(actor, d, context.bounds);
+  actor.action = new WT.MoveDirection(actor, d);
 
   expect(
     context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))

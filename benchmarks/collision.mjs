@@ -67,16 +67,14 @@ export function benchmark_collision() {
       actor.action = new WT.MoveDirection(
         actor,
         moveVector,
-        maxAngle,
-        context.bounds,
+        maxAngle
       );
     });
     let moveVector = moveVectors[i % moveVectors.length];
     actor.action = new WT.MoveDirection(
       actor,
       moveVector,
-      maxAngle,
-      context.bounds,
+      maxAngle
     );
     actors.push(actor);
   }
