@@ -31,37 +31,48 @@ export class AudioController {
     return source_id;
   }
 
-  private static ensure_enabled(): void {
+  private static ensureEnabled(): void {
     if (this._context.state === "suspended") {
       this._context.resume();
     }
   }
 
   public static play(id: number, volume = 1, loop = false) {
-    this.ensure_enabled();
-    if (this._sources.has(id)) {
-      const source = this._sources.get(id)!;
-      source.loop = loop;
-      const gainNode = this._context.createGain();
-      gainNode.gain.value = volume;
-      source.connect(gainNode).connect(this._context.destination);
-      source.start();
-    }
+    this.ensureEnabled();
+    console.assert(this._sources.has(id));
+    source.loop = loop;
+    gainNode.gain.value = volume;
+    source.connect(gainNode).connect(this._context.destination);
+    source.start();
   }
 
-  public static play_panning(id: number, entity: PhysicalEntity, volume = 1, loop = false) {
-    this.ensure_enabled();
-    if (this._sources.has(id)) {
-      const source = this._sources.get(id)!;
-      const panner = this._panners.get(entity.id)!;
-      console.assert(panner, 'no panner for entity');
+  public static loopPanningBackground(id: number, Array<number> entitiyIds, volume: number) {
+    this.ensureEnabled();
+    console.assert(this._sources.has(id));
+    const source = this._sources.get(id)!;
+    const gainNode = this._context.createGain();
+    gainNode.gain.value = volume;
 
-      source.loop = loop;
-      const gainNode = this._context.createGain();
-      gainNode.gain.value = volume;
-      source.connect(gainNode).connect(panner).connect(this._context.destination);
-      source.start();
+    for (let id of entityIds) {
+      const panner = this._panners.get(id)!;
+      source.connect(panner).connect(gainNode).connect(this._context.destination);
     }
+    source.loop = true;
+    source.start();
+  }
+
+  public static playPanningOnce(id: number, entity: PhysicalEntity, volume = 1, loop = false) {
+    this.ensureEnabled();
+    console.assert(this._sources.has(id));
+    const source = this._sources.get(id)!;
+    const panner = this._panners.get(entity.id)!;
+    console.assert(panner, 'no panner for entity');
+
+    source.loop = loop;
+    const gainNode = this._context.createGain();
+    gainNode.gain.value = volume;
+    source.connect(gainNode).connect(panner).connect(this._context.destination);
+    source.start();
   }
 
   public static addPanningEntity(entity: PhysicalEntity): void {
