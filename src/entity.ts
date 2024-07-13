@@ -152,7 +152,12 @@ export class MovableEntity extends PhysicalEntity {
     this.postEvent(EntityEvent.Moving);
     const direction = Navigation.getDirectionFromVector(new Vector2D(d.x, d.y));
     this.direction = direction;
-    this.postEvent(EntityEvent.FaceDirection);
+  }
+
+  updatePositionNotDirection(d: Vector3D): void {
+    EntityBounds.translate(this.id, d);
+    this.geometry.translate(d);
+    this.postEvent(EntityEvent.Moving);
   }
 
   get gravitySpeed(): number {

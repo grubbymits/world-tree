@@ -351,7 +351,7 @@ export class Gravity {
         );
         const collision = CollisionDetector.detectInArea(movable, path);
         if (collision == null) {
-          movable.updatePosition(path);
+          movable.updatePositionNotDirection(path);
           this._movableSpeeds.set(movable.id, speed);
         } else {
           // FIXME: Calculate the movable distance and do it.

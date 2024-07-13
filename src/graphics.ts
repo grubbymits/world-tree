@@ -388,7 +388,6 @@ export class DirectionalGraphicComponent extends GraphicComponent {
       } else if (this._staticGraphics.has(alternatives[1])) {
         this._direction = alternatives[1];
       }
-      console.log("graphic direction unsupported");
     }
   }
 

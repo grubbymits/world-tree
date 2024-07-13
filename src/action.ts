@@ -209,81 +209,26 @@ export class Navigate extends Action {
   }
 }
 
-export function TouchOrClickNav(context: ContextImpl,
-                                canvas: HTMLCanvasElement,
-                                camera: Camera,
-                                actor: Actor,
-                                speed: number): void {
-  console.assert(context.grid && 'expected grid');
-  canvas.addEventListener("mousedown", (e) => {
-    if (e.button == 0) {
-      console.log('mouse click');
-      const destination = context.scene.getLocationAt(e.offsetX, e.offsetY, camera);
-      if (destination) {
-        actor.action = new Navigate(actor, speed, destination!);
-      }
-    }
-  });
-  canvas.addEventListener("touchstart", (e) => {
-    const touch = e.touches[0];
-    const destination = context.scene.getLocationAt(touch.pageX, touch.pageY, camera);
-    if (destination) {
-      actor.action = new Navigate(actor, speed, destination!);
-    }
-  });
-}
+export class Jump extends MoveAction {
+  constructor(
+    actor: Actor,
+    private _d: Vector3D
+  ) {
+    super(actor);
+  }
 
-const activeArrowKeys = new Set<Direction>();
-export function ArrowKeyMovement(canvas: HTMLCanvasElement,
-                                 actor: Actor,
-                                 speed: number): void {
-
-  const actionFromKeys = (actor: Actor) => {
-    let d = new Vector3D(0, 0, 0);
-    for (let direction of activeArrowKeys) {
-      d = d.add(Navigation.getDirectionVector(direction));
+  perform(): boolean {
+    if (this._d.mag() <= 0.01) {
+      return true;
     }
-    if (!d.zero) {
-      actor.action = new MoveDirection(actor, d.norm().scale(speed));
-    } else {
-      actor.action = new MoveDirection(actor, d);
+    const currentPos = EntityBounds.bottomCentre(this.actor.id);
+    const nextPos = currentPos.add(this._d);
+    const obstruction = this.obstructed(currentPos, nextPos);
+    if (obstruction == null || !obstruction.blocking) {
+      this.actor.updatePositionNotDirection(this._d);
+      this._d = new Vector3D(this._d.x, this._d.y, this._d.z * 0.8);
+      return false;
     }
-  };
-
-  canvas.addEventListener('keydown', (e) => {
-    switch (e.key) {
-    default: return;
-    case 'ArrowUp':
-      activeArrowKeys.add(Direction.North);
-      break;
-    case 'ArrowDown':
-      activeArrowKeys.add(Direction.South);
-      break;
-    case 'ArrowLeft':
-      activeArrowKeys.add(Direction.West);
-      break;
-    case 'ArrowRight':
-      activeArrowKeys.add(Direction.East);
-      break;
-    }
-    actionFromKeys(actor);
-  });
-  canvas.addEventListener('keyup', (e) => {
-    switch (e.key) {
-    default: return;
-    case 'ArrowUp':
-      activeArrowKeys.delete(Direction.North);
-      break;
-    case 'ArrowDown':
-      activeArrowKeys.delete(Direction.South);
-      break;
-    case 'ArrowLeft':
-      activeArrowKeys.delete(Direction.West);
-      break;
-    case 'ArrowRight':
-      activeArrowKeys.delete(Direction.East);
-      break;
-    }
-    actionFromKeys(actor);
-  });
+    return true;
+  }
 }

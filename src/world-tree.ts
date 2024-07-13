@@ -16,3 +16,4 @@ export * from "./biomes.ts";
 export * from "./grid.ts";
 export * from "./bounds.ts";
 export * from "./audio.ts";
+export * from "./control.ts";
