@@ -32,6 +32,16 @@ class MoveAction extends Action {
   perform(): boolean {
     return true;
   }
+
+  move(d: Vector3D): boolean {
+    this.actor.updatePosition(d);
+    return false;
+  }
+
+  end(): boolean {
+    this.actor.postEvent(EntityEvent.EndMove);
+    return true;
+  }
 }
 
 export class MoveDirection extends MoveAction {
@@ -50,15 +60,13 @@ export class MoveDirection extends MoveAction {
 
   perform(): boolean {
     if (this._d.zero) {
-      this.actor.postEvent(EntityEvent.EndMove);
-      return true;
+      return this.end();
     }
     const currentPos = EntityBounds.bottomCentre(this.actor.id);
     const nextPos = currentPos.add(this._d);
     const obstruction = this.obstructed(currentPos, nextPos);
     if (obstruction == null || !obstruction.blocking) {
-      this.actor.updatePosition(this._d);
-      return false;
+      return this.move(this._d);
     }
 
     if (obstruction.intersectInfo) {
@@ -84,27 +92,23 @@ export class MoveDirection extends MoveAction {
         }
       }
       if (this.adjustedD.mag() < 0.01) {
-        this.actor.postEvent(EntityEvent.EndMove);
-        return true;
+        return this.end();
       }
       const adjustedNextPos = currentPos.add(this.adjustedD);
       const adjustedObstruction = this.obstructed(currentPos, adjustedNextPos);
       if (adjustedObstruction == null) {
-        this.actor.updatePosition(this.adjustedD);
-        return false;
+        return this.move(this.adjustedD);
       }
     } else {
       // Without any collision info, just try the previous adjustment angle,
       const adjustedNextPos = currentPos.add(this.adjustedD);
       const adjustedObstruction = this.obstructed(currentPos, adjustedNextPos);
       if (adjustedObstruction == null) {
-        this.actor.updatePosition(this.adjustedD);
-        return false;
+        return this.move(this.adjustedD);
       }
     }
     this.adjustedD = new Vector3D(0, 0, 0);
-    this.actor.postEvent(EntityEvent.EndMove);
-    return true;
+    return this.end();
   }
 }
 
@@ -132,25 +136,21 @@ export class MoveDestination extends MoveAction {
   }
   set destination(destination: Point3D) {
     this._destination = destination;
-    const currentPos = EntityBounds.bottomCentre(this.actor.id);
-    this._d = destination.vec_diff(currentPos).norm().scale(this._step);
   }
 
   perform(): boolean {
     const location: Point3D = EntityBounds.bottomCentre(this.actor.id);
-    // Check for obstruction.
-    if (this.obstructed(location, location.add(this._d))) {
-      this.actor.postEvent(EntityEvent.EndMove);
-      return true;
-    }
     // Make sure we don't overshoot the destination.
     const maxD: Vector3D = this.destination.vec_diff(location);
     if (maxD.mag() < this._step) {
-      this.actor.postEvent(EntityEvent.EndMove);
-      return true;
+      return this.end();
     }
-    this.actor.updatePosition(this._d);
-    return false;
+    this._d = this.destination.vec_diff(location).norm().scale(this._step);
+    // Check for obstruction.
+    if (this.obstructed(location, location.add(this._d))) {
+      return this.end();
+    }
+    return this.move(this._d);
   }
 }
 

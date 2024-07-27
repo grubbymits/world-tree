@@ -100,6 +100,7 @@ test("move destination north flat", () => {
   const action = new WT.MoveDestination(actor, velocity, destination);
   actor.action = action;
   let moveVector = destination.vec_diff(WT.EntityBounds.bottomCentre(actor.id));
+  actor.action.perform();
 
   expect(action.d.mag()).toBeCloseTo(velocity, 5);
   const expectedVector = new WT.Vector3D(
@@ -126,6 +127,7 @@ test("move destination south east", () => {
   const action = new WT.MoveDestination(actor, velocity, destination);
   actor.action = action;
   let moveVector = destination.vec_diff(WT.EntityBounds.bottomCentre(actor.id));
+  actor.action.perform();
 
   expect(action.d.mag()).toBeCloseTo(velocity, 5);
   const expectedVector = new WT.Vector3D(

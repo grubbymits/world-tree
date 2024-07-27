@@ -138,6 +138,7 @@ export class MovableEntity extends PhysicalEntity {
   protected _gravitySpeed = 0;
   protected readonly _canSwim = false;
   protected _direction: Direction;
+  protected _velocity: Vector3D = new Vector3D(0, 0, 0);
 
   constructor(context: ContextImpl, location: Point3D, dimensions: Dimensions,
               graphics: GraphicComponent) {
@@ -172,6 +173,12 @@ export class MovableEntity extends PhysicalEntity {
   set direction(direction: Direction) {
     this._direction = direction;
     this.postEvent(EntityEvent.FaceDirection);
+  }
+  get velocity(): Vector3D {
+    return this._velocity;
+  }
+  set velocity(v: Vector3D) {
+    this._velocity = v;
   }
 }
 
