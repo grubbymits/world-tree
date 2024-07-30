@@ -31,14 +31,13 @@ export class AudioController {
     return source_id;
   }
 
-  private static ensureEnabled(): void {
+  public static ensureEnabled(): void {
     if (this._context.state === "suspended") {
       this._context.resume();
     }
   }
 
   public static play(id: number, volume = 1, loop = false) {
-    this.ensureEnabled();
     console.assert(this._sources.has(id));
     const source = this._sources.get(id)!;
     source.loop = loop;
@@ -49,14 +48,14 @@ export class AudioController {
   }
 
   public static loopPanningBackground(id: number, entityIds: Array<number>, volume: number) {
-    this.ensureEnabled();
     console.assert(this._sources.has(id));
     const source = this._sources.get(id)!;
     const gainNode = this._context.createGain();
     gainNode.gain.value = volume;
 
-    for (let id of entityIds) {
-      const panner = this._panners.get(id)!;
+    for (let entity_id of entityIds) {
+      console.assert(this._panners.has(entity_id));
+      const panner = this._panners.get(entity_id)!;
       source.connect(panner).connect(gainNode).connect(this._context.destination);
     }
     source.loop = true;
@@ -64,11 +63,10 @@ export class AudioController {
   }
 
   public static playPanningOnce(id: number, entity: PhysicalEntity, volume = 1, loop = false) {
-    this.ensureEnabled();
     console.assert(this._sources.has(id));
+    console.assert(this._panners.has(entity.id));
     const source = this._sources.get(id)!;
     const panner = this._panners.get(entity.id)!;
-    console.assert(panner, 'no panner for entity');
 
     source.loop = loop;
     const gainNode = this._context.createGain();

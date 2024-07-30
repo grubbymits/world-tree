@@ -19,6 +19,7 @@ import {
 } from "./geometry.ts";
 import { EntityBounds } from "./bounds.ts";
 
+
 export enum TerrainShape {
   Flat,             // 0
   Wall,             // 1

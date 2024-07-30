@@ -1,3 +1,4 @@
+import { AudioController } from "./audio.ts";
 import { MovableEntity, PhysicalEntity } from "./entity.ts";
 import { Terrain, TerrainType, TerrainSpriteDescriptor } from "./terrain.ts";
 import { TerrainGrid } from "./grid.ts";
@@ -149,6 +150,7 @@ export class ContextImpl implements Context {
 
   update(camera: Camera): void {
     camera.update();
+    AudioController.ensureEnabled();
     const elements = this._scene.render(camera, false);
     this.renderer.draw(elements);
 
