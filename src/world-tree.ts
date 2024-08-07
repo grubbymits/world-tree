@@ -18,3 +18,5 @@ export * from "./bounds.ts";
 export * from "./audio.ts";
 export * from "./control.ts";
 export * from "./terraform.ts";
+export * from "./utils.ts";
+
