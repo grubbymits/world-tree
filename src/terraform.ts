@@ -1,4 +1,5 @@
 import { Coord } from "./utils.ts";
+import { MinPriorityQueue } from './queue.ts';
 
 export type TerraceGrid = Array<Uint8Array>;
 export type BlockingGrid = Array<Uint8Array>;
@@ -24,6 +25,21 @@ function isDiagonal(direction: DirectionBit) {
   return (direction & diagonal) != 0;
 }
 
+function directionName(direction: DirectionBit): string {
+  switch (direction) {
+  default: console.error('unhandled direction');
+  case DirectionBit.North: return 'North';
+  case DirectionBit.NorthEast: return 'NorthEast';
+  case DirectionBit.East: return 'East';
+  case DirectionBit.SouthEast: return 'SouthEast';
+  case DirectionBit.South: return 'South';
+  case DirectionBit.SouthWest: return 'SouthWest';
+  case DirectionBit.West: return 'West';
+  case DirectionBit.NorthWest: return 'NorthWest';
+  case DirectionBit.Max: return 'Max';
+  }
+}
+
 function rotateLeft(direction: DirectionBit, n: number): DirectionBit {
   return 0xFF & ((direction << n) | (direction >>> (8 - n)));
 }
@@ -33,7 +49,7 @@ function rotateRight(direction: DirectionBit, n: number): DirectionBit {
 }
 
 export function getOpposite(direction: DirectionBit): DirectionBit {
-  const n = DirectionBit.Max >> 1;
+  const n = 4;
   return rotateLeft(direction, n);
 }
 
@@ -128,7 +144,6 @@ export class Ramp {
   get x(): number { return this._x; }
   get y(): number { return this._y; }
 }
-
 
 export function findEdges(terraceGrid: TerraceGrid): Array<Edge> {
   const neighbourOffsets: Array<Coord> = [
@@ -316,7 +331,7 @@ export function buildBlockingGrid(terraceGrid: TerraceGrid,
   }
 
   // Top edge
-  for (let x of blockingGrid[0]) {
+  for (let x = 0; x < blockingGrid[0].length; ++x) {
     blockingGrid[0][x] |=
       DirectionBit.North |
       DirectionBit.NorthWest |
@@ -395,5 +410,95 @@ export function isNeighbourAccessible(x: number,
                                       y: number,
                                       direction: DirectionBit,
                                       grid: BlockingGrid): boolean {
+  console.assert(y >= 0 && y < grid.length);
+  console.assert(x >= 0 && x < grid[y].length);
   return (grid[y][x] & direction) == 0;
+}
+
+export function isCompletelyBlocked(x: number,
+                                    y: number,
+                                    grid: BlockingGrid): boolean {
+  console.assert(y >= 0 && y < grid.length);
+  console.assert(x >= 0 && x < grid[y].length);
+  return grid[y][x] == 255;
+}
+
+const allDirections = new Array<DirectionBit>(
+  DirectionBit.North,
+  DirectionBit.NorthEast,
+  DirectionBit.East,
+  DirectionBit.SouthEast,
+  DirectionBit.South,
+  DirectionBit.SouthWest,
+  DirectionBit.West,
+  DirectionBit.NorthWest
+);
+
+export function findPath(start: Coord,
+                         end: Coord,
+                         blockingGrid: BlockingGrid): Array<Coord> {
+  if (start.x == end.x && start.y == end.y) {
+    return new Array<Coord>();
+  }
+
+  if (isCompletelyBlocked(start.x, start.y, blockingGrid) ||
+      isCompletelyBlocked(end.x, end.y, blockingGrid)) {
+    return new Array<Coord>();
+  }
+
+  const depth = blockingGrid.length;
+  const width = blockingGrid[0].length;
+  const id = (coord: Coord): number => (width * coord.y) + coord.x;
+  const coord  = (id: number): Coord => {
+    const x = Math.floor(id % width);
+    const y = Math.floor((id - x) / depth);
+    return new Coord(x, y);
+  };
+
+  // https://www.redblobgames.com/pathfinding/a-star/introduction.html
+  const frontier = new MinPriorityQueue<number>();
+  const cameFrom = new Map<number, number | null>();
+  const costs = new Map<number, number>();
+  const startId = id(start);
+  const endId = id(end);
+  frontier.insert(startId, 0);
+  cameFrom.set(startId, null);
+  costs.set(startId, 0);
+
+  let currentId = startId;
+  while (!frontier.empty()) {
+    currentId = frontier.pop();
+    if (currentId == endId) {
+      break;
+    }
+    const current = coord(currentId);
+    for (let direction of allDirections) {
+      if (isNeighbourAccessible(current.x, current.y, direction, blockingGrid)) {
+        const nextCoord = getNeighbourCoord(current.x, current.y, direction);
+        const nextId = id(nextCoord);
+        // TODO: ramps.
+        const cost = isDiagonal(direction) ? 3 : 2;
+        const new_cost = costs.get(currentId)! + cost;
+        if (!costs.has(nextId) || new_cost < costs.get(nextId)!) {
+          debugger;
+          costs.set(nextId, new_cost);
+          const priority = new_cost; // + heuristic(goal, next)
+          frontier.insert(nextId, priority);
+          cameFrom.set(nextId, currentId);
+        }
+      }
+    }
+  }
+
+  // Failed to find path.
+  if (currentId != endId) {
+    return Array<Coord>();
+  }
+  const path = new Array<Coord>(coord(currentId));
+  while (currentId != startId) {
+    currentId = cameFrom.get(currentId!)!;
+    path.push(coord(currentId));
+  }
+  path.reverse();
+  return path.splice(1);
 }

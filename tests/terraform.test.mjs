@@ -47,6 +47,11 @@ test("outside peninsulas", () => {
     new Uint8Array([ 0, 1, 0 ]),
   ];
   const edges = WT.findEdges(terraceGrid);
+  expect(edges.length).toBe(4);
+  expect(edges[0].shape).toBe(WT.EdgeShape.SouthPeninsula);
+  expect(edges[1].shape).toBe(WT.EdgeShape.EastPeninsula);
+  expect(edges[2].shape).toBe(WT.EdgeShape.WestPeninsula);
+  expect(edges[3].shape).toBe(WT.EdgeShape.NorthPeninsula);
 });
 
 test("corners", () => {
@@ -211,4 +216,41 @@ test("cardinals blocking grid", () => {
   expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthWest, blockingGrid)).toBe(false);
   expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.West, blockingGrid)).toBe(false);
   expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthWest, blockingGrid)).toBe(false);
+});
+
+test("spire path", () => {
+  const terraceGrid = [
+    new Uint8Array([ 0, 0, 0 ]),
+    new Uint8Array([ 0, 1, 0 ]),
+    new Uint8Array([ 0, 0, 0 ]),
+  ];
+  const edges = WT.findEdges(terraceGrid);
+  const blockingRamps = false;
+  const blockingUpHeight = 1;
+  const blockingDownHeight = 1;
+  const blockingGrid = WT.buildBlockingGrid(
+    terraceGrid,
+    edges,
+    blockingRamps,
+    blockingUpHeight,
+    blockingDownHeight
+  );
+  const startX = 0;
+  const startY = 0;
+  expect(WT.isNeighbourAccessible(startX, startY, WT.DirectionBit.East, blockingGrid)).toBe(true);
+  expect(WT.isNeighbourAccessible(startX, startY, WT.DirectionBit.SouthEast, blockingGrid)).toBe(false);
+  expect(WT.isNeighbourAccessible(startX, startY, WT.DirectionBit.South, blockingGrid)).toBe(true);
+
+  const start = new WT.Coord(startX, startY);
+  const end = new WT.Coord(2, 2);
+  const path = WT.findPath(
+    start,
+    end,
+    blockingGrid
+  );
+  expect(path.length).toBe(4);
+  expect(path[0]).toMatchObject(new WT.Coord(1, 0));
+  expect(path[1]).toMatchObject(new WT.Coord(2, 0));
+  expect(path[2]).toMatchObject(new WT.Coord(2, 1));
+  expect(path[3]).toMatchObject(new WT.Coord(2, 2));
 });
