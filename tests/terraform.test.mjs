@@ -129,12 +129,14 @@ test("cardinals blocking grid", () => {
     new Uint8Array([ 0, 0, 1, 0, 0 ]),
   ];
   const edges = WT.findEdges(terraceGrid);
+  const ramps = [];
   const blockingRamps = false;
   const blockingUpHeight = 1;
   const blockingDownHeight = 1;
   const blockingGrid = WT.buildBlockingGrid(
     terraceGrid,
     edges,
+    ramps,
     blockingRamps,
     blockingUpHeight,
     blockingDownHeight
@@ -168,7 +170,7 @@ test("cardinals blocking grid", () => {
   // 239
   expect(blockingGrid[edge.y][edge.x]).toBe(239);
 
-  // Middlea
+  // Middle
   let x = 2;
   let y = 2;
   expect(blockingGrid[y][x]).toBe(255);
@@ -228,9 +230,11 @@ test("spire path", () => {
   const blockingRamps = false;
   const blockingUpHeight = 1;
   const blockingDownHeight = 1;
+  const ramps = [];
   const blockingGrid = WT.buildBlockingGrid(
     terraceGrid,
     edges,
+    ramps,
     blockingRamps,
     blockingUpHeight,
     blockingDownHeight
@@ -253,4 +257,84 @@ test("spire path", () => {
   expect(path[1]).toMatchObject(new WT.Coord(2, 0));
   expect(path[2]).toMatchObject(new WT.Coord(2, 1));
   expect(path[3]).toMatchObject(new WT.Coord(2, 2));
+});
+
+test("centre ramps path", () => {
+  const terraceGrid = [
+    new Uint8Array([ 1, 1, 1, 1, 1, 1, 1, 1, 1 ]),
+    new Uint8Array([ 1, 0, 0, 0, 0, 0, 0, 0, 1 ]),
+    new Uint8Array([ 1, 0, 0, 0, 0, 0, 0, 0, 1 ]),
+    new Uint8Array([ 1, 0, 0, 0, 1, 0, 0, 0, 1 ]),
+    new Uint8Array([ 1, 0, 0, 1, 1, 1, 0, 0, 1 ]),
+    new Uint8Array([ 1, 0, 0, 0, 1, 0, 0, 0, 1 ]),
+    new Uint8Array([ 1, 0, 0, 0, 0, 0, 0, 0, 1 ]),
+    new Uint8Array([ 1, 0, 0, 0, 0, 0, 0, 0, 1 ]),
+    new Uint8Array([ 1, 1, 1, 1, 1, 1, 1, 1, 1 ]),
+  ];
+  const edges = WT.findEdges(terraceGrid);
+  const ramps = WT.findRamps(terraceGrid, edges);
+  const blockingRamps = false;
+  const blockingUpHeight = 1;
+  const blockingDownHeight = 1;
+  const blockingGrid = WT.buildBlockingGrid(
+    terraceGrid,
+    edges,
+    ramps,
+    blockingRamps,
+    blockingUpHeight,
+    blockingDownHeight
+  );
+
+  // straight across
+  let path = WT.findPath(
+    new WT.Coord(1, 4),
+    new WT.Coord(7, 4),
+    blockingGrid
+  );
+  expect(path.length).toBe(6);
+  expect(path[0]).toMatchObject(new WT.Coord(2, 4));
+  expect(path[1]).toMatchObject(new WT.Coord(3, 4));
+  expect(path[2]).toMatchObject(new WT.Coord(4, 4));
+  expect(path[3]).toMatchObject(new WT.Coord(5, 4));
+  expect(path[4]).toMatchObject(new WT.Coord(6, 4));
+  expect(path[5]).toMatchObject(new WT.Coord(7, 4));
+
+  // straight down
+  path = WT.findPath(
+    new WT.Coord(4, 1),
+    new WT.Coord(4, 7),
+    blockingGrid
+  );
+  expect(path.length).toBe(6);
+  expect(path[0]).toMatchObject(new WT.Coord(4, 2));
+  expect(path[1]).toMatchObject(new WT.Coord(4, 3));
+  expect(path[2]).toMatchObject(new WT.Coord(4, 4));
+  expect(path[3]).toMatchObject(new WT.Coord(4, 5));
+  expect(path[4]).toMatchObject(new WT.Coord(4, 6));
+  expect(path[5]).toMatchObject(new WT.Coord(4, 7));
+
+  // between two ramps to another position between two ramps.
+  const midx = 4;
+  const midy = 4;
+  expect(WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.North, blockingGrid)).toBe(true);
+  expect(WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.NorthEast, blockingGrid)).toBe(false);
+  expect(WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.East, blockingGrid)).toBe(true);
+  expect(WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.SouthEast, blockingGrid)).toBe(false);
+  expect(WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.South, blockingGrid)).toBe(true);
+  expect(WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.SouthWest, blockingGrid)).toBe(false);
+  expect(WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.West, blockingGrid)).toBe(true);
+  expect(WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.NorthWest, blockingGrid)).toBe(false);
+  path = WT.findPath(
+    new WT.Coord(3, 3),
+    new WT.Coord(5, 5),
+    blockingGrid
+  );
+  expect(path.length).toBe(7);
+  expect(path[0]).toMatchObject(new WT.Coord(2, 3));
+  expect(path[1]).toMatchObject(new WT.Coord(2, 4));
+  expect(path[2]).toMatchObject(new WT.Coord(3, 4));
+  expect(path[3]).toMatchObject(new WT.Coord(4, 4));
+  expect(path[4]).toMatchObject(new WT.Coord(5, 4));
+  expect(path[5]).toMatchObject(new WT.Coord(6, 5));
+  expect(path[6]).toMatchObject(new WT.Coord(5, 5));
 });

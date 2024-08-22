@@ -320,6 +320,7 @@ function inrange(coord: Coord,
 
 export function buildBlockingGrid(terraceGrid: TerraceGrid,
                                   edges: Array<Edge>,
+                                  ramps: Array<Ramp>,
                                   blockingRamps = false,
                                   blockingUpHeight = 1,
                                   blockingDownHeight = 1): BlockingGrid {
@@ -386,11 +387,19 @@ export function buildBlockingGrid(terraceGrid: TerraceGrid,
       if (heightDiff >= blockingUpHeight) {
         // Block the cardinal neighbour by all directions.
         for (let d of allDirections) {
-          // The edge tile blocks itself.
-          blockingGrid[edge.y][edge.x] |= d;
-
           const fromDirectionBit = getOpposite(d);
+          // block the cardinal neighbour
           blockingGrid[cardinalNeighbour.y][cardinalNeighbour.x] |= fromDirectionBit;
+
+          // block the neighbours of the cardinal neighbour, including this edge.
+          const neighbour = getNeighbourCoord(
+            cardinalNeighbour.x,
+            cardinalNeighbour.y,
+            fromDirectionBit,
+          );
+          if (inrange(neighbour, blockingGrid)) {
+            blockingGrid[neighbour.y][neighbour.x] |= d;
+          }
         }
         // Block the other, diagonal, neighbours too.
         for (let d of otherDirections) {
@@ -403,6 +412,29 @@ export function buildBlockingGrid(terraceGrid: TerraceGrid,
       }
     }
   }
+
+  // Some edges will be ramps, so undo some of the blocking.
+  const rampDirections = new Map<RampShape, DirectionBit>([
+    [ RampShape.North, DirectionBit.North ],
+    [ RampShape.East, DirectionBit.East ],
+    [ RampShape.South, DirectionBit.South ],
+    [ RampShape.West, DirectionBit.West ],
+  ]);
+
+  for (let ramp of ramps) {
+    const direction = rampDirections.get(ramp.shape)!;
+    const oppositeDirection = getOpposite(direction);
+
+    // The edge unblocks itself in one direction.
+    blockingGrid[ramp.y][ramp.x] &= ~direction;
+
+    // Two of its cardinal neighbours are then also unblocked.
+    let neighbour = getNeighbourCoord(ramp.x, ramp.y, direction);
+    blockingGrid[neighbour.y][neighbour.x] &= ~oppositeDirection;
+    neighbour = getNeighbourCoord(ramp.x, ramp.y, oppositeDirection);
+    blockingGrid[neighbour.y][neighbour.x] &= ~direction;
+  }
+
   return blockingGrid;
 }
 
@@ -446,13 +478,17 @@ export function findPath(start: Coord,
     return new Array<Coord>();
   }
 
-  const depth = blockingGrid.length;
-  const width = blockingGrid[0].length;
-  const id = (coord: Coord): number => (width * coord.y) + coord.x;
   const coord  = (id: number): Coord => {
+    const depth = blockingGrid.length;
+    const width = blockingGrid[0].length;
     const x = Math.floor(id % width);
     const y = Math.floor((id - x) / depth);
     return new Coord(x, y);
+  };
+
+  const id = (coord: Coord): number => {
+    const width = blockingGrid[0].length;
+    return (width * coord.y) + coord.x;
   };
 
   // https://www.redblobgames.com/pathfinding/a-star/introduction.html
@@ -476,7 +512,7 @@ export function findPath(start: Coord,
       if (isNeighbourAccessible(current.x, current.y, direction, blockingGrid)) {
         const nextCoord = getNeighbourCoord(current.x, current.y, direction);
         const nextId = id(nextCoord);
-        // TODO: ramps.
+        // TODO: ramps should cost more.
         const cost = isDiagonal(direction) ? 3 : 2;
         const new_cost = costs.get(currentId)! + cost;
         if (!costs.has(nextId) || new_cost < costs.get(nextId)!) {
