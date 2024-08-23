@@ -2,7 +2,8 @@
 
 import { EntityEvent, EventHandler, InputEvent } from "./events.ts";
 import { MovableEntity } from "./entity.ts";
-import { Point2D, Point3D } from "./geometry.ts";
+import { Point2D } from "./utils/geometry2d.ts";
+import { Point3D } from "./utils/geometry3d.ts";
 import { Scene } from "./scene.ts";
 
 export class Camera {

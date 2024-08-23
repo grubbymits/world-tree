@@ -1,157 +1,4 @@
-import { EntityBounds } from "./bounds.ts";
-
-export enum Orientation {
-  Colinear,
-  Clockwise,
-  CounterClockwise,
-}
-
-export class Vector2D {
-  constructor(private readonly _x: number, private readonly _y: number) {
-    Object.freeze(this);
-  }
-  get x() {
-    return this._x;
-  }
-  get y() {
-    return this._y;
-  }
-
-  dot(other: Vector2D): number {
-    const x = this.x * other.x;
-    const y = this.y * other.y;
-    return x + y;
-  }
-
-  mag(): number {
-    return Math.sqrt(this.dot(this));
-  }
-
-  normalise(): Vector2D {
-    const mag = this.mag();
-    const x = this.x / mag;
-    const y = this.y / mag;
-    return new Vector2D(x, y);
-  }
-
-  angle(other: Vector2D): number {
-    const x = this.x * other.y - other.x * this.y;
-    const y = this.dot(other);
-    return Math.atan2(x, y);
-  }
-}
-
-export class Point2D {
-  constructor(private readonly _x: number, private readonly _y: number) {
-    Object.freeze(this);
-  }
-  get x() {
-    return this._x;
-  }
-  get y() {
-    return this._y;
-  }
-
-  add(vec: Vector2D): Point2D {
-    return new Point2D(this.x + vec.x, this.y + vec.y);
-  }
-
-  sub(vec: Vector2D): Point2D {
-    return new Point2D(this.x - vec.x, this.y - vec.y);
-  }
-
-  diff(other: Point2D): Vector2D {
-    return new Vector2D(this.x - other.x, this.y - other.y);
-  }
-
-  static orientation(p: Point2D, q: Point2D, r: Point2D): Orientation {
-    // https://www.geeksforgeeks.org/orientation-3-ordered-points/
-    const res: number = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
-    if (res == 0) {
-      return Orientation.Colinear;
-    }
-    return res > 0 ? Orientation.Clockwise : Orientation.CounterClockwise;
-  }
-}
-
-export class Segment2D {
-  constructor(private readonly _p0: Point2D, private readonly _p1: Point2D) {}
-
-  get p0(): Point2D {
-    return this._p0;
-  }
-  get p1(): Point2D {
-    return this._p1;
-  }
-
-  contains(p: Point2D): boolean {
-    return (
-      p.x <= Math.max(this.p0.x, this.p1.x) &&
-      p.x >= Math.min(this.p0.x, this.p1.x) &&
-      p.y <= Math.max(this.p0.y, this.p1.y) &&
-      p.y >= Math.min(this.p0.y, this.p1.y)
-    );
-  }
-
-  add(diff: Vector2D): Segment2D {
-    const p0 = this.p0.add(diff);
-    const p1 = this.p1.add(diff);
-    return new Segment2D(p0, p1);
-  }
-
-  on(p: Point2D): boolean {
-    const dxc = p.x - this.p0.x;
-    const dyc = p.y - this.p0.y;
-    const dxl = this.p1.x - this.p0.x;
-    const dyl = this.p1.y - this.p0.y;
-    return dxc * dyl - dyc * dxl == 0;
-  }
-
-  intersects(other: Segment2D): boolean {
-    // Only consider an intersection which crosses properly.
-    if (this.on(other.p0)) {
-      return false;
-    }
-    if (this.on(other.p1)) {
-      return false;
-    }
-    // https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
-
-    const o1 = Point2D.orientation(this.p0, this.p1, other.p0);
-    const o2 = Point2D.orientation(this.p0, this.p1, other.p1);
-    const o3 = Point2D.orientation(other.p0, other.p1, this.p0);
-    const o4 = Point2D.orientation(other.p0, other.p1, this.p1);
-
-    if (o1 != o2 && o3 != o4) {
-      return true;
-    }
-    if (o1 == Orientation.Colinear && this.contains(other.p0)) {
-      return true;
-    }
-    if (o2 == Orientation.Colinear && this.contains(other.p1)) {
-      return true;
-    }
-    if (o3 == Orientation.Colinear && other.contains(this.p0)) {
-      return true;
-    }
-    if (o4 == Orientation.Colinear && other.contains(this.p1)) {
-      return true;
-    }
-    return false;
-  }
-
-  distance(p: Point2D): number {
-    // https://www.geomalgorithms.com/a02-_lines.html
-    const vl: number = this.p0.x * this.p1.y - this.p1.x * this.p0.y;
-    const w: number = this.p0.x * p.y - p.x * this.p0.y;
-    const u =
-      1 /
-      Math.sqrt(
-        Math.pow(this.p1.x - this.p0.x, 2) + Math.pow(this.p1.y - this.p0.y, 2)
-      );
-    return vl * w * u;
-  }
-}
+import { EntityBounds } from '../bounds.ts';
 
 export class Point3D {
   constructor(
@@ -356,6 +203,7 @@ export class Vertex3D {
     return begin.add(dir.scale(r));
   }
 }
+
 
 export abstract class Face3D {
   constructor(protected readonly _vertex: Vertex3D) {}
@@ -604,56 +452,57 @@ export class CuboidGeometry extends Geometry {
   }
 }
 
-export class RampUpWestGeometry extends Geometry {
+export class RampUpNorthGeometry extends Geometry {
   constructor(id: number) {
     super(id);
-    this._name = "RampUpWestGeometry";
+    this._name = "RampUpNorthGeometry";
     this.resetWorld();
   }
 
   resetWorld(): void {
     this.resetModel();
-    //     4
-    //     /\
-    //    /  \
-    // 5 /    \
-    //  |\     \
-    //  | \     \ 2
-    //  |  \    /
-    //  |   \  /
-    //  |____\/
-    //  1     3
+    //   2 ______  3
+    //    | \    \
+    //    |  \    \
+    //    |___\____\
+    //   0     1     4
+
     const minLocation = EntityBounds.minLocation(this.id);
     const maxLocation = EntityBounds.maxLocation(this.id);
     const p: Array<Point3D> = [
       minLocation, // 0
       minLocation.add(this.depthVec3D), // 1
-      minLocation.add(this.widthVec3D), // 2
-      maxLocation.sub(this.heightVec3D), // 3
-      minLocation.add(this.heightVec3D), // 4
-      maxLocation.sub(this.widthVec3D), // 5
+      minLocation.add(this.heightVec3D), // 2
+      maxLocation.sub(this.depthVec3D), // 3
+      maxLocation.sub(this.heightVec3D), // 4
+      minLocation.add(this.widthVec3D), // 5
     ];
 
     // left
-    const v0 = new Vertex3D(p[1], p[5], p[0]);
-    const v1 = new Vertex3D(p[4], p[0], p[5]);
-    this._faces.push(new QuadFace3D(v0, v1));
+    const left = new TriangleFace3D(new Vertex3D(p[0], p[1], p[2]));
+    this._faces.push(left);
 
     // front
-    this._faces.push(new TriangleFace3D(new Vertex3D(p[1], p[3], p[5])));
+    const v0 = new Vertex3D(p[1], p[4], p[2]);
+    const v1 = new Vertex3D(p[3], p[2], p[4]);
+    const front = new QuadFace3D(v0, v1);
+    this._faces.push(front);
 
     // right
-    const v2 = new Vertex3D(p[2], p[4], p[3]);
-    const v3 = new Vertex3D(p[5], p[3], p[4]);
-    this._faces.push(new QuadFace3D(v2, v3));
-
-    // bottom
-    const v4 = new Vertex3D(p[3], p[1], p[2]);
-    const v5 = new Vertex3D(p[0], p[2], p[1]);
-    this._faces.push(new QuadFace3D(v4, v5));
+    const right = new TriangleFace3D(new Vertex3D(p[5], p[3], p[4]));
+    this._faces.push(right);
 
     // back
-    this._faces.push(new TriangleFace3D(new Vertex3D(p[0], p[4], p[2])));
+    const v2 = new Vertex3D(p[0], p[2], p[5]);
+    const v3 = new Vertex3D(p[3], p[5], p[2]);
+    const back = new QuadFace3D(v2, v3);
+    this._faces.push(back);
+
+    // bottom
+    const v4 = new Vertex3D(p[1], p[4], p[0]);
+    const v5 = new Vertex3D(p[5], p[0], p[4]);
+    const bottom = new QuadFace3D(v4, v5);
+    this._faces.push(bottom);
   }
 }
 
@@ -714,60 +563,6 @@ export class RampUpEastGeometry extends Geometry {
   }
 }
 
-export class RampUpNorthGeometry extends Geometry {
-  constructor(id: number) {
-    super(id);
-    this._name = "RampUpNorthGeometry";
-    this.resetWorld();
-  }
-
-  resetWorld(): void {
-    this.resetModel();
-    //   2 ______  3
-    //    | \    \
-    //    |  \    \
-    //    |___\____\
-    //   0     1     4
-
-    const minLocation = EntityBounds.minLocation(this.id);
-    const maxLocation = EntityBounds.maxLocation(this.id);
-    const p: Array<Point3D> = [
-      minLocation, // 0
-      minLocation.add(this.depthVec3D), // 1
-      minLocation.add(this.heightVec3D), // 2
-      maxLocation.sub(this.depthVec3D), // 3
-      maxLocation.sub(this.heightVec3D), // 4
-      minLocation.add(this.widthVec3D), // 5
-    ];
-
-    // left
-    const left = new TriangleFace3D(new Vertex3D(p[0], p[1], p[2]));
-    this._faces.push(left);
-
-    // front
-    const v0 = new Vertex3D(p[1], p[4], p[2]);
-    const v1 = new Vertex3D(p[3], p[2], p[4]);
-    const front = new QuadFace3D(v0, v1);
-    this._faces.push(front);
-
-    // right
-    const right = new TriangleFace3D(new Vertex3D(p[5], p[3], p[4]));
-    this._faces.push(right);
-
-    // back
-    const v2 = new Vertex3D(p[0], p[2], p[5]);
-    const v3 = new Vertex3D(p[3], p[5], p[2]);
-    const back = new QuadFace3D(v2, v3);
-    this._faces.push(back);
-
-    // bottom
-    const v4 = new Vertex3D(p[1], p[4], p[0]);
-    const v5 = new Vertex3D(p[5], p[0], p[4]);
-    const bottom = new QuadFace3D(v4, v5);
-    this._faces.push(bottom);
-  }
-}
-
 export class RampUpSouthGeometry extends Geometry {
   constructor(id: number) {
     super(id);
@@ -819,5 +614,58 @@ export class RampUpSouthGeometry extends Geometry {
     const v5 = new Vertex3D(p[5], p[0], p[4]);
     const bottom = new QuadFace3D(v4, v5);
     this._faces.push(bottom);
+  }
+}
+
+export class RampUpWestGeometry extends Geometry {
+  constructor(id: number) {
+    super(id);
+    this._name = "RampUpWestGeometry";
+    this.resetWorld();
+  }
+
+  resetWorld(): void {
+    this.resetModel();
+    //     4
+    //     /\
+    //    /  \
+    // 5 /    \
+    //  |\     \
+    //  | \     \ 2
+    //  |  \    /
+    //  |   \  /
+    //  |____\/
+    //  1     3
+    const minLocation = EntityBounds.minLocation(this.id);
+    const maxLocation = EntityBounds.maxLocation(this.id);
+    const p: Array<Point3D> = [
+      minLocation, // 0
+      minLocation.add(this.depthVec3D), // 1
+      minLocation.add(this.widthVec3D), // 2
+      maxLocation.sub(this.heightVec3D), // 3
+      minLocation.add(this.heightVec3D), // 4
+      maxLocation.sub(this.widthVec3D), // 5
+    ];
+
+    // left
+    const v0 = new Vertex3D(p[1], p[5], p[0]);
+    const v1 = new Vertex3D(p[4], p[0], p[5]);
+    this._faces.push(new QuadFace3D(v0, v1));
+
+    // front
+    this._faces.push(new TriangleFace3D(new Vertex3D(p[1], p[3], p[5])));
+
+    // right
+    const v2 = new Vertex3D(p[2], p[4], p[3]);
+    const v3 = new Vertex3D(p[5], p[3], p[4]);
+    this._faces.push(new QuadFace3D(v2, v3));
+
+    // bottom
+    const v4 = new Vertex3D(p[3], p[1], p[2]);
+    const v5 = new Vertex3D(p[0], p[2], p[1]);
+    this._faces.push(new QuadFace3D(v4, v5));
+
+    // back
+    this._faces.push(new TriangleFace3D(new Vertex3D(p[0], p[4], p[2])));
   }
 }

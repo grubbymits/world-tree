@@ -1,8 +1,18 @@
 //deno-lint-ignore-file no-explicit-any
 
-import { Direction, Navigation } from "./navigation.ts";
+import { Compass, Direction } from "./utils/navigation.ts";
 import { BoundingCuboid, Dimensions } from "./physics.ts";
-import { CuboidGeometry, Geometry, Point3D, Vector2D, Vector3D } from "./geometry.ts";
+import { Vector2D } from "./utils/geometry2d.ts";
+import {
+  Point3D,
+  Vector3D,
+  Geometry,
+  CuboidGeometry,
+  RampUpNorthGeometry,
+  RampUpEastGeometry,
+  RampUpSouthGeometry,
+  RampUpWestGeometry,
+} from "./utils/geometry3d.ts";
 import { GraphicComponent } from "./graphics.ts";
 import { ContextImpl } from "./context.ts";
 import { Action } from "./action.ts";
@@ -33,7 +43,8 @@ export class PhysicalEntity {
   constructor(
     protected _context: ContextImpl,
     minLocation: Point3D,
-    dimensions: Dimensions
+    dimensions: Dimensions,
+    geometry: new (...args: any[]) => Geometry
   ) {
     this._id = PhysicalEntity._ids;
     PhysicalEntity._ids++;
@@ -42,7 +53,7 @@ export class PhysicalEntity {
       minLocation.y + dimensions.depth / 2,
       minLocation.z + dimensions.height / 2
     );
-    this._geometry = new CuboidGeometry(this.id);
+    this._geometry = new geometry(this.id);
     EntityBounds.addEntity(this.id, minLocation, dimensions);
     this._context.addEntity(this);
   }
@@ -134,7 +145,57 @@ export class PhysicalEntity {
   }
 }
 
-export class MovableEntity extends PhysicalEntity {
+export class CuboidEntity extends PhysicalEntity {
+  constructor(
+    context: ContextImpl,
+    minLocation: Point3D,
+    dimensions: Dimensions
+  ) {
+    super(context, minLocation, dimensions, CuboidGeometry);
+  }
+}
+
+export class RampNorthEntity extends PhysicalEntity {
+  constructor(
+    context: ContextImpl,
+    minLocation: Point3D,
+    dimensions: Dimensions
+  ) {
+    super(context, minLocation, dimensions, RampUpNorthGeometry);
+  }
+}
+
+export class RampEastEntity extends PhysicalEntity {
+  constructor(
+    context: ContextImpl,
+    minLocation: Point3D,
+    dimensions: Dimensions
+  ) {
+    super(context, minLocation, dimensions, RampUpEastGeometry);
+  }
+}
+
+export class RampSouthEntity extends PhysicalEntity {
+  constructor(
+    context: ContextImpl,
+    minLocation: Point3D,
+    dimensions: Dimensions
+  ) {
+    super(context, minLocation, dimensions, RampUpSouthGeometry);
+  }
+}
+
+export class RampWestEntity extends PhysicalEntity {
+  constructor(
+    context: ContextImpl,
+    minLocation: Point3D,
+    dimensions: Dimensions
+  ) {
+    super(context, minLocation, dimensions, RampUpWestGeometry);
+  }
+}
+
+export class MovableEntity extends CuboidEntity {
   protected _gravitySpeed = 0;
   protected readonly _canSwim = false;
   protected _direction: Direction;
@@ -151,7 +212,7 @@ export class MovableEntity extends PhysicalEntity {
     EntityBounds.translate(this.id, d);
     this.geometry.translate(d);
     this.postEvent(EntityEvent.Moving);
-    const direction = Navigation.getDirectionFromVector(new Vector2D(d.x, d.y));
+    const direction = Compass.getFromVector(new Vector2D(d.x, d.y));
     this.direction = direction;
   }
 
@@ -212,7 +273,7 @@ export function createGraphicalEntity(
   dimensions: Dimensions,
   graphicComponent: GraphicComponent
 ) {
-  const entity = new PhysicalEntity(context, location, dimensions);
+  const entity = new PhysicalEntity(context, location, dimensions, CuboidGeometry);
   entity.addGraphic(graphicComponent);
   return entity;
 }

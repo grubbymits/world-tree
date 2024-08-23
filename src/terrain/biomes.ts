@@ -1,7 +1,10 @@
-import { Direction, Navigation } from "./navigation.ts"
-import { Point2D } from "./geometry.ts";
+import {
+  Coord,
+  Compass,
+  Direction,
+} from "../utils/navigation.ts";
 
-export enum Biome {
+export const enum Biome {
   Water,
   Desert,
   Grassland,
@@ -137,7 +140,7 @@ export function generateBiomeGrid(config: BiomeConfig,
 
 class Cloud {
   constructor(
-    private _pos: Point2D,
+    private _pos: Coord,
     private _moisture: number,
     private readonly _direction: Direction,
     private _rain: Rain
@@ -149,10 +152,10 @@ class Cloud {
   get y(): number {
     return this._pos.y;
   }
-  get pos(): Point2D {
+  get pos(): Coord {
     return this._pos;
   }
-  set pos(p: Point2D) {
+  set pos(p: Coord) {
     this._pos = p;
   }
   get moisture(): number {
@@ -189,7 +192,7 @@ class Cloud {
     return this.rain.heightGrid[y][x];
   }
 
-  inbounds(pos: Point2D): boolean {
+  inbounds(pos: Coord): boolean {
     return (pos.x >= 0 && pos.x < this.rain.cellsX &&
             pos.y >= 0 && pos.y < this.rain.cellsY);
   }
@@ -197,7 +200,7 @@ class Cloud {
   move(): void {
     // Cloud may have left the map.
     while (this.inbounds(this.pos)) {
-      const nextCoord = Navigation.getAdjacentCoord(this.pos, this.direction);
+      const nextCoord = Compass.getNeighbourCoord(this.pos.x, this.pos.y, this.direction);
       if (!this.inbounds(nextCoord)) {
         this.dropMoisture(1);
         return;
@@ -243,28 +246,28 @@ export class Rain {
       case Direction.North: {
         const y = this.cellsY - 1;
         for (let x = 0; x < this.cellsX; x++) {
-          this.addCloud(new Point2D(x, y), moisture, direction);
+          this.addCloud(new Coord(x, y), moisture, direction);
         }
         break;
       }
       case Direction.East: {
         const x = 0;
         for (let y = 0; y < this.cellsY; y++) {
-          this.addCloud(new Point2D(x, y), moisture, direction);
+          this.addCloud(new Coord(x, y), moisture, direction);
         }
         break;
       }
       case Direction.South: {
         const y = 0;
         for (let x = 0; x < this.cellsX; x++) {
-          this.addCloud(new Point2D(x, y), moisture, direction);
+          this.addCloud(new Coord(x, y), moisture, direction);
         }
         break;
       }
       case Direction.West: {
         const x = this.cellsX - 1;
         for (let y = 0; y < this.cellsY; y++) {
-          this.addCloud(new Point2D(x, y), moisture, direction);
+          this.addCloud(new Coord(x, y), moisture, direction);
         }
         break;
       }
@@ -299,11 +302,11 @@ export class Rain {
     return this._moistureGrid[y][x];
   }
 
-  addMoistureAt(pos: Point2D, moisture: number): void {
+  addMoistureAt(pos: Coord, moisture: number): void {
     this.moistureGrid[pos.y][pos.x] += moisture;
   }
 
-  addCloud(pos: Point2D, moisture: number, direction: Direction): void {
+  addCloud(pos: Coord, moisture: number, direction: Direction): void {
     this.clouds.push(new Cloud(pos, moisture, direction, this));
     this._totalClouds++;
   }

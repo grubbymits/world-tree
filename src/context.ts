@@ -1,10 +1,9 @@
 import { AudioController } from "./audio.ts";
 import { MovableEntity, PhysicalEntity } from "./entity.ts";
 import { Terrain, TerrainType, TerrainSpriteDescriptor } from "./terrain.ts";
-import { TerrainGrid } from "./grid.ts";
-import { TerrainBuilder } from "./builder.ts";
 import { EntityEvent } from "./events.ts";
-import { BiomeConfig } from "./biomes.ts";
+import { TerrainBuilder } from "./terrain/builder.ts";
+import { BiomeConfig } from "./terrain/biomes.ts";
 import {
   Perspective,
   Scene,
@@ -28,10 +27,10 @@ import {
   Gravity,
   Octree,
 } from "./physics.ts";
+import { Point3D } from './utils/geometry3d.ts';
 
 export interface Context {
   update(camera: Camera): void;
-  grid: TerrainGrid | null;
   addController(controller: Controller): void;
   verify(): boolean;
 }
@@ -50,7 +49,6 @@ export class ContextImpl implements Context {
   private _controllers: Array<Controller> = new Array<Controller>();
   private _spatialGraph: Octree;
   private _totalEntities = 0;
-  private _grid: TerrainGrid|null;
 
   static reset(): void {
     PhysicalEntity.reset();
@@ -58,7 +56,10 @@ export class ContextImpl implements Context {
     SpriteSheet.reset();
   }
 
-  constructor(worldDims: Dimensions, perspective: Perspective) {
+  constructor(
+    private readonly _tileDims: Dimensions,
+    worldDims: Dimensions,
+    perspective: Perspective) {
     this._spatialGraph = new Octree(worldDims);
     CollisionDetector.init(this._spatialGraph);
     switch (perspective) {
@@ -75,6 +76,9 @@ export class ContextImpl implements Context {
     this._renderer = new DummyRenderer();
   }
 
+  get tileDims(): Dimensions {
+    return this._tileDims;
+  }
   get scene(): Scene {
     return this._scene;
   }
@@ -95,12 +99,6 @@ export class ContextImpl implements Context {
   }
   get controllers(): Array<Controller> {
     return this._controllers;
-  }
-  set grid(g: TerrainGrid|null) {
-    this._grid = g;
-  }
-  get grid(): TerrainGrid | null {
-    return this._grid;
   }
 
   verify(): boolean {
@@ -164,25 +162,53 @@ export class ContextImpl implements Context {
       controller.update();
     });
   }
+
+  scaleGridToWorld(x: number, y: number, z: number): Point3D {
+    const gap = 0.001;
+    const gapX = x * gap;
+    const gapY = y * gap;
+    const gapZ = z * gap;
+    return new Point3D(x * this.tileDims.width + gapX,
+                       y * this.tileDims.depth + gapY,
+                       z * this.tileDims.height + gapZ);
+  }
+
+  scaleWorldToGrid(loc: Point3D): Point3D {
+    // round down
+    const width = this.bounds.width;
+    const depth = this.bounds.depth;
+    const height = this.bounds.height;
+    const x = loc.x - (loc.x % width);
+    const y = loc.y - (loc.y % depth);
+    const z = loc.z - (loc.z % height);
+    // then scale to grid
+    return new Point3D(
+      Math.floor(x / width),
+      Math.floor(y / depth),
+      Math.floor(z / height)
+    );
+  }
 }
 
 export function createContext(
   canvas: HTMLCanvasElement,
+  tileDims: Dimensions,
   worldDims: Dimensions,
   perspective: Perspective
 ): ContextImpl {
   ContextImpl.reset();
-  const context = new ContextImpl(worldDims, perspective);
+  const context = new ContextImpl(tileDims, worldDims, perspective);
   context.addOnscreenRenderer(canvas);
   return context;
 }
 
 export function createTestContext(
+  tileDims: Dimensions,
   worldDims: Dimensions,
   perspective: Perspective
 ): ContextImpl {
   ContextImpl.reset();
-  const context = new ContextImpl(worldDims, perspective);
+  const context = new ContextImpl(tileDims, worldDims, perspective);
   return context;
 }
 
@@ -202,19 +228,20 @@ export async function createWorld(worldDesc: WorldDescriptor): Promise<ContextIm
   const spriteWidth = terrainSpriteDesc.spriteWidth;
   const spriteHeight = terrainSpriteDesc.spriteHeight;
   const perspective = getPerspectiveFromString(worldDesc.projection);
-  const physicalDims = getDimensionsFromPerspective(spriteWidth, spriteHeight, perspective);
-  console.log('physical dimensions:', physicalDims);
+  const tileDims = getDimensionsFromPerspective(spriteWidth, spriteHeight, perspective);
+  console.log('tile dimensions:', tileDims);
   const cellsY = worldDesc.heightMap.length;
   const cellsX = worldDesc.heightMap[0].length;
   const cellsZ = 1 + worldDesc.numTerraces;
   const worldDims = new Dimensions(
-    physicalDims.width * cellsX,
-    physicalDims.depth * cellsY,
-    physicalDims.height * cellsZ
+    tileDims.width * cellsX,
+    tileDims.depth * cellsY,
+    tileDims.height * cellsZ
   );
   const canvas = <HTMLCanvasElement>document.getElementById(worldDesc.canvasName)!;
   const context = createContext(
     canvas,
+    tileDims,
     worldDims,
     perspective,
   );
@@ -224,7 +251,7 @@ export async function createWorld(worldDesc: WorldDescriptor): Promise<ContextIm
       worldDesc.numTerraces,
       worldDesc.floor,
       worldDesc.wall,
-      physicalDims
+      tileDims, 
     );
     if (Object.hasOwn(worldDesc, 'biomeConfig')) {
       builder.generateBiomes(worldDesc.biomeConfig);

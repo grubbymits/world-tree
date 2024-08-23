@@ -1,5 +1,5 @@
-import { Point2D } from "./geometry.ts";
-import { Direction, Navigation } from "./navigation.ts";
+import { Point2D } from "./utils/geometry2d.ts";
+import { Compass, Direction } from "./utils/navigation.ts";
 import { ContextImpl } from "./context.ts";
 import { Renderer } from "./render.ts";
 
@@ -382,7 +382,7 @@ export class DirectionalGraphicComponent extends GraphicComponent {
     if (this._staticGraphics.has(direction)) {
       this._direction = direction;
     } else {
-      const alternatives = Navigation.getAdjacentDirections(direction);
+      const alternatives = Compass.getAdjacents(direction);
       if (this._staticGraphics.has(alternatives[0])) {
         this._direction = alternatives[0];
       } else if (this._staticGraphics.has(alternatives[1])) {
@@ -401,7 +401,7 @@ export class DirectionalGraphicComponent extends GraphicComponent {
     }
     console.error(
       "unhandled stationary graphic:",
-      Navigation.getDirectionName(this.direction)
+      Compass.getName(this.direction)
     );
     return 0;
   }
@@ -495,12 +495,12 @@ export class AnimatedDirectionalGraphicComponent extends GraphicComponent {
     if (this.stationary) {
       console.error(
         "unhandled stationary graphic:",
-        Navigation.getDirectionName(this.direction)
+        Compass.getName(this.direction)
       );
     } else {
       console.error(
         "unhandled movement graphic:",
-        Navigation.getDirectionName(this.direction)
+        Compass.getName(this.direction)
       );
     }
     return 0;

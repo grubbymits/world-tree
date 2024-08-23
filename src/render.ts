@@ -1,5 +1,5 @@
 import { GraphicEvent } from "./graphics.ts";
-import { Point2D } from "./geometry.ts";
+import { Point2D } from "./utils/geometry2d.ts";
 
 export class DrawElementList {
   constructor(

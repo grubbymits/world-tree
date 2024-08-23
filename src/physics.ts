@@ -1,5 +1,5 @@
 import { MovableEntity, PhysicalEntity } from "./entity.ts";
-import { Geometry, IntersectInfo, Point3D, Vector3D } from "./geometry.ts";
+import { Geometry, IntersectInfo, Point3D, Vector3D } from "./utils/geometry3d.ts";
 import { EntityEvent } from "./events.ts";
 import { ContextImpl } from "./context.ts";
 import { EntityBounds } from "./bounds.ts";

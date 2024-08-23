@@ -2,7 +2,8 @@ import { ContextImpl } from "./context.ts";
 import { MovableEntity, PhysicalEntity } from "./entity.ts";
 import { EntityEvent } from "./events.ts";
 import { CollisionDetector, CollisionInfo } from "./physics.ts";
-import { Face3D, IntersectInfo, Point2D } from "./geometry.ts";
+import { Point2D } from './utils/geometry2d.ts';
+import { Face3D, IntersectInfo } from "./utils/geometry3d.ts";
 import { Camera } from "./camera.ts";
 import { SceneNode, Scene } from "./scene.ts";
 

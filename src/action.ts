@@ -3,9 +3,10 @@ import { ContextImpl } from "./context.ts";
 import { Camera } from "./camera.ts";
 import { EntityEvent } from "./events.ts";
 import { CollisionDetector, CollisionInfo } from "./physics.ts";
-import { Point3D, Vector2D, Vector3D, Vertex3D } from "./geometry.ts";
-import { Direction, Navigation } from "./navigation.ts";
+import { Vector2D } from "./utils/geometry2d.ts";
+import { Point3D, Vector3D, Vertex3D } from "./utils/geometry3d.ts";
 import { EntityBounds } from "./bounds.ts";
+import { BlockingGrid, Coord, findPath } from "./utils/navigation.ts";
 
 export abstract class Action {
   constructor(protected _actor: Actor) {}
@@ -162,11 +163,19 @@ export class Navigate extends Action {
   constructor(
     actor: Actor,
     private readonly _step: number,
-    private readonly _destination: Point3D
+    private readonly _destination: Point3D,
+    blockingGrid: BlockingGrid,
   ) {
     super(actor);
-    this._waypoints = actor.context.grid!.findPath(EntityBounds.bottomCentre(actor.id), _destination);
-    if (this.waypoints.length != 0) {
+    const actorPointScaled =
+      actor.context.scaleWorldToGrid(EntityBounds.bottomCentre(actor.id));
+    const destPointScaled = actor.context.scaleWorldToGrid(_destination);
+    const actorGridCoord = new Coord(actorPointScaled.x, actorPointScaled.y);
+    const destinationGridCoord = new Coord(destPointScaled.x, destPointScaled.y);
+
+    const path = findPath(actorGridCoord, destinationGridCoord, blockingGrid);
+    if (path.length != 0) {
+      // TODO: translate grid coords to world positions
       this._currentStep = new MoveDestination(actor, this.step, this.waypoints[0]);
     }
   }

@@ -1,6 +1,7 @@
 import { PhysicalEntity } from "./entity.ts";
 import { Camera } from "./camera.ts";
-import { Point2D, Point3D, Vector2D } from "./geometry.ts";
+import { Point2D, Vector2D } from "./utils/geometry2d.ts";
+import { Point3D, Vector3D } from "./utils/geometry3d.ts";
 import { GraphicComponent, Sprite } from "./graphics.ts";
 import { Dimensions } from "./physics.ts";
 import { TimedEventHandler } from "./events.ts";

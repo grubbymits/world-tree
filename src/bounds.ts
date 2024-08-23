@@ -1,5 +1,5 @@
 import { Dimensions } from "./physics.ts";
-import { Point3D, Vector3D } from "./geometry.ts";
+import { Point3D, Vector3D } from "./utils/geometry3d.ts";
 
 export class EntityBounds {
   private static readonly MAX_ENTITIES = 1024;

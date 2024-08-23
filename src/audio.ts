@@ -1,4 +1,4 @@
-import { Point3D, Vector3D } from './geometry.ts'
+import { Point3D, Vector3D } from './utils/geometry3d.ts'
 import { PhysicalEntity, MovableEntity } from './entity.ts'
 import { EntityEvent } from './events.ts'
 

@@ -2,20 +2,20 @@ import { Actor } from "./entity.ts";
 import { Jump, MoveDirection, Navigate } from "./action.ts";
 import { ContextImpl } from "./context.ts";
 import { Camera } from "./camera.ts";
-import { Point3D, Vector3D } from "./geometry.ts";
-import { Direction, Navigation } from "./navigation.ts";
+import { Point3D, Vector3D } from "./utils/geometry3d.ts";
+import { BlockingGrid, Direction, Compass } from "./utils/navigation.ts";
 
 export function TouchOrClickNav(context: ContextImpl,
                                 canvas: HTMLCanvasElement,
                                 camera: Camera,
                                 actor: Actor,
+                                blockingGrid: BlockingGrid,
                                 speed: number): void {
-  console.assert(context.grid && 'expected grid');
   canvas.addEventListener("mousedown", (e) => {
     if (e.button == 0) {
       const destination = context.scene.getLocationAt(e.offsetX, e.offsetY, camera);
       if (destination) {
-        actor.action = new Navigate(actor, speed, destination!);
+        actor.action = new Navigate(actor, speed, destination!, blockingGrid);
       }
     }
   });
@@ -23,7 +23,7 @@ export function TouchOrClickNav(context: ContextImpl,
     const touch = e.touches[0];
     const destination = context.scene.getLocationAt(touch.pageX, touch.pageY, camera);
     if (destination) {
-      actor.action = new Navigate(actor, speed, destination!);
+      actor.action = new Navigate(actor, speed, destination!, blockingGrid);
     }
   });
 }
@@ -36,7 +36,7 @@ export function ArrowKeyMovement(canvas: HTMLCanvasElement,
   const actionFromKeys = (actor: Actor) => {
     let d = new Vector3D(0, 0, 0);
     for (let direction of activeArrowKeys) {
-      d = d.add(Navigation.getDirectionVector(direction));
+      d = d.add(Compass.getVector3D(direction));
     }
     if (!d.zero) {
       actor.action = new MoveDirection(actor, d.norm().scale(speed));
@@ -90,7 +90,7 @@ export function SpaceJump(canvas: HTMLCanvasElement,
     if (e.key == ' ') {
       let d = new Vector3D(0, 0, speed);
       for (let direction of activeArrowKeys) {
-        d = d.add(Navigation.getDirectionVector(direction));
+        d = d.add(Compass.getVector3D(direction));
       }
       actor.action = new Jump(actor, d);
     }
