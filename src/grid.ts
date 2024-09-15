@@ -16,6 +16,14 @@ import {
   Point3D,
   Vector3D,
 } from './geometry.ts';
+import {
+  PhysicalEntity,
+  CuboidEntity,
+  RampNorthEntity,
+  RampEastEntity,
+  RampSouthEntity,
+  RampWestEntity,
+} from "./entity.ts";
 
 export interface TerrainGridDescriptor {
   cellHeightGrid: Array<Array<number>>;
@@ -115,10 +123,31 @@ export class TerrainGrid {
           console.error('terrain out-of-bounds:', position);
         }
 
-        const terrain = new Terrain(
-          this._context,
+        let physical: new (...args: any[]) => PhysicalEntity;
+        switch (terrainShape) {
+        default:
+          physical = CuboidEntity;
+          break;
+        case TerrainShape.RampUpNorth:
+          physical = RampNorthEntity;
+          break;
+        case TerrainShape.RampUpEast:
+          physical = RampEastEntity;
+          break;
+        case TerrainShape.RampUpSouth:
+          physical = RampSouthEntity;
+          break;
+        case TerrainShape.RampUpWest:
+          physical = RampWestEntity;
+          break;
+        }
+        const entity = new physical(
+          this.context,
           position,
-          this.dimensions,
+          this.descriptor.tileDimensions
+        );
+        const terrain = new Terrain(
+          entity,
           terrainType,
           terrainShape
         );
@@ -133,7 +162,12 @@ export class TerrainGrid {
         while (z > zStop) {
           z--;
           const subSurfacePosition = this.scaleGridToWorld(x, y, z);
-          new Terrain(this._context, subSurfacePosition, this.dimensions, terrainType, shape);
+          const subSurfaceEntity = new CuboidEntity(
+            this.context,
+            subSurfacePosition,
+            this.descriptor.tileDimensions
+          );
+          new Terrain(subSurfaceEntity, terrainType, shape);
           this._totalSubSurface++;
         }
       }
@@ -146,6 +180,9 @@ export class TerrainGrid {
     }
   }
 
+  get context(): ContextImpl {
+    return this._context;
+  }
   get descriptor(): TerrainGridDescriptor {
     return this._descriptor;
   }

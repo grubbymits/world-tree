@@ -1,7 +1,6 @@
 import { Direction } from "./navigation.ts";
 import { Dimensions } from "./physics.ts";
 import { PhysicalEntity } from "./entity.ts";
-import { Navigation } from "./navigation.ts";
 import {
   GraphicComponent,
   Sprite,
@@ -9,14 +8,7 @@ import {
   StaticGraphicComponent,
 } from "./graphics.ts";
 import { ContextImpl } from "./context.ts";
-import {
-  Point2D,
-  Point3D,
-  RampUpEastGeometry,
-  RampUpNorthGeometry,
-  RampUpSouthGeometry,
-  RampUpWestGeometry,
-} from "./geometry.ts";
+import { Point3D } from "./geometry.ts";
 import { EntityBounds } from "./bounds.ts";
 
 
@@ -74,7 +66,7 @@ export interface TerrainSpriteDescriptor {
   tileColumnShapes: Array<TerrainShape>;
 };
 
-export class Terrain extends PhysicalEntity {
+export class Terrain {
   private static _terrainGraphics = new Map<
     TerrainType,
     Map<TerrainShape, GraphicComponent>
@@ -359,53 +351,40 @@ export class Terrain extends PhysicalEntity {
   private readonly _surfaceLocation: Point3D;
 
   constructor(
-    context: ContextImpl,
-    position: Point3D,
-    dimensions: Dimensions,
+    private _entity: PhysicalEntity,
     private readonly _type: TerrainType,
     private readonly _shape: TerrainShape
   ) {
-    super(
-      context,
-      position,
-      dimensions
-    );
-    this.addGraphic(Terrain.graphics(_type, _shape));
+    this.entity.addGraphic(Terrain.graphics(_type, _shape));
 
     // Pre-calculate the angle of the ramp.
     if (!Terrain.isFlat(_shape)) {
-      const theta = (Math.atan(this.height / this.depth) * 180) / Math.PI;
+      const theta = (Math.atan(this.entity.height / this.entity.depth) * 180) / Math.PI;
       this._tanTheta = Math.tan(theta);
-      if (Terrain.isRampUp(this._shape, Direction.West)) {
-        this.geometry = new RampUpWestGeometry(this.id);
-      } else if (Terrain.isRampUp(this._shape, Direction.East)) {
-        this.geometry = new RampUpEastGeometry(this.id);
-      } else if (Terrain.isRampUp(this._shape, Direction.South)) {
-        this.geometry = new RampUpSouthGeometry(this.id);
-      } else if (Terrain.isRampUp(this._shape, Direction.North)) {
-        this.geometry = new RampUpNorthGeometry(this.id);
-      }
     } else {
       this._tanTheta = 0;
     }
 
-    const x = EntityBounds.centreX(this.id);
-    const y = EntityBounds.centreY(this.id);
-    const z = this.heightAt(EntityBounds.centre(this.id))!;
+    const x = EntityBounds.centreX(this.entity.id);
+    const y = EntityBounds.centreY(this.entity.id);
+    const z = this.heightAt(EntityBounds.centre(this.entity.id))!;
     this._surfaceLocation = new Point3D(x, y, z);
   }
 
-  get width(): number {
-    return this.dimensions.width;
-  }
-  get depth(): number {
-    return this.dimensions.depth;
-  }
-  get height(): number {
-    return this.dimensions.height;
+  get entity(): PhysicalEntity {
+    return this._entity;
   }
   get shape(): TerrainShape {
     return this._shape;
+  }
+  get x(): number {
+    return this.entity.x;
+  }
+  get y(): number {
+    return this.entity.y;
+  }
+  get z(): number {
+    return this.entity.z;
   }
   get type(): TerrainType {
     return this._type;
@@ -418,13 +397,13 @@ export class Terrain extends PhysicalEntity {
     // Given a world location, does this terrain define what the minimum z
     // coordinate?
     // If the locations is outside of the bounding cuboid, just return null.
-    if (!EntityBounds.contains(this.id, location)) {
+    if (!EntityBounds.contains(this.entity.id, location)) {
       return null;
     }
-    if (Terrain.isFlat(this._shape)) {
-      return this.z + this.height;
+    if (Terrain.isFlat(this.shape)) {
+      return this.entity.z + this.entity.height;
     }
-    return this.z + location.y * this._tanTheta;
+    return this.entity.z + location.y * this._tanTheta;
   }
 }
 
