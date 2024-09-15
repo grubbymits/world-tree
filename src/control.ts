@@ -9,13 +9,14 @@ export function TouchOrClickNav(context: ContextImpl,
                                 canvas: HTMLCanvasElement,
                                 camera: Camera,
                                 actor: Actor,
-                                speed: number): void {
+                                speed: number,
+                                blockingGrid: Array<Uint8Array>): void {
   console.assert(context.grid && 'expected grid');
   canvas.addEventListener("mousedown", (e) => {
     if (e.button == 0) {
       const destination = context.scene.getLocationAt(e.offsetX, e.offsetY, camera);
       if (destination) {
-        actor.action = new Navigate(actor, speed, destination!);
+        actor.action = new Navigate(actor, speed, destination!, blockingGrid);
       }
     }
   });
@@ -23,7 +24,7 @@ export function TouchOrClickNav(context: ContextImpl,
     const touch = e.touches[0];
     const destination = context.scene.getLocationAt(touch.pageX, touch.pageY, camera);
     if (destination) {
-      actor.action = new Navigate(actor, speed, destination!);
+      actor.action = new Navigate(actor, speed, destination!, blockingGrid);
     }
   });
 }

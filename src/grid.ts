@@ -15,6 +15,7 @@ import {
   Point2D,
   Point3D,
   Vector3D,
+  Geometry,
 } from './geometry.ts';
 import {
   PhysicalEntity,
@@ -71,39 +72,14 @@ export class TerrainGridDescriptorImpl implements TerrainGridDescriptor {
   }
 }
 
-class PathNode {
-  private _edgeCosts: Map<PathNode, number> = new Map<PathNode, number>();
-  private readonly _waypoint: Point3D;
-  
-  constructor(terrain: Terrain) {
-    this._waypoint = terrain.surfaceLocation;
-  }
-  
-  addNeighbour(neighbour: PathNode, cost: number): void {
-    this._edgeCosts.set(neighbour, cost);
-  }
-  
-  hasNeighbour(neighbour: PathNode): boolean {
-    return this._edgeCosts.has(neighbour);
-  }
-  
-  get neighbours(): Map<PathNode, number> {
-    return this._edgeCosts;
-  }
-  
-  get waypoint(): Point3D {
-    return this._waypoint;
-  }
-}
-
 export class TerrainGrid {
-  private _surfaceTerrain: Array<Array<Terrain>> = new Array<Array<Terrain>>();
+  private _surfaceGeometry: Array<Array<Geometry>> = new Array<Array<Geometry>>();
   private readonly _cellsX: number;
   private readonly _cellsY: number;
   private readonly _dimensions: Dimensions;
   private _totalSurface = 0;
   private _totalSubSurface = 0;
-  private _nodes = new Map<Terrain, PathNode>();
+  private _gap = 0.001;
 
   constructor(
     private readonly _context: ContextImpl,
@@ -112,7 +88,7 @@ export class TerrainGrid {
     this._context.grid = this;
     this._dimensions = this.descriptor.tileDimensions;
     for (let y = 0; y < this.cellsY; ++y) {
-      this.surfaceTerrain.push(new Array<Terrain>(this.cellsX));
+      this.surfaceGeometry.push(new Array<Geometry>(this.cellsX));
       for (let x = 0; x < this.cellsX; ++x) {
         let z = this.descriptor.cellHeightGrid[y][x];
         const terrainShape = this.terrainShapeAt(x, y);
@@ -146,13 +122,8 @@ export class TerrainGrid {
           position,
           this.descriptor.tileDimensions
         );
-        const terrain = new Terrain(
-          entity,
-          terrainType,
-          terrainShape
-        );
-        this._nodes.set(terrain, new PathNode(terrain));
-        this.surfaceTerrain[y][x] = terrain;
+        entity.addGraphic(Terrain.graphics(terrainType, terrainShape));
+        this.surfaceGeometry[y][x] = entity.geometry;
         this._totalSurface++;
 
         const zStop = z - this.calcRelativeHeight(x, y, this.descriptor);
@@ -167,15 +138,8 @@ export class TerrainGrid {
             subSurfacePosition,
             this.descriptor.tileDimensions
           );
-          new Terrain(subSurfaceEntity, terrainType, shape);
           this._totalSubSurface++;
         }
-      }
-    }
-    for (let y = 0; y < this.cellsY; y++) {
-      for (let x = 0; x < this.cellsX; x++) {
-        const terrain = this.getSurfaceTerrainAt(x, y)!;
-        this.addNeighbours(terrain);
       }
     }
   }
@@ -201,11 +165,8 @@ export class TerrainGrid {
   get totalSubSurface(): number {
     return this._totalSubSurface;
   }
-  get surfaceTerrain(): Array<Array<Terrain>> {
-    return this._surfaceTerrain;
-  }
-  get nodes(): Map<Terrain, PathNode> {
-    return this._nodes;
+  get surfaceGeometry(): Array<Array<Geometry>> {
+    return this._surfaceGeometry;
   }
 
   terrainShapeAt(x: number, y: number): TerrainShape {
@@ -219,10 +180,9 @@ export class TerrainGrid {
   }
 
   scaleGridToWorld(x: number, y: number, z: number): Point3D {
-    const gap = 0.001;
-    const gapX = x * gap;
-    const gapY = y * gap;
-    const gapZ = z * gap;
+    const gapX = x * this._gap;
+    const gapY = y * this._gap;
+    const gapZ = z * this._gap;
     return new Point3D(x * this.dimensions.width + gapX,
                        y * this.dimensions.depth + gapY,
                        z * this.dimensions.height + gapZ);
@@ -233,14 +193,14 @@ export class TerrainGrid {
     const width = this.dimensions.width;
     const depth = this.dimensions.depth;
     const height = this.dimensions.height;
-    const x = loc.x - (loc.x % width);
-    const y = loc.y - (loc.y % depth);
-    const z = loc.z - (loc.z % height);
+    //const x = loc.x - (loc.x % width);
+    //const y = loc.y - (loc.y % depth);
+    //const z = loc.z - (loc.z % height);
     // then scale to grid
     return new Point3D(
-      Math.floor(x / width),
-      Math.floor(y / depth),
-      Math.floor(z / height)
+      Math.floor(loc.x / width),
+      Math.floor(loc.y / depth),
+      Math.floor(loc.z / height)
     );
   }
 
@@ -271,201 +231,24 @@ export class TerrainGrid {
            y >= 0 && y < this.cellsY;
   }
 
-  getSurfaceTerrainAt(x: number, y: number): Terrain | null {
+  getCentreSurfaceLocationAt(x: number, y: number): Point3D | null {
     if (!this.inbounds(x, y)) {
       return null;
     }
-    return this.surfaceTerrain[y][x];
-  }
+    const gapX = x * this._gap;
+    const gapY = y * this._gap;
+    const rayX = (this.dimensions.width / 2) + x * this.dimensions.width + gapX;
+    const rayY = (this.dimensions.depth / 2) + y * this.dimensions.depth + gapY;
+    const begin = new Point3D(rayX, rayY, this.context.bounds.height);
+    const end = new Point3D(rayX, rayY, 0);
 
-  getSurfaceLocationAt(x: number, y: number): Point3D | null {
-    if (!this.inbounds(x, y)) {
-      return null;
-    }
-    return this.surfaceTerrain[y][x]!.surfaceLocation.add(
-      new Vector3D(0, 0, 0.1)
+    const surfaceGeometry = this.surfaceGeometry[y][x]!;
+    const obstructInfo = surfaceGeometry.obstructsRay(begin, end);
+    // Adjust it slightly above the contact point.
+    return new Point3D(
+      obstructInfo!.i.x, 
+      obstructInfo!.i.y, 
+      obstructInfo!.i.z + 0.1
     );
-  }
-
-  getSurfaceTerrainAtPoint(loc: Point3D): Terrain | null {
-    const scaled: Point3D = this.scaleWorldToGrid(loc);
-    const terrain = this.getSurfaceTerrainAt(scaled.x, scaled.y);
-    if (terrain != null) {
-      //if (terrain.centre.z == scaled.z) {
-        return terrain;
-      //}
-    }
-    return null;
-  }
-
-  addNeighbours(centre: Terrain): void {
-    console.assert(
-      this.nodes.has(centre),
-      "object not in node map: %o",
-      centre
-    );
-    const neighbours: Array<Terrain> = this.getAccessibleNeighbours(centre);
-    if (neighbours.length == 0) {
-      return;
-    }
-    const centreNode: PathNode = this.nodes.get(centre)!;
-    for (const neighbour of neighbours) {
-      console.assert(
-        this.nodes.has(neighbour),
-        "object not in node map: %o",
-        neighbour
-      );
-      const cost = this.getNeighbourCost(centre, neighbour);
-      centreNode.addNeighbour(this.nodes.get(neighbour)!, cost);
-    }
-  }
-
-  getNeighbourCost(centre: Terrain, to: Terrain): number {
-    // If a horizontal, or vertical, move cost 1 then a diagonal move would be
-    // 1.444... So scale by 2 and round. Double the cost of changing height.
-    const cost = centre.x == to.x || centre.y == to.y ? 2 : 3;
-    if (Terrain.isFlat(centre.shape) && Terrain.isFlat(to.shape)) {
-      return cost;
-    }
-    return centre.z == to.z ? cost : cost * 2;
-  }
-
-  getAccessibleNeighbours(centre: Terrain): Array<Terrain> {
-    const neighbours = new Map<Direction, Terrain>();
-
-    // Blocked by different Z values, other than when:
-    // direction, entering non-blocking tile
-    // north,     RampUpNorth
-    // east,      RampUEast
-    // south,     RampUpSouth
-    // west,      RampUpWest
-
-    // Blocked by different Z values, other than when:
-    // direction, leaving non-blocking tile
-    // north,     RampUpSouth
-    // east,      RampUpWest
-    // south,     RampUpNorth
-    // west,      RampUpEast
-
-    for (const neighbourOffset of Navigation.neighbourOffsets) {
-      const direction = neighbourOffset[0];
-      const vector = neighbourOffset[1];
-
-      const scaled: Point3D = this.scaleWorldToGrid(centre.surfaceLocation);
-      const neighbour = this.getSurfaceTerrainAt(
-        scaled.x + vector.x,
-        scaled.y + vector.y
-      );
-      if (!neighbour) {
-        continue;
-      }
-      if (Math.abs(centre.z - neighbour.z) > 1) {
-        continue;
-      }
-
-      let diagonal = true;
-      switch (direction) {
-      default:
-        diagonal = false;
-        break;
-      case Direction.NorthWest:
-        if (!neighbours.has(Direction.North) ||
-            !neighbours.has(Direction.West)) {
-          continue;
-        }
-        break;
-      case Direction.NorthEast:
-        if (!neighbours.has(Direction.North) ||
-            !neighbours.has(Direction.East)) {
-          continue;
-        }
-        break;
-      case Direction.SouthEast:
-        if (!neighbours.has(Direction.South) ||
-            !neighbours.has(Direction.East)) {
-          continue;
-        }
-        break;
-      case Direction.SouthWest:
-        if (!neighbours.has(Direction.South) ||
-            !neighbours.has(Direction.West)) {
-          continue;
-        }
-        break;
-      }
-
-      const oppositeDir: Direction = Navigation.getOppositeDirection(direction);
-      if (neighbour.z == centre.z) {
-        //return true;
-      } else if (neighbour.z > centre.z && !diagonal) {
-        if (!Terrain.isRampUp(neighbour.shape, direction)) {
-          continue;
-        }
-      } else if (neighbour.z < centre.z && !diagonal) {
-        if (!Terrain.isRampUp(neighbour.shape, oppositeDir)) {
-          continue;
-        }
-      } else {
-        continue;
-      }
-      neighbours.set(direction, neighbour);
-    }
-    return Array.from(neighbours.values());
-  }
-
-  findPath(startPoint: Point3D, endPoint: Point3D): Array<Point3D> {
-    const startTerrain: Terrain | null =
-      this.getSurfaceTerrainAtPoint(startPoint);
-    const endTerrain: Terrain | null =
-      this.getSurfaceTerrainAtPoint(endPoint);
-    if (startTerrain == null || endTerrain == null) {
-      return new Array<Point3D>();
-    }
-
-    const start: PathNode = this.nodes.get(startTerrain)!;
-    if (start.neighbours.size == 0) {
-      return new Array<Point3D>();
-    }
-    const end: PathNode = this.nodes.get(endTerrain)!;
-    if (end.neighbours.size == 0) {
-      return new Array<Point3D>();
-    }
-
-    // https://www.redblobgames.com/pathfinding/a-star/introduction.html
-    const frontier = new MinPriorityQueue<PathNode>();
-    const cameFrom = new Map<PathNode, PathNode | null>();
-    const costs = new Map<PathNode, number>();
-    frontier.insert(start, 0);
-    cameFrom.set(start, null);
-    costs.set(start, 0);
-    let current: PathNode = start;
-    while (!frontier.empty()) {
-      current = frontier.pop();
-      if (current == end) {
-        break;
-      }
-      current.neighbours.forEach((cost: number, next: PathNode) => {
-        const new_cost = costs.get(current)! + cost;
-        if (!costs.has(next) || new_cost < costs.get(next)!) {
-          costs.set(next, new_cost);
-          const priority = new_cost; // + heuristic(goal, next)
-          frontier.insert(next, priority);
-          cameFrom.set(next, current);
-        }
-      });
-    }
-
-    // Failed to find path.
-    if (current != end) {
-      return Array<Point3D>();
-    }
-    const path = new Array<Point3D>(current.waypoint);
-    while (current != start) {
-      current = cameFrom.get(current!)!;
-      path.push(current.waypoint);
-    }
-    path.reverse();
-    return path.splice(1);
   }
 }
-

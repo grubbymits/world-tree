@@ -6,6 +6,8 @@ import { CollisionDetector, CollisionInfo } from "./physics.ts";
 import { Point3D, Vector2D, Vector3D, Vertex3D } from "./geometry.ts";
 import { Direction, Navigation } from "./navigation.ts";
 import { EntityBounds } from "./bounds.ts";
+import { findPath } from "./terraform.ts";
+import { Coord } from "./utils";
 
 export abstract class Action {
   constructor(protected _actor: Actor) {}
@@ -162,11 +164,22 @@ export class Navigate extends Action {
   constructor(
     actor: Actor,
     private readonly _step: number,
-    private readonly _destination: Point3D
+    private readonly _destination: Point3D,
+    private readonly _blockingGrid: Array<Uint8Array>,
   ) {
     super(actor);
-    this._waypoints = actor.context.grid!.findPath(EntityBounds.bottomCentre(actor.id), _destination);
-    if (this.waypoints.length != 0) {
+    const begin = actor.context.grid!.scaleWorldToGrid(EntityBounds.bottomCentre(actor.id));
+    const end = actor.context.grid!.scaleWorldToGrid(this.destination);
+    const gridCoords = findPath(
+      new Coord(begin.x, begin.y),
+      new Coord(end.x, end.y),
+      this.blockingGrid
+    );
+    if (gridCoords.length != 0) {
+      this.waypoints = new Array<Point3D>();
+      for (let gridCoord of gridCoords) {
+        this.waypoints.push(actor.context.grid!.getCentreSurfaceLocationAt(gridCoord.x, gridCoord.y)!);
+      }
       this._currentStep = new MoveDestination(actor, this.step, this.waypoints[0]);
     }
   }
@@ -174,11 +187,20 @@ export class Navigate extends Action {
   get step(): number {
     return this._step;
   }
+  get destination(): Point3D {
+    return this._destination;
+  }
+  get blockingGrid(): Array<Uint8Array> {
+    return this._blockingGrid;
+  }
   get index(): number {
     return this._index;
   }
   get waypoints(): Array<Point3D> {
     return this._waypoints;
+  }
+  set waypoints(w: Array<Point3D>) {
+    this._waypoints = w;
   }
 
   perform(): boolean {

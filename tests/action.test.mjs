@@ -34,22 +34,22 @@ function createMap() {
   // top row
   for (let i = 0; i < numTilesWide; i++) {
     let minLocation = new WT.Point3D(i * squareTileSize, 0, 0);
-    new WT.PhysicalEntity(context, minLocation, tileDims);
+    new WT.CuboidEntity(context, minLocation, tileDims);
   }
   // bottom row
   for (let i = 0; i < numTilesWide; i++) {
     let minLocation = new WT.Point3D(i * squareTileSize, squareTileSize * 4, 0);
-    new WT.PhysicalEntity(context, minLocation, tileDims);
+    new WT.CuboidEntity(context, minLocation, tileDims);
   }
   // left side
   for (let i = 0; i < numTilesDeep; i++) {
     let minLocation = new WT.Point3D(0, i * squareTileSize, 0);
-    new WT.PhysicalEntity(context, minLocation, tileDims);
+    new WT.CuboidEntity(context, minLocation, tileDims);
   }
   // right side
   for (let i = 0; i < numTilesDeep; i++) {
     let minLocation = new WT.Point3D(4 * squareTileSize, i * squareTileSize, 0);
-    new WT.PhysicalEntity(context, minLocation, tileDims);
+    new WT.CuboidEntity(context, minLocation, tileDims);
   }
   return context;
 }
@@ -163,11 +163,11 @@ test("move around object", () => {
   const terrainShapes = new Array(5).fill(terrainShape);
   const terrainGridDescriptor = {
     cellHeightGrid: [
-      [1, 1, 1, 1, 1],
-      [1, 0, 0, 0, 1],
-      [1, 0, 1, 0, 1],
-      [1, 0, 0, 0, 1],
-      [1, 1, 1, 1, 1],
+      new Uint8Array([1, 1, 1, 1, 1]),
+      new Uint8Array([1, 0, 0, 0, 1]),
+      new Uint8Array([1, 0, 1, 0, 1]),
+      new Uint8Array([1, 0, 0, 0, 1]),
+      new Uint8Array([1, 1, 1, 1, 1]),
     ],
     typeGrid: new Array(5).fill(terrainTypes),
     shapeGrid: new Array(5).fill(terrainShapes),
@@ -180,42 +180,53 @@ test("move around object", () => {
   const grid = new WT.TerrainGrid(context, terrainGridDescriptor);
 
   const minLocation = new WT.Point3D(2 * squareTileSize, 2 * squareTileSize, 0);
-  new WT.PhysicalEntity(context, minLocation, tileDims);
+  new WT.CuboidEntity(context, minLocation, tileDims);
   const beginPos = getTileSurfaceCentre(1, 1);
   const destination = getTileSurfaceCentre(3, 3);
   const actor = new WT.Actor(context, beginPos, entityDims);
+
+  const edges = WT.findEdges(terrainGridDescriptor.cellHeightGrid);
+  const blockingGrid = WT.buildBlockingGrid(
+    terrainGridDescriptor.cellHeightGrid,
+    edges,
+    [], // ramps
+  );
   const velocity = 5;
-  const action = new WT.Navigate(actor, velocity, destination);
+  const action = new WT.Navigate(actor, velocity, destination, blockingGrid);
   actor.action = action;
   expect(action.waypoints.length).toBe(4);
   expect(action.index).toBe(0);
 
   actor.update();
   actor.update();
-  expect(context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))).toStrictEqual(
-    new WT.Point3D(2, 1, 1));
   expect(action.index).toBe(1);
+  expect(
+    context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))
+  ).toStrictEqual(new WT.Point3D(2, 1, 1));
 
   actor.update();
   actor.update();
   actor.update();
-  expect(context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))).toStrictEqual(
-    new WT.Point3D(3, 1, 1));
   expect(action.index).toBe(2);
+  expect(
+    context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))
+  ).toStrictEqual(new WT.Point3D(3, 1, 1));
 
   actor.update();
   actor.update();
   actor.update();
-  expect(context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))).toStrictEqual(
-    new WT.Point3D(3, 2, 1));
   expect(action.index).toBe(3);
+  expect(
+    context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))
+  ).toStrictEqual(new WT.Point3D(3, 2, 1));
 
   actor.update();
   actor.update();
   actor.update();
-  expect(context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))).toStrictEqual(
-    new WT.Point3D(3, 3, 1));
   expect(action.index).toBe(4);
+  expect(
+    context.grid.scaleWorldToGrid(WT.EntityBounds.bottomCentre(actor.id))
+  ).toStrictEqual(new WT.Point3D(3, 3, 1));
 });
 
 test("move down ramp", () => {
@@ -249,11 +260,11 @@ test("move down ramp", () => {
 
   const terrainGridDescriptor = {
     cellHeightGrid: [
-      [1, 1, 1, 1, 1],
-      [1, 0, 1, 0, 1],
-      [1, 0, 1, 0, 1],
-      [1, 0, 0, 0, 1],
-      [1, 1, 1, 1, 1],
+      new Uint8Array([1, 1, 1, 1, 1]),
+      new Uint8Array([1, 0, 1, 0, 1]),
+      new Uint8Array([1, 0, 1, 0, 1]),
+      new Uint8Array([1, 0, 0, 0, 1]),
+      new Uint8Array([1, 1, 1, 1, 1]),
     ],
     typeGrid: new Array(5).fill(terrainTypes),
     shapeGrid: shapeGrid,
@@ -267,7 +278,7 @@ test("move down ramp", () => {
   Utils.addDummyTerrainGraphic(terrainType, WT.TerrainShape.RampUpNorth);
   const grid = new WT.TerrainGrid(context, terrainGridDescriptor);
 
-  const beginPos = context.grid.getSurfaceLocationAt(2, 1);
+  const beginPos = context.grid.getCentreSurfaceLocationAt(2, 1);
   const actor = new WT.Actor(context, beginPos, entityDims);
   actor.gravitySpeed = 0.1;
   const d = WT.Navigation.getDirectionVector(WT.Direction.South).scale(2);
@@ -349,7 +360,7 @@ test("move up ramp", () => {
   Utils.addDummyTerrainGraphic(terrainType, WT.TerrainShape.RampUpNorth);
   const grid = new WT.TerrainGrid(context, terrainGridDescriptor);
 
-  const beginPos = context.grid.getSurfaceLocationAt(2, 3);
+  const beginPos = context.grid.getCentreSurfaceLocationAt(2, 3);
   const actor = new WT.Actor(context, beginPos, entityDims);
   actor.gravitySpeed = 0.1;
   const d = WT.Navigation.getDirectionVector(WT.Direction.North).scale(2);

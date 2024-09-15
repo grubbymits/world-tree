@@ -39,7 +39,7 @@ test("draw order of single row", () => {
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
     let minLocation = new WT.Point3D(i * (entityDimensions.width + gap), 0, 0);
-    let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
+    let entity = new WT.CuboidEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, scene);
     nodes.push(node);
   }
@@ -62,7 +62,7 @@ test("draw order of single column", () => {
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
     let minLocation = new WT.Point3D(0, i * (entityDimensions.depth + gap), 0);
-    let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
+    let entity = new WT.CuboidEntity(context, minLocation, entityDimensions);
     let node = new WT.SceneNode(entity, scene);
     nodes.push(node);
   }
@@ -88,7 +88,7 @@ test("draw order of (x, y) increasing diagonal", () => {
       i * (entityDimensions.depth + gap),
       0
     );
-    let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
+    let entity = new WT.CuboidEntity(context, minLocation, entityDimensions);
     entity.addGraphic(dummyGraphic);
     nodes.push(context.scene.getNode(entity.id));
   }
@@ -130,7 +130,7 @@ test("draw order of (x, y) four in a square", () => {
         y * (entityDimensions.depth + gap),
         0
       );
-      let entity = new WT.PhysicalEntity(
+      let entity = new WT.CuboidEntity(
         context,
         minLocation,
         entityDimensions
@@ -168,7 +168,7 @@ test("draw order of (x, y, z) eight in a cube", () => {
           y * (entityDimensions.depth + gap),
           z * (entityDimensions.height + gap)
         );
-        let entity = new WT.PhysicalEntity(
+        let entity = new WT.CuboidEntity(
           context,
           minLocation,
           entityDimensions
@@ -211,7 +211,7 @@ test("draw order of (x, y, z) updating eight in a cube", () => {
           y * (entityDimensions.depth + gap),
           z * (entityDimensions.height + gap)
         );
-        let entity = new WT.PhysicalEntity(
+        let entity = new WT.CuboidEntity(
           context,
           minLocation,
           entityDimensions
@@ -257,13 +257,13 @@ test("draw order of (x, y, z) updating level in a cube", () => {
     WT.Perspective.TwoByOneIsometric
   );
 
-  let addEntityAt = (x, y, z) => {
-    let minLocation = new WT.Point3D(
+  const addCuboidEntityAt = (x, y, z) => {
+    const minLocation = new WT.Point3D(
       x * (entityDimensions.width + gap),
       y * (entityDimensions.depth + gap),
       z * (entityDimensions.height + gap)
     );
-    let entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
+    const entity = new WT.CuboidEntity(context, minLocation, entityDimensions);
     entity.addGraphic(dummyGraphic);
     return entity;
   };
@@ -274,12 +274,12 @@ test("draw order of (x, y, z) updating level in a cube", () => {
         if (z == 1 && y == 0 && x == 0) {
           continue;
         }
-        addEntityAt(x, y, z);
+        addCuboidEntityAt(x, y, z);
       }
     }
   }
   // One cube above the rest
-  const movable = addEntityAt(0, 0, 2);
+  const movable = addCuboidEntityAt(0, 0, 2);
   const moveDown = new WT.Vector3D(0, 0, -(height - 2));
 
   // bottom layer
@@ -325,13 +325,13 @@ test("draw order of (x, y, z) levels with a ramp", () => {
     WT.Perspective.TwoByOneIsometric
   );
 
-  let addEntityAt = (x, y, z, dims) => {
-    let minLocation = new WT.Point3D(
+  const addCuboidEntityAt = (x, y, z, dims) => {
+    const minLocation = new WT.Point3D(
       x * (entityDimensions.width + gap),
       y * (entityDimensions.depth + gap),
       z * (entityDimensions.height + gap)
     );
-    let entity = new WT.PhysicalEntity(context, minLocation, dims);
+    const entity = new WT.CuboidEntity(context, minLocation, dims);
     entity.addGraphic(dummyGraphic);
     return entity;
   };
@@ -339,9 +339,16 @@ test("draw order of (x, y, z) levels with a ramp", () => {
   for (let z = 0; z < 2; ++z) {
     for (let y = 0; y < 2; ++y) {
       for (let x = 0; x < 2; ++x) {
-        const entity = addEntityAt(x, y, z, entityDimensions);
         if (z == 1 && y == 0 && x == 0) {
-          entity.geometry = new WT.RampUpSouthGeometry(entity.id);
+          const minLocation = new WT.Point3D(
+            x * (entityDimensions.width + gap),
+            y * (entityDimensions.depth + gap),
+            z * (entityDimensions.height + gap)
+          );
+          const entity = new WT.RampSouthEntity(context, minLocation, entityDimensions);
+          entity.addGraphic(dummyGraphic);
+        } else {
+          const entity = addCuboidEntityAt(x, y, z, entityDimensions);
         }
       }
     }
@@ -352,7 +359,7 @@ test("draw order of (x, y, z) levels with a ramp", () => {
     entityDimensions.depth / 2,
     entityDimensions.height / 2
   );
-  const movable = addEntityAt(0, 0, 2, movableDimensions);
+  const movable = addCuboidEntityAt(0, 0, 2, movableDimensions);
   const moveDown = new WT.Vector3D(0, 0, -2);
 
   // bottom layer
@@ -408,28 +415,28 @@ test("draw order of short and tall", () => {
     WT.Perspective.TwoByOneIsometric
   );
 
-  const addEntityAt = (x, y, z, entityDimensions) => {
+  const addCuboidEntityAt = (x, y, z, entityDimensions) => {
     const minLocation = new WT.Point3D(
       x * (terrainDims.width + gap),
       y * (terrainDims.depth + gap),
       z * (terrainDims.height + gap)
     );
-    const entity = new WT.PhysicalEntity(context, minLocation, entityDimensions);
+    const entity = new WT.CuboidEntity(context, minLocation, entityDimensions);
     entity.addGraphic(dummyGraphic);
     return entity;
   };
 
   for (let y = 0; y < cellsY; ++y) {
     for (let x = 0; x < cellsX; ++x) {
-      addEntityAt(x, y, 0, terrainDims);
+      addCuboidEntityAt(x, y, 0, terrainDims);
     }
   }
   // central tower
-  addEntityAt(2, 2, 1, terrainDims);
-  addEntityAt(2, 2, 2, terrainDims);
+  addCuboidEntityAt(2, 2, 1, terrainDims);
+  addCuboidEntityAt(2, 2, 2, terrainDims);
 
   // tree
-  const tree = addEntityAt(0, 2, 1, treeDims);
+  const tree = addCuboidEntityAt(0, 2, 1, treeDims);
 
   const camera = new WT.Camera(context.scene, 1920, 1080);
   camera.location = new WT.Point3D(0, 0, 0);

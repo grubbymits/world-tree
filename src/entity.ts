@@ -53,8 +53,8 @@ export class PhysicalEntity {
       minLocation.y + dimensions.depth / 2,
       minLocation.z + dimensions.height / 2
     );
-    this._geometry = new geometry(this.id);
     EntityBounds.addEntity(this.id, minLocation, dimensions);
+    this._geometry = new geometry(this.id);
     this._context.addEntity(this);
   }
 

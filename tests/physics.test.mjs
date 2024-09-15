@@ -161,26 +161,26 @@ function createMap() {
   // top row
   for (let i = 0; i < numTilesWide; i++) {
     let minLocation = new WT.Point3D(i * squareTileSize, 0, 0);
-    new WT.PhysicalEntity(context, minLocation, tileDims);
+    new WT.CuboidEntity(context, minLocation, tileDims);
   }
   // bottom row
   for (let i = 0; i < numTilesWide; i++) {
     let minLocation = new WT.Point3D(i * squareTileSize, squareTileSize * 4, 0);
-    new WT.PhysicalEntity(context, minLocation, tileDims);
+    new WT.CuboidEntity(context, minLocation, tileDims);
   }
   // left side
   for (let i = 0; i < numTilesDeep; i++) {
     let minLocation = new WT.Point3D(0, i * squareTileSize, 0);
-    new WT.PhysicalEntity(context, minLocation, tileDims);
+    new WT.CuboidEntity(context, minLocation, tileDims);
   }
   // right side
   for (let i = 0; i < numTilesDeep; i++) {
     let minLocation = new WT.Point3D(4 * squareTileSize, i * squareTileSize, 0);
-    new WT.PhysicalEntity(context, minLocation, tileDims);
+    new WT.CuboidEntity(context, minLocation, tileDims);
   }
   // middle
   let minLocation = new WT.Point3D(2 * squareTileSize, 2 * squareTileSize, 0);
-  new WT.PhysicalEntity(context, minLocation, tileDims);
+  new WT.CuboidEntity(context, minLocation, tileDims);
 
   return context;
 }
@@ -320,30 +320,29 @@ function createMapWithRampUpEast() {
   // top row
   for (let i = 0; i < numTilesWide; i++) {
     let minLocation = new WT.Point3D(i * (squareTileSize + 0.001), 0, 0);
-    new WT.PhysicalEntity(context, minLocation, tileDims);
+    new WT.CuboidEntity(context, minLocation, tileDims);
   }
   // bottom row
   for (let i = 0; i < numTilesWide; i++) {
     let minLocation = new WT.Point3D(i * (squareTileSize + 0.001),
                                      (squareTileSize + 0.001) * 4, 0);
-    new WT.PhysicalEntity(context, minLocation, tileDims);
+    new WT.CuboidEntity(context, minLocation, tileDims);
   }
   // left side
   for (let i = 0; i < numTilesDeep; i++) {
     let minLocation = new WT.Point3D(0, i * (squareTileSize + 0.001), 0);
-    new WT.PhysicalEntity(context, minLocation, tileDims);
+    new WT.CuboidEntity(context, minLocation, tileDims);
   }
   // right side
   for (let i = 0; i < numTilesDeep; i++) {
     let minLocation = new WT.Point3D(4 * (squareTileSize + 0.001),
                                      i * (squareTileSize + 0.001), 0);
-    new WT.PhysicalEntity(context, minLocation, tileDims);
+    new WT.CuboidEntity(context, minLocation, tileDims);
   }
   // middle
   const minLocation = new WT.Point3D(2 * (squareTileSize + 0.001),
                                      2 * (squareTileSize + 0.001), 0);
-  const entity = new WT.PhysicalEntity(context, minLocation, tileDims);
-  entity.geometry = new WT.RampUpEastGeometry(entity.id);
+  const entity = new WT.RampEastEntity(context, minLocation, tileDims);
 
   return context;
 }

@@ -161,8 +161,8 @@ test("cuboid obstruction", () => {
   );
   const dims = new WT.Dimensions(10, 10, 10);
   const minLocation = new WT.Point3D(0, 0, 0);
-  const entity = new WT.PhysicalEntity(context, minLocation, dims);
-  const cube = new WT.CuboidGeometry(entity.id);
+  const entity = new WT.CuboidEntity(context, minLocation, dims);
+  const cube = entity.geometry;
   const p0 = new WT.Point3D(5, 5, 11);
   const p1 = new WT.Point3D(5, 5, -1);
   const p2 = new WT.Point3D(-1, 5, 5);
@@ -280,8 +280,8 @@ test("ramp up west obstruction", () => {
   );
   const dims = new WT.Dimensions(10, 10, 10);
   const minLocation = new WT.Point3D(0, 0, 0);
-  const entity = new WT.PhysicalEntity(context, minLocation, dims);
-  const ramp = new WT.RampUpWestGeometry(entity.id);
+  const entity = new WT.RampWestEntity(context, minLocation, dims);
+  const ramp = entity.geometry;
 
   const p0 = new WT.Point3D(-1, 5, 1);
   const p1 = new WT.Point3D(15, 5, 1);
@@ -316,8 +316,8 @@ test("ramp up east obstruction", () => {
   );
   const dims = new WT.Dimensions(10, 10, 10);
   const minLocation = new WT.Point3D(0, 0, 0);
-  const entity = new WT.PhysicalEntity(context, minLocation, dims);
-  const ramp = new WT.RampUpEastGeometry(entity.id);
+  const entity = new WT.RampEastEntity(context, minLocation, dims);
+  const ramp = entity.geometry;
 
   const p0 = new WT.Point3D(-1, 5, 1);
   const p1 = new WT.Point3D(15, 5, 1);
@@ -360,8 +360,8 @@ test("ramp up north obstruction", () => {
   );
   const dims = new WT.Dimensions(10, 10, 10);
   const minLocation = new WT.Point3D(0, 0, 0);
-  const entity = new WT.PhysicalEntity(context, minLocation, dims);
-  const ramp = new WT.RampUpNorthGeometry(entity.id);
+  const entity = new WT.RampNorthEntity(context, minLocation, dims);
+  const ramp = entity.geometry;
 
   const p0 = new WT.Point3D(-1, 5, 5.2);
   const p1 = new WT.Point3D(15, 5, 5.2);
@@ -405,8 +405,8 @@ test("ramp up south obstruction", () => {
   );
   const dims = new WT.Dimensions(10, 10, 10);
   const minLocation = new WT.Point3D(0, 0, 0);
-  const entity = new WT.PhysicalEntity(context, minLocation, dims);
-  const ramp = new WT.RampUpSouthGeometry(entity.id);
+  const entity = new WT.RampSouthEntity(context, minLocation, dims);
+  const ramp = entity.geometry;
 
   const p0 = new WT.Point3D(-1, 5, 5.2);
   const p1 = new WT.Point3D(15, 5, 5.2);
