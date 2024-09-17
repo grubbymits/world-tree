@@ -83,7 +83,7 @@ test("no moisture", () => {
     expect(biomeGrid[y][1]).toBe(WT.Biome.Desert);
     expect(biomeGrid[y][3]).toBe(WT.Biome.Desert);
   }
-  expect(biomeGrid[2][2]).toBe(WT.Biome.Rock);
+  expect(biomeGrid[2][2]).toBe(WT.Biome.AlpineDesert);
 });
 
 test("moisture", () => {
@@ -120,9 +120,9 @@ test("moisture", () => {
     moistureGrid
   );
   expect(biomeGrid[1][1]).toBe(WT.Biome.Desert);
-  expect(biomeGrid[1][2]).toBe(WT.Biome.Grassland);
-  expect(biomeGrid[1][3]).toBe(WT.Biome.Shrubland);
-  expect(biomeGrid[3][1]).toBe(WT.Biome.MoistForest);
-  expect(biomeGrid[3][2]).toBe(WT.Biome.WetForest);
-  expect(biomeGrid[3][3]).toBe(WT.Biome.RainForest);
+  expect(biomeGrid[1][2]).toBe(WT.Biome.Savanna);
+  expect(biomeGrid[1][3]).toBe(WT.Biome.Savanna);
+  expect(biomeGrid[3][1]).toBe(WT.Biome.Woodland);
+  expect(biomeGrid[3][2]).toBe(WT.Biome.Woodland);
+  expect(biomeGrid[3][3]).toBe(WT.Biome.Rainforest);
 });

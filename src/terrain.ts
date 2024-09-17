@@ -12,50 +12,39 @@ import { Point3D } from "./geometry.ts";
 import { EntityBounds } from "./bounds.ts";
 
 
-export enum TerrainShape {
-  Flat,             // 0
-  Wall,             // 1
-  FlatWest,         // 2
-  FlatEast,         // 3
-  FlatNorthWest,    // 4
-  FlatNorth,        // 5
-  FlatNorthEast,    // 6
-  FlatSouthWest,    // 7
-  FlatSouth,        // 8
-  FlatSouthEast,    // 9
-  FlatNorthOut,     // 10
-  FlatEastOut,      // 11
-  FlatWestOut,      // 12
-  FlatSouthOut,     // 13
-  FlatAloneOut,     // 14
-  FlatNorthSouth,   // 15
-  FlatEastWest,     // 16
-  RampUpSouthEdge,  // 17
-  RampUpWestEdge,   // 18
-  RampUpEastEdge,   // 19
-  RampUpNorthEdge,  // 20
-  RampUpSouth,      // 21
-  RampUpWest,       // 22
-  RampUpEast,       // 23
-  RampUpNorth,      // 24
-  Max,              // 25
+export const enum TerrainShape {
+  Flat,
+  Wall,
+  NorthEdge,
+  EastEdge,
+  NorthEastCorner,
+  SouthEdge,
+  NorthSouthCorridor,
+  SouthEastCorner,
+  EastPeninsula,
+  WestEdge,
+  NorthWestCorner,
+  EastWestCorridor,
+  NorthPeninsula,
+  SouthWestCorner,
+  WestPeninsula,
+  SouthPeninsula,
+  Spire,
+  RampNorth,
+  RampEast,
+  RampSouth,
+  RampWest,
+  Max,
 }
 
-export enum TerrainType {
+export const enum TerrainType {
   Water,
-  Inside,
-  Lowland0,
-  Lowland1,
-  Lowland2,
-  Lowland3,
-  Lowland4,
-  Lowland5,
-  Upland0,
-  Upland1,
-  Upland2,
-  Upland3,
-  Upland4,
-  Upland5,
+  Snow,
+  Sand,
+  Rock,
+  Mud,
+  DryGrass,
+  WetGrass
 }
 
 export interface TerrainSpriteDescriptor {
@@ -67,6 +56,31 @@ export interface TerrainSpriteDescriptor {
 };
 
 export class Terrain {
+  private static readonly defaultSupportedShapes_ = new Map<TerrainShape, boolean>([
+    [ TerrainShape.Flat,               true ],
+    [ TerrainShape.Wall,               true ],
+    [ TerrainShape.NorthEdge,          false ],
+    [ TerrainShape.EastEdge,           false ],
+    [ TerrainShape.NorthEastCorner,    false ],
+    [ TerrainShape.SouthEdge,          false ],
+    [ TerrainShape.NorthSouthCorridor, false ],
+    [ TerrainShape.SouthEastCorner,    false ],
+    [ TerrainShape.EastPeninsula,      false ],
+    [ TerrainShape.WestEdge,           false ],
+    [ TerrainShape.NorthWestCorner,    false ],
+    [ TerrainShape.EastWestCorridor,   false ],
+    [ TerrainShape.NorthPeninsula,     false ],
+    [ TerrainShape.SouthWestCorner,    false ],
+    [ TerrainShape.WestPeninsula,      false ],
+    [ TerrainShape.SouthPeninsula,     false ],
+    [ TerrainShape.Spire,              false ],
+    [ TerrainShape.RampNorth,          false ],
+    [ TerrainShape.RampEast,           false ],
+    [ TerrainShape.RampSouth,          false ],
+    [ TerrainShape.RampWest,           false ],
+  ]);
+  private static _supportedShapes = new Map<TerrainShape, boolean>(this.defaultSupportedShapes_);
+    
   private static _terrainGraphics = new Map<
     TerrainType,
     Map<TerrainShape, GraphicComponent>
@@ -77,7 +91,18 @@ export class Terrain {
       TerrainType,
       Map<TerrainShape, GraphicComponent>
     >();
+    this._supportedShapes = new Map<TerrainShape, boolean>(this.defaultSupportedShapes_);
   }
+
+  static isSupportedShape(shape: TerrainShape): boolean {
+    console.assert(this._supportedShapes.has(shape));
+    return this._supportedShapes.get(shape)!;
+  }
+
+  static setSupportedShape(shape: TerrainShape): void {
+    this._supportedShapes.set(shape, true);
+  }
+
 
   static graphics(
     terrainType: TerrainType,
@@ -147,12 +172,6 @@ export class Terrain {
     return this._terrainGraphics.has(ty);
   }
 
-  static isSupportedShape(ty: TerrainType, shape: TerrainShape): boolean {
-    return (
-      this.isSupportedType(ty) && this._terrainGraphics.get(ty)!.has(shape)
-    );
-  }
-
   static getShapeName(terrain: TerrainShape): string {
     switch (terrain) {
       default:
@@ -162,52 +181,44 @@ export class Terrain {
         return "TerrainShape.Flat";
       case TerrainShape.Wall:
         return "TerrainShape.Wall";
-      case TerrainShape.FlatNorth:
-        return "TerrainShape.FlatNorth";
-      case TerrainShape.FlatNorthEast:
-        return "TerrainShape.FlatNorthRast";
-      case TerrainShape.FlatNorthWest:
-        return "TerrainShape.FlatNorthWest";
-      case TerrainShape.FlatEast:
-        return "TerrainShape.FlatEast";
-      case TerrainShape.FlatWest:
-        return "TerrainShape.FlatWest";
-      case TerrainShape.FlatSouth:
-        return "TerrainShape.FlatSouth";
-      case TerrainShape.FlatSouthEast:
-        return "TerrainShape.FlatSouthEast";
-      case TerrainShape.FlatSouthWest:
-        return "TerrainShape.FlatSouthWest";
-      case TerrainShape.RampUpNorth:
-        return "TerrainShape.RampUporth";
-      case TerrainShape.RampUpNorthEdge:
-        return "TerrainShape.RampUpNorthEdge";
-      case TerrainShape.RampUpEast:
-        return "TerrainShape.RampUpEast";
-      case TerrainShape.RampUpEastEdge:
-        return "TerrainShape.RampUpEastEdge";
-      case TerrainShape.RampUpSouth:
-        return "TerrainShape.RampUpSouth";
-      case TerrainShape.RampUpSouthEdge:
-        return "TerrainShape.RampUpSouthEdge";
-      case TerrainShape.RampUpWest:
-        return "TerrainShape.RampUpWest";
-      case TerrainShape.RampUpWestEdge:
-        return "TerrainShape.RampUpWestEdge";
-      case TerrainShape.FlatNorthOut:
-        return "TerrainShape.FlatNorthOut";
-      case TerrainShape.FlatEastOut:
-        return "TerrainShape.FlatEastOut";
-      case TerrainShape.FlatWestOut:
-        return "TerrainShape.FlatWestOut";
-      case TerrainShape.FlatSouthOut:
-        return "TerrainShape.FlatSouthOut";
-      case TerrainShape.FlatAloneOut:
-        return "TerrainShape.FlatAloneOut";
-      case TerrainShape.FlatNorthSouth:
-        return "TerrainShape.FlatNorthSouth";
-      case TerrainShape.FlatEastWest:
-        return "TerrainShape.FlatEastWest";
+      case TerrainShape.NorthEdge:
+        return "TerrainShape.NorthEdge";
+      case TerrainShape.EastEdge:
+        return "TerrainShape.EastEdge";
+      case TerrainShape.NorthEastCorner:
+        return "TerrainShape.NorthEastCorner";
+      case TerrainShape.SouthEdge:
+        return "TerrainShape.SouthEdge";
+      case TerrainShape.NorthSouthCorridor:
+        return "TerrainShape.NorthSouthCorridor";
+      case TerrainShape.SouthEastCorner:
+        return "TerrainShape.SouthEastCorner";
+      case TerrainShape.EastPeninsula:
+        return "TerrainShape.EastPeninsula";
+      case TerrainShape.WestEdge:
+        return "TerrainShape.WestEdge";
+      case TerrainShape.NorthWestCorner:
+        return "TerrainShape.NorthWestCorner";
+      case TerrainShape.EastWestCorridor:
+        return "TerrainShape.EastWestCorridor";
+      case TerrainShape.NorthPeninsula:
+        return "TerrainShape.NorthPeninsula";
+      case TerrainShape.SouthWestCorner:
+        return "TerrainShape.SouthWestCorner";
+      case TerrainShape.WestPeninsula:
+        return "TerrainShape.WestPeninsula";
+      case TerrainShape.SouthPeninsula:
+        return "TerrainShape.SouthPeninsula";
+      case TerrainShape.Spire:
+        return "TerrainShape.Spire";
+      case TerrainShape.RampNorth:
+        return "TerrainShape.RampNorth";
+      case TerrainShape.RampEast:
+        return "TerrainShape.RampEast";
+      case TerrainShape.RampSouth:
+        return "TerrainShape.RampSouth";
+      case TerrainShape.RampWest:
+        return "TerrainShape.RampWest";
     }
   }
 
@@ -218,132 +229,35 @@ export class Terrain {
         return "invalid terrain";
       case TerrainType.Water:
         return "TerrainType.Water";
-      case TerrainType.Inside:
-        return "TerrainType.Inside";
-      case TerrainType.Lowland0:
-        return "TerrainType.Lowland0";
-      case TerrainType.Lowland1:
-        return "TerrainType.Lowland1";
-      case TerrainType.Lowland2:
-        return "TerrainType.Lowland2";
-      case TerrainType.Lowland3:
-        return "TerrainType.Lowland3";
-      case TerrainType.Lowland4:
-        return "TerrainType.Lowland4";
-      case TerrainType.Lowland5:
-        return "TerrainType.Lowland5";
-      case TerrainType.Upland0:
-        return "TerrainType.Upland0";
-      case TerrainType.Upland1:
-        return "TerrainType.Upland1";
-      case TerrainType.Upland2:
-        return "TerrainType.Upland2";
-      case TerrainType.Upland3:
-        return "TerrainType.Upland3";
-      case TerrainType.Upland4:
-        return "TerrainType.Upland4";
-      case TerrainType.Upland5:
-        return "TerrainType.Upland5";
+      case TerrainType.Snow:
+        return "TerrainType.Snow";
+      case TerrainType.Sand:
+        return "TerrainType.Sand";
+      case TerrainType.Rock:
+        return "TerrainType.Rock";
+      case TerrainType.Mud:
+        return "TerrainType.Mud";
+      case TerrainType.DryGrass:
+        return "TerrainType.DryGrass";
+      case TerrainType.WetGrass:
+        return "TerrainType.WetGrass";
     }
   }
 
-  static isFlat(terrain: TerrainShape): boolean {
+  static isRamp(terrain: TerrainShape): boolean {
     switch (terrain) {
       default:
         break;
-      case TerrainShape.FlatNorthWest:
-      case TerrainShape.FlatNorth:
-      case TerrainShape.FlatNorthEast:
-      case TerrainShape.FlatNorthSouth:
-      case TerrainShape.FlatWest:
-      case TerrainShape.Flat:
-      case TerrainShape.Wall:
-      case TerrainShape.FlatEast:
-      case TerrainShape.FlatEastWest:
-      case TerrainShape.FlatSouthWest:
-      case TerrainShape.FlatSouth:
-      case TerrainShape.FlatSouthEast:
-      case TerrainShape.FlatNorthOut:
-      case TerrainShape.FlatEastOut:
-      case TerrainShape.FlatSouthOut:
-      case TerrainShape.FlatWestOut:
-      case TerrainShape.FlatAloneOut:
+      case TerrainShape.RampNorth:
+      case TerrainShape.RampEast:
+      case TerrainShape.RampSouth:
+      case TerrainShape.RampWest:
         return true;
     }
     return false;
   }
 
   static isEdge(terrain: TerrainShape): boolean {
-    switch (terrain) {
-      default:
-        break;
-      case TerrainShape.FlatNorthWest:
-      case TerrainShape.FlatNorth:
-      case TerrainShape.FlatNorthEast:
-      case TerrainShape.FlatWest:
-      case TerrainShape.Wall:
-      case TerrainShape.FlatEast:
-      case TerrainShape.FlatSouthWest:
-      case TerrainShape.FlatSouth:
-      case TerrainShape.FlatSouthEast:
-      case TerrainShape.FlatNorthSouth:
-      case TerrainShape.FlatEastWest:
-      case TerrainShape.FlatNorthOut:
-      case TerrainShape.FlatEastOut:
-      case TerrainShape.FlatSouthOut:
-      case TerrainShape.FlatWestOut:
-      case TerrainShape.FlatAloneOut:
-      case TerrainShape.RampUpSouthEdge:
-      case TerrainShape.RampUpWestEdge:
-      case TerrainShape.RampUpEastEdge:
-      case TerrainShape.RampUpNorthEdge:
-        return true;
-    }
-    return false;
-  }
-
-  static isRamp(shape: TerrainShape): boolean {
-    switch (shape) {
-      default:
-        break;
-      case TerrainShape.RampUpSouthEdge:
-      case TerrainShape.RampUpWestEdge:
-      case TerrainShape.RampUpEastEdge:
-      case TerrainShape.RampUpNorthEdge:
-      case TerrainShape.RampUpSouth:
-      case TerrainShape.RampUpWest:
-      case TerrainShape.RampUpEast:
-      case TerrainShape.RampUpNorth:
-        return true;
-    }
-    return false;
-  }
-
-  static isRampUp(shape: TerrainShape, direction: Direction): boolean {
-    switch (direction) {
-      default:
-        break;
-      case Direction.North:
-        return (
-          shape == TerrainShape.RampUpNorthEdge ||
-          shape == TerrainShape.RampUpNorth
-        );
-      case Direction.East:
-        return (
-          shape == TerrainShape.RampUpEastEdge ||
-          shape == TerrainShape.RampUpEast
-        );
-      case Direction.South:
-        return (
-          shape == TerrainShape.RampUpSouthEdge ||
-          shape == TerrainShape.RampUpSouth
-        );
-      case Direction.West:
-        return (
-          shape == TerrainShape.RampUpWestEdge ||
-          shape == TerrainShape.RampUpWest
-        );
-    }
-    return false;
+    return !Terrain.isRamp(terrain) && terrain != TerrainShape.Flat;
   }
 }

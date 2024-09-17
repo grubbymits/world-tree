@@ -12,11 +12,12 @@ import { Direction, Navigation } from "./navigation.ts";
 import { Point2D } from "./geometry.ts";
 import { ContextImpl } from "./context.ts";
 import { Biome, BiomeConfig, generateBiomeGrid, getBiomeName, addRain } from "./biomes.ts";
+import { Edge, EdgeShape, Ramp, RampShape } from "./terraform.ts";
 
-function buildBiomes(biomeConfig: BiomeConfig,
-                     moistureGrid: Array<Array<number>>,
+export function buildBiomes(biomeConfig: BiomeConfig,
                      heightGrid: Array<Array<number>>,
-                     terraceGrid: Array<Array<number>>): Array<Array<Biome>> {
+                     terraceGrid: Array<Uint8Array>): Array<Uint8Array> {
+  let moistureGrid = new Array<Array<number>>();
   if (biomeConfig.rainfall > 0) {
     moistureGrid = addRain(
       heightGrid,
@@ -25,6 +26,12 @@ function buildBiomes(biomeConfig: BiomeConfig,
       biomeConfig.rainfall,
       biomeConfig.waterLine
     );
+  } else {
+    const cellsY = heightGrid.length;
+    const cellsX = heightGrid[0].length;
+    for (let y = 0; y < cellsY; ++y) {
+      moistureGrid[y] = new Array<number>(cellsX).fill(0);
+    }
   }
   return generateBiomeGrid(biomeConfig, heightGrid, moistureGrid);
 }
@@ -32,9 +39,11 @@ function buildBiomes(biomeConfig: BiomeConfig,
 export function normaliseHeightGrid(heightGrid: Array<Array<number>>,
                                     numTerraces: number): number {
   // Normalise heights, minimum = 0;
+  const cellsY = heightGrid.length;
+  const cellsX = heightGrid[0].length;
   let minHeight = 0;
   let maxHeight = 0;
-  for (let y = 0; y < heightGrid.length; y++) {
+  for (let y = 0; y < cellsY; y++) {
     const row: Array<number> = heightGrid[y];
     const max = row.reduce(function (a, b) {
       return Math.max(a, b);
@@ -47,8 +56,6 @@ export function normaliseHeightGrid(heightGrid: Array<Array<number>>,
   }
   if (minHeight < 0) {
     minHeight = Math.abs(minHeight);
-    const cellsY = heightGrid.length;
-    const cellsX = heightGrid[0].length;
     for (let y = 0; y < cellsY; y++) {
       for (let x = 0; x < cellsX; x++) {
         heightGrid[y][x] += minHeight;
@@ -56,17 +63,16 @@ export function normaliseHeightGrid(heightGrid: Array<Array<number>>,
     }
     maxHeight += minHeight;
   }
-  const terraceSpacing = maxHeight / numTerraces;
-  return terraceSpacing;
+  return maxHeight / numTerraces;
 }
 
-export function setTerraces(heightGrid: Array<Array<number>>,
-                            terraceSpacing: number): Array<Array<number>> {
+export function buildTerraceGrid(heightGrid: Array<Array<number>>,
+                                 terraceSpacing: number): Array<Uint8Array> {
   const cellsY = heightGrid.length;
   const cellsX = heightGrid[0].length;
-  const terraceGrid = new Array<Array<number>>();
+  const terraceGrid = new Array<Uint8Array>();
   for (let y = 0; y < cellsY; y++) {
-    terraceGrid[y] = new Array<number>();
+    terraceGrid[y] = new Uint8Array(cellsX);
     for (let x = 0; x < cellsX; x++) {
       const surfaceHeight = heightGrid[y][x];
       terraceGrid[y][x] =
@@ -76,564 +82,177 @@ export function setTerraces(heightGrid: Array<Array<number>>,
   return terraceGrid;
 }
 
-export class TerrainBuilder {
-  private readonly _terraceSpacing: number;
-  private readonly _depth: number;
-  private readonly _width: number;
+export function buildTerrainShapeGrid(terraceGrid: Array<Uint8Array>,
+                                      edges: Array<Edge>,
+                                      ramps: Array<Ramp>): Array<Uint8Array> {
 
-  private _biomeGrid = new Array<Array<Biome>>();
-  private _terraceGrid: Array<Array<number>> =
-    new Array<Array<number>>();
-  private _moistureGrid: Array<Array<number>> =
-    new Array<Array<number>>();
-  private _typeGrid: Array<Array<TerrainType>> =
-    new Array<Array<TerrainType>>();
-  private _shapeGrid: Array<Array<TerrainShape>> =
-    new Array<Array<TerrainShape>>();
+  const cellsY = terraceGrid.length;
+  const cellsX = terraceGrid[0].length;
+  const terrainShapes = new Array<Uint8Array>();
+  for (let y = 0; y < cellsY; ++y) {
+    terrainShapes[y] = new Uint8Array(cellsX).fill(TerrainShape.Flat);
+  }
 
-  constructor(
-    private _heightGrid: Array<Array<number>>,
-    private readonly _numTerraces: number,
-    private readonly _floor: TerrainType,
-    private readonly _wall: TerrainType,
-    private readonly _tileDimensions: Dimensions
-  ) {
-    this._depth = this.heightGrid.length;
-    this._width = this.heightGrid[0].length;
-    this._terraceSpacing =
-      normaliseHeightGrid(this.heightGrid, this.numTerraces);
-    this._terraceGrid = setTerraces(this.heightGrid, this.terraceSpacing);
+  // If ramps are requested, all ramps are supported.
+  const rampToShape = new Map<RampShape, TerrainShape>([
+    [ RampShape.North,  TerrainShape.RampNorth ],
+    [ RampShape.East,   TerrainShape.RampEast ],
+    [ RampShape.South,  TerrainShape.RampSouth ],
+    [ RampShape.West,   TerrainShape.RampWest ],
+  ]);
+  for (let ramp of ramps) {
+    terrainShapes[ramp.y][ramp.x] = rampToShape.get(ramp.shape)!;
+  }
 
-    for (let y = 0; y < this.depth; y++) {
-      this._moistureGrid[y] = new Array<number>();
-      this._shapeGrid[y] = new Array<TerrainShape>();
-      this._typeGrid[y] = new Array<TerrainType>();
-      for (let x = 0; x < this.width; x++) {
-        this.shapeGrid[y][x] = TerrainShape.Flat;
-        this.typeGrid[y][x] = this.floor;
+  const edgeToShape = new Map<EdgeShape, Uint8Array>([
+    [ EdgeShape.None,
+      new Uint8Array([ TerrainShape.Flat ])
+    ],
+    [ EdgeShape.North,
+      new Uint8Array([ TerrainShape.NorthEdge ])
+    ],
+    [ EdgeShape.East,
+      new Uint8Array([ TerrainShape.EastEdge ])
+    ],
+    [ EdgeShape.NorthEastCorner,
+      new Uint8Array([ TerrainShape.NorthEastCorner,
+                       TerrainShape.EastEdge,
+                       TerrainShape.NorthEdge ])
+    ],
+    [ EdgeShape.South,
+      new Uint8Array([ TerrainShape.SouthEdge ])
+    ],
+    [ EdgeShape.NorthSouthCorridor,
+      new Uint8Array([ TerrainShape.NorthSouthCorridor,
+                       TerrainShape.EastEdge ])
+    ],
+    [ EdgeShape.SouthEastCorner,
+      new Uint8Array([ TerrainShape.SouthEastCorner,
+                       TerrainShape.EastEdge,
+                       TerrainShape.SouthEdge ])
+    ],
+    [ EdgeShape.EastPeninsula,
+      new Uint8Array([ TerrainShape.EastPeninsula,
+                       TerrainShape.NorthEastCorner,
+                       TerrainShape.SouthEastCorner,
+                       TerrainShape.EastEdge,
+                       TerrainShape.NorthEdge,
+                       TerrainShape.SouthEdge ])
+    ],
+    [ EdgeShape.West,
+      new Uint8Array([ TerrainShape.WestEdge ])
+    ],
+    [ EdgeShape.NorthWestCorner,
+      new Uint8Array([ TerrainShape.NorthWestCorner,
+                       TerrainShape.NorthEdge,
+                       TerrainShape.WestEdge ])
+    ],
+    [ EdgeShape.EastWestCorridor,
+      new Uint8Array([ TerrainShape.EastWestCorridor,
+                       TerrainShape.NorthEdge,
+                       TerrainShape.SouthEdge ])
+    ],
+    [ EdgeShape.NorthPeninsula,
+      new Uint8Array([ TerrainShape.NorthPeninsula,
+                       TerrainShape.NorthEastCorner,
+                       TerrainShape.NorthWestCorner,
+                       TerrainShape.EastEdge,
+                       TerrainShape.NorthEdge,
+                       TerrainShape.WestEdge ])
+    ],
+    [ EdgeShape.SouthWestCorner,
+      new Uint8Array([ TerrainShape.SouthWestCorner,
+                       TerrainShape.SouthEdge,
+                       TerrainShape.WestEdge ])
+    ],
+    [ EdgeShape.WestPeninsula,
+      new Uint8Array([ TerrainShape.WestPeninsula,
+                       TerrainShape.NorthWestCorner,
+                       TerrainShape.NorthEdge,
+                       TerrainShape.SouthEdge,
+                       TerrainShape.WestEdge ])
+    ],
+    [ EdgeShape.SouthPeninsula,
+      new Uint8Array([ TerrainShape.SouthPeninsula,
+                       TerrainShape.SouthEastCorner,
+                       TerrainShape.SouthWestCorner,
+                       TerrainShape.EastEdge,
+                       TerrainShape.NorthEdge,
+                       TerrainShape.WestEdge ])
+    ],
+    [ EdgeShape.Spire,
+      new Uint8Array([ TerrainShape.Spire,
+                       TerrainShape.EastPeninsula,
+                       TerrainShape.NorthPeninsula,
+                       TerrainShape.NorthEastCorner,
+                       TerrainShape.EastEdge,
+                       TerrainShape.NorthEdge,
+                       TerrainShape.SouthEdge,
+                       TerrainShape.WestEdge ])
+    ],
+  ]);
+
+  const foundSupported = (edge: Edge) => {
+    console.assert(edgeToShape.has(edge.shape));
+    const shapes = edgeToShape.get(edge.shape)!;
+    for (const shape of shapes) {
+      if (Terrain.isSupportedShape(shape)) {
+        terrainShapes[edge.y][edge.x] = shape;
+        return true;
       }
     }
-  }
-
-  get numTerraces(): number {
-    return this._numTerraces;
-  }
-  get wall(): TerrainType {
-    return this._wall;
-  }
-  get floor(): TerrainType {
-    return this._floor;
-  }
-  get tileDimensions(): Dimensions {
-    return this._tileDimensions;
-  }
-  get terraceSpacing(): number {
-    return this._terraceSpacing;
-  }
-  get width(): number {
-    return this._width;
-  }
-  get depth(): number {
-    return this._depth;
-  }
-  get heightGrid(): Array<Array<number>> {
-    return this._heightGrid;
-  }
-  get moistureGrid(): Array<Array<number>> {
-    return this._moistureGrid;
-  }
-  get terraceGrid(): Array<Array<number>> {
-    return this._terraceGrid;
-  }
-  get shapeGrid(): Array<Array<TerrainShape>> {
-    return this._shapeGrid;
-  }
-  get typeGrid(): Array<Array<TerrainType>> {
-    return this._typeGrid;
-  }
-  get biomeGrid(): Array<Array<Biome>> {
-    return this._biomeGrid;
-  }
-
-  terraceAt(x: number, y: number): number {
-    console.assert(
-      x >= 0 && x < this.width && y >= 0 && y < this.depth
-    );
-    return this._terraceGrid[y][x];
-  }
-
-  terrainTypeAt(x: number, y: number): TerrainType {
-    console.assert(
-      x >= 0 && x < this.width && y >= 0 && y < this.depth
-    );
-    return this._typeGrid[y][x];
-  }
-
-  terrainShapeAt(x: number, y: number): TerrainShape {
-    console.assert(
-      x >= 0 && x < this.width && y >= 0 && y < this.depth
-    );
-    return this._shapeGrid[y][x];
-  }
-
-  moistureAt(x: number, y: number): number {
-    console.assert(
-      x >= 0 && x < this.width && y >= 0 && y < this.depth
-    );
-    return this._moistureGrid[y][x];
-  }
-
-  isFlatAt(x: number, y: number): boolean {
-    console.assert(
-      x >= 0 && x < this.width && y >= 0 && y < this.depth
-    );
-    return Terrain.isFlat(this._shapeGrid[y][x]);
-  }
-
-  biomeAt(x: number, y: number): Biome {
-    console.assert(
-      x >= 0 && x < this.width && y >= 0 && y < this.depth
-    );
-    return this._biomeGrid[y][x];
-  }
-
-  heightAt(x: number, y: number): number {
-    console.assert(
-      x >= 0 && x < this.width && y >= 0 && y < this.depth
-    );
-    return this._heightGrid[y][x];
-  }
-
-  generateBiomes(config: BiomeConfig): void {
-    this._biomeGrid = buildBiomes(
-      config,
-      this.moistureGrid,
-      this.heightGrid,
-      this.terraceGrid
-    );
-    console.log('generated biomes');
-    setTerrainTypes(this.biomeGrid, this.typeGrid);
-  }
-
-  generateMap(context: ContextImpl): void {
-    setRamps(this._heightGrid, this._terraceGrid, this._shapeGrid,
-             this._terraceSpacing, 0);
-    setEdges(this._terraceGrid, this._shapeGrid, this._typeGrid, this.floor,
-             this.wall, this.wall != this.floor);
-
-    const descriptor = new TerrainGridDescriptorImpl(
-      this.terraceGrid,
-      this.typeGrid,
-      this.shapeGrid,
-      this.biomeGrid,
-      this.tileDimensions,
-      this.width,
-      this.depth,
-      this.numTerraces
-    );
-
-    new TerrainGrid(
-      context,
-      descriptor
-    );
-  }
-}
-
-export function setRamps(heightGrid: Array<Array<number>>,
-                         terraceGrid: Array<Array<number>>,
-                         shapeGrid: Array<Array<TerrainShape>>,
-                         terraceSpacing: number,
-                         rampTolerance: number): number {
-  const coordOffsets: Array<Point2D> = [
-    new Point2D(0, 1),
-    new Point2D(-1, 0),
-    new Point2D(0, -1),
-    new Point2D(1, 0),
-  ];
-
-  const ramps: Array<TerrainShape> = [
-    TerrainShape.RampUpSouth,
-    TerrainShape.RampUpWest,
-    TerrainShape.RampUpNorth,
-    TerrainShape.RampUpEast,
-  ];
-  const depth = heightGrid.length;
-  const width = heightGrid[0].length;
-
-  const isRampHeight = function(centreHeight: number, centreTerrace: number,
-                                terraceSpacing: number) {
-    const roundUpHeight = centreHeight + terraceSpacing / 2;
-    const lower = roundUpHeight - rampTolerance;
-    const upper = roundUpHeight + rampTolerance;
-    const middle = (centreTerrace + 1) * terraceSpacing;
-    return middle >= lower && middle <= upper;
+    return false;
   };
 
-  // Find locations that have heights that sit exactly between two terraces
-  // and then find their adjacent locations that are higher terraces. Set
-  // those locations to be ramps.
-  let totalRamps = 0;
-  let fixed = new Map<number, Set<number>>();
-  for (let y = depth - 3; y > 1; y--) {
-    for (let x = 2; x < width - 2; x++) {
-      const centreShape: TerrainShape = shapeGrid[y][x];
-      if (!Terrain.isFlat(centreShape)) {
-        continue;
-      }
-
-      const centreHeight = heightGrid[y][x];
-      const centreTerrace = terraceGrid[y][x];
-
-      if (!isRampHeight(centreHeight, centreTerrace, terraceSpacing)) {
-        continue;
-      }
-
-      for (const i in coordOffsets) {
-        const offset: Point2D = coordOffsets[i];
-        const neighbourX = x + offset.x;
-        const neighbourY = y + offset.y;
-
-        if (fixed.has(neighbourX) &&
-            fixed.get(neighbourX)!.has(neighbourY)) {
-          continue;
-        }
-        const nextNeighbourX = neighbourX + offset.x;
-        const nextNeighbourY = neighbourY + offset.y;
-        if (fixed.has(nextNeighbourX) &&
-            fixed.get(nextNeighbourX)!.has(nextNeighbourY)) {
-          continue;
-        }
-        const neighbourTerrace = terraceGrid[neighbourY][neighbourX];
-        const nextNeighbourTerrace = terraceGrid[nextNeighbourY][nextNeighbourX];
-        if (
-          neighbourTerrace == centreTerrace + 1 &&
-          neighbourTerrace == nextNeighbourTerrace
-        ) {
-          shapeGrid[neighbourY][neighbourX] = ramps[i];
-          if (fixed.has(neighbourX)) {
-            fixed.get(neighbourX)!.add(neighbourY);
-          } else {
-            fixed.set(neighbourX, new Set<number>([neighbourY]));
-          }
-          if (fixed.has(nextNeighbourX)) {
-            fixed.get(nextNeighbourX)!.add(nextNeighbourY);
-          } else {
-            fixed.set(nextNeighbourX, new Set<number>([nextNeighbourY]));
-          }
-          totalRamps++;
-        }
-      }
+  // We default to Flat and, if a compatible edge shape is not found we default
+  // to Wall.
+  for (let edge of edges) {
+    if (!foundSupported(edge)) {
+      terrainShapes[edge.y][edge.x] = TerrainShape.Wall;
     }
   }
-  return totalRamps;
+  return terrainShapes;
 }
 
-export function setEdges(terraceGrid: Array<Array<number>>,
-                         shapeGrid: Array<Array<TerrainShape>>,
-                         typeGrid: Array<Array<TerrainType>>,
-                         floor: TerrainType,
-                         wall: TerrainType,
-                         indoors: boolean): void {
-  const depth = terraceGrid.length;
-  const width = terraceGrid[0].length;
-  const inbounds = function(x: number, y: number): boolean {
-    return x >= 0 && x < width &&
-           y >= 0 && y < depth;
-  };
-
-  for (let y = 0; y < depth; y++) {
-    for (let x = 0; x < width; x++) {
-      if (typeGrid[y][x] == TerrainType.Water) {
-        continue;
-      }
-      const centrePos = new Point2D(x, y);
-      const centreTerrace = terraceGrid[y][x];
-      let centreShape = shapeGrid[y][x];
-      let centreType = typeGrid[y][x];
-      let shapeType = shapeGrid[y][x];
-      let northEdge = false;
-      let eastEdge = false;
-      let southEdge = false;
-      let westEdge = false;
-      const isPerimeter = x == 0 || x == width -1 ||
-                          y == 0 || y == depth - 1; 
-
-      for (const offset of Navigation.neighbourOffsets.values()) {
-        const neighbourX = x + offset.x;
-        const neighbourY = y + offset.y;
-        if (!inbounds(neighbourX, neighbourY)) {
-          continue;
-        }
-        const neighbourPos = new Point2D(neighbourX, neighbourY);
-        const neighbourTerrace = terraceGrid[neighbourY][neighbourX];
-        const neighbourShape = shapeGrid[neighbourY][neighbourX];
-
-        // Only look at lower neighbours
-        if (neighbourTerrace > centreTerrace) {
-          continue;
-        }
-        // Don't look at diagonal neighbours.
-        if (neighbourPos.x != x && neighbourPos.y != y) {
-          continue;
-        }
-
-        if (
-          neighbourTerrace == centreTerrace &&
-          Terrain.isFlat(centreShape) == Terrain.isFlat(neighbourShape)
-        ) {
-          continue;
-        }
-
-        // We want to enable edges, just not at the point where the ramp
-        // joins the upper terrace.
-        if (!Terrain.isFlat(neighbourShape)) {
-          const direction = Navigation.getDirectionFromPoints(neighbourPos, centrePos);
-          switch (direction) {
-          default:
-            break;
-          case Direction.North:
-            if (neighbourShape == TerrainShape.RampUpNorth) continue;
-            break;
-          case Direction.East:
-            if (neighbourShape == TerrainShape.RampUpEast) continue;
-            break;
-          case Direction.South:
-            if (neighbourShape == TerrainShape.RampUpSouth) continue;
-            break;
-          case Direction.West:
-            if (neighbourShape == TerrainShape.RampUpWest) continue;
-            break;
-          }
-        }
-
-        northEdge = northEdge || neighbourY < y;
-        southEdge = southEdge || neighbourY > y;
-        eastEdge = eastEdge || neighbourX > x;
-        westEdge = westEdge || neighbourX < x;
-        if (northEdge && eastEdge && southEdge && westEdge) {
-          break;
-        }
-      }
-
-      if (shapeType == TerrainShape.Flat) {
-        if (northEdge && eastEdge && southEdge && westEdge) {
-          shapeType = TerrainShape.FlatAloneOut;
-        } else if (northEdge && eastEdge && westEdge) {
-          shapeType = TerrainShape.FlatNorthOut;
-        } else if (northEdge && eastEdge && southEdge) {
-          shapeType = TerrainShape.FlatEastOut;
-        } else if (eastEdge && southEdge && westEdge) {
-          shapeType = TerrainShape.FlatSouthOut;
-        } else if (southEdge && westEdge && northEdge) {
-          shapeType = TerrainShape.FlatWestOut;
-        } else if (northEdge && eastEdge) {
-          shapeType = TerrainShape.FlatNorthEast;
-        } else if (northEdge && westEdge) {
-          shapeType = TerrainShape.FlatNorthWest;
-        } else if (southEdge && eastEdge) {
-          shapeType = TerrainShape.FlatSouthEast;
-        } else if (southEdge && westEdge) {
-          shapeType = TerrainShape.FlatSouthWest;
-        } else if (southEdge && northEdge) {
-          shapeType = TerrainShape.FlatNorthSouth;
-        } else if (eastEdge && westEdge) {
-          shapeType = TerrainShape.FlatEastWest;
-        } else if (northEdge) {
-          shapeType = TerrainShape.FlatNorth;
-        } else if (southEdge) {
-          shapeType = TerrainShape.FlatSouth;
-        } else if (eastEdge) {
-          shapeType = TerrainShape.FlatEast;
-        } else if (westEdge) {
-          shapeType = TerrainShape.FlatWest;
-        }
-      } else if (shapeType == TerrainShape.RampUpNorth && eastEdge) {
-        if (
-          Terrain.isSupportedShape(centreType, TerrainShape.RampUpNorthEdge)
-        ) {
-          shapeType = TerrainShape.RampUpNorthEdge;
-        }
-      } else if (shapeType == TerrainShape.RampUpEast && northEdge) {
-        if (
-          Terrain.isSupportedShape(centreType, TerrainShape.RampUpEastEdge)
-        ) {
-          shapeType = TerrainShape.RampUpEastEdge;
-        }
-      } else if (shapeType == TerrainShape.RampUpSouth && eastEdge) {
-        if (
-          Terrain.isSupportedShape(centreType, TerrainShape.RampUpSouthEdge)
-        ) {
-          shapeType = TerrainShape.RampUpSouthEdge;
-        }
-      } else if (shapeType == TerrainShape.RampUpWest && northEdge) {
-        if (
-          Terrain.isSupportedShape(centreType, TerrainShape.RampUpWestEdge)
-        ) {
-          shapeType = TerrainShape.RampUpWestEdge;
-        }
-      }
-
-      // Fixup the sides of the map.
-      if (
-        shapeType == TerrainShape.Flat && isPerimeter
-      ) {
-        if (x == 0 &&  y == 0) {
-          shapeType = TerrainShape.FlatNorthWest;
-        } else if (x == 0 &&  y == depth - 1) {
-          shapeType = TerrainShape.FlatSouthWest;
-        } else if (x == width - 1 && y == 0) {
-          shapeType = TerrainShape.FlatNorthEast;
-        } else if (x == 0) {
-          shapeType = TerrainShape.FlatWest;
-        } else if (y == 0) {
-          shapeType = TerrainShape.FlatNorth;
-        } else if (x == width - 1 && y == depth - 1) {
-          shapeType = TerrainShape.FlatSouthEast;
-        } else if (x == width - 1) {
-          shapeType = TerrainShape.FlatEast;
-        } else if (y == depth - 1) {
-          shapeType = TerrainShape.FlatSouth;
-        }
-      }
-
-      // If we don't support edge, try the basic wall tile and use the
-      // default wall type.
-      if (Terrain.isFlat(shapeType) && Terrain.isEdge(shapeType)) {
-        if (indoors) {
-          centreType = wall;
-        }
-        if (!Terrain.isSupportedShape(centreType, shapeType)) {
-          switch (shapeType) {
-            default:
-              shapeType = TerrainShape.Wall;
-              break;
-            case TerrainShape.FlatNorthOut:
-              if (
-                Terrain.isSupportedShape(centreType, TerrainShape.FlatNorth)
-              ) {
-                shapeType = TerrainShape.FlatNorth;
-              } else {
-                shapeType = TerrainShape.Wall;
-              }
-              break;
-            case TerrainShape.FlatNorthEast:
-            case TerrainShape.FlatSouthEast:
-              if (
-                Terrain.isSupportedShape(centreType, TerrainShape.FlatEast)
-              ) {
-                shapeType = TerrainShape.FlatEast;
-              } else {
-                shapeType = TerrainShape.Wall;
-              }
-              break;
-            case TerrainShape.FlatNorthWest:
-              if (
-                Terrain.isSupportedShape(
-                  centreType,
-                  TerrainShape.FlatWestOut
-                )
-              ) {
-                shapeType = TerrainShape.FlatWestOut;
-              } else {
-                shapeType = TerrainShape.Wall;
-              }
-              break;
-            case TerrainShape.FlatSouthWest:
-              if (
-                Terrain.isSupportedShape(centreType, TerrainShape.FlatWest)
-              ) {
-                shapeType = TerrainShape.FlatWest;
-              } else {
-                shapeType = TerrainShape.Wall;
-              }
-              break;
-          }
-        }
-      }
-
-      // Avoid introducing Wall tiles for the floor around the edge of the
-      // map.
-      if (centreTerrace == 0 && shapeType == TerrainShape.Wall) {
-        shapeType = TerrainShape.Flat;
-      }
-
-      // If we have a unsupported shape, such as a ramp, check whether we have
-      // the ramp shape for a default terrain type.
-      if (
-        !Terrain.isFlat(shapeType) &&
-        !Terrain.isSupportedShape(centreType, shapeType)
-      ) {
-        if (Terrain.isSupportedShape(floor, shapeType)) {
-          centreType = floor;
-        } else if (Terrain.isSupportedShape(wall, shapeType)) {
-          centreType = wall;
-        }
-      }
-
-      // And if that fails, fallback to the base flat tile.
-      if (!Terrain.isSupportedShape(centreType, shapeType)) {
-        shapeType = TerrainShape.Flat;
-      }
-      typeGrid[y][x] = centreType;
-      shapeGrid[y][x] = shapeType;
-    }
-  }
-}
-
-export function setTerrainTypes(biomeGrid: Array<Array<Biome>>,
-                                typeGrid: Array<Array<TerrainType>>): void {
+export function setTerrainTypes(biomeGrid: Array<Uint8Array>,
+                                defaultTerrainType: TerrainType): Array<Uint8Array> {
   const cellsY = biomeGrid.length;
   const cellsX = biomeGrid[0].length;
+  const typeGrid = new Array<Uint8Array>();
   for (let y = 0; y < cellsY; y++) {
+    typeGrid[y] = new Uint8Array(cellsX).fill(defaultTerrainType);
     for (let x = 0; x < cellsX; x++) {
       const biome = biomeGrid[y][x];
-      let terrain = TerrainType.Water;
+      let terrain = defaultTerrainType;
       switch (biome) {
         default:
           console.error("unhandled biome:", getBiomeName(biome));
           break;
         case Biome.Water:
-          break;
-        case Biome.Rock:
-          terrain = TerrainType.Upland0;
-          break;
-        case Biome.Tundra:
-          terrain = TerrainType.Upland1;
-          break;
-        case Biome.AlpineGrassland:
-          terrain = TerrainType.Upland2;
-          break;
-        case Biome.AlpineMeadow:
-          terrain = TerrainType.Upland3;
-          break;
-        case Biome.AlpineForest:
-          terrain = TerrainType.Upland4;
-          break;
-        case Biome.Taiga:
-          terrain = TerrainType.Upland5;
+          terrain = TerrainType.Water;
           break;
         case Biome.Desert:
-          terrain = TerrainType.Lowland0;
+          terrain = TerrainType.Sand;
           break;
-        case Biome.Grassland:
-          terrain = TerrainType.Lowland1;
+        case Biome.Savanna:
+        case Biome.Steppe:
+          terrain = TerrainType.DryGrass;
           break;
-        case Biome.Shrubland:
-          terrain = TerrainType.Lowland2;
+        case Biome.Woodland:
+          terrain = TerrainType.WetGrass;
           break;
-        case Biome.MoistForest:
-          terrain = TerrainType.Lowland3;
+        case Biome.Rainforest:
+          terrain = TerrainType.Mud;
           break;
-        case Biome.WetForest:
-          terrain = TerrainType.Lowland4;
+        case Biome.AlpineDesert:
+          terrain = TerrainType.Snow;
           break;
-        case Biome.RainForest:
-          terrain = TerrainType.Lowland5;
+        case Biome.AlpineTundra:
+        case Biome.SubalpineForest:
+          terrain = TerrainType.Rock;
           break;
       }
-      // Only change the type if it's supported, otherwise we'll just
-      // fallback to the default which is set in the constructor.
-      // TODO: What about default wall tiles?
+      // Only change the type if it's supported.
       if (Terrain.isSupportedType(terrain)) {
         typeGrid[y][x] = terrain;
       } else {
@@ -644,4 +263,5 @@ export function setTerrainTypes(biomeGrid: Array<Array<Biome>>,
       }
     }
   }
+  return typeGrid;
 }

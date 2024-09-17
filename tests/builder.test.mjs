@@ -58,7 +58,7 @@ test("terrace spacing with positive and negative heights", () => {
   ];
   const terraceSpacing = WT.normaliseHeightGrid(heightMap, numTerraces);
   expect(terraceSpacing).toBe(1.5);
-  const terraceGrid = WT.setTerraces(heightMap, terraceSpacing);
+  const terraceGrid = WT.buildTerraceGrid(heightMap, terraceSpacing);
   for (let y = 0; y < cellsY; ++y) {
     for (let x = 0; x < cellsX; ++x) {
       expect(terraceGrid[y][x]).toBe(Math.floor(heightMap[y][x] / terraceSpacing));
@@ -66,8 +66,7 @@ test("terrace spacing with positive and negative heights", () => {
   }
 });
 
-test("zero tolerance ramps", () => {
-  const tolerance = 0;
+test("all ramps and edges supported", () => {
   const cellsX = 11;
   const cellsY = 11;
   const numTerraces = 3;
@@ -86,146 +85,178 @@ test("zero tolerance ramps", () => {
   ];
 
   const terraceSpacing = WT.normaliseHeightGrid(heightMap, numTerraces);
-  const terraceGrid = WT.setTerraces(heightMap, terraceSpacing);
-  const shapeGrid = new Array();
-  for (let y = 0; y < cellsY; ++y) {
-    shapeGrid[y] = new Array();
-    for (let x = 0; x < cellsX; ++x) {
-      shapeGrid[y][x] = WT.TerrainShape.Flat;
-    }
+  const terraceGrid = WT.buildTerraceGrid(heightMap, terraceSpacing);
+  const edges = WT.findEdges(terraceGrid);
+  const ramps = WT.findRamps(terraceGrid, edges);
+
+  for (let shape = WT.TerrainShape.Flat; shape < WT.TerrainShape.Max; ++shape) {
+    WT.Terrain.setSupportedShape(shape);
   }
+  const shapeGrid = WT.buildTerrainShapeGrid(
+    terraceGrid,
+    edges,
+    ramps
+  );
 
-  const numRamps = WT.setRamps(heightMap, terraceGrid, shapeGrid, terraceSpacing, tolerance);
-
-  for (let y = 0; y < cellsY; ++y) {
-    for (let x = 0; x < cellsX; ++x) {
-      let shape = WT.TerrainShape.Flat;
-      let geometry = "CuboidGeometry";
-
-      if (x == 3 && y == 3) {
-        shape = WT.TerrainShape.RampUpEast;
-        geometry = "RampUpEastGeometry";
-      } else if (x == 2 && y == 4) {
-        shape = WT.TerrainShape.RampUpSouth;
-        geometry = "RampUpSouthGeometry";
-      } else if (x == 5 && y == 2) {
-        shape = WT.TerrainShape.RampUpWest;
-        geometry = "RampUpWestGeometry";
-      } else if (x == 7 && y == 3) {
-        shape = WT.TerrainShape.RampUpWest;
-        geometry = "RampUpWestGeometry";
-      } else if (x == 2 && y == 7) {
-        shape = WT.TerrainShape.RampUpNorth;
-        geometry = "RampUpNorthGeometry";
-      } else if (x == 4 && y == 6) {
-        shape = WT.TerrainShape.RampUpNorth;
-        geometry = "RampUpNorthGeometry";
-      } else if (x == 3 && y == 8) {
-        shape = WT.TerrainShape.RampUpEast;
-        geometry = "RampUpEastGeometry";
-      } else if (x == 7 && y == 8) {
-        shape = WT.TerrainShape.RampUpWest;
-        geometry = "RampUpWestGeometry";
-      } else if (x == 8 && y == 7) {
-        shape = WT.TerrainShape.RampUpNorth;
-        geometry = "RampUpNorthGeometry";
-      } else if (x == 8 && y == 4) {
-        shape = WT.TerrainShape.RampUpSouth;
-        geometry = "RampUpSouthGeometry";
-      }
-      expect(shapeGrid[y][x]).toBe(shape);
-      //expect(builder.terrainGeometryName(x, y), geometry);
+  for (const edge of edges) {
+    const terrainShape = shapeGrid[edge.y][edge.x];
+    let expectedShape = WT.TerrainShape.Flat;
+    switch (edge.shape) {
+    case WT.EdgeShape.North:
+      expectedShape = WT.TerrainShape.NorthEdge;
+      break;
+    case WT.EdgeShape.East:
+      expectedShape = WT.TerrainShape.EastEdge;
+      break;
+    case WT.EdgeShape.NorthEastCorner:
+      expectedShape = WT.TerrainShape.NorthEastCorner;
+      break;
+    case WT.EdgeShape.South:
+      expectedShape = WT.TerrainShape.SouthEdge;
+      break;
+    case WT.EdgeShape.NorthSouthCorridor:
+      expectedShape = WT.TerrainShape.NorthSouthCorridor;
+      break;
+    case WT.EdgeShape.SouthEastCorner:
+      expectedShape = WT.TerrainShape.SouthEastCorner;
+      break;
+    case WT.EdgeShape.EastPeninsula:
+      expectedShape = WT.TerrainShape.EastPeninsula;
+      break;
+    case WT.EdgeShape.West:
+      expectedShape = WT.TerrainShape.WestEdge;
+      break;
+    case WT.EdgeShape.NorthWestCorner:
+      expectedShape = WT.TerrainShape.NorthWestCorner;
+      break;
+    case WT.EdgeShape.EastWestCorridor:
+      expectedShape = WT.TerrainShape.EastWestCorridor;
+      break;
+    case WT.EdgeShape.NorthPeninsula:
+      expectedShape = WT.TerrainShape.NorthPeninsula;
+      break;
+    case WT.EdgeShape.SouthWestCorner:
+      expectedShape = WT.TerrainShape.SouthWestCorner;
+      break;
+    case WT.EdgeShape.WestPeninsula:
+      expectedShape = WT.TerrainShape.WestPeninsula;
+      break;
+    case WT.EdgeShape.SouthPeninsula:
+      expectedShape = WT.TerrainShape.SouthPeninsula;
+      break;
+    case WT.EdgeShape.Spire:
+      expectedShape = WT.TerrainShape.Spire;
+      break;
     }
+    expect(terrainShape).toBe(expectedShape);
   }
 });
 
-test("0.5 tolerance ramps", () => {
-  const tolerance = 0;
-  const cellsX = 5;
-  const cellsY = 7;
-  const numTerraces = 2;
+test("only flat and wall supported", () => {
+  const cellsX = 11;
+  const cellsY = 11;
+  const numTerraces = 3;
   const heightMap = [
-    [3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3],
-    [3, 2, 2, 2, 3],
-    [3, 2, 2, 2, 3],
-    [3, 1, 1, 1, 3],
-    [3, 1, 1, 1, 3],
-    [3, 1, 1, 1, 3],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 1, 2, 2, 2, 2, 1, 1, 1, 1, 0],
+    [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
+    [0, 1, 2, 3, 3, 4, 3, 2, 2, 1, 0],
+    [0, 1, 2, 3, 4, 6, 4, 2, 2, 1, 0],
+    [0, 1, 2, 3, 4, 4, 3, 2, 2, 1, 0],
+    [0, 1, 2, 3, 3, 2, 2, 2, 2, 1, 0],
+    [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   ];
 
   const terraceSpacing = WT.normaliseHeightGrid(heightMap, numTerraces);
-  expect(terraceSpacing).toBe(1.5);
-  const terraceGrid = WT.setTerraces(heightMap, terraceSpacing);
-  const shapeGrid = new Array();
-  for (let y = 0; y < cellsY; ++y) {
-    shapeGrid[y] = new Array();
-    for (let x = 0; x < cellsX; ++x) {
-      shapeGrid[y][x] = WT.TerrainShape.Flat;
-    }
-  }
+  const terraceGrid = WT.buildTerraceGrid(heightMap, terraceSpacing);
+  const edges = WT.findEdges(terraceGrid);
+  const ramps = WT.findRamps(terraceGrid, edges);
 
-  const numRamps = WT.setRamps(heightMap, terraceGrid, shapeGrid, terraceSpacing, 0.5);
-  const expected = [
-    [ 0, 0, 0, 0, 0 ],
-    [ 0, 0, WT.Terrain.RampUpNorth, 0, 0 ],
-    [ 0, 0, 0, 0, 0 ],
-    [ 0, 0, WT.Terrain.RampUpNorth, 0, 0 ],
-    [ 0, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 0 ]
-  ];
-  expect(numRamps).toBe(2);
+  WT.Terrain.reset();
+  const shapeGrid = WT.buildTerrainShapeGrid(
+    terraceGrid,
+    edges,
+    ramps
+  );
+
+  for (const edge of edges) {
+    const terrainShape = shapeGrid[edge.y][edge.x];
+    expect(terrainShape).toBe(WT.TerrainShape.Wall);
+  }
 });
-
-test("walls", () => {
-  const dims = new WT.Dimensions(5, 5, 5);
-  const width = 5;
-  const depth = 6;
-  const numTerraces = 2;
-  const worldDims = new WT.Dimensions(
-    dims.width * width,
-    dims.depth * depth,
-    dims.height * (numTerraces + 1)
-  );
-  let context = WT.createTestContext(
-    worldDims,
-    WT.Perspective.TwoByOneIsometric
-  );
+test("only basic edges supported", () => {
+  const cellsX = 11;
+  const cellsY = 11;
+  const numTerraces = 3;
   const heightMap = [
-    [0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 1],
-    [0, 0, 2, 0, 1],
-    [0, 2, 2, 2, 1],
-    [0, 0, 2, 0, 1],
-    [0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 1, 2, 2, 2, 2, 1, 1, 1, 1, 0],
+    [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
+    [0, 1, 2, 3, 3, 4, 3, 2, 2, 1, 0],
+    [0, 1, 2, 3, 4, 6, 4, 2, 2, 1, 0],
+    [0, 1, 2, 3, 4, 4, 3, 2, 2, 1, 0],
+    [0, 1, 2, 3, 3, 2, 2, 2, 2, 1, 0],
+    [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   ];
-  for (let type of types) {
-    Utils.addDummyTerrainGraphic(type, WT.TerrainShape.Wall);
-    Utils.addDummyTerrainGraphic(type, WT.TerrainShape.Flat);
+
+  const terraceSpacing = WT.normaliseHeightGrid(heightMap, numTerraces);
+  const terraceGrid = WT.buildTerraceGrid(heightMap, terraceSpacing);
+  const edges = WT.findEdges(terraceGrid);
+  const ramps = WT.findRamps(terraceGrid, edges);
+
+  const supportedShapes = [
+    WT.TerrainShape.Flat,
+    WT.TerrainShape.Wall,
+    WT.TerrainShape.NorthEdge,
+    WT.TerrainShape.EastEdge,
+    WT.TerrainShape.SouthEdge,
+    WT.TerrainShape.WestEdge
+  ];
+
+  WT.Terrain.reset();
+  for (const shape of supportedShapes) {
+    WT.Terrain.setSupportedShape(shape);
   }
-  let builder = new WT.TerrainBuilder(
-    heightMap,
-    numTerraces,
-    WT.TerrainType.Lowland0,
-    WT.TerrainType.Lowland0,
-    dims
+  const shapeGrid = WT.buildTerrainShapeGrid(
+    terraceGrid,
+    edges,
+    ramps
   );
-  builder.generateMap(context);
-  for (let y = 0; y < depth; ++y) {
-    for (let x = 0; x < width; ++x) {
-      if (x == 4) {
-        expect(builder.terrainShapeAt(x, y)).toBe(WT.TerrainShape.Wall);
-      } else if (
-        (x == 2 && y == 2) ||
-        (x == 1 && y == 3) ||
-        (x == 3 && y == 3) ||
-        (x == 2 && y == 4)
-      ) {
-        expect(builder.terrainShapeAt(x, y)).toBe(WT.TerrainShape.Wall);
-      } else {
-        expect(builder.terrainShapeAt(x, y)).toBe(WT.TerrainShape.Flat);
-      }
+
+  for (const edge of edges) {
+    const terrainShape = shapeGrid[edge.y][edge.x];
+    let expectedShape = WT.TerrainShape.Flat;
+    switch (edge.shape) {
+    case WT.EdgeShape.North:
+    case WT.EdgeShape.NorthSouthCorridor:
+    case WT.EdgeShape.NorthWestCorner:
+    case WT.EdgeShape.EastWestCorridor:
+    case WT.EdgeShape.WestPeninsula:
+      expectedShape = WT.TerrainShape.NorthEdge;
+      break;
+    case WT.EdgeShape.East:
+    case WT.EdgeShape.NorthEastCorner:
+    case WT.EdgeShape.SouthEastCorner:
+    case WT.EdgeShape.NorthPeninsula:
+    case WT.EdgeShape.EastPeninsula:
+    case WT.EdgeShape.SouthPeninsula:
+    case WT.EdgeShape.Spire:
+      expectedShape = WT.TerrainShape.EastEdge;
+      break;
+    case WT.EdgeShape.South:
+    case WT.EdgeShape.SouthWestCorner:
+      expectedShape = WT.TerrainShape.SouthEdge;
+      break;
+    case WT.EdgeShape.West:
+      expectedShape = WT.TerrainShape.WestEdge;
+      break;
     }
+    expect(terrainShape).toBe(expectedShape);
   }
 });

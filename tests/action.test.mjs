@@ -251,7 +251,7 @@ test("move down ramp", () => {
     shapeGrid[y] = new Array(cellsX);
     for (let x = 0; x < cellsX; ++x) {
       if (y == 2 && x == 2) {
-        shapeGrid[2][2] = WT.TerrainShape.RampUpNorth;
+        shapeGrid[2][2] = WT.TerrainShape.RampNorth;
       } else {
         shapeGrid[y][x] = WT.TerrainShape.Flat;
       }
@@ -275,7 +275,7 @@ test("move down ramp", () => {
   };
 
   Utils.addDummyTerrainGraphic(terrainType, terrainShape);
-  Utils.addDummyTerrainGraphic(terrainType, WT.TerrainShape.RampUpNorth);
+  Utils.addDummyTerrainGraphic(terrainType, WT.TerrainShape.RampNorth);
   const grid = new WT.TerrainGrid(context, terrainGridDescriptor);
 
   const beginPos = context.grid.getCentreSurfaceLocationAt(2, 1);
@@ -333,7 +333,7 @@ test("move up ramp", () => {
     shapeGrid[y] = new Array(cellsX);
     for (let x = 0; x < cellsX; ++x) {
       if (y == 2 && x == 2) {
-        shapeGrid[2][2] = WT.TerrainShape.RampUpNorth;
+        shapeGrid[2][2] = WT.TerrainShape.RampNorth;
       } else {
         shapeGrid[y][x] = WT.TerrainShape.Flat;
       }
@@ -357,7 +357,7 @@ test("move up ramp", () => {
   };
 
   Utils.addDummyTerrainGraphic(terrainType, terrainShape);
-  Utils.addDummyTerrainGraphic(terrainType, WT.TerrainShape.RampUpNorth);
+  Utils.addDummyTerrainGraphic(terrainType, WT.TerrainShape.RampNorth);
   const grid = new WT.TerrainGrid(context, terrainGridDescriptor);
 
   const beginPos = context.grid.getCentreSurfaceLocationAt(2, 3);

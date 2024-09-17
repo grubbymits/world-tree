@@ -2,7 +2,13 @@ import { AudioController } from "./audio.ts";
 import { MovableEntity, PhysicalEntity } from "./entity.ts";
 import { Terrain, TerrainType, TerrainSpriteDescriptor } from "./terrain.ts";
 import { TerrainGrid } from "./grid.ts";
-import { TerrainBuilder } from "./builder.ts";
+import {
+  normaliseHeightGrid,
+  buildTerraceGrid,
+  buildTerrainShapeGrid,
+  buildBiomes
+} from "./builder.ts";
+import { findEdges, findRamps } from "./terraform.ts";
 import { EntityEvent } from "./events.ts";
 import { BiomeConfig } from "./biomes.ts";
 import {
@@ -191,6 +197,7 @@ export interface WorldDescriptor {
   projection: string;
   heightMap: Array<Array<number>>;
   numTerraces: number;
+  hasRamps: boolean;
   floor: TerrainType,
   wall: TerrainType,
   biomeConfig: BiomeConfig;
@@ -202,8 +209,11 @@ export async function createWorld(worldDesc: WorldDescriptor): Promise<ContextIm
   const spriteWidth = terrainSpriteDesc.spriteWidth;
   const spriteHeight = terrainSpriteDesc.spriteHeight;
   const perspective = getPerspectiveFromString(worldDesc.projection);
-  const physicalDims = getDimensionsFromPerspective(spriteWidth, spriteHeight, perspective);
-  console.log('physical dimensions:', physicalDims);
+  const physicalDims = getDimensionsFromPerspective(
+    spriteWidth,
+    spriteHeight,
+    perspective
+  );
   const cellsY = worldDesc.heightMap.length;
   const cellsX = worldDesc.heightMap[0].length;
   const cellsZ = 1 + worldDesc.numTerraces;
@@ -219,17 +229,31 @@ export async function createWorld(worldDesc: WorldDescriptor): Promise<ContextIm
     perspective,
   );
   await Terrain.generateSprites(terrainSpriteDesc, context).then(() => {
-    const builder = new TerrainBuilder(
+    const terraceSpacing = normaliseHeightGrid(
+      worldDesc.heightMap, 
+      worldDesc.numTerraces
+    );
+    const terraceGrid = buildTerraceGrid(
       worldDesc.heightMap,
-      worldDesc.numTerraces,
-      worldDesc.floor,
-      worldDesc.wall,
-      physicalDims
+      terraceSpacing 
+    );
+    const edges = findEdges(terraceGrid);
+    const ramps = worldDesc.hasRamps 
+                ? findRamps(terraceGrid, edges)
+                : [];
+    const shapeGrid = buildTerrainShapeGrid(
+      terraceGrid,
+      edges,
+      ramps
     );
     if (Object.hasOwn(worldDesc, 'biomeConfig')) {
-      builder.generateBiomes(worldDesc.biomeConfig);
+      const biomeGrid = buildBiomes(
+        worldDesc.biomeConfig,
+        worldDesc.heightMap,
+        terraceGrid
+      );
+    } else {
     }
-    builder.generateMap(context);
   });
   return context;
 }

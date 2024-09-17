@@ -1,20 +1,16 @@
 import { Direction, Navigation } from "./navigation.ts"
 import { Point2D } from "./geometry.ts";
 
-export enum Biome {
+export const enum Biome {
   Water,
   Desert,
-  Grassland,
-  Shrubland,
-  MoistForest,
-  WetForest,
-  RainForest,
-  Rock,
-  Tundra,
-  AlpineGrassland,
-  AlpineMeadow,
-  AlpineForest,
-  Taiga,
+  Savanna,
+  Woodland,
+  Rainforest,
+  AlpineDesert,
+  AlpineTundra,
+  Steppe,
+  SubalpineForest,
 }
 
 export function getBiomeName(biome: Biome): string {
@@ -26,26 +22,20 @@ export function getBiomeName(biome: Biome): string {
       return "water";
     case Biome.Desert:
       return "desert";
-    case Biome.Grassland:
-      return "grassland";
-    case Biome.Shrubland:
-      return "shrubland";
-    case Biome.MoistForest:
-      return "moist forest";
-    case Biome.WetForest:
-      return "wet forest";
-    case Biome.RainForest:
+    case Biome.Savanna:
+      return "savanna";
+    case Biome.Woodland:
+      return "woodland";
+    case Biome.Rainforest:
       return "rain forest";
-    case Biome.Tundra:
-      return "tundra";
-    case Biome.AlpineGrassland:
-      return "alpine grassland";
-    case Biome.AlpineMeadow:
-      return "alpine meadow";
-    case Biome.AlpineForest:
-      return "alpine forest";
-    case Biome.Taiga:
-      return "taiga";
+    case Biome.AlpineDesert:
+      return "alpine desert";
+    case Biome.AlpineTundra:
+      return "alpine tundra";
+    case Biome.Steppe:
+      return "steppe";
+    case Biome.SubalpineForest:
+      return "subalpine forest";
   }
 }
 
@@ -63,19 +53,19 @@ export class BiomeConfig {
 
 export function generateBiomeGrid(config: BiomeConfig,
                                   heightGrid: Array<Array<number>>,
-                                  moistureGrid: Array<Array<number>>): Array<Array<Biome>> {
+                                  moistureGrid: Array<Array<number>>): Array<Uint8Array> {
   const cellsX = heightGrid[0].length;
   const cellsY = heightGrid.length;
   const moistureRange = 6;
-  let biomeGrid: Array<Array<Biome>> = new Array<Array<Biome>>();
+  const biomeGrid: Array<Uint8Array> = new Array<Uint8Array>();
   for (let y = 0; y < cellsY; y++) {
-    biomeGrid[y] = new Array<Biome>();
+    biomeGrid[y] = new Uint8Array(cellsX);
     for (let x = 0; x < cellsX; x++) {
       let biome: Biome = Biome.Water;
       const moisture = moistureGrid[y][x];
       const moisturePercent = Math.min(1, moisture / moistureRange);
-      // Split into six biomes based on moisture.
-      const moistureScaled = Math.floor(5 * moisturePercent);
+      // Split into four biomes based on moisture.
+      const moistureScaled = Math.floor(3 * moisturePercent);
       const surfaceHeight = heightGrid[y][x];
 
       if (surfaceHeight <= config.waterLine) {
@@ -86,22 +76,16 @@ export function generateBiomeGrid(config: BiomeConfig,
             console.error("unhandled moisture scale:", moistureScaled);
             break;
           case 0:
-            biome = Biome.Rock;
+            biome = Biome.AlpineDesert;
             break;
           case 1:
-            biome = Biome.Tundra;
+            biome = Biome.AlpineTundra;
             break;
           case 2:
-            biome = Biome.AlpineGrassland;
+            biome = Biome.Steppe;
             break;
           case 3:
-            biome = Biome.AlpineMeadow;
-            break;
-          case 4:
-            biome = Biome.AlpineForest;
-            break;
-          case 5:
-            biome = Biome.Taiga;
+            biome = Biome.SubalpineForest;
             break;
         }
       } else {
@@ -113,19 +97,13 @@ export function generateBiomeGrid(config: BiomeConfig,
             biome = Biome.Desert;
             break;
           case 1:
-            biome = Biome.Grassland;
+            biome = Biome.Savanna;
             break;
           case 2:
-            biome = Biome.Shrubland;
+            biome = Biome.Woodland;
             break;
           case 3:
-            biome = Biome.MoistForest;
-            break;
-          case 4:
-            biome = Biome.WetForest;
-            break;
-          case 5:
-            biome = Biome.RainForest;
+            biome = Biome.Rainforest;
             break;
         }
       }
@@ -227,7 +205,7 @@ export class Rain {
     private readonly _cellsX: number,
     private readonly _cellsY: number,
     private readonly _heightGrid: Array<Array<number>>,
-    private readonly _terraceGrid: Array<Array<number>>,
+    private readonly _terraceGrid: Array<Uint8Array>,
     private readonly _minHeight: number,
     moisture: number,
     direction: Direction
@@ -292,7 +270,7 @@ export class Rain {
   get heightGrid(): Array<Array<number>> {
     return this._heightGrid;
   }
-  get terraceGrid(): Array<Array<number>> {
+  get terraceGrid(): Array<Uint8Array> {
     return this._terraceGrid;
   }
   moistureAt(x: number, y: number): number {
@@ -446,7 +424,7 @@ function gaussianBlur(
 
 // Take a height map and return a moisture map.
 export function addRain(heightGrid: Array<Array<number>>,
-                        terraceGrid: Array<Array<number>>,
+                        terraceGrid: Array<Uint8Array>,
                         towards: Direction, water: number, waterLine: number):
                         Array<Array<number>> {
   const cellsX = heightGrid[0].length;

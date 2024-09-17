@@ -104,16 +104,16 @@ export class TerrainGrid {
         default:
           physical = CuboidEntity;
           break;
-        case TerrainShape.RampUpNorth:
+        case TerrainShape.RampNorth:
           physical = RampNorthEntity;
           break;
-        case TerrainShape.RampUpEast:
+        case TerrainShape.RampEast:
           physical = RampEastEntity;
           break;
-        case TerrainShape.RampUpSouth:
+        case TerrainShape.RampSouth:
           physical = RampSouthEntity;
           break;
-        case TerrainShape.RampUpWest:
+        case TerrainShape.RampWest:
           physical = RampWestEntity;
           break;
         }
@@ -127,7 +127,7 @@ export class TerrainGrid {
         this._totalSurface++;
 
         const zStop = z - this.calcRelativeHeight(x, y, this.descriptor);
-        const shape = Terrain.isFlat(terrainShape)
+        const shape = !Terrain.isRamp(terrainShape)
           ? terrainShape
           : TerrainShape.Flat;
         while (z > zStop) {
