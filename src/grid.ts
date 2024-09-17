@@ -27,10 +27,10 @@ import {
 } from "./entity.ts";
 
 export interface TerrainGridDescriptor {
-  cellHeightGrid: Array<Array<number>>;
-  typeGrid: Array<Array<TerrainType>>;
-  shapeGrid: Array<Array<TerrainShape>>;
-  biomeGrid: Array<Array<Biome>>;
+  cellHeightGrid: Array<Uint8Array>;
+  typeGrid: Array<Uint8Array>;
+  shapeGrid: Array<Uint8Array>;
+  biomeGrid: Array<Uint8Array>;
   tileDimensions: Dimensions;
   cellsX: number;
   cellsY: number;
@@ -38,24 +38,24 @@ export interface TerrainGridDescriptor {
 }
 
 export class TerrainGridDescriptorImpl implements TerrainGridDescriptor {
-  constructor (private readonly _cellHeightGrid: Array<Array<number>>,
-               private readonly _typeGrid: Array<Array<TerrainType>>,
-               private readonly _shapeGrid: Array<Array<TerrainShape>>,
-               private readonly _biomeGrid: Array<Array<Biome>>,
+  constructor (private readonly _cellHeightGrid: Array<Uint8Array>,
+               private readonly _typeGrid: Array<Uint8Array>,
+               private readonly _shapeGrid: Array<Uint8Array>,
+               private readonly _biomeGrid: Array<Uint8Array>,
                private readonly _tileDimensions: Dimensions,
                private readonly _cellsX: number,
                private readonly _cellsY: number,
                private readonly _cellsZ: number) { }
-  get cellHeightGrid(): Array<Array<number>> {
+  get cellHeightGrid(): Array<Uint8Array> {
     return this._cellHeightGrid;
   }
-  get typeGrid(): Array<Array<TerrainType>> {
+  get typeGrid(): Array<Uint8Array> {
     return this._typeGrid;
   }
-  get shapeGrid(): Array<Array<TerrainShape>> {
+  get shapeGrid(): Array<Uint8Array> {
     return this._shapeGrid;
   }
-  get biomeGrid(): Array<Array<Biome>> {
+  get biomeGrid(): Array<Uint8Array> {
     return this._biomeGrid;
   }
   get tileDimensions(): Dimensions {
@@ -126,8 +126,12 @@ export class TerrainGrid {
         this.surfaceGeometry[y][x] = entity.geometry;
         this._totalSurface++;
 
-        const zStop = z - this.calcRelativeHeight(x, y, this.descriptor);
-        const shape = !Terrain.isRamp(terrainShape)
+        const zStop = z - this.calcRelativeHeight(
+          x,
+          y,
+          this.descriptor.cellHeightGrid
+        );
+        const subSurfaceShape = !Terrain.isRamp(terrainShape)
           ? terrainShape
           : TerrainShape.Flat;
         while (z > zStop) {
@@ -138,6 +142,7 @@ export class TerrainGrid {
             subSurfacePosition,
             this.descriptor.tileDimensions
           );
+          subSurfaceEntity.addGraphic(Terrain.graphics(terrainType, subSurfaceShape));
           this._totalSubSurface++;
         }
       }
@@ -204,9 +209,9 @@ export class TerrainGrid {
     );
   }
 
-  calcRelativeHeight(x: number, y: number, descriptor: TerrainGridDescriptor): number {
+  calcRelativeHeight(x: number, y: number, cellHeightGrid: Array<Uint8Array>): number {
     let relativeHeight = 0;
-    const centreTerrace = descriptor.cellHeightGrid[y][x];
+    const centreTerrace = cellHeightGrid[y][x];
 
     for (let offset of Navigation.neighbourOffsets.values()) {
       const neighbourX = x + offset.x;
@@ -214,7 +219,7 @@ export class TerrainGrid {
       if (!this.inbounds(neighbourX, neighbourY)) {
         continue;
       }
-      const neighbourTerrace = descriptor.cellHeightGrid[neighbourY][neighbourX];
+      const neighbourTerrace = cellHeightGrid[neighbourY][neighbourX];
       console.assert(
         neighbourTerrace >= 0,
         "Found neighbour with negative terrace!",

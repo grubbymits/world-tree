@@ -1,11 +1,12 @@
 import { AudioController } from "./audio.ts";
 import { MovableEntity, PhysicalEntity } from "./entity.ts";
 import { Terrain, TerrainType, TerrainSpriteDescriptor } from "./terrain.ts";
-import { TerrainGrid } from "./grid.ts";
+import { TerrainGrid, TerrainGridDescriptorImpl } from "./grid.ts";
 import {
   normaliseHeightGrid,
   buildTerraceGrid,
   buildTerrainShapeGrid,
+  buildTerrainTypeGrid,
   buildBiomes
 } from "./builder.ts";
 import { findEdges, findRamps } from "./terraform.ts";
@@ -198,8 +199,7 @@ export interface WorldDescriptor {
   heightMap: Array<Array<number>>;
   numTerraces: number;
   hasRamps: boolean;
-  floor: TerrainType,
-  wall: TerrainType,
+  defaultTerrainType: TerrainType,
   biomeConfig: BiomeConfig;
   terrainSpriteDescriptor: TerrainSpriteDescriptor;
 };
@@ -246,14 +246,32 @@ export async function createWorld(worldDesc: WorldDescriptor): Promise<ContextIm
       edges,
       ramps
     );
+    let typeGrid = new Array<Uint8Array>();
+    let biomeGrid = new Array<Uint8Array>();
     if (Object.hasOwn(worldDesc, 'biomeConfig')) {
-      const biomeGrid = buildBiomes(
+      biomeGrid = buildBiomes(
         worldDesc.biomeConfig,
         worldDesc.heightMap,
         terraceGrid
       );
+      typeGrid = buildTerrainTypeGrid(biomeGrid, worldDesc.defaultTerrainType);
     } else {
+      for (let y = 0; y < cellsY; ++y) {
+        typeGrid[y] = new Uint8Array(cellsX).fill(worldDesc.defaultTerrainType);
+      }
     }
+
+    const terrainGridDescriptor = new TerrainGridDescriptorImpl(
+      terraceGrid,
+      typeGrid,
+      shapeGrid,
+      biomeGrid,
+      physicalDims,
+      cellsX,
+      cellsY,
+      cellsZ
+    );
+    const grid = new TerrainGrid(context, terrainGridDescriptor);
   });
   return context;
 }

@@ -58,7 +58,7 @@ export interface TerrainSpriteDescriptor {
 export class Terrain {
   private static readonly defaultSupportedShapes_ = new Map<TerrainShape, boolean>([
     [ TerrainShape.Flat,               true ],
-    [ TerrainShape.Wall,               true ],
+    [ TerrainShape.Wall,               false ],
     [ TerrainShape.NorthEdge,          false ],
     [ TerrainShape.EastEdge,           false ],
     [ TerrainShape.NorthEastCorner,    false ],
@@ -95,7 +95,6 @@ export class Terrain {
   }
 
   static isSupportedShape(shape: TerrainShape): boolean {
-    console.assert(this._supportedShapes.has(shape));
     return this._supportedShapes.get(shape)!;
   }
 
@@ -103,6 +102,9 @@ export class Terrain {
     this._supportedShapes.set(shape, true);
   }
 
+  static isSupportedType(ty: TerrainType): boolean {
+    return this._terrainGraphics.has(ty);
+  }
 
   static graphics(
     terrainType: TerrainType,
@@ -140,6 +142,7 @@ export class Terrain {
       );
     }
     this._terrainGraphics.get(terrainType)!.set(terrainShape, component);
+    this.setSupportedShape(terrainShape);
   }
 
   static async generateSprites(desc: TerrainSpriteDescriptor,
@@ -166,10 +169,6 @@ export class Terrain {
         }
       }
     });
-  }
-
-  static isSupportedType(ty: TerrainType): boolean {
-    return this._terrainGraphics.has(ty);
   }
 
   static getShapeName(terrain: TerrainShape): string {

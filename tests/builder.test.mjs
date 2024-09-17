@@ -152,7 +152,7 @@ test("all ramps and edges supported", () => {
   }
 });
 
-test("only flat and wall supported", () => {
+test("only flat supported", () => {
   const cellsX = 11;
   const cellsY = 11;
   const numTerraces = 3;
@@ -184,9 +184,47 @@ test("only flat and wall supported", () => {
 
   for (const edge of edges) {
     const terrainShape = shapeGrid[edge.y][edge.x];
+    expect(terrainShape).toBe(WT.TerrainShape.Flat);
+  }
+});
+
+test("only flat and wall supported", () => {
+  const cellsX = 11;
+  const cellsY = 11;
+  const numTerraces = 3;
+  const heightMap = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 1, 2, 2, 2, 2, 1, 1, 1, 1, 0],
+    [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
+    [0, 1, 2, 3, 3, 4, 3, 2, 2, 1, 0],
+    [0, 1, 2, 3, 4, 6, 4, 2, 2, 1, 0],
+    [0, 1, 2, 3, 4, 4, 3, 2, 2, 1, 0],
+    [0, 1, 2, 3, 3, 2, 2, 2, 2, 1, 0],
+    [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ];
+
+  const terraceSpacing = WT.normaliseHeightGrid(heightMap, numTerraces);
+  const terraceGrid = WT.buildTerraceGrid(heightMap, terraceSpacing);
+  const edges = WT.findEdges(terraceGrid);
+  const ramps = WT.findRamps(terraceGrid, edges);
+
+  WT.Terrain.reset();
+  WT.Terrain.setSupportedShape(WT.TerrainShape.Wall);
+  const shapeGrid = WT.buildTerrainShapeGrid(
+    terraceGrid,
+    edges,
+    ramps
+  );
+
+  for (const edge of edges) {
+    const terrainShape = shapeGrid[edge.y][edge.x];
     expect(terrainShape).toBe(WT.TerrainShape.Wall);
   }
 });
+
 test("only basic edges supported", () => {
   const cellsX = 11;
   const cellsY = 11;
@@ -212,7 +250,6 @@ test("only basic edges supported", () => {
 
   const supportedShapes = [
     WT.TerrainShape.Flat,
-    WT.TerrainShape.Wall,
     WT.TerrainShape.NorthEdge,
     WT.TerrainShape.EastEdge,
     WT.TerrainShape.SouthEdge,

@@ -204,18 +204,19 @@ export function buildTerrainShapeGrid(terraceGrid: Array<Uint8Array>,
     return false;
   };
 
-  // We default to Flat and, if a compatible edge shape is not found we default
-  // to Wall.
+  const defaultWall = Terrain.isSupportedShape(TerrainShape.Wall)
+                    ? TerrainShape.Wall
+                    : TerrainShape.Flat;
   for (let edge of edges) {
     if (!foundSupported(edge)) {
-      terrainShapes[edge.y][edge.x] = TerrainShape.Wall;
+      terrainShapes[edge.y][edge.x] = defaultWall;
     }
   }
   return terrainShapes;
 }
 
-export function setTerrainTypes(biomeGrid: Array<Uint8Array>,
-                                defaultTerrainType: TerrainType): Array<Uint8Array> {
+export function buildTerrainTypeGrid(biomeGrid: Array<Uint8Array>,
+                                     defaultTerrainType: TerrainType): Array<Uint8Array> {
   const cellsY = biomeGrid.length;
   const cellsX = biomeGrid[0].length;
   const typeGrid = new Array<Uint8Array>();
