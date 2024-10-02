@@ -110,19 +110,24 @@ const blockingCardinals = new Array<Uint8Array>(
 );
 
 export class Edge {
-  constructor(private readonly _shape: EdgeShape,
+  constructor(private _shape: EdgeShape,
               private readonly _x: number,
               private readonly _y: number) {
-    Object.freeze(this);
   }
   get shape(): EdgeShape {
     return this._shape;
+  }
+  set shape(s: EdgeShape) {
+    this._shape = s;
   }
   get x(): number {
     return this._x;
   }
   get y(): number {
     return this._y;
+  }
+  addCardinalEdge(direction: EdgeShape): void {
+    this.shape |= direction;
   }
 }
 
@@ -214,11 +219,25 @@ export function findRamps(terraceGrid: TerraceGrid,
   //    /   \
   const minDistance = 1;
   const distance = minDistance + extraDistance;
+  const minX = distance;
+  const minY = distance;
+  const maxX = terraceGrid[0].length - distance;
+  const maxY = terraceGrid.length - distance;
+  const ramps = new Array<Ramp>();
+
+  const isRampAt = (x: number, y: number): boolean => {
+    return ramps.some((ramp) => ramp.x == x && ramp.y == y);
+  };
 
   const areNeighbourTerracesEqual = (x: number, y: number, direction: number) => {
     const offset = neighbourOffsets[direction];
+    const closestNeighbourX = x + offset.x;
+    const closestNeighbourY = y + offset.y;
+    if (isRampAt(closestNeighbourX, closestNeighbourY)) {
+      return false;
+    }
     const centreTerrace = terraceGrid[y][x];
-    for (let i = 1; i < distance; ++i) {
+    for (let i = 1; i <= distance; ++i) {
       const neighbourY = y + (i * offset.y);
       const neighbourX = x + (i * offset.x);
       const neighbourTerrace = terraceGrid[neighbourY][neighbourX];
@@ -228,10 +247,16 @@ export function findRamps(terraceGrid: TerraceGrid,
     }
     return true;
   }
+
   const areNeighbourTerracesLower = (x: number, y: number, direction: number) => {
     const offset = neighbourOffsets[direction];
+    const closestNeighbourX = x + offset.x;
+    const closestNeighbourY = y + offset.y;
+    if (isRampAt(closestNeighbourX, closestNeighbourY)) {
+      return false;
+    }
     const centreTerrace = terraceGrid[y][x];
-    for (let i = 1; i < distance; ++i) {
+    for (let i = 1; i <= distance; ++i) {
       const neighbourY = y + (i * offset.y);
       const neighbourX = x + (i * offset.x);
       const neighbourTerrace = terraceGrid[neighbourY][neighbourX];
@@ -242,11 +267,6 @@ export function findRamps(terraceGrid: TerraceGrid,
     return true;
   }
 
-  const minX = distance;
-  const minY = distance;
-  const maxX = terraceGrid[0].length - distance;
-  const maxY = terraceGrid.length - distance;
-  const ramps = new Array<Ramp>();
   for (let edge of edges) {
     const x = edge.x;
     const y = edge.y;
@@ -259,29 +279,61 @@ export function findRamps(terraceGrid: TerraceGrid,
     case EdgeShape.NorthPeninsula:
       if (areNeighbourTerracesLower(x, y, NORTH) &&
           areNeighbourTerracesEqual(x, y, SOUTH)) {
-        ramps.push(new Ramp(RampShape.North, x, y));
+        ramps.push(new Ramp(RampShape.South, x, y));
       }
       break;
     case EdgeShape.South:
     case EdgeShape.SouthPeninsula:
       if (areNeighbourTerracesLower(x, y, SOUTH) &&
           areNeighbourTerracesEqual(x, y, NORTH)) {
-        ramps.push(new Ramp(RampShape.South, x, y));
+        ramps.push(new Ramp(RampShape.North, x, y));
       }
       break;
     case EdgeShape.East:
     case EdgeShape.EastPeninsula:
       if (areNeighbourTerracesLower(x, y, EAST) &&
           areNeighbourTerracesEqual(x, y, WEST)) {
-        ramps.push(new Ramp(RampShape.East, x, y));
+        ramps.push(new Ramp(RampShape.West, x, y));
       }
       break;
     case EdgeShape.West:
     case EdgeShape.WestPeninsula:
       if (areNeighbourTerracesLower(x, y, WEST) &&
           areNeighbourTerracesEqual(x, y, EAST)) {
-        ramps.push(new Ramp(RampShape.West, x, y));
+        ramps.push(new Ramp(RampShape.East, x, y));
       }
+      break;
+    }
+  }
+
+  // Adding ramps will create more edges...
+  const addEdge = (x: number, y: number, offset: Coord,
+                   edgeShape: EdgeShape) => {
+    const neighbourX = x + offset.x;
+    const neighbourY = y + offset.y;
+    if (isRampAt(neighbourX, neighbourY)) {
+      return;
+    }
+    const edge = edges.find((edge) => edge.x == neighbourX && edge.y == neighbourY);
+    if (edge != undefined) {
+      edge.addCardinalEdge(edgeShape);
+      return;
+    }
+    edges.push(new Edge(edgeShape, neighbourX, neighbourY));
+  }
+  for (const ramp of ramps) {
+    const x = ramp.x;
+    const y = ramp.y;
+    switch (ramp.shape) {
+    case RampShape.North:
+    case RampShape.South:
+      addEdge(x, y, neighbourOffsets[EAST], EdgeShape.West);
+      addEdge(x, y, neighbourOffsets[WEST], EdgeShape.East);
+      break;
+    case RampShape.East:
+    case RampShape.West:
+      addEdge(x, y, neighbourOffsets[NORTH], EdgeShape.South);
+      addEdge(x, y, neighbourOffsets[SOUTH], EdgeShape.North);
       break;
     }
   }
@@ -426,7 +478,7 @@ export function buildBlockingGrid(terraceGrid: TerraceGrid,
     const oppositeDirection = getOpposite(direction);
 
     // The edge unblocks itself in one direction.
-    blockingGrid[ramp.y][ramp.x] &= ~direction;
+    blockingGrid[ramp.y][ramp.x] &= ~oppositeDirection;
 
     // Two of its cardinal neighbours are then also unblocked.
     let neighbour = getNeighbourCoord(ramp.x, ramp.y, direction);

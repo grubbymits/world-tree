@@ -118,6 +118,10 @@ test("centre ramps", () => {
   expect(edges.length).toBe(32);
   const ramps = WT.findRamps(terraceGrid, edges);
   expect(ramps.length).toBe(4);
+  expect(ramps[0].shape).toBe(WT.RampShape.South);
+  expect(ramps[1].shape).toBe(WT.RampShape.East);
+  expect(ramps[2].shape).toBe(WT.RampShape.West);
+  expect(ramps[3].shape).toBe(WT.RampShape.North);
 });
 
 test("cardinals blocking grid", () => {
@@ -284,6 +288,12 @@ test("centre ramps path", () => {
     blockingUpHeight,
     blockingDownHeight
   );
+  expect(WT.isNeighbourAccessible(3, 4, WT.DirectionBit.East, blockingGrid)).toBe(true);
+  expect(WT.isNeighbourAccessible(3, 4, WT.DirectionBit.West, blockingGrid)).toBe(true);
+  expect(WT.isNeighbourAccessible(4, 4, WT.DirectionBit.East, blockingGrid)).toBe(true);
+  expect(WT.isNeighbourAccessible(4, 4, WT.DirectionBit.West, blockingGrid)).toBe(true);
+  expect(WT.isNeighbourAccessible(5, 4, WT.DirectionBit.East, blockingGrid)).toBe(true);
+  expect(WT.isNeighbourAccessible(5, 4, WT.DirectionBit.West, blockingGrid)).toBe(true);
 
   // straight across
   let path = WT.findPath(

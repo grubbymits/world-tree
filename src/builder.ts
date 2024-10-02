@@ -93,17 +93,6 @@ export function buildTerrainShapeGrid(terraceGrid: Array<Uint8Array>,
     terrainShapes[y] = new Uint8Array(cellsX).fill(TerrainShape.Flat);
   }
 
-  // If ramps are requested, all ramps are supported.
-  const rampToShape = new Map<RampShape, TerrainShape>([
-    [ RampShape.North,  TerrainShape.RampNorth ],
-    [ RampShape.East,   TerrainShape.RampEast ],
-    [ RampShape.South,  TerrainShape.RampSouth ],
-    [ RampShape.West,   TerrainShape.RampWest ],
-  ]);
-  for (let ramp of ramps) {
-    terrainShapes[ramp.y][ramp.x] = rampToShape.get(ramp.shape)!;
-  }
-
   const edgeToShape = new Map<EdgeShape, Uint8Array>([
     [ EdgeShape.None,
       new Uint8Array([ TerrainShape.Flat ])
@@ -212,6 +201,18 @@ export function buildTerrainShapeGrid(terraceGrid: Array<Uint8Array>,
       terrainShapes[edge.y][edge.x] = defaultWall;
     }
   }
+
+  // If ramps are requested, all ramps are supported.
+  const rampToShape = new Map<RampShape, TerrainShape>([
+    [ RampShape.North,  TerrainShape.RampNorth ],
+    [ RampShape.East,   TerrainShape.RampEast ],
+    [ RampShape.South,  TerrainShape.RampSouth ],
+    [ RampShape.West,   TerrainShape.RampWest ],
+  ]);
+  for (let ramp of ramps) {
+    terrainShapes[ramp.y][ramp.x] = rampToShape.get(ramp.shape)!;
+  }
+
   return terrainShapes;
 }
 

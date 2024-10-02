@@ -131,9 +131,7 @@ export class TerrainGrid {
           y,
           this.descriptor.cellHeightGrid
         );
-        const subSurfaceShape = !Terrain.isRamp(terrainShape)
-          ? terrainShape
-          : TerrainShape.Flat;
+        const subSurfaceShape = TerrainShape.Flat;
         while (z > zStop) {
           z--;
           const subSurfacePosition = this.scaleGridToWorld(x, y, z);

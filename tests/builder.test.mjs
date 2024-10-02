@@ -98,9 +98,35 @@ test("all ramps and edges supported", () => {
     ramps
   );
 
+  const edgesToIgnore = [];
+  for (const ramp of ramps) {
+    edgesToIgnore.push({x: ramp.x, y: ramp.y});
+    const terrainShape = shapeGrid[ramp.y][ramp.x];
+    let expectedShape = WT.TerrainShape.Flat;
+    switch (ramp.shape) {
+    case WT.RampShape.North:
+      expectedShape = WT.TerrainShape.RampNorth;
+      break;
+    case WT.RampShape.East:
+      expectedShape = WT.TerrainShape.RampEast;
+      break;
+    case WT.RampShape.South:
+      expectedShape = WT.TerrainShape.RampSouth;
+      break;
+    case WT.RampShape.West:
+      expectedShape = WT.TerrainShape.RampWest;
+      break;
+    }
+    expect(terrainShape).toBe(expectedShape);
+  }
+
   for (const edge of edges) {
+    if (edgesToIgnore.find((ignore) => ignore.x == edge.x && ignore.y == edge.y)) {
+      continue;
+    }
     const terrainShape = shapeGrid[edge.y][edge.x];
     let expectedShape = WT.TerrainShape.Flat;
+
     switch (edge.shape) {
     case WT.EdgeShape.North:
       expectedShape = WT.TerrainShape.NorthEdge;
@@ -173,7 +199,7 @@ test("only flat supported", () => {
   const terraceSpacing = WT.normaliseHeightGrid(heightMap, numTerraces);
   const terraceGrid = WT.buildTerraceGrid(heightMap, terraceSpacing);
   const edges = WT.findEdges(terraceGrid);
-  const ramps = WT.findRamps(terraceGrid, edges);
+  const ramps = [];
 
   WT.Terrain.reset();
   const shapeGrid = WT.buildTerrainShapeGrid(
@@ -209,7 +235,7 @@ test("only flat and wall supported", () => {
   const terraceSpacing = WT.normaliseHeightGrid(heightMap, numTerraces);
   const terraceGrid = WT.buildTerraceGrid(heightMap, terraceSpacing);
   const edges = WT.findEdges(terraceGrid);
-  const ramps = WT.findRamps(terraceGrid, edges);
+  const ramps = [];
 
   WT.Terrain.reset();
   WT.Terrain.setSupportedShape(WT.TerrainShape.Wall);
@@ -246,7 +272,7 @@ test("only basic edges supported", () => {
   const terraceSpacing = WT.normaliseHeightGrid(heightMap, numTerraces);
   const terraceGrid = WT.buildTerraceGrid(heightMap, terraceSpacing);
   const edges = WT.findEdges(terraceGrid);
-  const ramps = WT.findRamps(terraceGrid, edges);
+  const ramps = [];
 
   const supportedShapes = [
     WT.TerrainShape.Flat,

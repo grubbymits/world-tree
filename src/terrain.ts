@@ -13,28 +13,28 @@ import { EntityBounds } from "./bounds.ts";
 
 
 export const enum TerrainShape {
-  Flat,
-  Wall,
-  NorthEdge,
-  EastEdge,
-  NorthEastCorner,
-  SouthEdge,
-  NorthSouthCorridor,
-  SouthEastCorner,
-  EastPeninsula,
-  WestEdge,
-  NorthWestCorner,
-  EastWestCorridor,
-  NorthPeninsula,
-  SouthWestCorner,
-  WestPeninsula,
-  SouthPeninsula,
-  Spire,
-  RampNorth,
-  RampEast,
-  RampSouth,
-  RampWest,
-  Max,
+  Flat,                 // 0
+  Wall,                 // 1
+  NorthEdge,            // 2
+  EastEdge,             // 3
+  NorthEastCorner,      // 4
+  SouthEdge,            // 5
+  NorthSouthCorridor,   // 6
+  SouthEastCorner,      // 7
+  EastPeninsula,        // 8
+  WestEdge,             // 9
+  NorthWestCorner,      // 10
+  EastWestCorridor,     // 11
+  NorthPeninsula,       // 12
+  SouthWestCorner,      // 13
+  WestPeninsula,        // 14
+  SouthPeninsula,       // 15
+  Spire,                // 16
+  RampNorth,            // 17
+  RampEast,             // 18
+  RampSouth,            // 19
+  RampWest,             // 20
+  Max,                  // 21
 }
 
 export const enum TerrainType {
