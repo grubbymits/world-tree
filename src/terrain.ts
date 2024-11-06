@@ -1,6 +1,3 @@
-import { Direction } from "./navigation.ts";
-import { Dimensions } from "./physics.ts";
-import { PhysicalEntity } from "./entity.ts";
 import {
   GraphicComponent,
   Sprite,
@@ -8,9 +5,6 @@ import {
   StaticGraphicComponent,
 } from "./graphics.ts";
 import { ContextImpl } from "./context.ts";
-import { Point3D } from "./geometry.ts";
-import { EntityBounds } from "./bounds.ts";
-
 
 export const enum TerrainShape {
   Flat,                 // 0
