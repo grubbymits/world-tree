@@ -3,8 +3,6 @@ export * from "./navigation.ts";
 export * from "./queue.ts";
 export * from "./graphics.ts";
 export * from "./scene.ts";
-export * from "./terrain.ts";
-export * from "./builder.ts";
 export * from "./context.ts";
 export * from "./physics.ts";
 export * from "./entity.ts";
@@ -19,4 +17,4 @@ export * from "./audio.ts";
 export * from "./control.ts";
 export * from "./terraform.ts";
 export * from "./utils.ts";
-
+export * from "./terrain-graphics.ts";

@@ -1,10 +1,10 @@
 import { ContextImpl } from './context.ts';
 import { Biome } from './biomes.ts';
+import { TerrainGraphics } from './terrain-graphics.ts';
 import {
-  Terrain,
   TerrainShape,
   TerrainType,
-} from './terrain.ts';
+} from './terraform.ts';
 import {
   Direction,
   Navigation
@@ -122,7 +122,7 @@ export class TerrainGrid {
           position,
           this.descriptor.tileDimensions
         );
-        entity.addGraphic(Terrain.graphics(terrainType, terrainShape));
+        entity.addGraphic(TerrainGraphics.graphics(terrainType, terrainShape));
         this.surfaceGeometry[y][x] = entity.geometry;
         this._totalSurface++;
 
@@ -140,7 +140,7 @@ export class TerrainGrid {
             subSurfacePosition,
             this.descriptor.tileDimensions
           );
-          subSurfaceEntity.addGraphic(Terrain.graphics(terrainType, subSurfaceShape));
+          subSurfaceEntity.addGraphic(TerrainGraphics.graphics(terrainType, subSurfaceShape));
           this._totalSubSurface++;
         }
       }

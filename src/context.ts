@@ -1,15 +1,22 @@
 import { AudioController } from "./audio.ts";
 import { MovableEntity, PhysicalEntity } from "./entity.ts";
-import { Terrain, TerrainType, TerrainSpriteDescriptor } from "./terrain.ts";
+import {
+  TerrainGraphics,
+  TerrainSpriteDescriptor,
+} from "./terrain-graphics.ts";
 import { TerrainGrid, TerrainGridDescriptorImpl } from "./grid.ts";
+import {
+  buildBiomes,
+} from "./biomes.ts";
 import {
   normaliseHeightGrid,
   buildTerraceGrid,
   buildTerrainShapeGrid,
   buildTerrainTypeGrid,
-  buildBiomes
-} from "./builder.ts";
-import { findEdges, findRamps } from "./terraform.ts";
+  findEdges,
+  findRamps,
+  TerrainType,
+} from "./terraform.ts";
 import { EntityEvent } from "./events.ts";
 import { BiomeConfig } from "./biomes.ts";
 import {
@@ -61,7 +68,7 @@ export class ContextImpl implements Context {
 
   static reset(): void {
     PhysicalEntity.reset();
-    Terrain.reset();
+    TerrainGraphics.reset();
     SpriteSheet.reset();
   }
 
@@ -228,7 +235,7 @@ export async function createWorld(worldDesc: WorldDescriptor): Promise<ContextIm
     worldDims,
     perspective,
   );
-  await Terrain.generateSprites(terrainSpriteDesc, context).then(() => {
+  await TerrainGraphics.generateSprites(terrainSpriteDesc, context).then(() => {
     const terraceSpacing = normaliseHeightGrid(
       worldDesc.heightMap, 
       worldDesc.numTerraces

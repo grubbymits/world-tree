@@ -438,3 +438,25 @@ export function addRain(heightGrid: Array<Array<number>>,
   );
   return moisture;
 }
+
+export function buildBiomes(biomeConfig: BiomeConfig,
+                            heightGrid: Array<Array<number>>,
+                            terraceGrid: Array<Uint8Array>): Array<Uint8Array> {
+  let moistureGrid = new Array<Array<number>>();
+  if (biomeConfig.rainfall > 0) {
+    moistureGrid = addRain(
+      heightGrid,
+      terraceGrid,
+      biomeConfig.rainDirection,
+      biomeConfig.rainfall,
+      biomeConfig.waterLine
+    );
+  } else {
+    const cellsY = heightGrid.length;
+    const cellsX = heightGrid[0].length;
+    for (let y = 0; y < cellsY; ++y) {
+      moistureGrid[y] = new Array<number>(cellsX).fill(0);
+    }
+  }
+  return generateBiomeGrid(biomeConfig, heightGrid, moistureGrid);
+}

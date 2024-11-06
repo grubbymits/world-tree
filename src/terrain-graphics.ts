@@ -1,45 +1,18 @@
 import {
-  GraphicComponent,
+  ContextImpl
+} from './context.ts';
+import {
+  getTerrainShapeName,
+  getTerrainTypeName,
+  TerrainShape,
+  TerrainType
+} from './terraform.ts';
+import {
   Sprite,
   SpriteSheet,
+  GraphicComponent,
   StaticGraphicComponent,
-} from "./graphics.ts";
-import { ContextImpl } from "./context.ts";
-
-export const enum TerrainShape {
-  Flat,                 // 0
-  Wall,                 // 1
-  NorthEdge,            // 2
-  EastEdge,             // 3
-  NorthEastCorner,      // 4
-  SouthEdge,            // 5
-  NorthSouthCorridor,   // 6
-  SouthEastCorner,      // 7
-  EastPeninsula,        // 8
-  WestEdge,             // 9
-  NorthWestCorner,      // 10
-  EastWestCorridor,     // 11
-  NorthPeninsula,       // 12
-  SouthWestCorner,      // 13
-  WestPeninsula,        // 14
-  SouthPeninsula,       // 15
-  Spire,                // 16
-  RampNorth,            // 17
-  RampEast,             // 18
-  RampSouth,            // 19
-  RampWest,             // 20
-  Max,                  // 21
-}
-
-export const enum TerrainType {
-  Water,
-  Snow,
-  Sand,
-  Rock,
-  Mud,
-  DryGrass,
-  WetGrass
-}
+} from './graphics.ts';
 
 export interface TerrainSpriteDescriptor {
   spriteWidth: number;
@@ -49,7 +22,7 @@ export interface TerrainSpriteDescriptor {
   tileColumnShapes: Array<TerrainShape>;
 };
 
-export class Terrain {
+export class TerrainGraphics {
   private static readonly defaultSupportedShapes_ = new Map<TerrainShape, boolean>([
     [ TerrainShape.Flat,               true ],
     [ TerrainShape.Wall,               false ],
@@ -107,12 +80,12 @@ export class Terrain {
     if (!this._terrainGraphics.has(terrainType)) {
       console.error(
         "missing graphics for TerrainType:",
-        Terrain.getTypeName(terrainType)
+        getTerrainTypeName(terrainType)
       );
     } else if (!this._terrainGraphics.get(terrainType)!.has(shape)) {
       console.error(
         "missing graphics for TerrainShape:",
-        Terrain.getShapeName(shape)
+        getTerrainShapeName(shape)
       );
     }
     return this._terrainGraphics.get(terrainType)!.get(shape)!;
@@ -163,94 +136,5 @@ export class Terrain {
         }
       }
     });
-  }
-
-  static getShapeName(terrain: TerrainShape): string {
-    switch (terrain) {
-      default:
-        console.error("unhandled terrain shape:", terrain);
-        return "invalid shape";
-      case TerrainShape.Flat:
-        return "TerrainShape.Flat";
-      case TerrainShape.Wall:
-        return "TerrainShape.Wall";
-      case TerrainShape.NorthEdge:
-        return "TerrainShape.NorthEdge";
-      case TerrainShape.EastEdge:
-        return "TerrainShape.EastEdge";
-      case TerrainShape.NorthEastCorner:
-        return "TerrainShape.NorthEastCorner";
-      case TerrainShape.SouthEdge:
-        return "TerrainShape.SouthEdge";
-      case TerrainShape.NorthSouthCorridor:
-        return "TerrainShape.NorthSouthCorridor";
-      case TerrainShape.SouthEastCorner:
-        return "TerrainShape.SouthEastCorner";
-      case TerrainShape.EastPeninsula:
-        return "TerrainShape.EastPeninsula";
-      case TerrainShape.WestEdge:
-        return "TerrainShape.WestEdge";
-      case TerrainShape.NorthWestCorner:
-        return "TerrainShape.NorthWestCorner";
-      case TerrainShape.EastWestCorridor:
-        return "TerrainShape.EastWestCorridor";
-      case TerrainShape.NorthPeninsula:
-        return "TerrainShape.NorthPeninsula";
-      case TerrainShape.SouthWestCorner:
-        return "TerrainShape.SouthWestCorner";
-      case TerrainShape.WestPeninsula:
-        return "TerrainShape.WestPeninsula";
-      case TerrainShape.SouthPeninsula:
-        return "TerrainShape.SouthPeninsula";
-      case TerrainShape.Spire:
-        return "TerrainShape.Spire";
-      case TerrainShape.RampNorth:
-        return "TerrainShape.RampNorth";
-      case TerrainShape.RampEast:
-        return "TerrainShape.RampEast";
-      case TerrainShape.RampSouth:
-        return "TerrainShape.RampSouth";
-      case TerrainShape.RampWest:
-        return "TerrainShape.RampWest";
-    }
-  }
-
-  static getTypeName(terrain: TerrainType): string {
-    switch (terrain) {
-      default:
-        console.error("unhandled terrain type:", terrain);
-        return "invalid terrain";
-      case TerrainType.Water:
-        return "TerrainType.Water";
-      case TerrainType.Snow:
-        return "TerrainType.Snow";
-      case TerrainType.Sand:
-        return "TerrainType.Sand";
-      case TerrainType.Rock:
-        return "TerrainType.Rock";
-      case TerrainType.Mud:
-        return "TerrainType.Mud";
-      case TerrainType.DryGrass:
-        return "TerrainType.DryGrass";
-      case TerrainType.WetGrass:
-        return "TerrainType.WetGrass";
-    }
-  }
-
-  static isRamp(terrain: TerrainShape): boolean {
-    switch (terrain) {
-      default:
-        break;
-      case TerrainShape.RampNorth:
-      case TerrainShape.RampEast:
-      case TerrainShape.RampSouth:
-      case TerrainShape.RampWest:
-        return true;
-    }
-    return false;
-  }
-
-  static isEdge(terrain: TerrainShape): boolean {
-    return !Terrain.isRamp(terrain) && terrain != TerrainShape.Flat;
   }
 }
