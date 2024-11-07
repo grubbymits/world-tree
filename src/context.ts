@@ -1,9 +1,5 @@
 import { AudioController } from "./audio.ts";
 import { MovableEntity, PhysicalEntity } from "./entity.ts";
-import {
-  TerrainGraphics,
-  TerrainSpriteDescriptor,
-} from "./terrain-graphics.ts";
 import { TerrainGrid, TerrainGridDescriptorImpl } from "./grid.ts";
 import {
   buildBiomes,
@@ -16,6 +12,8 @@ import {
   findEdges,
   findRamps,
   TerrainType,
+  TerrainGraphics,
+  TerrainSpriteDescriptor,
 } from "./terraform.ts";
 import { EntityEvent } from "./events.ts";
 import { BiomeConfig } from "./biomes.ts";

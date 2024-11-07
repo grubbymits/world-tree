@@ -1,7 +1,7 @@
 import { ContextImpl } from './context.ts';
 import { Biome } from './biomes.ts';
-import { TerrainGraphics } from './terrain-graphics.ts';
 import {
+  TerrainGraphics,
   TerrainShape,
   TerrainType,
 } from './terraform.ts';

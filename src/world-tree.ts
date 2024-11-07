@@ -17,4 +17,3 @@ export * from "./audio.ts";
 export * from "./control.ts";
 export * from "./terraform.ts";
 export * from "./utils.ts";
-export * from "./terrain-graphics.ts";
