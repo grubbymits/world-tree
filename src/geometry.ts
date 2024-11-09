@@ -28,9 +28,9 @@ export class Vector2D {
   }
 
   normalise(): Vector2D {
-    const mag = this.mag();
-    const x = this.x / mag;
-    const y = this.y / mag;
+    const magDiv = 1 / this.mag();
+    const x = this.x * magDiv;
+    const y = this.y * magDiv;
     return new Vector2D(x, y);
   }
 
@@ -256,10 +256,10 @@ export class Vector3D {
   }
 
   norm(): Vector3D {
-    const mag = this.mag();
-    const x = this.x / mag;
-    const y = this.y / mag;
-    const z = this.z / mag;
+    const magDiv = 1 / this.mag();
+    const x = this.x * magDiv;
+    const y = this.y * magDiv;
+    const z = this.z * magDiv;
     return new Vector3D(x, y, z);
   }
 
