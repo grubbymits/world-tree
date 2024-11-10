@@ -1,7 +1,7 @@
 import * as WT from "../dist/world-tree.mjs";
 
-function run_test(width, height, scale) {
-  const gradLattice = new WT.GradientLattice(width, height, scale);
+function run_test(width, height, scale, factor) {
+  const gradLattice = new WT.ValueGradientLattice(width, height, scale, factor);
   const gradients = gradLattice.gradients;
   const lattice = gradLattice.lattice;
   const noise = gradLattice.noise;
@@ -33,25 +33,36 @@ function run_test(width, height, scale) {
       }
     }
   }
+
+  for (let y = 0; y < noise.length; ++y) {
+    for (let x = 0; x < noise[y].length; ++x) {
+      const value = noise[y][x];
+      expect(value).toBeGreaterThanOrEqual(-factor);
+      expect(value).toBeLessThanOrEqual(factor);
+    }
+  }
 }
 
-test('2x2x2', () => {
+test('2x2x2x1', () => {
   const width = 2;
   const height = 2;
   const scale = 2;
-  run_test(width, height, scale);
+  const factor = 1;
+  run_test(width, height, scale, factor);
 });
 
-test('3x3x3', () => {
+test('3x3x3x2', () => {
   const width = 6;
   const height = 6;
   const scale = 3;
-  run_test(width, height, scale);
+  const factor = 2;
+  run_test(width, height, scale, factor);
 });
 
-test('6x4x2', () => {
+test('6x4x5', () => {
   const width = 6;
   const height = 4;
   const scale = 2;
-  run_test(width, height, scale);
+  const factor = 5;
+  run_test(width, height, scale, factor);
 });

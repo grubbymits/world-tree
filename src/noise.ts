@@ -14,7 +14,7 @@ function lerp(t: number, x0: number, x1: number): number {
   return x0 + t * (x1 - x0);
 }
 
-function smooth(x: number): number {
+function smoothstep(x: number): number {
   return x * x * (3 - 2 * x);
 }
 
@@ -33,7 +33,7 @@ function smooth(x: number): number {
 //
 //  *  +  *  +  *  +  *
 
-export class GradientLattice {
+export class ValueGradientLattice {
   private _latticeWidth: number;
   private _latticeHeight: number;
   private _gradientWidth: number;
@@ -44,7 +44,8 @@ export class GradientLattice {
 
   constructor(private readonly _width: number,
               private readonly _height: number,
-              private readonly _scale: number) {
+              private readonly _scale: number,
+              private readonly _factor: number) {
 
     // lattice = noise + 1;
     // gradient = (lattice + (scale - 1)) / scale;
@@ -97,18 +98,22 @@ export class GradientLattice {
 
     for (let y = 0; y < this.noise.length; ++y) {
       const row = this.noise[y];
-      const wy = 1; //smoothstep();
+      const fy = (y % this.scale) * scaleDiv;
+      const gy = Math.floor(y * scaleDiv);
+      const wy = smoothstep(fy);
       for (let x = 0; x < row.length; ++x) {
         const f00 = f(x, y);
         const f01 = f(x, y + 1);
         const f10 = f(x + 1, y);
         const f11 = f(x + 1, y + 1);
-        const wx = 1; //smoothstep();
-        const a00 = f00;
-        const a10 = f10 - f00;
-        const a01 = f01 - f00;
-        const a11 = f11 - f10 - f01 + f00;
-        row[x] = a00 + (a10 * x * wx) + (a01 * y * wy) + (a11 * x * y);
+        const fx = (x % this.scale) * scaleDiv;
+        const gx = Math.floor(x * scaleDiv);
+        const wx = smoothstep(fx);
+        const lerpx = lerp(wx, f00, f10);
+        const lerpy = lerp(wx, f01, f11);
+        const value_noise = lerp(wy, lerpx, lerpy);
+        const grad_noise = (this.gradients[gy][gx*2] + this.gradients[gy][gx*2+1]) * 0.5;
+        row[x] = this.factor * (value_noise + grad_noise) * 0.5;
       }
     }
   }
@@ -116,6 +121,7 @@ export class GradientLattice {
   get width(): number { return this._width; }
   get height(): number { return this._height; }
   get scale(): number { return this._scale; }
+  get factor(): number { return this._factor; }
   get latticeWidth(): number { return this._latticeWidth; }
   set latticeWidth(w: number) { this._latticeWidth = w; }
   get latticeHeight(): number { return this._latticeHeight; }
