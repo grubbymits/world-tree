@@ -1,22 +1,11 @@
 import * as WT from "../../../dist/world-tree.mjs";
 
+const heightMap = new WT.ValueGradientLattice(20, 20, 4, 3).noise;
 const worldDescriptor = {
   canvasName: "demoCanvas",
   projection: "TwoByOneIsometric",
-  heightMap: [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 1, 2, 2, 2, 2, 1, 1, 1, 1, 0],
-    [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
-    [0, 1, 2, 2, 3, 3, 3, 2, 2, 1, 0],
-    [0, 1, 2, 3, 3, 4, 3, 2, 2, 1, 0],
-    [0, 1, 2, 2, 3, 3, 3, 2, 2, 1, 0],
-    [0, 1, 2, 2, 2, 2, 2, 2, 2, 1, 0],
-    [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
-    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  ],
-  numTerraces: 3,
+  heightMap: heightMap,
+  numTerraces: 4,
   defaultTerrainType: WT.TerrainType.DryGrass,
   biomeConfig: {
     waterLine: 0,

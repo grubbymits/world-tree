@@ -236,15 +236,30 @@ export function findRamps(terraceGrid: TerraceGrid,
   const maxY = terraceGrid.length - distance;
   const ramps = new Array<Ramp>();
 
-  const isRampAt = (x: number, y: number): boolean => {
-    return ramps.some((ramp) => ramp.x == x && ramp.y == y);
+  const edgesToAvoid = [
+    EdgeShape.North,
+    EdgeShape.East,
+    EdgeShape.South,
+    EdgeShape.West,
+    EdgeShape.NorthPeninsula,
+    EdgeShape.EastPeninsula,
+    EdgeShape.SouthPeninsula,
+    EdgeShape.WestPeninsula,
+  ];
+
+  const avoidEdgeAt = (x: number, y: number): boolean => {
+    const edge = edges.find((edge) => edge.x == x && edge.y == y);
+    if (edge != undefined) {
+      return edgesToAvoid.some((avoid) => avoid == edge.shape);
+    };
+    return false;
   };
 
   const areNeighbourTerracesEqual = (x: number, y: number, direction: number) => {
     const offset = neighbourOffsets[direction];
     const closestNeighbourX = x + offset.x;
     const closestNeighbourY = y + offset.y;
-    if (isRampAt(closestNeighbourX, closestNeighbourY)) {
+    if (avoidEdgeAt(closestNeighbourX, closestNeighbourY)) {
       return false;
     }
     const centreTerrace = terraceGrid[y][x];
@@ -263,7 +278,7 @@ export function findRamps(terraceGrid: TerraceGrid,
     const offset = neighbourOffsets[direction];
     const closestNeighbourX = x + offset.x;
     const closestNeighbourY = y + offset.y;
-    if (isRampAt(closestNeighbourX, closestNeighbourY)) {
+    if (avoidEdgeAt(closestNeighbourX, closestNeighbourY)) {
       return false;
     }
     const centreTerrace = terraceGrid[y][x];
@@ -317,6 +332,10 @@ export function findRamps(terraceGrid: TerraceGrid,
     }
   }
 
+  const isRampAt = (x: number, y: number): boolean => {
+    return ramps.some((ramp) => ramp.x == x && ramp.y == y);
+  };
+
   // Adding ramps will create more edges...
   const addEdge = (x: number, y: number, offset: Coord,
                    edgeShape: EdgeShape) => {
@@ -328,9 +347,9 @@ export function findRamps(terraceGrid: TerraceGrid,
     const edge = edges.find((edge) => edge.x == neighbourX && edge.y == neighbourY);
     if (edge != undefined) {
       edge.addCardinalEdge(edgeShape);
-      return;
+    } else {
+      edges.push(new Edge(edgeShape, neighbourX, neighbourY));
     }
-    edges.push(new Edge(edgeShape, neighbourX, neighbourY));
   }
   for (const ramp of ramps) {
     const x = ramp.x;

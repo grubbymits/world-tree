@@ -1,28 +1,22 @@
 import * as WT from "../../../dist/world-tree.mjs";
 
+const width = 20;
+const depth = 20;
+const scale = 2;
+const numTerraces = 2;
+const heightMap =
+  new WT.ValueGradientLattice(width, depth, scale, numTerraces).noise;
 const worldDescriptor = {
   canvasName: "demoCanvas",
   projection: "TwoByOneIsometric",
-  heightMap: [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-    [0, 1, 2, 2, 2, 2, 1, 1, 1, 0, 0],
-    [0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0],
-    [0, 1, 1, 3, 3, 2, 3, 2, 2, 1, 0],
-    [0, 1, 2, 3, 3, 3, 3, 2, 2, 1, 0],
-    [0, 1, 1, 3, 3, 3, 3, 2, 2, 1, 0],
-    [0, 0, 1, 2, 3, 2, 2, 2, 2, 1, 0],
-    [0, 1, 1, 1, 1, 2, 2, 2, 1, 0, 0],
-    [0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  ],
-  numTerraces: 3,
+  heightMap: heightMap,
+  numTerraces: numTerraces,
   hasRamps: true,
   defaultTerrainType: WT.TerrainType.DryGrass,
   terrainSpriteDescriptor: {
     spriteWidth: 161,
     spriteHeight: 125,
-    spriteSheetName: "graphics/png/outside-tiles-muted-161x125",
+    spriteSheetName: "graphics/png/grass-all-shapes-161x125",
     tileRowTypes: [
       WT.TerrainType.DryGrass,
     ],
