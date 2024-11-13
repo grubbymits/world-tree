@@ -33,14 +33,13 @@ function smoothstep(x: number): number {
 //
 //  *  +  *  +  *  +  *
 
-export class ValueGradientLattice {
+export class LatticeNoise  {
   private _latticeWidth: number;
   private _latticeHeight: number;
   private _gradientWidth: number;
   private _gradientHeight: number;
   private _gradients: Array<Float64Array>;
   private _lattice: Array<Float64Array>;
-  private _noise: Array<Float64Array>;
 
   constructor(private readonly _width: number,
               private readonly _height: number,
@@ -73,10 +72,6 @@ export class ValueGradientLattice {
     for (let y = 0; y < this.lattice.length; ++y) {
       this.lattice[y] = new Float64Array(this.latticeWidth);
     }
-    this.noise = new Array<Float64Array>(this.height);
-    for (let y = 0; y < this.noise.length; ++y) {
-      this.noise[y] = new Float64Array(this.width);
-    }
 
     // Populate the lattice with a dot product of the gradient
     // and the fractional relative position.
@@ -91,29 +86,6 @@ export class ValueGradientLattice {
         const gx = in_row[ix * 2];
         const gy = in_row[ix * 2 + 1];
         out_row[x] = fx * gx + fy * gy;
-      }
-    }
-
-    const f = (x: number, y: number): number => this.lattice[y][x];
-
-    for (let y = 0; y < this.noise.length; ++y) {
-      const row = this.noise[y];
-      const fy = (y % this.scale) * scaleDiv;
-      const gy = Math.floor(y * scaleDiv);
-      const wy = smoothstep(fy);
-      for (let x = 0; x < row.length; ++x) {
-        const f00 = f(x, y);
-        const f01 = f(x, y + 1);
-        const f10 = f(x + 1, y);
-        const f11 = f(x + 1, y + 1);
-        const fx = (x % this.scale) * scaleDiv;
-        const gx = Math.floor(x * scaleDiv);
-        const wx = smoothstep(fx);
-        const lerpx = lerp(wx, f00, f10);
-        const lerpy = lerp(wx, f01, f11);
-        const value_noise = lerp(wy, lerpx, lerpy);
-        const grad_noise = (this.gradients[gy][gx*2] + this.gradients[gy][gx*2+1]) * 0.5;
-        row[x] = this.factor * (value_noise + grad_noise) * 0.5;
       }
     }
   }
@@ -134,6 +106,47 @@ export class ValueGradientLattice {
   set gradients(g: Array<Float64Array>) { this._gradients = g; }
   get lattice(): Array<Float64Array> { return this._lattice; }
   set lattice(v: Array<Float64Array>) { this._lattice = v; }
-  get noise(): Array<Float64Array> { return this._noise; }
-  set noise(n: Array<Float64Array>) { this._noise = n; }
+
+  get value(): Array<Float64Array> {
+    const noise = new Array<Float64Array>(this.height);
+    for (let y = 0; y < noise.length; ++y) {
+      noise[y] = new Float64Array(this.width);
+    }
+    const f = (x: number, y: number): number => this.lattice[y][x];
+    const scaleDiv = 1 / this.scale;
+    for (let y = 0; y < noise.length; ++y) {
+      const row = noise[y];
+      const fy = (y % this.scale) * scaleDiv;
+      const wy = smoothstep(fy);
+      for (let x = 0; x < row.length; ++x) {
+        const f00 = f(x, y);
+        const f01 = f(x, y + 1);
+        const f10 = f(x + 1, y);
+        const f11 = f(x + 1, y + 1);
+        const fx = (x % this.scale) * scaleDiv;
+        const wx = smoothstep(fx);
+        const lerpx = lerp(wx, f00, f10);
+        const lerpy = lerp(wx, f01, f11);
+        const value_noise = lerp(wy, lerpx, lerpy);
+        row[x] = value_noise;
+      }
+    }
+    return noise;
+  }
+
+  get valueGradient(): Array<Float64Array> {
+    const noise = this.value;
+    const scaleDiv = 1 / this.scale;
+    for (let y = 0; y < noise.length; ++y) {
+      const row = noise[y];
+      const gy = Math.floor(y * scaleDiv);
+      for (let x = 0; x < row.length; ++x) {
+        const gx = Math.floor(x * scaleDiv);
+        const grad_noise =
+          (this.gradients[gy][gx*2] + this.gradients[gy][gx*2+1]) * 0.5;
+        row[x] = this.factor * (row[x] + grad_noise) * 0.5;
+      }
+    }
+    return noise;
+  }
 }

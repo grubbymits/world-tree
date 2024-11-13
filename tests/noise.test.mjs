@@ -1,10 +1,10 @@
 import * as WT from "../dist/world-tree.mjs";
 
 function run_test(width, height, scale, factor) {
-  const gradLattice = new WT.ValueGradientLattice(width, height, scale, factor);
+  const gradLattice = new WT.LatticeNoise(width, height, scale, factor);
   const gradients = gradLattice.gradients;
   const lattice = gradLattice.lattice;
-  const noise = gradLattice.noise;
+  const noise = gradLattice.valueGradient;
 
   expect(noise.length).toBe(height);
   expect(noise[0].length).toBe(width);
