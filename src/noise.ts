@@ -34,10 +34,6 @@ function smoothstep(x: number): number {
 //  *  +  *  +  *  +  *
 
 export class LatticeNoise  {
-  private _latticeWidth: number;
-  private _latticeHeight: number;
-  private _gradientWidth: number;
-  private _gradientHeight: number;
   private _gradients: Array<Float64Array>;
   private _lattice: Array<Float64Array>;
 
@@ -49,16 +45,16 @@ export class LatticeNoise  {
     // lattice = noise + 1;
     // gradient = (lattice + (scale - 1)) / scale;
     const scaleDiv = 1 / this.scale;
-    this.latticeWidth = this.width + 1;
-    this.latticeHeight = this.height + 1;
-    this.gradientWidth = (this.latticeWidth + (this.scale - 1)) * scaleDiv;
-    this.gradientHeight = (this.latticeHeight + (this.scale - 1)) * scaleDiv;
+    const latticeWidth = this.width + 1;
+    const latticeHeight = this.height + 1;
+    const gradientWidth = (latticeWidth + (this.scale - 1)) * scaleDiv;
+    const gradientHeight = (latticeHeight + (this.scale - 1)) * scaleDiv;
 
     // Create 2D grid of normalised 2D vectors.
-    this.gradients = new Array<Float64Array>(this.gradientHeight);
+    this.gradients = new Array<Float64Array>(gradientHeight);
     for (let y = 0; y < this.gradients.length; ++y) {
       // * 2 to store x and y.
-      this.gradients[y] = new Float64Array(this.gradientWidth * 2);
+      this.gradients[y] = new Float64Array(gradientWidth * 2);
       const row = this.gradients[y];
       for (let x = 0; x < row.length; ++x) {
         const grad = normVector2D(-1, 1);
@@ -68,9 +64,9 @@ export class LatticeNoise  {
     }
 
     // Create the 2D lattice and the noise output
-    this.lattice = new Array<Float64Array>(this.latticeHeight);
+    this.lattice = new Array<Float64Array>(latticeHeight);
     for (let y = 0; y < this.lattice.length; ++y) {
-      this.lattice[y] = new Float64Array(this.latticeWidth);
+      this.lattice[y] = new Float64Array(latticeWidth);
     }
 
     // Populate the lattice with a dot product of the gradient
@@ -94,14 +90,6 @@ export class LatticeNoise  {
   get height(): number { return this._height; }
   get scale(): number { return this._scale; }
   get factor(): number { return this._factor; }
-  get latticeWidth(): number { return this._latticeWidth; }
-  set latticeWidth(w: number) { this._latticeWidth = w; }
-  get latticeHeight(): number { return this._latticeHeight; }
-  set latticeHeight(h: number) { this._latticeHeight = h; }
-  get gradientWidth(): number { return this._gradientWidth; }
-  set gradientWidth(w: number) { this._gradientWidth = w; }
-  get gradientHeight(): number { return this._gradientHeight; }
-  set gradientHeight(h: number) { this._gradientHeight = h; }
   get gradients(): Array<Float64Array> { return this._gradients; }
   set gradients(g: Array<Float64Array>) { this._gradients = g; }
   get lattice(): Array<Float64Array> { return this._lattice; }
