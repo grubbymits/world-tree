@@ -1,14 +1,19 @@
 import * as WT from "../../../dist/world-tree.mjs";
 
-const heightMap = new WT.ValueGradientLattice(20, 20, 4, 3).noise;
+const width = 20;
+const depth = 20;
+const scale = 4;
+const factor = 3;
+const numTerraces = 3;
+const lattice = new WT.LatticeNoise(width, depth, scale, factor);
 const worldDescriptor = {
   canvasName: "demoCanvas",
   projection: "TwoByOneIsometric",
-  heightMap: heightMap,
-  numTerraces: 4,
+  heightMap: lattice.valueGradientNoise(),
+  numTerraces: numTerraces,
   defaultTerrainType: WT.TerrainType.DryGrass,
   biomeConfig: {
-    waterLine: 0,
+    waterLine: 1,
     rainfall: 50,
     rainDirection: WT.Direction.North,
     uplandThreshold: 4,
@@ -16,7 +21,7 @@ const worldDescriptor = {
   terrainSpriteDescriptor: {
     spriteWidth: 161,
     spriteHeight: 124,
-    spriteSheetName: "graphics/png/flat-tiles-162x124",
+    spriteSheetName: "graphics/png/flat-tiles-162x123",
     tileRowTypes: [
       WT.TerrainType.WetGrass,
       WT.TerrainType.DryGrass,
@@ -24,6 +29,7 @@ const worldDescriptor = {
       WT.TerrainType.Sand,
       WT.TerrainType.Rock,
       WT.TerrainType.Snow,
+      WT.TerrainType.Water,
     ],
     tileColumnShapes: [
       WT.TerrainShape.Flat,

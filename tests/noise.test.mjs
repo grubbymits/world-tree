@@ -4,7 +4,7 @@ function run_test(width, height, scale, factor) {
   const gradLattice = new WT.LatticeNoise(width, height, scale, factor);
   const gradients = gradLattice.gradients;
   const lattice = gradLattice.lattice;
-  const noise = gradLattice.valueGradient;
+  const noise = gradLattice.valueGradientNoise(WT.bilinear);
 
   expect(noise.length).toBe(height);
   expect(noise[0].length).toBe(width);

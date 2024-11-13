@@ -2,14 +2,14 @@ import * as WT from "../../../dist/world-tree.mjs";
 
 const width = 20;
 const depth = 20;
-const scale = 2;
+const scale = 4;
+const factor = 2;
 const numTerraces = 2;
-const heightMap =
-  new WT.ValueGradientLattice(width, depth, scale, numTerraces).noise;
+const lattice = new WT.LatticeNoise(width, depth, scale, factor);
 const worldDescriptor = {
   canvasName: "demoCanvas",
   projection: "TwoByOneIsometric",
-  heightMap: heightMap,
+  heightMap: lattice.valueGradientNoise(WT.bilinear),
   numTerraces: numTerraces,
   hasRamps: true,
   defaultTerrainType: WT.TerrainType.DryGrass,

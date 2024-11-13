@@ -10,12 +10,39 @@ function normVector2D(min: number, max: number): Vector2D {
   return new Vector2D(x, y).normalise();
 }
 
-function lerp(t: number, x0: number, x1: number): number {
-  return x0 + t * (x1 - x0);
+type InterpolateCallback =
+  (latticeNoise: LatticeNoise, x: number, y: number) => number;
+
+export function bilinear(noise: LatticeNoise,
+                         x: number, y: number) {
+  const scaleDiv = 1 / noise.scale;
+  const fx = (x % noise.scale) * scaleDiv;
+  const fy = (y % noise.scale) * scaleDiv;
+
+  const smoothstep = (x: number): number => x * x * (3 - 2 * x);
+  const wx = smoothstep(fx);
+  const wy = smoothstep(fy);
+
+  const n00 = noise.getLatticeValue(x, y);
+  const n01 = noise.getLatticeValue(x, y + 1);
+  const n10 = noise.getLatticeValue(x + 1, y);
+  const n11 = noise.getLatticeValue(x + 1, y + 1);
+
+  const lerp = (t: number, x0: number, x1: number): number => {
+    return x0 + t * (x1 - x0);
+  }
+  const lerpx = lerp(wx, n00, n10);
+  const lerpy = lerp(wx, n01, n11);
+  return lerp(wy, lerpx, lerpy);
 }
 
-function smoothstep(x: number): number {
-  return x * x * (3 - 2 * x);
+export function quadraticMean(noise: LatticeNoise,
+                              x: number, y: number) {
+  const n00 = noise.getLatticeValue(x, y);
+  const n01 = noise.getLatticeValue(x, y + 1);
+  const n10 = noise.getLatticeValue(x + 1, y);
+  const n11 = noise.getLatticeValue(x + 1, y + 1);
+  return Math.sqrt((n00 * n00 + n01 * n01 + n10 * n10 + n11 * n11) * 0.25);
 }
 
 // gradients will be generated for '*', then scaled at '+':
@@ -95,35 +122,27 @@ export class LatticeNoise  {
   get lattice(): Array<Float64Array> { return this._lattice; }
   set lattice(v: Array<Float64Array>) { this._lattice = v; }
 
-  get value(): Array<Float64Array> {
+  getLatticeValue(x: number, y: number) {
+    return this.lattice[y][x];
+  }
+
+  interpolateLattice(interpolate = quadraticMean): Array<Float64Array> {
     const noise = new Array<Float64Array>(this.height);
     for (let y = 0; y < noise.length; ++y) {
       noise[y] = new Float64Array(this.width);
     }
-    const f = (x: number, y: number): number => this.lattice[y][x];
-    const scaleDiv = 1 / this.scale;
     for (let y = 0; y < noise.length; ++y) {
       const row = noise[y];
-      const fy = (y % this.scale) * scaleDiv;
-      const wy = smoothstep(fy);
       for (let x = 0; x < row.length; ++x) {
-        const f00 = f(x, y);
-        const f01 = f(x, y + 1);
-        const f10 = f(x + 1, y);
-        const f11 = f(x + 1, y + 1);
-        const fx = (x % this.scale) * scaleDiv;
-        const wx = smoothstep(fx);
-        const lerpx = lerp(wx, f00, f10);
-        const lerpy = lerp(wx, f01, f11);
-        const value_noise = lerp(wy, lerpx, lerpy);
+        const value_noise = interpolate(this, x, y);
         row[x] = value_noise;
       }
     }
     return noise;
   }
 
-  get valueGradient(): Array<Float64Array> {
-    const noise = this.value;
+  valueGradientNoise(interpolate: InterpolateCallback): Array<Float64Array> {
+    const noise = this.interpolateLattice(interpolate);
     const scaleDiv = 1 / this.scale;
     for (let y = 0; y < noise.length; ++y) {
       const row = noise[y];
