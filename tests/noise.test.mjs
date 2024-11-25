@@ -1,29 +1,29 @@
 import * as WT from "../dist/world-tree.mjs";
 
 function run_test(width, height, scale, factor) {
-  const gradLattice = new WT.LatticeNoise(width, height, scale, factor);
+  const gradLattice = new WT.GradientNoise(width, height, scale, factor);
   const gradients = gradLattice.gradients;
   const lattice = gradLattice.lattice;
   const noise = gradLattice.valueGradientNoise(WT.bilinear);
 
   expect(noise.length).toBe(height);
   expect(noise[0].length).toBe(width);
-  expect(lattice.length).toBe(height + 1);
-  expect(lattice[0].length).toBe(width + 1);
-  expect(gradients.length).toBe((lattice.length + scale - 1) / scale);
-  expect(gradients[0].length).toBe(2 * (lattice[0].length + scale - 1) / scale);
+  expect(lattice.height).toBe(height + 1);
+  expect(lattice.width).toBe(width + 1);
+  expect(gradients.height).toBe((lattice.height + scale - 1) / scale);
+  expect(gradients.width).toBe(2 * (lattice.width + scale - 1) / scale);
 
-  for (let y = 0; y < gradients.length; ++y) {
-    for (let x = 0; x < gradients[y].length; ++x) {
-      const value = gradients[y][x];
+  for (let y = 0; y < gradients.height; ++y) {
+    for (let x = 0; x < gradients.width; ++x) {
+      const value = gradients.getValue(x, y);
       expect(value).toBeGreaterThanOrEqual(-1);
       expect(value).toBeLessThanOrEqual(1);
     }
   }
 
-  for (let y = 0; y < lattice.length; ++y) {
-    for (let x = 0; x < lattice[y].length; ++x) {
-      const value = lattice[y][x];
+  for (let y = 0; y < lattice.height; ++y) {
+    for (let x = 0; x < lattice.width; ++x) {
+      const value = lattice.getValue(x, y);
 
       if (x % scale == 0 && y % scale == 0) {
         expect(Math.abs(value)).toBe(0);
