@@ -5,7 +5,7 @@ const depth = 20;
 const scale = 4;
 const factor = 3;
 const numTerraces = 3;
-const lattice = new WT.LatticeNoise(width, depth, scale, factor);
+const lattice = new WT.GradientNoise(width, depth, scale, factor);
 const worldDescriptor = {
   canvasName: "demoCanvas",
   projection: "TwoByOneIsometric",
