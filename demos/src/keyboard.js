@@ -15,26 +15,13 @@ const worldDescriptor = {
     [2, 2, 2, 2, 2, 2, 2, 2, 2],
   ],
   numTerraces: 2,
-  floor: WT.TerrainType.Upland0,
-  wall: WT.TerrainType.Upland1,
+  defaultTerrainType: WT.TerrainType.WetGrass,
   terrainSpriteDescriptor: {
-    spriteWidth: 322,
-    spriteHeight: 270,
-    spriteSheetName: "graphics/png/outside-terrain-tiles-muted-textured",
+    spriteWidth: 161,
+    spriteHeight: 124,
+    spriteSheetName: "graphics/png/flat-tiles-162x123",
     tileRowTypes: [
-      WT.TerrainType.Lowland5,
-      WT.TerrainType.Lowland4,
-      WT.TerrainType.Lowland3,
-      WT.TerrainType.Lowland2,
-      WT.TerrainType.Lowland1,
-      WT.TerrainType.Lowland0,
-      WT.TerrainType.Upland5,
-      WT.TerrainType.Upland4,
-      WT.TerrainType.Upland3,
-      WT.TerrainType.Upland2,
-      WT.TerrainType.Upland1,
-      WT.TerrainType.Upland0,
-      WT.TerrainType.Water,
+      WT.TerrainType.WetGrass,
     ],
     tileColumnShapes: [
       WT.TerrainShape.Flat,
@@ -42,15 +29,6 @@ const worldDescriptor = {
       WT.TerrainShape.RampUpWest,
       WT.TerrainShape.RampUpEast,
       WT.TerrainShape.RampUpNorth,
-      WT.TerrainShape.Wall,
-      WT.TerrainShape.FlatAloneOut,
-      WT.TerrainShape.FlatWestOut,
-      WT.TerrainShape.FlatSouthOut,
-      WT.TerrainShape.FlatSouthWest,
-      WT.TerrainShape.FlatNorthEast,
-      WT.TerrainShape.FlatNorth,
-      WT.TerrainShape.FlatEastOut,
-      WT.TerrainShape.FlatEast,
     ],
   },
 };
@@ -94,7 +72,7 @@ window.onload = async (event) => {
   const x = 4;
   const y = 2;
   const droidPosition =
-    context.grid.getSurfaceLocationAt(x, y).add(new WT.Vector3D(0, 0, 1));
+    context.grid.getCentreSurfaceLocationAt(x, y).add(new WT.Vector3D(0, 0, 1));
   const droid = await createDroid(context, droidPosition);
   const camera = new WT.TrackerCamera(
     context.scene,
