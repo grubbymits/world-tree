@@ -118,6 +118,7 @@ export class OnscreenRenderer implements Renderer {
         }
 
         const ctx2d = ctx.canvas.getContext("2d");
+        ctx2d.save();
         ctx2d.clearRect(0, 0, ctx.width, ctx.height);
         for (let i = 0; i < e.data.length; i += 3) {
           const spriteId = nodes[i];
@@ -125,6 +126,7 @@ export class OnscreenRenderer implements Renderer {
           const y = nodes[i+2];
           ctx2d.drawImage(ctx.sprites[spriteId], x, y);
         }
+        ctx2d.restore();
         break;
       }
     }
