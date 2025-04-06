@@ -163,7 +163,6 @@ export abstract class SceneGraph {
     // there is an order relation x < y between the given pair of elements of the
     // partial order.
     toDraw.forEach((node) => node.clear());
-    let edges = 0;
     for (let i = 0; i < toDraw.length; ++i) {
       const nodeI = toDraw[i];
       for (let j = i + 1; j < toDraw.length; ++j) {
@@ -171,14 +170,11 @@ export abstract class SceneGraph {
         const order = this.drawOrder(nodeI, nodeJ);
         if (RenderOrder.Before == order) {
           nodeI.addSucc(nodeJ);
-          edges++;
         } else if (RenderOrder.After == order) {
           nodeJ.addSucc(nodeI);
-          edges++;
         }
       }
     }
-    //console.log(edges);
 
     this.order = [];
     const discovered = new Set<SceneNode>();
