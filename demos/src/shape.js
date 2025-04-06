@@ -16,7 +16,7 @@ const worldDescriptor = {
   terrainSpriteDescriptor: {
     spriteWidth: 161,
     spriteHeight: 125,
-    spriteSheetName: "graphics/png/grass-all-shapes-161x125",
+    spriteSheetName: "graphics/png/outside-tiles-muted-161x123",
     tileRowTypes: [
       WT.TerrainType.DryGrass,
     ],

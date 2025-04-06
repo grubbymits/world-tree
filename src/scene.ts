@@ -163,19 +163,22 @@ export abstract class SceneGraph {
     // there is an order relation x < y between the given pair of elements of the
     // partial order.
     toDraw.forEach((node) => node.clear());
-
-    for (let i = 0; i < toDraw.length; i++) {
+    let edges = 0;
+    for (let i = 0; i < toDraw.length; ++i) {
       const nodeI = toDraw[i];
       for (let j = i + 1; j < toDraw.length; ++j) {
         const nodeJ = toDraw[j];
         const order = this.drawOrder(nodeI, nodeJ);
         if (RenderOrder.Before == order) {
           nodeI.addSucc(nodeJ);
+          edges++;
         } else if (RenderOrder.After == order) {
           nodeJ.addSucc(nodeI);
+          edges++;
         }
       }
     }
+    //console.log(edges);
 
     this.order = [];
     const discovered = new Set<SceneNode>();
@@ -394,49 +397,16 @@ export enum Perspective {
 // - sides equal length = 1,
 // - the short diagonal is length = 1,
 // - the long diagonal is length = sqrt(3) ~= 1.73.
-export class IsometricPhysicalDimensions extends Dimensions {
-  private static readonly _oneOverSqrt3: number = 1 / Math.sqrt(3);
-
-  static physicalWidth(spriteWidth: number): number {
-    return Math.round(spriteWidth * this._oneOverSqrt3);
-  }
-
-  static physicalDepth(physicalWidth: number, relativeDims: Dimensions) {
-    const depthRatio: number = relativeDims.depth / relativeDims.width;
-    return Math.round(physicalWidth * depthRatio);
-  }
-
-  static physicalHeight(
-    physicalWidth: number,
-    relativeDims: Dimensions
-  ): number {
-    const heightRatio: number = relativeDims.height / relativeDims.width;
-    return Math.round(physicalWidth * heightRatio);
-  }
-
-  constructor(spriteWidth: number, relativeDims: Dimensions) {
-    const width = IsometricPhysicalDimensions.physicalWidth(spriteWidth);
-    const depth = IsometricPhysicalDimensions.physicalDepth(
-      width,
-      relativeDims
-    );
-    const height = IsometricPhysicalDimensions.physicalHeight(
-      width,
-      relativeDims
-    );
-    super(width, depth, height);
-  }
-}
-
 export class TrueIsometric extends SceneGraph {
-  constructor() {
+  constructor(private readonly _spriteWidth: number,
+              private readonly _spriteHeight: number) {
     super();
   }
 
   protected static readonly _sqrt3 = Math.sqrt(3);
   protected static readonly _halfSqrt3 = Math.sqrt(3) * 0.5;
 
-  static getDrawCoord(loc: Point3D): Point2D {
+  getDrawCoord(loc: Point3D): Point2D {
     // An isometric square has:
     // - sides equal length = 1,
     // - the short diagonal is length = 1,
@@ -446,13 +416,9 @@ export class TrueIsometric extends SceneGraph {
 
     // Tiles are placed overlapping each other by half.
     // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
-    const dx = Math.round(this._halfSqrt3 * (loc.x + loc.y));
+    const dx = Math.round(TrueIsometric._halfSqrt3 * (loc.x + loc.y));
     const dy = Math.round(0.5 * (loc.y - loc.x) - loc.z);
     return new Point2D(dx, dy);
-  }
-
-  getDrawCoord(location: Point3D): Point2D {
-    return TrueIsometric.getDrawCoord(location);
   }
 
   drawOrder(first: SceneNode, second: SceneNode): RenderOrder {
@@ -467,7 +433,8 @@ export class TrueIsometric extends SceneGraph {
 // - the short diagonal is length = 2,
 // - the long diagonal is length = 4.
 export class TwoByOneIsometric extends SceneGraph {
-  constructor() {
+  constructor(private readonly _spriteWidth: number,
+              private readonly _spriteHeight: number) {
     super();
   }
 
@@ -478,14 +445,6 @@ export class TwoByOneIsometric extends SceneGraph {
 
   private static readonly _oneOverMagicRatio: number =
     1 / Math.cos(Math.atan(0.5));
-
-  static getDrawCoord(loc: Point3D): Point2D {
-    // Tiles are placed overlapping each other by half.
-    // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
-    const dx = Math.floor((loc.x + loc.y) * 2 * this._oneOverMagicRatio);
-    const dy = Math.floor((loc.y - loc.x - loc.z) * this._oneOverMagicRatio);
-    return new Point2D(dx, dy);
-  }
 
   static getDimensions(spriteWidth: number, spriteHeight: number): Dimensions {
     // We're allowing the height to vary, so its a cuboid, not a cube, but with
@@ -500,16 +459,40 @@ export class TwoByOneIsometric extends SceneGraph {
     const oneUnit = spriteWidth * 0.25;
     const twoUnits = spriteWidth * 0.5;
     const width = oneUnit * this._magicRatio;
-    const depth = width; //twoUnits * Math.sin(Math.atan(0.5));
+    const depth = width;
     const height = (spriteHeight - twoUnits) * this._magicRatio;
-    return new Dimensions(
-      Math.floor(width),
-      Math.floor(depth),
-      Math.floor(height)
+    return new Dimensions(width, depth, height
+      //Math.floor(width),
+      //Math.floor(depth),
+      //Math.floor(height)
     );
   }
 
-  static drawOrder(first: SceneNode, second: SceneNode): RenderOrder {
+  getDrawCoord(loc: Point3D): Point2D {
+    // Tiles are placed overlapping each other by half.
+    // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
+    let dx = ((loc.x + loc.y) * 2 * TwoByOneIsometric._oneOverMagicRatio);
+    let dy = ((loc.y - loc.x - loc.z) * TwoByOneIsometric._oneOverMagicRatio);
+
+    const halfSpriteWidth = this._spriteWidth / 2;
+    const alignX = dx % halfSpriteWidth;
+    if (alignX <= 1) {
+      dx - alignX;
+    } else if (alignX >= halfSpriteWidth - 1) {
+      dx += halfSpriteWidth - alignX;
+    }
+
+    const quarterSpriteHeight = this._spriteHeight / 4;
+    const alignY = dy % quarterSpriteHeight;
+    if (alignY <= 1) {
+      dy - alignY;
+    } else if (alignY >= quarterSpriteHeight - 1) {
+      dy += quarterSpriteHeight - alignY;
+    }
+    return new Point2D(dx, dy);
+  }
+
+  drawOrder(first: SceneNode, second: SceneNode): RenderOrder {
     // https://shaunlebron.github.io/IsometricBlocks/
     // draw coords
     // (0, 0) ______________ x
@@ -535,57 +518,112 @@ export class TwoByOneIsometric extends SceneGraph {
     //        \
     //         y
 
+    const ida = first.entity.id;
+    const idb = second.entity.id;
+    const overlapZ = EntityBounds.axisOverlapZ(ida, idb);
+
     // Draw nodes further from the camera first:
     // - smaller world z.
     // - smaller world y.
     // - larger world x.
-    const ida = first.entity.id;
-    const idb = second.entity.id;
-    if (EntityBounds.axisOverlapZ(ida, idb))  {
+    if (overlapZ) {
+      // Given a grid on the same z-plane:
+      // A B C
+      // E F G
+      // H I J
+      //
+      // The scene needs to be drawn like the following, although the order of
+      // each row doesn't matter:
+      //   C
+      //  B G
+      // A F J
+      //  E I
+      //   H
+      //
+      // We also want to reduce the number of edges created in the graph, so
+      // even though two entities may overlap on the x- or y-axis, they may
+      // be too far away to require ordering. We choose this distance based
+      // upon the larger of the two entities.
+      const minXA = EntityBounds.minX(ida);
+      const maxXA = EntityBounds.maxX(ida);
+      const minYA = EntityBounds.minY(ida);
+      const maxYA = EntityBounds.maxY(ida);
+      const minXB = EntityBounds.minX(idb);
+      const minYB = EntityBounds.minY(idb);
+      const maxXB = EntityBounds.maxX(idb);
+      const maxYB = EntityBounds.maxY(idb);
+
+      // First, calculate whether this entities are horizontally adjacent.
+      const rounding = 0.005;
+      if (maxXA + rounding >= minXB && maxXA + rounding < maxXB &&
+          maxYA + rounding >= minYB && maxYA + rounding < maxYB) {
+        return RenderOrder.Any;
+      } else if (maxXB + rounding >= minXA && maxXB + rounding < maxXA &&
+                 maxYB + rounding >= minYA && maxYB + rounding < maxYA) {
+        return RenderOrder.Any;
+      }
+
+      const maxWidth = Math.max(EntityBounds.width(ida), EntityBounds.width(idb));
+      const distanceX = Math.min(
+        Math.abs(minXA - maxXB),
+        Math.abs(maxXA - minXB)
+      );
+      if (distanceX <= maxWidth) {
+        // Draw smaller Y first.
+        if (maxYA < minYB) {
+          return RenderOrder.Before;
+        }
+        if (maxYB < minYA) {
+          return RenderOrder.After;
+        }
+      }
+      const maxDepth = Math.max(EntityBounds.depth(ida), EntityBounds.depth(idb));
+      const distanceY = Math.min(
+        Math.abs(minYA - maxYB),
+        Math.abs(maxYA - minYB)
+      );
+      if (distanceY <= maxDepth) {
+        // Draw larger X first
+        if (minXA > maxXB) {
+          return RenderOrder.Before;
+        }
+        if (minXB > maxXA) {
+          return RenderOrder.After;
+        }
+      }
+      const overlapX = EntityBounds.axisOverlapX(ida, idb);
+      const overlapY = EntityBounds.axisOverlapY(ida, idb);
       // For ramps, draw the lower entity first.
-      if (EntityBounds.axisOverlapX(ida, idb) &&
-          EntityBounds.axisOverlapY(ida, idb)) {
-        if (EntityBounds.minZ(ida) < EntityBounds.minZ(idb)) {
+      if (overlapX && overlapY) {
+        const minZA = EntityBounds.minZ(ida);
+        const minZB = EntityBounds.minZ(idb);
+        if (minZA < minZB) {
           return RenderOrder.Before;
         }
         return RenderOrder.After;
       }
-      // Draw smaller Y first.
-      if (EntityBounds.maxY(ida) < EntityBounds.minY(idb)) {
-        return RenderOrder.Before;
-      }
-      if (EntityBounds.maxY(idb) < EntityBounds.minY(ida)) {
-        return RenderOrder.After;
-      }
-      // Draw larger X first
-      if (EntityBounds.minX(ida) > EntityBounds.maxX(idb)) {
-        return RenderOrder.Before;
-      }
-      if (EntityBounds.minX(idb) > EntityBounds.maxX(ida)) {
-        return RenderOrder.After;
-      }
     } else if (EntityBounds.axisOverlapX(ida, idb) &&
                EntityBounds.axisOverlapY(ida, idb)) {
-      // Draw smaller Z first.
-      if (EntityBounds.maxZ(ida) < EntityBounds.minZ(idb)) {
-        return RenderOrder.Before;
-      }
-      if (EntityBounds.maxZ(idb) < EntityBounds.minZ(ida)) {
-        return RenderOrder.After;
+      const minZA = EntityBounds.minZ(ida);
+      const maxZA = EntityBounds.maxZ(ida);
+      const minZB = EntityBounds.minZ(idb);
+      const maxZB = EntityBounds.maxZ(idb);
+      const maxHeight = Math.max(EntityBounds.height(ida), EntityBounds.height(idb));
+      const distanceZ = Math.min(
+        Math.abs(minZA - maxZB),
+        Math.abs(maxZA - minZB)
+      );
+      if (distanceZ <= maxHeight) {
+        // Draw smaller Z first.
+        if (maxZA < minZB) {
+          return RenderOrder.Before;
+        }
+        if (maxZB < minZA) {
+          return RenderOrder.After;
+        }
       }
     }
     return RenderOrder.Any;
-  }
-
-  getDrawCoord(location: Point3D): Point2D {
-    return TwoByOneIsometric.getDrawCoord(location);
-  }
-
-  drawOrder(first: SceneNode, second: SceneNode): RenderOrder {
-    // priority ordering:
-    // - smaller y
-    // - greater x
-    return TwoByOneIsometric.drawOrder(first, second);
   }
 }
 

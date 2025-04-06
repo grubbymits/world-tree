@@ -79,7 +79,7 @@ export class TerrainGrid {
   private readonly _dimensions: Dimensions;
   private _totalSurface = 0;
   private _totalSubSurface = 0;
-  private _gap = 0.001;
+  private _gap = 0.0001;
 
   constructor(
     private readonly _context: ContextImpl,

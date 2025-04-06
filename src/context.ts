@@ -70,7 +70,8 @@ export class ContextImpl implements Context {
     SpriteSheet.reset();
   }
 
-  constructor(worldDims: Dimensions, perspective: Perspective) {
+  constructor(worldDims: Dimensions, perspective: Perspective,
+              terrainSpriteWidth: number, terrainSpriteHeight: number) {
     this._spatialGraph = new Octree(worldDims);
     CollisionDetector.init(this._spatialGraph);
     switch (perspective) {
@@ -78,10 +79,10 @@ export class ContextImpl implements Context {
         console.error("unhandled perspective");
         break;
       case Perspective.TrueIsometric:
-        this._scene = new Scene(new TrueIsometric());
+        this._scene = new Scene(new TrueIsometric(terrainSpriteWidth, terrainSpriteHeight));
         break;
       case Perspective.TwoByOneIsometric:
-        this._scene = new Scene(new TwoByOneIsometric());
+        this._scene = new Scene(new TwoByOneIsometric(terrainSpriteWidth, terrainSpriteHeight));
         break;
     }
     this._renderer = new DummyRenderer();
@@ -181,20 +182,34 @@ export class ContextImpl implements Context {
 export function createContext(
   canvas: HTMLCanvasElement,
   worldDims: Dimensions,
-  perspective: Perspective
+  perspective: Perspective,
+  terrainSpriteWidth: number,
+  terrainSpriteHeight: number
 ): ContextImpl {
   ContextImpl.reset();
-  const context = new ContextImpl(worldDims, perspective);
+  const context = new ContextImpl(
+    worldDims,
+    perspective,
+    terrainSpriteWidth,
+    terrainSpriteHeight
+  );
   context.addOnscreenRenderer(canvas);
   return context;
 }
 
 export function createTestContext(
   worldDims: Dimensions,
-  perspective: Perspective
+  perspective: Perspective,
+  terrainSpriteWidth: number,
+  terrainSpriteHeight: number
 ): ContextImpl {
   ContextImpl.reset();
-  const context = new ContextImpl(worldDims, perspective);
+  const context = new ContextImpl(
+    worldDims,
+    perspective,
+    terrainSpriteWidth,
+    terrainSpriteHeight
+  );
   return context;
 }
 
@@ -232,6 +247,8 @@ export async function createWorld(worldDesc: WorldDescriptor): Promise<ContextIm
     canvas,
     worldDims,
     perspective,
+    spriteWidth,
+    spriteHeight
   );
   await TerrainGraphics.generateSprites(terrainSpriteDesc, context).then(() => {
     const terraceSpacing = normaliseHeightGrid(
