@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width">
+<meta name="description" content="Generating sprites in JS">
+<title>Sprite Generator Demo</title>
+</head>
+<body>
+  <script type="module">
+    import * as WT from "/demos/src/sprite-generator.mjs";
+    window.onload = async (event) => {
+      const canvas = document.getElementById("demoCanvas");
+      const descriptor = {
+        width: 161,
+        height: 123,
+        snowColour: 'papayawhip',
+        sandColour: 'burlywood',
+        rockColour: 'slategrey',
+        mudColour: 'saddlebrown',
+        dryGrassColour: 'khaki',
+        wetGrassColour: 'darkolivegreen',
+        waterColour: 'lightseagreen',
+        lightUndergroundColour: 'peru',
+        darkUndergroundColour: 'darkgoldenrod',
+      };
+      const bitmap = WT.generateSprites(descriptor);
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(bitmap, 0, 0);
+    }
+  </script>
+  <div class="d-none d-sm-block">
+    <canvas id="demoCanvas" oncontextmenu="return false;" width="161" height="900">
+  </div>
+</body>

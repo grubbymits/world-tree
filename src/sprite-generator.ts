@@ -7,17 +7,6 @@ class Coord {
   get y() { return this._y; }
 }
 
-function drawShape(coords: Array<Coord>, colour: string,
-                   ctx: OffscreenCanvasRenderingContext2D) {
-  ctx.moveTo(coords[0].x, coords[0].y);
-  ctx.beginPath();
-  for (let i = 1; i < coords.length; ++i) {
-    const coord = coords[i];
-    ctx.lineTo(coord.x, coord.y);
-  }
-  ctx.fill();
-}
-
 export interface SpriteGeneratorDescriptor {
   width: number;
   height: number;
@@ -32,56 +21,120 @@ export interface SpriteGeneratorDescriptor {
   darkUndergroundColour: string;
 }
 
-export function generateSprites(descriptor: SpriteGeneratorDescriptor) {
+class SpriteGenerator {
+  constructor(private readonly _descriptor: SpriteGeneratorDescriptor) {
+    // The incoming width should be divisible by four, so that we can calculate
+    // the y delta, between top and topLeft/Right, without rounding. We also want
+    // a mid point which also doesn't require rounding.
 
-  // The incoming width should be divisible by four, so that we can calculate
-  // the y delta, between top and topLeft/Right, without rounding. We also want
-  // a mid point which also doesn't require rounding.
-  //                  * 'top'
-  //                /   \
-  //               /     \
-  //    'topLeft' *       * 'topRight'
-  //              |\     /|
-  //              | \   / |
-  //              |   *   |
-  //'bottomLeft'  *   |   * 'bottomRight'
-  //               \  |  /
-  //                \ | /
-  //                  *
-  //              'bottom'
+    // So, firstly round the width and calculate yDelta.
+    this.width = descriptor.width;
+    this.height = descriptor.height;
+    const widthRem = Math.floor(this.width % 4);
+    if (widthRem < 2) {
+      this.width +- widthRem;
+    } else {
+      this.width += widthRem;
+    }
+    const yDelta = this.width >> 2;
+    const midX = Math.floor(0.5 * this.width) - 1;
+    const bottomY = this.height - 1 - yDelta;
 
-  // So, firstly round the width and calculate yDelta.
-  const widthRem = Math.floor(descriptor.width % 4);
-  if (widthRem < 2) {
-    descriptor.width +- widthRem;
-  } else {
-    descriptor.width += widthRem;
-  }
-  const colours = new Array<string>(
-    descriptor.dryGrassColour,
-    descriptor.wetGrassColour,
-    descriptor.sandColour,
-    descriptor.rockColour,
-    descriptor.mudColour,
-    descriptor.snowColour,
-    descriptor.waterColour,
-  );
-  const numShapes = 1;
-  const numTerrains = colours.length;
-  const canvas = new OffscreenCanvas(
-    numTerrains * descriptor.width, 
-    numShapes * descriptor.height
-  );
-  const ctx = canvas.getContext("2d");
-  if (ctx) {
-    generateFlat(
-      descriptor.width,
-      descriptor.height,
-      colours,
-      descriptor.darkUndergroundColour,
-      descriptor.lightUndergroundColour,
-      ctx!
+    //                  * 'top'
+    //                /   \
+    //               /     \
+    //    'topLeft' *       * 'topRight'
+    //              |\     /|
+    //              | \   / |
+    //              |   *   |
+    //'bottomLeft'  *   |   * 'bottomRight'
+    //               \  |  /
+    //                \ | /
+    //                  *
+    //              'bottom'
+
+    // Clockwise from top
+    this.top = new Coord(midX, 0);
+    this.rightOfTop = new Coord(midX + 1, 0);
+    this.topRight = new Coord(width - 1, yDelta);
+    this.bottomRight = new Coord(width - 1, bottomY);
+    this.rightOfBottom = new Coord(midX + 1, height - 1);
+    this.bottom = new Coord(midX, height - 1);
+    this.leftOfBottom = new Coord(midX - 1, height - 1);
+    this.bottomLeft = new Coord(0, bottomY);
+    this.topLeft = new Coord(0, yDelta); 
+    this.leftOfTop = new Coord(midX - 1, 0);
+    
+    this.mid = new Coord(midX, yDelta * 2);
+    this.leftOfMid = new Coord(midX - 1, yDelta * 2);
+    this.rightOfMid = new Coord(midX + 1, yDelta * 2);
+    
+    this.colours = new Array<string>(
+      descriptor.dryGrassColour,
+      descriptor.wetGrassColour,
+      descriptor.sandColour,
+      descriptor.rockColour,
+      descriptor.mudColour,
+      descriptor.snowColour,
+      descriptor.waterColour,
     );
+
+    const numShapes = 1;
+    const numTerrains = this.colours.length;
+    this.canvas = new OffscreenCanvas(
+      numShapes * this.width,
+      numTerrains * this.height 
+    );
+    console.log('generating sprite sheet', this.canvas.width, this.canvas.height);
+    this.ctx = canvas.getContext("2d");
+  }
+
+  get descriptor(): SpriteGeneratorDescriptor { return this._descriptor; }
+  get top(): Coord { return this._top; }
+  set top(c: Coord) { this._top = c; }
+  get rightOfTop(): Coord { return this._rightOfTop; }
+  set rightOfTop(c: Coord) { this._rightOfTop = c; }
+  get topRight(): Coord { return this._topRight; }
+  set topRight(c: Coord) { this._topRight = c; }
+  get bottomRight(): Coord { return this._bottomRight; }
+  set bottomRight(c: Coord) { this._bottomRight = c; }
+  get rightOfBottom(): Coord { return this._rightOfBottom; }
+  set rightOfBottom(c: Coord) { this._rightOfBottom = c; }
+  get bottom(): Coord { return this._bottom; }
+  set bottom(c: Coord) { this._bottom = c; }
+  get leftOfBottom(): Coord { return this._leftOfBottom; }
+  set leftOfBottom(c: Coord) { this._leftOfBottom = c; }
+  get bottomLeft(): Coord { return this._bottomLeft; }
+  set bottomLeft(c: coord) { this._bottomLeft = c; }
+  get topLeft(): Coord { return this._topLeft; }
+  set topLeft(c: coord) { this._topLeft = c; }
+  get leftOfTop(): Coord { return this._leftOfTop; }
+  set leftOfTop(c: coord) { this._leftOfTop = c; }
+  get mid(): Coord { return this._mid; }
+  set mid(c: Coord) { this._mid = c; }
+  get leftOfMid(): Coord { return this._leftOfMid; }
+  set leftOfMid(c: Coord) { this._leftOfMid = c; }
+  get rightOfMid(): Coord { return this._rightOfMid; }
+  set rightOfMid(c: Coord) { this._rightOfMid = c; }
+
+  drawShape(coords: Array<Coord>, colour: string, offset: Coord) {
+    this.ctx.fillStyle = colour;
+    this.ctx.beginPath();
+    this.ctx.moveTo(coords[0].x + offset.x, coords[0].y + offset.y);
+    for (let i = 1; i < coords.length; ++i) {
+      const coord = coords[i];
+      this.ctx.lineTo(coord.x + offset.x, coord.y + offset.y);
+      // stroke?
+    }
+    this.ctx.fill();
+  }
+
+  generateSprites(): ImageBitmap {
+    if (ctx) {
+      generateFlat();
+      return canvas.transferToImageBitmap();
+    }
+    return new ImageBitmap();
   }
 }
 
@@ -107,49 +160,35 @@ function generateFlat(width: number, height: number,
   // Which means we have a single point (9, 0), that is in the middle, but not
   // a member of either set.
 
-  const yDelta = width >> 2;
-  const midX = Math.floor(0.5 * width) - 1;
-  const bottomY = height - 1 - yDelta;
-
-  const leftOfTopCoord = new Coord(midX - 1, 0);
-  const rightOfTopCoord = new Coord(midX + 1, 0);
-  const topRightCoord = new Coord(width - 1, yDelta);
-  const topLeftCoord = new Coord(0, yDelta); 
-  const midCoord = new Coord(midX, yDelta * 2);
-  const leftOfMidCoord = new Coord(midX - 1, yDelta * 2);
-  const rightOfMidCoord = new Coord(midX + 1, yDelta * 2);
-  const bottomRightCoord = new Coord(width - 1, bottomY);
-  const bottomLeftCoord = new Coord(0, bottomY);
-  const bottomCoord = new Coord(midX, height - 1);
-  const rightOfBottomCoord = new Coord(midX + 1, height - 1);
-  const leftOfBottomCoord = new Coord(midX - 1, height - 1);
-
   const rightShape = new Array<Coord>(
-    topRightCoord,
-    bottomRightCoord,
-    rightOfBottomCoord,
-    bottomCoord,
-    midCoord,
+    this.topRight,
+    this.bottomRight,
+    this.rightOfBottom,
+    this.bottom,
+    this.mid,
   );
   const leftShape = new Array<Coord>(
-    topLeftCoord,
-    bottomLeftCoord,
-    leftOfBottomCoord,
-    bottomCoord,
-    midCoord,
+    this.topLeft,
+    this.bottomLeft,
+    this.leftOfBottom,
+    this.bottom,
+    this.mid,
   );
   const topShape = new Array<Coord>(
-    leftOfTopCoord,
-    rightOfTopCoord,
-    topRightCoord,
-    rightOfMidCoord,
-    leftOfMidCoord,
-    topLeftCoord,
+    this.leftOfTop,
+    this.top,
+    this.rightOfTop,
+    this.topRight,
+    this.rightOfMid,
+    this.leftOfMid,
+    this.topLeft,
   );
-  for (const topColour of topColours) {
-    drawShape(rightShape, darkUndergroundColour, ctx);
-    drawShape(leftShape, lightUndergroundColour, ctx);
-    drawShape(topShape, topColour, ctx);
+  for (let i = 0; i < topColours.length; ++i) {
+    const topColour = topColours[i];
+    const offset = new Coord(0, height * i); 
+    drawShape(rightShape, lightUndergroundColour, offset, ctx);
+    drawShape(leftShape, darkUndergroundColour, offset, ctx);
+    drawShape(topShape, topColour, offset, ctx);
   }
 }
 
