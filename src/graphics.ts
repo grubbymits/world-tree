@@ -66,11 +66,11 @@ export class SpriteSheet {
   }
 
   private async generateBlob() {
-    this.canvas = new OffscreenCanvas(this.width, this.height);
+    this.canvas = new OffscreenCanvas(this.image.width, this.image.height);
     this.context2D = this.canvas.getContext("2d", {
       willReadFrequently: true,
     })!;
-    this.context2D.drawImage(this.image, 0, 0, this.width, this.height);
+    this.context2D.drawImage(this.image, 0, 0);
     await this.canvas.convertToBlob().then(
       (blob) => {
         this.canvasBlob = blob;
@@ -96,14 +96,27 @@ export class SpriteSheet {
     return sheet;
   }
 
+  public static async createFromCanvas(canvas: OffscreenCanvas,
+                                       context: ContextImpl): Promise<SpriteSheet> {
+    const sheet = new SpriteSheet(context);
+    sheet.canvas = canvas;
+    sheet.context2D = canvas.getContext("2d", {
+      willReadFrequently: true,
+    })!;
+    await sheet.canvas.convertToBlob().then(
+      (blob) => {
+        sheet.canvasBlob = blob;
+      },
+      (error) => {
+        console.log("failed to convert to blob:", error);
+      }
+    );
+    sheet.loaded = true;
+    return sheet;
+  }
+
   get image(): HTMLImageElement {
     return this._image;
-  }
-  get width(): number {
-    return this._image.width;
-  }
-  get height(): number {
-    return this._image.height;
   }
   get name(): string {
     return this._image.src;

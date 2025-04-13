@@ -8,29 +8,62 @@
 </head>
 <body>
   <script type="module">
-    import * as WT from "/dist/world-tree.mjs";
-    window.onload = async (event) => {
-      const canvas = document.getElementById("demoCanvas");
-      const descriptor = {
-        width: 161,
-        height: 123,
-        snowColour: '#D2D2CF',
-        sandColour: '#B1B191',
-        rockColour: '#ADAD9F',
-        mudColour: '#836F49',
-        dryGrassColour: '#9DA17C',
-        wetGrassColour: '#7A7F68',
-        waterColour: '#5B80A4',
-        lightUndergroundColour: '#978C68',
-        darkUndergroundColour: '#847B5B',
-      };
-      const generator = new WT.SpriteGenerator(descriptor);
-      const bitmap = generator.generateSpriteSheet();
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(bitmap, 0, 0);
-    }
+  import * as WT from "/dist/world-tree.mjs";
+
+  const width = 20;
+  const depth = 20;
+  const scale = 4;
+  const factor = 3;
+  const numTerraces = 3;
+  const lattice = new WT.GradientNoise(width, depth, scale, factor);
+  const worldDescriptor = {
+    canvasName: "demoCanvas",
+    projection: "TwoByOneIsometric",
+    heightMap: lattice.valueGradientNoise(),
+    numTerraces: numTerraces,
+    hasRamps: true,
+    defaultTerrainType: WT.TerrainType.DryGrass,
+    biomeConfig: {
+      waterLine: 1,
+      rainfall: 50,
+      rainDirection: WT.Direction.North,
+      uplandThreshold: 4,
+    },
+    terrainSpriteDescriptor: {
+      spriteWidth: 161,
+      spriteHeight: 123,
+      snowColour: '#D2D2CF',
+      sandColour: '#B1B191',
+      rockColour: '#ADAD9F',
+      mudColour: '#836F49',
+      dryGrassColour: '#9DA17C',
+      wetGrassColour: '#7A7F68',
+      waterColour: '#5B80A4',
+      lightUndergroundColour: '#978C68',
+      darkUndergroundColour: '#847B5B',
+    },
+  };
+
+  window.onload = async (event) => {
+    const context = await WT.createWorld(worldDescriptor);
+    const canvas = document.getElementById("demoCanvas");
+    const camera = new WT.MouseCamera(
+      context.scene,
+      canvas,
+      canvas.width,
+      canvas.height,
+    );
+
+    const update = function() {
+      if (document.hasFocus()) {
+        context.update(camera);
+      }
+      window.requestAnimationFrame(update);
+    };
+    window.requestAnimationFrame(update);
+  }
   </script>
   <div class="d-none d-sm-block">
-    <canvas id="demoCanvas" oncontextmenu="return false;" width="3000" height="900">
+    <canvas id="demoCanvas" oncontextmenu="return false;" width="1440" height="900">
   </div>
 </body>

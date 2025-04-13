@@ -18,4 +18,3 @@ export * from "./control.ts";
 export * from "./terraform.ts";
 export * from "./utils.ts";
 export * from "./noise.ts";
-export * from "./sprite-generator.ts";

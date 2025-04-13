@@ -779,6 +779,15 @@ export interface TerrainSpriteDescriptor {
   spriteSheetName: string;
   tileRowTypes: Array<TerrainType>;
   tileColumnShapes: Array<TerrainShape>;
+  waterColour: string;
+  snowColour: string;
+  sandColour: string;
+  rockColour: string;
+  mudColour: string;
+  dryGrassColour: string;
+  wetGrassColour: string;
+  lightUndergroundColour: string;
+  darkUndergroundColour: string;
 };
 
 export class TerrainGraphics {
@@ -874,27 +883,53 @@ export class TerrainGraphics {
   static async generateSprites(desc: TerrainSpriteDescriptor,
                                context: ContextImpl): Promise<void> {
     console.log('generateSprites');
-    await SpriteSheet.create(desc.spriteSheetName, context).then((sheet) => {
-      const width = desc.spriteWidth;
-      const height = desc.spriteHeight;
-      const columns = desc.tileColumnShapes.length;
-      const rows = desc.tileRowTypes.length;
-      for (let row = 0; row < rows; ++row) {
-        const terrainType = desc.tileRowTypes[row];
-        for (let column = 0; column < columns; ++column) {
-          const terrainShape = desc.tileColumnShapes[column];
-          this.addGraphic(
-            terrainType,
-            terrainShape,
-            sheet,
-            width * column,
-            height * row,
-            width,
-            height
-          );
+    if (Object.hasOwn(desc, 'spriteSheetName')) {
+      await SpriteSheet.create(desc.spriteSheetName, context).then((sheet) => {
+        const width = desc.spriteWidth;
+        const height = desc.spriteHeight;
+        const columns = desc.tileColumnShapes.length;
+        const rows = desc.tileRowTypes.length;
+        for (let row = 0; row < rows; ++row) {
+          const terrainType = desc.tileRowTypes[row];
+          for (let column = 0; column < columns; ++column) {
+            const terrainShape = desc.tileColumnShapes[column];
+            this.addGraphic(
+              terrainType,
+              terrainShape,
+              sheet,
+              width * column,
+              height * row,
+              width,
+              height
+            );
+          }
         }
-      }
-    });
+      });
+    } else {
+      const generator = new SpriteGenerator(desc);
+      const canvas = generator.generateCanvas();
+      await SpriteSheet.createFromCanvas(canvas, context).then((sheet) => {
+        const width = desc.spriteWidth;
+        const height = desc.spriteHeight;
+        const columns = desc.tileColumnShapes.length;
+        const rows = desc.tileRowTypes.length;
+        for (let row = 0; row < rows; ++row) {
+          const terrainType = desc.tileRowTypes[row];
+          for (let column = 0; column < columns; ++column) {
+            const terrainShape = desc.tileColumnShapes[column];
+            this.addGraphic(
+              terrainType,
+              terrainShape,
+              sheet,
+              width * column,
+              height * row,
+              width,
+              height
+            );
+          }
+        }
+      });
+    }
   }
 }
 
@@ -1100,3 +1135,529 @@ export function buildTerrainTypeGrid(biomeGrid: Array<Uint8Array>,
   }
   return typeGrid;
 }
+
+class SpriteGenerator {
+  private _canvas: OffscreenCanvas;
+  private _ctx: OffscreenCanvasRenderingContext2D;
+  private _width: number;
+  private _height: number;
+  private _colours: Array<string>;
+  private _top: Coord;
+  private _rightOfTop: Coord;
+  private _topRight: Coord;
+  private _bottomRight: Coord;
+  private _rightOfBottom: Coord;
+  private _bottom: Coord;
+  private _leftOfBottom: Coord;
+  private _bottomLeft: Coord;
+  private _topLeft: Coord;
+  private _leftOfTop: Coord;
+  private _mid: Coord;
+  private _leftOfMid: Coord;
+  private _rightOfMid: Coord;
+  private _backCorner: Coord;
+
+  constructor(private readonly _descriptor: TerrainSpriteDescriptor) {
+    // The incoming width should be divisible by four, so that we can calculate
+    // the y delta, between top and topLeft/Right, without rounding. We also want
+    // a mid point which also doesn't require rounding.
+
+    // So, firstly round the width and calculate yDelta.
+    this.width = this.descriptor.spriteWidth;
+    this.height = this.descriptor.spriteHeight;
+    const widthRem = Math.floor(this.width % 4);
+    if (widthRem < 2) {
+      this.width +- widthRem;
+    } else {
+      this.width += widthRem;
+    }
+    const yDelta = this.width >> 2;
+    const midX = Math.floor(0.5 * this.width) - 1;
+    const bottomY = this.height - 1 - yDelta;
+
+    // Say we've rounded the width to 20, yDelta would be 5. From the 'top' point
+    // we will move 10 units in the x axis and 5 in the y.
+    // 0 ... 19
+    //
+    // Splitting into two sides gives us two sets of points:
+    // 0,   1,  2,  3,  4,  5,  6,  7,  8,  9
+    // 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
+    //
+    // In the y-axis we have: 0, 1, 2, 3, 4.
+    // If we map the points using the y-axis we get two sets:
+    //
+    // (0, 4),  (2, 3),   (4, 2), (6, 1),  (8, 0)
+    // (10, 0), (12, 1), (14, 2), (16, 3), (18, 4)
+    //
+    // Which means we have a single point (9, 0), that is in the middle, but not
+    // a member of either set.
+    //
+    //
+    //                  * 'top'
+    //                /   \
+    //               /     \
+    //    'topLeft' *       * 'topRight'
+    //              |\     /|
+    //              | \   / |
+    //              |   *   |
+    //'bottomLeft'  *   |   * 'bottomRight'
+    //               \  |  /
+    //                \ | /
+    //                  *
+    //              'bottom'
+
+    // Clockwise from top
+    this.top = new Coord(midX, 0);
+    this.rightOfTop = new Coord(midX + 1, 0);
+    this.topRight = new Coord(this.width - 1, yDelta);
+    this.bottomRight = new Coord(this.width - 1, bottomY);
+    this.rightOfBottom = new Coord(midX + 1, this.height - 1);
+    this.bottom = new Coord(midX, this.height - 1);
+    this.leftOfBottom = new Coord(midX - 1, this.height - 1);
+    this.bottomLeft = new Coord(0, bottomY);
+    this.topLeft = new Coord(0, yDelta); 
+    this.leftOfTop = new Coord(midX - 1, 0);
+    
+    this.mid = new Coord(midX, yDelta * 2);
+    this.leftOfMid = new Coord(midX - 1, yDelta * 2);
+    this.rightOfMid = new Coord(midX + 1, yDelta * 2);
+
+    // For ramps
+    this.backCorner = new Coord(midX, yDelta);
+    
+    this.colours = new Array<string>(
+      this.descriptor.waterColour,
+      this.descriptor.snowColour,
+      this.descriptor.sandColour,
+      this.descriptor.rockColour,
+      this.descriptor.mudColour,
+      this.descriptor.dryGrassColour,
+      this.descriptor.wetGrassColour,
+    );
+
+    const numTerrains = this.colours.length;
+    this.canvas = new OffscreenCanvas(
+      TerrainShape.Max * this.width,
+      numTerrains * this.height 
+    );
+    console.log('generating sprite sheet', this.canvas.width, this.canvas.height);
+    const ctx = this.canvas.getContext("2d");
+    if (ctx) {
+      this.ctx = ctx!;
+    }
+  }
+
+  get width(): number { return this._width; }
+  set width(w: number) { this._width = w; }
+  get height(): number { return this._height; }
+  set height(h: number) { this._height = h; }
+  get canvas(): OffscreenCanvas { return this._canvas; }
+  set canvas(c: OffscreenCanvas) { this._canvas = c; }
+  get ctx(): OffscreenCanvasRenderingContext2D { return this._ctx; }
+  set ctx(c: OffscreenCanvasRenderingContext2D) { this._ctx = c; }
+  get descriptor(): TerrainSpriteDescriptor { return this._descriptor; }
+  get colours(): Array<string> { return this._colours; }
+  set colours(a: Array<string>) { this._colours = a; }
+
+  get top(): Coord { return this._top; }
+  set top(c: Coord) { this._top = c; }
+  get rightOfTop(): Coord { return this._rightOfTop; }
+  set rightOfTop(c: Coord) { this._rightOfTop = c; }
+  get topRight(): Coord { return this._topRight; }
+  set topRight(c: Coord) { this._topRight = c; }
+  get bottomRight(): Coord { return this._bottomRight; }
+  set bottomRight(c: Coord) { this._bottomRight = c; }
+  get rightOfBottom(): Coord { return this._rightOfBottom; }
+  set rightOfBottom(c: Coord) { this._rightOfBottom = c; }
+  get bottom(): Coord { return this._bottom; }
+  set bottom(c: Coord) { this._bottom = c; }
+  get leftOfBottom(): Coord { return this._leftOfBottom; }
+  set leftOfBottom(c: Coord) { this._leftOfBottom = c; }
+  get bottomLeft(): Coord { return this._bottomLeft; }
+  set bottomLeft(c: Coord) { this._bottomLeft = c; }
+  get topLeft(): Coord { return this._topLeft; }
+  set topLeft(c: Coord) { this._topLeft = c; }
+  get leftOfTop(): Coord { return this._leftOfTop; }
+  set leftOfTop(c: Coord) { this._leftOfTop = c; }
+  get mid(): Coord { return this._mid; }
+  set mid(c: Coord) { this._mid = c; }
+  get leftOfMid(): Coord { return this._leftOfMid; }
+  set leftOfMid(c: Coord) { this._leftOfMid = c; }
+  get rightOfMid(): Coord { return this._rightOfMid; }
+  set rightOfMid(c: Coord) { this._rightOfMid = c; }
+  get backCorner(): Coord { return this._backCorner; }
+  set backCorner(c: Coord) { this._backCorner = c; }
+
+  generateCanvas(): OffscreenCanvas {
+    // Populate the descriptor with the row and column information.
+    this.descriptor.tileRowTypes = new Array<TerrainType>(
+      TerrainType.Water,
+      TerrainType.Snow,
+      TerrainType.Sand,
+      TerrainType.Rock,
+      TerrainType.Mud,
+      TerrainType.DryGrass,
+      TerrainType.WetGrass,
+    );
+    this.descriptor.tileColumnShapes = new Array<TerrainShape>(
+      TerrainShape.Flat,
+      TerrainShape.Wall,
+      TerrainShape.NorthEdge,
+      TerrainShape.EastEdge,
+      TerrainShape.NorthEastCorner,
+      TerrainShape.SouthEdge,
+      TerrainShape.NorthSouthCorridor,
+      TerrainShape.SouthEastCorner,
+      TerrainShape.EastPeninsula,
+      TerrainShape.WestEdge,
+      TerrainShape.NorthWestCorner,
+      TerrainShape.EastWestCorridor,
+      TerrainShape.NorthPeninsula,
+      TerrainShape.SouthWestCorner,
+      TerrainShape.WestPeninsula,
+      TerrainShape.SouthPeninsula,
+      TerrainShape.Spire,
+      TerrainShape.RampNorth,
+      TerrainShape.RampEast,
+      TerrainShape.RampSouth,
+      TerrainShape.RampWest,
+    );
+
+    if (this.ctx) {
+      this.generateFlat(TerrainShape.Flat);
+      this.generateFlat(TerrainShape.Wall);
+      this.generateEdge(TerrainShape.NorthEdge);
+      this.generateEdge(TerrainShape.EastEdge);
+      this.generateCorner(TerrainShape.NorthEastCorner);
+      this.generateEdge(TerrainShape.SouthEdge);
+      this.generateCorridor(TerrainShape.NorthSouthCorridor);
+      this.generateCorner(TerrainShape.SouthEastCorner);
+      this.generatePeninsula(TerrainShape.EastPeninsula);
+      this.generateEdge(TerrainShape.WestEdge);
+      this.generateCorner(TerrainShape.NorthWestCorner);
+      this.generateCorridor(TerrainShape.EastWestCorridor);
+      this.generatePeninsula(TerrainShape.NorthPeninsula);
+      this.generateCorner(TerrainShape.SouthWestCorner);
+      this.generatePeninsula(TerrainShape.WestPeninsula);
+      this.generatePeninsula(TerrainShape.SouthPeninsula);
+      this.generateSpire();
+      this.generateRampNorth();
+      this.generateRampEast();
+      this.generateRampSouth();
+      this.generateRampWest();
+      return this.canvas;
+    } else {
+      throw new Error('no offscreen rendering context');
+    }
+    return this.canvas;
+  }
+
+  drawSide(coords: Array<Coord>, colour: string, offset: Coord) {
+    this.ctx.fillStyle = colour;
+    this.ctx.strokeStyle = colour;
+    this.ctx.beginPath();
+    this.ctx.moveTo(coords[0].x + offset.x, coords[0].y + offset.y);
+    for (let i = 1; i < coords.length; ++i) {
+      const coord = coords[i];
+      this.ctx.lineTo(coord.x + offset.x, coord.y + offset.y);
+      this.ctx.stroke();
+    }
+    this.ctx.fill();
+  }
+
+  drawThreeSides(rightShape: Array<Coord>,
+                 leftShape: Array<Coord>,
+                 topShape: Array<Coord>,
+                 shape: TerrainShape) {
+    for (let i = 0; i < this.colours.length; ++i) {
+      const topColour = this.colours[i];
+      const offset = new Coord(this.width * shape, this.height * i); 
+      this.drawSide(rightShape, this.descriptor.lightUndergroundColour, offset);
+      this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
+      this.drawSide(topShape, topColour, offset);
+    }
+  }
+
+  generateFlat(shape: TerrainShape) {
+    const rightShape = new Array<Coord>(
+      this.topRight,
+      this.bottomRight,
+      this.rightOfBottom,
+      this.bottom,
+      this.mid,
+    );
+    const leftShape = new Array<Coord>(
+      this.topLeft,
+      this.bottomLeft,
+      this.leftOfBottom,
+      this.bottom,
+      this.mid,
+    );
+    const topShape = new Array<Coord>(
+      this.leftOfTop,
+      this.top,
+      this.rightOfTop,
+      this.topRight,
+      this.rightOfMid,
+      this.leftOfMid,
+      this.topLeft,
+    );
+    for (let i = 0; i < this.colours.length; ++i) {
+      const topColour = this.colours[i];
+      const offset = new Coord(this.width * shape, this.height * i); 
+      this.drawSide(rightShape, this.descriptor.lightUndergroundColour, offset);
+      this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
+      this.drawSide(topShape, topColour, offset);
+    }
+  }
+
+  generateRampSouth() {
+    const rightShape = new Array<Coord> (
+      this.bottomRight,
+      this.bottom,
+      this.mid,
+      this.topRight,
+    );
+    const leftShape = new Array<Coord>(
+      this.bottomLeft,
+      this.bottom,
+      this.mid,
+    );
+    const topShape = new Array<Coord>(
+      this.bottomLeft,
+      this.backCorner,
+      this.topRight,
+      this.mid,
+    );
+    for (let i = 0; i < this.colours.length; ++i) {
+      const topColour = this.colours[i];
+      const offset = new Coord(this.width * TerrainShape.RampSouth, this.height * i); 
+      this.drawSide(rightShape, this.descriptor.lightUndergroundColour, offset);
+      this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
+      this.drawSide(topShape, topColour, offset);
+    }
+  }
+
+  generateRampWest() {
+    const rightShape = new Array<Coord> (
+      this.bottomRight,
+      this.bottom,
+      this.mid,
+    );
+    const leftShape = new Array<Coord>(
+      this.topLeft,
+      this.bottomLeft,
+      this.bottom,
+      this.mid,
+    );
+    const topShape = new Array<Coord>(
+      this.topLeft,
+      this.mid,
+      this.bottomRight,
+      this.backCorner,
+    );
+    this.drawThreeSides(rightShape, leftShape, topShape, TerrainShape.RampWest);
+  }
+
+  generateRampEast() {
+    const rightShape = new Array<Coord>(
+      this.topRight,
+      this.bottomRight,
+      this.bottom,
+    );
+    const topShape = new Array<Coord> (
+      this.bottomLeft,
+      this.top,
+      this.topRight,
+      this.bottom,
+    );
+    for (let i = 0; i < this.colours.length; ++i) {
+      const topColour = this.colours[i];
+      const offset = new Coord(this.width * TerrainShape.RampEast, this.height * i); 
+      this.drawSide(rightShape, this.descriptor.lightUndergroundColour, offset);
+      this.drawSide(topShape, topColour, offset);
+    }
+  }
+
+  generateRampNorth() {
+    const leftShape = new Array<Coord>(
+      this.bottomLeft,
+      this.topLeft,
+      this.bottom,
+    );
+    const topShape = new Array<Coord> (
+      this.top,
+      this.topLeft,
+      this.bottom,
+      this.bottomRight,
+    );
+    for (let i = 0; i < this.colours.length; ++i) {
+      const topColour = this.colours[i];
+      const offset = new Coord(this.width * TerrainShape.RampNorth, this.height * i); 
+      this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
+      this.drawSide(topShape, topColour, offset);
+    }
+  }
+
+  drawShadow(from: Coord, to: Coord, offset: Coord) {
+    this.ctx.strokeStyle = "rgb(0 0 0 / 25%)";
+    this.ctx.beginPath();
+    this.ctx.moveTo(from.x + offset.x, from.y + offset.y);
+    this.ctx.lineTo(to.x + offset.x, to.y + offset.y);
+    this.ctx.stroke();
+  }
+
+  generateEdge(shape: TerrainShape) {
+    let from: Coord;
+    let to: Coord;
+    switch (shape) {
+    default:
+      throw new Error('unhandled edge');
+      break;
+    case TerrainShape.WestEdge:
+      from = this.topLeft;
+      to = this.mid;
+      break;
+    case TerrainShape.NorthEdge:
+      from = this.topLeft;
+      to = this.top;
+      break;
+    case TerrainShape.EastEdge:
+      from = this.topRight;
+      to = this.top;
+      break;
+    case TerrainShape.SouthEdge:
+      from = this.topRight;
+      to = this.mid;
+      break;
+    }
+    this.generateFlat(shape);
+    for (let i = 0; i < this.colours.length; ++i) {
+      const offset = new Coord(this.width * shape, this.height * i);
+      this.drawShadow(from, to, offset);
+    }
+  }
+
+  generateCorner(shape: TerrainShape) {
+    let start: Coord;
+    let mid: Coord;
+    let end: Coord;
+    switch (shape) {
+    default:
+      throw new Error('unhandled corner');
+      break;
+    case TerrainShape.NorthWestCorner:
+      start = this.mid;
+      mid = this.topLeft;
+      end = this.top
+      break;
+    case TerrainShape.NorthEastCorner:
+      start = this.topLeft;
+      mid = this.top;
+      end = this.topRight;
+      break;
+    case TerrainShape.SouthEastCorner:
+      start = this.top;
+      mid = this.topRight;
+      end = this.mid;
+      break;
+    case TerrainShape.SouthWestCorner:
+      start = this.topRight;
+      mid = this.mid;
+      end = this.topLeft;
+      break;
+    }
+    this.generateFlat(shape);
+    for (let i = 0; i < this.colours.length; ++i) {
+      const offset = new Coord(this.width * shape, this.height * i);
+      this.drawShadow(start, mid, offset);
+      this.drawShadow(mid, end, offset);
+    }
+  }
+
+  generateCorridor(shape: TerrainShape) {
+    let a: Coord;
+    let b: Coord;
+    let c: Coord;
+    let d: Coord;
+    switch (shape) {
+    default:
+      throw new Error('unhandled corner');
+      break;
+    case TerrainShape.NorthSouthCorridor:
+      a = this.topLeft;
+      b = this.mid;
+      c = this.top;
+      d = this.topRight;
+      break;
+    case TerrainShape.EastWestCorridor:
+      a = this.top;
+      b = this.topLeft;
+      c = this.topRight;
+      d = this.mid;
+      break;
+    }
+    this.generateFlat(shape);
+    for (let i = 0; i < this.colours.length; ++i) {
+      const offset = new Coord(this.width * shape, this.height * i);
+      this.drawShadow(a, b, offset);
+      this.drawShadow(c, d, offset);
+    }
+  }
+
+  generateSpire() {
+    const shape = TerrainShape.Spire;
+    this.generateFlat(shape);
+    for (let i = 0; i < this.colours.length; ++i) {
+      const offset = new Coord(this.width * shape, this.height * i);
+      this.drawShadow(this.top, this.topRight, offset);
+      this.drawShadow(this.topRight, this.mid, offset);
+      this.drawShadow(this.mid, this.topLeft, offset);
+      this.drawShadow(this.topLeft, this.top, offset);
+    }
+  }
+
+  generatePeninsula(shape: TerrainShape) {
+    let a: Coord;
+    let b: Coord;
+    let c: Coord;
+    let d: Coord;
+    switch (shape) {
+    default:
+      throw new Error('unhandled peninsula');
+      break;
+    case TerrainShape.NorthPeninsula:
+      a = this.mid;
+      b = this.topLeft;
+      c = this.top
+      d = this.topRight;
+      break;
+    case TerrainShape.EastPeninsula:
+      a = this.topLeft;
+      b = this.top;
+      c = this.topRight;
+      d = this.mid;
+      break;
+    case TerrainShape.SouthPeninsula:
+      a = this.top;
+      b = this.topRight;
+      c = this.mid;
+      d = this.topLeft;
+      break;
+    case TerrainShape.WestPeninsula:
+      a = this.topRight;
+      b = this.mid;
+      c = this.topLeft;
+      d = this.top;
+      break;
+    }
+    this.generateFlat(shape);
+    for (let i = 0; i < this.colours.length; ++i) {
+      const offset = new Coord(this.width * shape, this.height * i);
+      this.drawShadow(a, b, offset);
+      this.drawShadow(b, c, offset);
+      this.drawShadow(c, d, offset);
+    }
+  }
+}
+
