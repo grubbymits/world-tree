@@ -1356,6 +1356,17 @@ class SpriteGenerator {
     return this.canvas;
   }
 
+  drawShadow(coords: Array<Coord>, offset: Coord) {
+    this.ctx.strokeStyle = "rgb(0 0 0 / 25%)";
+    this.ctx.beginPath();
+    this.ctx.moveTo(coords[0].x + offset.x, coords[0].y + offset.y);
+    for (let i = 1; i < coords.length; ++i) {
+      const coord = coords[i];
+      this.ctx.lineTo(coord.x + offset.x, coord.y + offset.y);
+      this.ctx.stroke();
+    }
+  }
+
   drawSide(coords: Array<Coord>, colour: string, offset: Coord) {
     this.ctx.fillStyle = colour;
     this.ctx.strokeStyle = colour;
@@ -1515,164 +1526,187 @@ class SpriteGenerator {
     }
   }
 
-  drawShadow(from: Coord, to: Coord, offset: Coord) {
-    this.ctx.strokeStyle = "rgb(0 0 0 / 25%)";
-    this.ctx.beginPath();
-    this.ctx.moveTo(from.x + offset.x, from.y + offset.y);
-    this.ctx.lineTo(to.x + offset.x, to.y + offset.y);
-    this.ctx.stroke();
-  }
-
   generateEdge(shape: TerrainShape) {
-    let from: Coord;
-    let to: Coord;
+    let shadows: Array<Coord>;
     switch (shape) {
     default:
       throw new Error('unhandled edge');
       break;
     case TerrainShape.WestEdge:
-      from = this.topLeft;
-      to = this.mid;
+      shadows = new Array<Coord>(
+        this.topLeft,
+        this.leftOfMid,
+      );
       break;
     case TerrainShape.NorthEdge:
-      from = this.topLeft;
-      to = this.top;
+      shadows = new Array<Coord>(
+        this.topLeft,
+        this.leftOfTop,
+      );
       break;
     case TerrainShape.EastEdge:
-      from = this.topRight;
-      to = this.top;
+      shadows = new Array<Coord>(
+        this.topRight,
+        this.rightOfTop,
+      );
       break;
     case TerrainShape.SouthEdge:
-      from = this.topRight;
-      to = this.mid;
+      shadows = new Array<Coord>(
+        this.topRight,
+        this.rightOfMid,
+      );
       break;
     }
     this.generateFlat(shape);
     for (let i = 0; i < this.colours.length; ++i) {
       const offset = new Coord(this.width * shape, this.height * i);
-      this.drawShadow(from, to, offset);
+      this.drawShadow(shadows, offset);
     }
   }
 
   generateCorner(shape: TerrainShape) {
-    let start: Coord;
-    let mid: Coord;
-    let end: Coord;
+    let shadows: Array<Coord>;
     switch (shape) {
     default:
       throw new Error('unhandled corner');
       break;
     case TerrainShape.NorthWestCorner:
-      start = this.mid;
-      mid = this.topLeft;
-      end = this.top
+      shadows = new Array<Coord>(
+        this.mid,
+        this.topLeft,
+        this.leftOfTop,
+      );
       break;
     case TerrainShape.NorthEastCorner:
-      start = this.topLeft;
-      mid = this.top;
-      end = this.topRight;
+      shadows = new Array<Coord>(
+        this.topLeft,
+        this.leftOfTop,
+        this.topRight,
+      );
       break;
     case TerrainShape.SouthEastCorner:
-      start = this.top;
-      mid = this.topRight;
-      end = this.mid;
+      shadows = new Array<Coord>(
+        this.rightOfTop,
+        this.topRight,
+        this.mid,
+      );
       break;
     case TerrainShape.SouthWestCorner:
-      start = this.topRight;
-      mid = this.mid;
-      end = this.topLeft;
+      shadows = new Array<Coord>(
+        this.topRight,
+        this.mid,
+        this.topLeft,
+      );
       break;
     }
     this.generateFlat(shape);
     for (let i = 0; i < this.colours.length; ++i) {
       const offset = new Coord(this.width * shape, this.height * i);
-      this.drawShadow(start, mid, offset);
-      this.drawShadow(mid, end, offset);
+      this.drawShadow(shadows, offset);
     }
   }
 
   generateCorridor(shape: TerrainShape) {
-    let a: Coord;
-    let b: Coord;
-    let c: Coord;
-    let d: Coord;
+    this.generateFlat(shape);
+    let shadows: Array<Coord>;
     switch (shape) {
     default:
       throw new Error('unhandled corner');
       break;
     case TerrainShape.NorthSouthCorridor:
-      a = this.topLeft;
-      b = this.mid;
-      c = this.top;
-      d = this.topRight;
+      shadows = new Array<Coord>(
+        this.topLeft,
+        this.leftOfMid,
+      );
+      this.top,
+        this.topRight,
+      );
       break;
     case TerrainShape.EastWestCorridor:
-      a = this.top;
-      b = this.topLeft;
-      c = this.topRight;
-      d = this.mid;
+      shadows = new Array<Coord>(
+        this.top,
+        this.topLeft,
+        this.topRight,
+        this.mid,
+      );
       break;
     }
-    this.generateFlat(shape);
     for (let i = 0; i < this.colours.length; ++i) {
       const offset = new Coord(this.width * shape, this.height * i);
-      this.drawShadow(a, b, offset);
-      this.drawShadow(c, d, offset);
+      this.drawShadow(shadows, offset);
     }
   }
 
   generateSpire() {
     const shape = TerrainShape.Spire;
     this.generateFlat(shape);
+    const shadows = new Array<Coord>(
+      this.top,
+      this.rightOfTop,
+      this.topRight,
+      this.rightOfMid,
+      this.leftOfMid,
+      this.topLeft,
+      this.leftOfTop,
+      this.top,
+    );
     for (let i = 0; i < this.colours.length; ++i) {
       const offset = new Coord(this.width * shape, this.height * i);
-      this.drawShadow(this.top, this.topRight, offset);
-      this.drawShadow(this.topRight, this.mid, offset);
-      this.drawShadow(this.mid, this.topLeft, offset);
-      this.drawShadow(this.topLeft, this.top, offset);
+      this.drawShadow(shadows, offset);
     }
   }
 
   generatePeninsula(shape: TerrainShape) {
-    let a: Coord;
-    let b: Coord;
-    let c: Coord;
-    let d: Coord;
+    let shadows: Array<Coord>;
     switch (shape) {
     default:
       throw new Error('unhandled peninsula');
       break;
     case TerrainShape.NorthPeninsula:
-      a = this.mid;
-      b = this.topLeft;
-      c = this.top
-      d = this.topRight;
+      shadows = new Array<Coord>(
+        this.leftOfMid,
+        this.topLeft,
+        this.leftOfTop,
+        this.top,
+        this.rightOfTop,
+        this.topRight,
+      );
       break;
     case TerrainShape.EastPeninsula:
-      a = this.topLeft;
-      b = this.top;
-      c = this.topRight;
-      d = this.mid;
+      shadows = new Array<Coord>(
+        this.topLeft,
+        this.leftOfTop,
+        this.top,
+        this.rightOfTop,
+        this.topRight,
+        this.rightOfMid,
+      );
       break;
     case TerrainShape.SouthPeninsula:
-      a = this.top;
-      b = this.topRight;
-      c = this.mid;
-      d = this.topLeft;
+      shadows = new Array<Coord>(
+        this.top,
+        this.rightOfTop,
+        this.topRight,
+        this.rightOfMid,
+        this.leftOfMid,
+        this.topLeft,
+      );
       break;
     case TerrainShape.WestPeninsula:
-      a = this.topRight;
-      b = this.mid;
-      c = this.topLeft;
-      d = this.top;
+      shadows = new Array<Coord>(
+        this.topRight,
+        this.rightOfMid,
+        this.leftOfMid,
+        this.topLeft,
+        this.leftOfTop,
+        this.top,
+      );
       break;
     }
     this.generateFlat(shape);
     for (let i = 0; i < this.colours.length; ++i) {
       const offset = new Coord(this.width * shape, this.height * i);
-      this.drawShadow(a, b, offset);
-      this.drawShadow(b, c, offset);
-      this.drawShadow(c, d, offset);
+      this.drawShadow(shadows, offset);
     }
   }
 }

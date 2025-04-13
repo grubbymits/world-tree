@@ -537,6 +537,21 @@ export class TwoByOneIsometric extends SceneGraph {
     //        \
     //         y
 
+    // First, check whether the sprites could overlap each other.
+    const distanceX = Math.abs(first.drawCoord.x - second.drawCoord.x);
+    const distanceY = Math.abs(first.drawCoord.y - second.drawCoord.y);
+    const widest = Math.max(
+      first.entity.graphics[0].width,
+      second.entity.graphics[0].width
+    );
+    const tallest = Math.max(
+      first.entity.graphics[0].height,
+      second.entity.graphics[0].height
+    );
+    if (distanceX > widest && distanceY > tallest) {
+      return RenderOrder.Any;
+    }
+
     const ida = first.entity.id;
     const idb = second.entity.id;
     const overlapZ = EntityBounds.axisOverlapZ(ida, idb);
@@ -572,16 +587,6 @@ export class TwoByOneIsometric extends SceneGraph {
       const maxXB = EntityBounds.maxX(idb);
       const maxYB = EntityBounds.maxY(idb);
 
-      // First, calculate whether this entities are horizontally adjacent.
-      const rounding = 0.005;
-      if (maxXA + rounding >= minXB && maxXA + rounding < maxXB &&
-          maxYA + rounding >= minYB && maxYA + rounding < maxYB) {
-        return RenderOrder.Any;
-      } else if (maxXB + rounding >= minXA && maxXB + rounding < maxXA &&
-                 maxYB + rounding >= minYA && maxYB + rounding < maxYA) {
-        return RenderOrder.Any;
-      }
-
       const maxWidth = Math.max(EntityBounds.width(ida), EntityBounds.width(idb));
       const distanceX = Math.min(
         Math.abs(minXA - maxXB),
@@ -595,7 +600,7 @@ export class TwoByOneIsometric extends SceneGraph {
         if (maxYB < minYA) {
           return RenderOrder.After;
         }
-      }
+      }    
       const maxDepth = Math.max(EntityBounds.depth(ida), EntityBounds.depth(idb));
       const distanceY = Math.min(
         Math.abs(minYA - maxYB),
@@ -609,7 +614,8 @@ export class TwoByOneIsometric extends SceneGraph {
         if (minXB > maxXA) {
           return RenderOrder.After;
         }
-      }
+      } 
+
       const overlapX = EntityBounds.axisOverlapX(ida, idb);
       const overlapY = EntityBounds.axisOverlapY(ida, idb);
       // For ramps, draw the lower entity first.
