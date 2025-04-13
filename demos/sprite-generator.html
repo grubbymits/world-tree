@@ -8,28 +8,29 @@
 </head>
 <body>
   <script type="module">
-    import * as WT from "/demos/src/sprite-generator.mjs";
+    import * as WT from "/dist/world-tree.mjs";
     window.onload = async (event) => {
       const canvas = document.getElementById("demoCanvas");
       const descriptor = {
         width: 161,
         height: 123,
-        snowColour: 'papayawhip',
-        sandColour: 'burlywood',
-        rockColour: 'slategrey',
-        mudColour: 'saddlebrown',
-        dryGrassColour: 'khaki',
-        wetGrassColour: 'darkolivegreen',
-        waterColour: 'lightseagreen',
-        lightUndergroundColour: 'peru',
-        darkUndergroundColour: 'darkgoldenrod',
+        snowColour: '#D2D2CF',
+        sandColour: '#B1B191',
+        rockColour: '#ADAD9F',
+        mudColour: '#836F49',
+        dryGrassColour: '#9DA17C',
+        wetGrassColour: '#7A7F68',
+        waterColour: '#5B80A4',
+        lightUndergroundColour: '#978C68',
+        darkUndergroundColour: '#847B5B',
       };
-      const bitmap = WT.generateSprites(descriptor);
+      const generator = new WT.SpriteGenerator(descriptor);
+      const bitmap = generator.generateSpriteSheet();
       const ctx = canvas.getContext('2d');
       ctx.drawImage(bitmap, 0, 0);
     }
   </script>
   <div class="d-none d-sm-block">
-    <canvas id="demoCanvas" oncontextmenu="return false;" width="161" height="900">
+    <canvas id="demoCanvas" oncontextmenu="return false;" width="3000" height="900">
   </div>
 </body>

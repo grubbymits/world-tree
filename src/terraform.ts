@@ -598,7 +598,6 @@ export function findPath(start: Coord,
         const cost = isDiagonal(direction) ? 3 : 2;
         const new_cost = costs.get(currentId)! + cost;
         if (!costs.has(nextId) || new_cost < costs.get(nextId)!) {
-          debugger;
           costs.set(nextId, new_cost);
           const priority = new_cost; // + heuristic(goal, next)
           frontier.insert(nextId, priority);
