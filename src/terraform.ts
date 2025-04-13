@@ -1383,7 +1383,7 @@ class SpriteGenerator {
   drawThreeSides(rightShape: Array<Coord>,
                  leftShape: Array<Coord>,
                  topShape: Array<Coord>,
-                 shadow: Array<Coord>,
+                 shadows: Array<Array<Coord>>,
                  shape: TerrainShape) {
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
@@ -1396,7 +1396,9 @@ class SpriteGenerator {
         this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
       }
       this.drawSide(topShape, topColour, offset);
-      this.drawShadow(shadow, offset);
+      for (let shadow of shadows) {
+        this.drawShadow(shadow, offset);
+      }
     }
   }
 
@@ -1456,15 +1458,15 @@ class SpriteGenerator {
       this.topRight,
       this.mid,
     );
-    const shadow = new Array<Coord>(
-      this.mid,
-      this.topRight,
+    const shadows = new Array<Array<Coord>>(
+      [this.mid, this.topRight],
+      [this.backCorner, this.bottomLeft],
     );
     this.drawThreeSides(
       rightShape,
       leftShape,
       topShape,
-      shadow,
+      shadows,
       TerrainShape.RampSouth
     );
   }
@@ -1487,15 +1489,15 @@ class SpriteGenerator {
       this.bottomRight,
       this.backCorner,
     );
-    const shadow = new Array<Coord>(
-      this.topLeft,
-      this.mid,
+    const shadows = new Array<Array<Coord>>(
+      [this.topLeft, this.mid],
+      [this.backCorner, this.bottomRight],
     );
     this.drawThreeSides(
       rightShape,
       leftShape,
       topShape,
-      shadow,
+      shadows,
       TerrainShape.RampWest
     );
   }
@@ -1512,9 +1514,9 @@ class SpriteGenerator {
       this.topRight,
       this.bottom,
     );
-    const shadow = new Array<Coord>(
-      this.top,
-      this.topRight,
+    const shadows = new Array<Array<Coord>>(
+      [this.top, this.topRight],
+      [this.bottomLeft, this.bottom],
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
@@ -1525,7 +1527,9 @@ class SpriteGenerator {
         this.drawSide(rightShape, this.descriptor.lightUndergroundColour, offset);
       }
       this.drawSide(topShape, topColour, offset);
-      this.drawShadow(shadow, offset);
+      for (let shadow of shadows) {
+        this.drawShadow(shadow, offset);
+      }
     }
   }
 
@@ -1541,9 +1545,9 @@ class SpriteGenerator {
       this.bottom,
       this.bottomRight,
     );
-    const shadow = new Array<Coord>(
-      this.top,
-      this.topLeft,
+    const shadows = new Array<Array<Coord>>(
+      [this.top, this.topLeft],
+      [this.bottomRight, this.bottom],
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
@@ -1554,7 +1558,9 @@ class SpriteGenerator {
         this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
       }
       this.drawSide(topShape, topColour, offset);
-      this.drawShadow(shadow, offset);
+      for (let shadow of shadows) {
+        this.drawShadow(shadow, offset);
+      }
     }
   }
 
