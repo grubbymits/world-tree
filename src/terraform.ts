@@ -1225,7 +1225,7 @@ class SpriteGenerator {
     this.rightOfMid = new Coord(midX + 1, yDelta * 2);
 
     // For ramps
-    this.backCorner = new Coord(midX, yDelta);
+    this.backCorner = new Coord(midX, this.height - yDelta * 2);
     
     this.colours = new Array<string>(
       this.descriptor.waterColour,
@@ -1357,7 +1357,7 @@ class SpriteGenerator {
   }
 
   drawShadow(coords: Array<Coord>, offset: Coord) {
-    this.ctx.strokeStyle = "rgb(0 0 0 / 25%)";
+    this.ctx.strokeStyle = "rgb(30 30 30 / 25%)";
     this.ctx.beginPath();
     this.ctx.moveTo(coords[0].x + offset.x, coords[0].y + offset.y);
     for (let i = 1; i < coords.length; ++i) {
@@ -1383,6 +1383,7 @@ class SpriteGenerator {
   drawThreeSides(rightShape: Array<Coord>,
                  leftShape: Array<Coord>,
                  topShape: Array<Coord>,
+                 shadow: Array<Coord>,
                  shape: TerrainShape) {
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
@@ -1395,6 +1396,7 @@ class SpriteGenerator {
         this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
       }
       this.drawSide(topShape, topColour, offset);
+      this.drawShadow(shadow, offset);
     }
   }
 
@@ -1415,7 +1417,7 @@ class SpriteGenerator {
     );
     const topShape = new Array<Coord>(
       this.leftOfTop,
-      this.top,
+      //this.top,
       this.rightOfTop,
       this.topRight,
       this.rightOfMid,
@@ -1454,7 +1456,17 @@ class SpriteGenerator {
       this.topRight,
       this.mid,
     );
-    this.drawThreeSides(rightShape, leftShape, topShape, TerrainShape.RampSouth);
+    const shadow = new Array<Coord>(
+      this.mid,
+      this.topRight,
+    );
+    this.drawThreeSides(
+      rightShape,
+      leftShape,
+      topShape,
+      shadow,
+      TerrainShape.RampSouth
+    );
   }
 
   generateRampWest() {
@@ -1475,7 +1487,17 @@ class SpriteGenerator {
       this.bottomRight,
       this.backCorner,
     );
-    this.drawThreeSides(rightShape, leftShape, topShape, TerrainShape.RampWest);
+    const shadow = new Array<Coord>(
+      this.topLeft,
+      this.mid,
+    );
+    this.drawThreeSides(
+      rightShape,
+      leftShape,
+      topShape,
+      shadow,
+      TerrainShape.RampWest
+    );
   }
 
   generateRampEast() {
@@ -1490,6 +1512,10 @@ class SpriteGenerator {
       this.topRight,
       this.bottom,
     );
+    const shadow = new Array<Coord>(
+      this.top,
+      this.topRight,
+    );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
       const offset = new Coord(this.width * TerrainShape.RampEast, this.height * i);
@@ -1499,6 +1525,7 @@ class SpriteGenerator {
         this.drawSide(rightShape, this.descriptor.lightUndergroundColour, offset);
       }
       this.drawSide(topShape, topColour, offset);
+      this.drawShadow(shadow, offset);
     }
   }
 
@@ -1514,6 +1541,10 @@ class SpriteGenerator {
       this.bottom,
       this.bottomRight,
     );
+    const shadow = new Array<Coord>(
+      this.top,
+      this.topLeft,
+    );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
       const offset = new Coord(this.width * TerrainShape.RampNorth, this.height * i); 
@@ -1523,6 +1554,7 @@ class SpriteGenerator {
         this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
       }
       this.drawSide(topShape, topColour, offset);
+      this.drawShadow(shadow, offset);
     }
   }
 
@@ -1536,24 +1568,32 @@ class SpriteGenerator {
       shadows = new Array<Coord>(
         this.topLeft,
         this.leftOfMid,
+        this.mid,
+        this.rightOfMid,
       );
       break;
     case TerrainShape.NorthEdge:
       shadows = new Array<Coord>(
         this.topLeft,
         this.leftOfTop,
+        //this.top,
+        //this.rightOfTop,
       );
       break;
     case TerrainShape.EastEdge:
       shadows = new Array<Coord>(
         this.topRight,
         this.rightOfTop,
+        //this.top,
+        //this.leftOfTop,
       );
       break;
     case TerrainShape.SouthEdge:
       shadows = new Array<Coord>(
         this.topRight,
         this.rightOfMid,
+        this.mid,
+        this.leftOfMid,
       );
       break;
     }
@@ -1572,29 +1612,40 @@ class SpriteGenerator {
       break;
     case TerrainShape.NorthWestCorner:
       shadows = new Array<Coord>(
+        this.rightOfMid,
         this.mid,
+        this.leftOfMid,
         this.topLeft,
         this.leftOfTop,
+        this.top,
       );
       break;
     case TerrainShape.NorthEastCorner:
       shadows = new Array<Coord>(
         this.topLeft,
         this.leftOfTop,
+        this.top,
+        this.rightOfTop,
         this.topRight,
       );
       break;
     case TerrainShape.SouthEastCorner:
       shadows = new Array<Coord>(
+        this.leftOfTop,
+        this.top,
         this.rightOfTop,
         this.topRight,
+        this.rightOfMid,
         this.mid,
+        this.leftOfMid,
       );
       break;
     case TerrainShape.SouthWestCorner:
       shadows = new Array<Coord>(
         this.topRight,
+        this.rightOfMid,
         this.mid,
+        this.leftOfMid,
         this.topLeft,
       );
       break;
@@ -1608,32 +1659,29 @@ class SpriteGenerator {
 
   generateCorridor(shape: TerrainShape) {
     this.generateFlat(shape);
-    let shadows: Array<Coord>;
+    let shadows: Array<Array<Coord>>;
     switch (shape) {
     default:
       throw new Error('unhandled corner');
       break;
     case TerrainShape.NorthSouthCorridor:
-      shadows = new Array<Coord>(
-        this.topLeft,
-        this.leftOfMid,
-      );
-      this.top,
-        this.topRight,
+      shadows = new Array<Array<Coord>>(
+        [this.topLeft, this.leftOfMid],
+        [this.top, this.topRight],
       );
       break;
     case TerrainShape.EastWestCorridor:
-      shadows = new Array<Coord>(
-        this.top,
-        this.topLeft,
-        this.topRight,
-        this.mid,
+      shadows = new Array<Array<Coord>>(
+        [this.leftOfTop, this.topLeft],
+        [this.topRight, this.rightOfMid],
       );
       break;
     }
-    for (let i = 0; i < this.colours.length; ++i) {
-      const offset = new Coord(this.width * shape, this.height * i);
-      this.drawShadow(shadows, offset);
+    for (let shadow of shadows) {
+      for (let i = 0; i < this.colours.length; ++i) {
+        const offset = new Coord(this.width * shape, this.height * i);
+        this.drawShadow(shadow, offset);
+      }
     }
   }
 
@@ -1664,6 +1712,8 @@ class SpriteGenerator {
       break;
     case TerrainShape.NorthPeninsula:
       shadows = new Array<Coord>(
+        this.rightOfMid,
+        this.mid,
         this.leftOfMid,
         this.topLeft,
         this.leftOfTop,
@@ -1680,14 +1730,18 @@ class SpriteGenerator {
         this.rightOfTop,
         this.topRight,
         this.rightOfMid,
+        this.mid,
+        this.leftOfMid,
       );
       break;
     case TerrainShape.SouthPeninsula:
       shadows = new Array<Coord>(
+        this.leftOfTop,
         this.top,
         this.rightOfTop,
         this.topRight,
         this.rightOfMid,
+        this.mid,
         this.leftOfMid,
         this.topLeft,
       );
@@ -1696,10 +1750,12 @@ class SpriteGenerator {
       shadows = new Array<Coord>(
         this.topRight,
         this.rightOfMid,
+        this.mid,
         this.leftOfMid,
         this.topLeft,
         this.leftOfTop,
         this.top,
+        this.rightOfTop,
       );
       break;
     }
