@@ -788,6 +788,8 @@ export interface TerrainSpriteDescriptor {
   wetGrassColour: string;
   lightUndergroundColour: string;
   darkUndergroundColour: string;
+  lightUnderwaterColour: string;
+  darkUnderwaterColour: string;
 };
 
 export class TerrainGraphics {
@@ -1241,7 +1243,9 @@ class SpriteGenerator {
       numTerrains * this.height 
     );
     console.log('generating sprite sheet', this.canvas.width, this.canvas.height);
-    const ctx = this.canvas.getContext("2d");
+    const ctx = this.canvas.getContext("2d", {
+      willReadFrequently: true,
+    });
     if (ctx) {
       this.ctx = ctx!;
     }
@@ -1371,9 +1375,14 @@ class SpriteGenerator {
                  shape: TerrainShape) {
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
-      const offset = new Coord(this.width * shape, this.height * i); 
-      this.drawSide(rightShape, this.descriptor.lightUndergroundColour, offset);
-      this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
+      const offset = new Coord(this.width * shape, this.height * i);
+      if (topColour == this.descriptor.waterColour) {
+        this.drawSide(rightShape, this.descriptor.lightUnderwaterColour, offset);
+        this.drawSide(leftShape, this.descriptor.darkUnderwaterColour, offset);
+      } else {
+        this.drawSide(rightShape, this.descriptor.lightUndergroundColour, offset);
+        this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
+      }
       this.drawSide(topShape, topColour, offset);
     }
   }
@@ -1405,8 +1414,13 @@ class SpriteGenerator {
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
       const offset = new Coord(this.width * shape, this.height * i); 
-      this.drawSide(rightShape, this.descriptor.lightUndergroundColour, offset);
-      this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
+      if (topColour == this.descriptor.waterColour) {
+        this.drawSide(rightShape, this.descriptor.lightUnderwaterColour, offset);
+        this.drawSide(leftShape, this.descriptor.darkUnderwaterColour, offset);
+      } else {
+        this.drawSide(rightShape, this.descriptor.lightUndergroundColour, offset);
+        this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
+      }
       this.drawSide(topShape, topColour, offset);
     }
   }
@@ -1429,13 +1443,7 @@ class SpriteGenerator {
       this.topRight,
       this.mid,
     );
-    for (let i = 0; i < this.colours.length; ++i) {
-      const topColour = this.colours[i];
-      const offset = new Coord(this.width * TerrainShape.RampSouth, this.height * i); 
-      this.drawSide(rightShape, this.descriptor.lightUndergroundColour, offset);
-      this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
-      this.drawSide(topShape, topColour, offset);
-    }
+    this.drawThreeSides(rightShape, leftShape, topShape, TerrainShape.RampSouth);
   }
 
   generateRampWest() {
@@ -1473,8 +1481,12 @@ class SpriteGenerator {
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
-      const offset = new Coord(this.width * TerrainShape.RampEast, this.height * i); 
-      this.drawSide(rightShape, this.descriptor.lightUndergroundColour, offset);
+      const offset = new Coord(this.width * TerrainShape.RampEast, this.height * i);
+      if (topColour == this.descriptor.waterColour) {
+        this.drawSide(rightShape, this.descriptor.lightUnderwaterColour, offset);
+      } else {
+        this.drawSide(rightShape, this.descriptor.lightUndergroundColour, offset);
+      }
       this.drawSide(topShape, topColour, offset);
     }
   }
@@ -1494,7 +1506,11 @@ class SpriteGenerator {
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
       const offset = new Coord(this.width * TerrainShape.RampNorth, this.height * i); 
-      this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
+      if (topColour == this.descriptor.waterColour) {
+        this.drawSide(leftShape, this.descriptor.darkUnderwaterColour, offset);
+      } else {
+        this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
+      }
       this.drawSide(topShape, topColour, offset);
     }
   }

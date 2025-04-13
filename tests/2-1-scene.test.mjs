@@ -16,12 +16,12 @@ function drawCoord(entity) {
 }
 
 test("calculate physical dimensions from sprite dimensions", () => {
-  const spriteWidth = 322;
-  const spriteHeight = 270;
+  const spriteWidth = 161;
+  const spriteHeight = 123;
   const dims = getDimensions(spriteWidth, spriteHeight);
-  expect(dims.width).toBeCloseTo(width);
-  expect(dims.depth).toBeCloseTo(depth);
-  expect(dims.height).toBeCloseTo(height);
+  expect(dims.width).toBeCloseTo(36.0);
+  expect(dims.depth).toBeCloseTo(36.0);
+  expect(dims.height).toBeCloseTo(38.01);
 });
 
 test("draw order of single row", () => {

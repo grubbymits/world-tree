@@ -402,6 +402,9 @@ export class TrueIsometric extends SceneGraph {
   protected static readonly _sqrt3 = Math.sqrt(3);
   protected static readonly _halfSqrt3 = Math.sqrt(3) * 0.5;
 
+  get spriteWidth(): number { return this._spriteWidth; }
+  get spriteHeight(): number { return this._spriteHeight; }
+
   getDrawCoord(loc: Point3D): Point2D {
     // An isometric square has:
     // - sides equal length = 1,
@@ -412,8 +415,28 @@ export class TrueIsometric extends SceneGraph {
 
     // Tiles are placed overlapping each other by half.
     // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
-    const dx = Math.round(TrueIsometric._halfSqrt3 * (loc.x + loc.y));
-    const dy = Math.round(0.5 * (loc.y - loc.x) - loc.z);
+    let dx = Math.round(TrueIsometric._halfSqrt3 * (loc.x + loc.y));
+    let dy = Math.round(0.5 * (loc.y - loc.x) - loc.z);
+
+    // Attempt snapping.
+    // Tiles are placed at each half width, on the x-axis and width/4 on the
+    // y-axis. Add or subtract a pixel if it will result in the coordinate
+    // being aligned to those values.
+    const halfWidth = this.spriteWidth >> 1;
+    const modX = dx % this.spriteWidth;
+    const modY = dy % this.spriteHeight;
+    if (modX == 1 || modX == halfWidth + 1) {
+      dx -= 1;
+    } else if (modX == this.spriteWidth - 1 || modX == halfWidth - 1) {
+      dx += 1;
+    }
+
+    const quarterWidth = this.spriteWidth >> 2;
+    if (modY == 1 || modY == quarterWidth + 1) {
+      dy -= 1;
+    } else if (modY == this.spriteHeight - 1 || modY == quarterWidth - 1) {
+      dy += 1;
+    }
     return new Point2D(dx, dy);
   }
 
