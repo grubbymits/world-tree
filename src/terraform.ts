@@ -1167,12 +1167,14 @@ class SpriteGenerator {
     // So, firstly round the width and calculate yDelta.
     this.width = this.descriptor.spriteWidth;
     this.height = this.descriptor.spriteHeight;
+    /*
     const widthRem = Math.floor(this.width % 4);
     if (widthRem < 2) {
       this.width +- widthRem;
     } else {
       this.width += widthRem;
     }
+    */
     const yDelta = this.width >> 2;
     const midX = Math.floor(0.5 * this.width) - 1;
     const bottomY = this.height - 1 - yDelta;
@@ -1242,7 +1244,6 @@ class SpriteGenerator {
       TerrainShape.Max * this.width,
       numTerrains * this.height 
     );
-    console.log('generating sprite sheet', this.canvas.width, this.canvas.height);
     const ctx = this.canvas.getContext("2d", {
       willReadFrequently: true,
     });
@@ -1293,6 +1294,8 @@ class SpriteGenerator {
   set backCorner(c: Coord) { this._backCorner = c; }
 
   generateCanvas(): OffscreenCanvas {
+    console.log('generating sprite sheet', this.canvas.width, this.canvas.height);
+    const startTime = performance.now();
     // Populate the descriptor with the row and column information.
     this.descriptor.tileRowTypes = new Array<TerrainType>(
       TerrainType.Water,
@@ -1349,6 +1352,8 @@ class SpriteGenerator {
       this.generateRampEast();
       this.generateRampSouth();
       this.generateRampWest();
+      const endTime = performance.now();
+      console.log('rendered sprite canvas in (msec):', endTime - startTime);
       return this.canvas;
     } else {
       throw new Error('no offscreen rendering context');

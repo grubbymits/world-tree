@@ -385,64 +385,7 @@ export class Scene {
 }
 
 export enum Perspective {
-  TrueIsometric,
   TwoByOneIsometric,
-}
-
-// An isometric square has:
-// - sides equal length = 1,
-// - the short diagonal is length = 1,
-// - the long diagonal is length = sqrt(3) ~= 1.73.
-export class TrueIsometric extends SceneGraph {
-  constructor(private readonly _spriteWidth: number,
-              private readonly _spriteHeight: number) {
-    super();
-  }
-
-  protected static readonly _sqrt3 = Math.sqrt(3);
-  protected static readonly _halfSqrt3 = Math.sqrt(3) * 0.5;
-
-  get spriteWidth(): number { return this._spriteWidth; }
-  get spriteHeight(): number { return this._spriteHeight; }
-
-  getDrawCoord(loc: Point3D): Point2D {
-    // An isometric square has:
-    // - sides equal length = 1,
-    // - the short diagonal is length = 1,
-    // - the long diagonal is length = sqrt(3) ~= 1.73.
-    // We're allowing the height to vary, so its a cuboid, not a cube, but with
-    // a square top.
-
-    // Tiles are placed overlapping each other by half.
-    // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
-    let dx = Math.round(TrueIsometric._halfSqrt3 * (loc.x + loc.y));
-    let dy = Math.round(0.5 * (loc.y - loc.x) - loc.z);
-
-    // Attempt snapping.
-    // Tiles are placed at each half width, on the x-axis and width/4 on the
-    // y-axis. Add or subtract a pixel if it will result in the coordinate
-    // being aligned to those values.
-    const halfWidth = this.spriteWidth >> 1;
-    const modX = dx % this.spriteWidth;
-    const modY = dy % this.spriteHeight;
-    if (modX == 1 || modX == halfWidth + 1) {
-      dx -= 1;
-    } else if (modX == this.spriteWidth - 1 || modX == halfWidth - 1) {
-      dx += 1;
-    }
-
-    const quarterWidth = this.spriteWidth >> 2;
-    if (modY == 1 || modY == quarterWidth + 1) {
-      dy -= 1;
-    } else if (modY == this.spriteHeight - 1 || modY == quarterWidth - 1) {
-      dy += 1;
-    }
-    return new Point2D(dx, dy);
-  }
-
-  drawOrder(first: SceneNode, second: SceneNode): RenderOrder {
-    return RenderOrder.Any;
-  }
 }
 
 // https://www.significant-bits.com/a-laymans-guide-to-projection-in-videogames/
@@ -456,6 +399,9 @@ export class TwoByOneIsometric extends SceneGraph {
               private readonly _spriteHeight: number) {
     super();
   }
+
+  get spriteWidth(): number { return this._spriteWidth; }
+  get spriteHeight(): number { return this._spriteHeight; }
 
   // atan(0.5) = 26.565
   // cos(26.565) = 0.8944
@@ -477,9 +423,13 @@ export class TwoByOneIsometric extends SceneGraph {
     //      322       |     72.001        |       322         |   144.0028
     const oneUnit = spriteWidth * 0.25;
     const twoUnits = spriteWidth * 0.5;
+    const cubeHeight = (spriteWidth - twoUnits) * this._magicRatio;
     const width = oneUnit * this._magicRatio;
     const depth = width;
-    const height = (spriteHeight - twoUnits) * this._magicRatio;
+    const height = cubeHeight;
+    console.assert(width >= 0, 'width < 0');
+    console.assert(depth >= 0, 'depth < 0');
+    console.assert(height >= 0, 'height < 0');
     return new Dimensions(width, depth, height
       //Math.floor(width),
       //Math.floor(depth),
@@ -493,20 +443,24 @@ export class TwoByOneIsometric extends SceneGraph {
     let dx = ((loc.x + loc.y) * 2 * TwoByOneIsometric._oneOverMagicRatio);
     let dy = ((loc.y - loc.x - loc.z) * TwoByOneIsometric._oneOverMagicRatio);
 
-    const halfSpriteWidth = this._spriteWidth / 2;
-    const alignX = dx % halfSpriteWidth;
-    if (alignX <= 1) {
-      dx - alignX;
-    } else if (alignX >= halfSpriteWidth - 1) {
-      dx += halfSpriteWidth - alignX;
+    // Attempt snapping.
+    // Tiles are placed at each half width, on the x-axis and width/4 on the
+    // y-axis. Add or subtract a pixel if it will result in the coordinate
+    // being aligned to those values.
+    const halfWidth = this.spriteWidth >> 1;
+    const modX = dx % this.spriteWidth;
+    const modY = dy % this.spriteHeight;
+    if (modX == 1 || modX == halfWidth + 1) {
+      dx -= 1;
+    } else if (modX == this.spriteWidth - 1 || modX == halfWidth - 1) {
+      dx += 1;
     }
 
-    const quarterSpriteHeight = this._spriteHeight / 4;
-    const alignY = dy % quarterSpriteHeight;
-    if (alignY <= 1) {
-      dy - alignY;
-    } else if (alignY >= quarterSpriteHeight - 1) {
-      dy += quarterSpriteHeight - alignY;
+    const quarterWidth = this.spriteWidth >> 2;
+    if (modY == 1 || modY == quarterWidth + 1) {
+      dy -= 1;
+    } else if (modY == this.spriteHeight - 1 || modY == quarterWidth - 1) {
+      dy += 1;
     }
     return new Point2D(dx, dy);
   }
@@ -669,8 +623,6 @@ export function getPerspectiveFromString(name: string): Perspective {
     default:
       throw new Error('unsupported perspective name');
       break;
-    case 'TrueIsometric':
-      return Perspective.TrueIsometric;
     case 'TwoByOneIsometric':
       return Perspective.TwoByOneIsometric;
   }

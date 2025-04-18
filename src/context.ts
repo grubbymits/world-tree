@@ -20,7 +20,6 @@ import { BiomeConfig } from "./biomes.ts";
 import {
   Perspective,
   Scene,
-  TrueIsometric,
   TwoByOneIsometric,
   getPerspectiveFromString,
   getDimensionsFromPerspective,
@@ -77,9 +76,6 @@ export class ContextImpl implements Context {
     switch (perspective) {
       default:
         console.error("unhandled perspective");
-        break;
-      case Perspective.TrueIsometric:
-        this._scene = new Scene(new TrueIsometric(terrainSpriteWidth, terrainSpriteHeight));
         break;
       case Perspective.TwoByOneIsometric:
         this._scene = new Scene(new TwoByOneIsometric(terrainSpriteWidth, terrainSpriteHeight));
@@ -225,6 +221,7 @@ export interface WorldDescriptor {
 };
 
 export async function createWorld(worldDesc: WorldDescriptor): Promise<ContextImpl>{
+  const startTime = performance.now();
   const terrainSpriteDesc = worldDesc.terrainSpriteDescriptor;
   const spriteWidth = terrainSpriteDesc.spriteWidth;
   const spriteHeight = terrainSpriteDesc.spriteHeight;
@@ -295,5 +292,7 @@ export async function createWorld(worldDesc: WorldDescriptor): Promise<ContextIm
     );
     const grid = new TerrainGrid(context, terrainGridDescriptor);
   });
+  const endTime = performance.now();
+  console.log('world generated in (msec):', endTime - startTime);
   return context;
 }

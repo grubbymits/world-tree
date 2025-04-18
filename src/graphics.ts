@@ -90,14 +90,18 @@ export class SpriteSheet {
   }
 
   public static async create(name: string, context: ContextImpl): Promise<SpriteSheet> {
+    const startTime = performance.now();
     const sheet = new SpriteSheet(context);
     await this.load(sheet, name);
     this.add(sheet);
+    const endTime = performance.now();
+    console.log('generated sprite sheet in (msec):', endTime - startTime);
     return sheet;
   }
 
   public static async createFromCanvas(canvas: OffscreenCanvas,
                                        context: ContextImpl): Promise<SpriteSheet> {
+    const startTime = performance.now();
     const sheet = new SpriteSheet(context);
     sheet.canvas = canvas;
     sheet.context2D = canvas.getContext("2d", {
@@ -111,6 +115,8 @@ export class SpriteSheet {
         console.log("failed to convert to blob:", error);
       }
     );
+    const endTime = performance.now();
+    console.log('generated sprite sheet in (msec):', endTime - startTime);
     sheet.loaded = true;
     return sheet;
   }

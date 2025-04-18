@@ -183,6 +183,9 @@ export class TerrainGrid {
   }
 
   scaleGridToWorld(x: number, y: number, z: number): Point3D {
+    console.assert(x >= 0, 'x < 0');
+    console.assert(y >= 0, 'y < 0');
+    console.assert(z >= 0, 'z < 0');
     const gapX = x * this._gap;
     const gapY = y * this._gap;
     const gapZ = z * this._gap;
