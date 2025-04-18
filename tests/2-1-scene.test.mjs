@@ -36,6 +36,7 @@ test("draw order of single row", () => {
   for (let i = 0; i < numEntities; i++) {
     let minLocation = new WT.Point3D(i * (entityDimensions.width + gap), 0, 0);
     let entity = new WT.CuboidEntity(context, minLocation, entityDimensions);
+    entity.addGraphic(dummyGraphic);
     let node = new WT.SceneNode(entity, scene);
     nodes.push(node);
   }
@@ -59,6 +60,7 @@ test("draw order of single column", () => {
   for (let i = 0; i < numEntities; i++) {
     let minLocation = new WT.Point3D(0, i * (entityDimensions.depth + gap), 0);
     let entity = new WT.CuboidEntity(context, minLocation, entityDimensions);
+    entity.addGraphic(dummyGraphic);
     let node = new WT.SceneNode(entity, scene);
     nodes.push(node);
   }
@@ -86,18 +88,21 @@ test("draw order of (x, y) increasing diagonal", () => {
       0
     );
     let entity = new WT.CuboidEntity(context, minLocation, entityDimensions);
+    entity.addGraphic(dummyGraphic);
     let node = new WT.SceneNode(entity, context.scene);
     nodes.push(node);
   }
-  expect(scene.drawOrder(nodes[0], nodes[1])).toBe(WT.RenderOrder.Any);
+
+  // TODO: We should be able to have these all as Any.
+  expect(scene.drawOrder(nodes[0], nodes[1])).toBe(WT.RenderOrder.Before);
   expect(scene.drawOrder(nodes[0], nodes[2])).toBe(WT.RenderOrder.Any);
   expect(scene.drawOrder(nodes[0], nodes[3])).toBe(WT.RenderOrder.Any);
-  expect(scene.drawOrder(nodes[1], nodes[2])).toBe(WT.RenderOrder.Any);
+  expect(scene.drawOrder(nodes[1], nodes[2])).toBe(WT.RenderOrder.Before);
   expect(scene.drawOrder(nodes[1], nodes[3])).toBe(WT.RenderOrder.Any);
-  expect(scene.drawOrder(nodes[2], nodes[3])).toBe(WT.RenderOrder.Any);
-  expect(scene.drawOrder(nodes[3], nodes[2])).toBe(WT.RenderOrder.Any);
-  expect(scene.drawOrder(nodes[2], nodes[1])).toBe(WT.RenderOrder.Any);
-  expect(scene.drawOrder(nodes[1], nodes[0])).toBe(WT.RenderOrder.Any);
+  expect(scene.drawOrder(nodes[2], nodes[3])).toBe(WT.RenderOrder.Before);
+  expect(scene.drawOrder(nodes[3], nodes[2])).toBe(WT.RenderOrder.After);
+  expect(scene.drawOrder(nodes[2], nodes[1])).toBe(WT.RenderOrder.After);
+  expect(scene.drawOrder(nodes[1], nodes[0])).toBe(WT.RenderOrder.After);
 });
 
 test("draw order of (x, y) four in a square", () => {
@@ -133,8 +138,8 @@ test("draw order of (x, y) four in a square", () => {
   let order = context.scene.graph.order;
   order.reverse();
   expect(order[0].entity.id).toBe(1);
-  expect(order[1].entity.id).toBe(3);
-  expect(order[2].entity.id).toBe(0);
+  expect(order[1].entity.id).toBe(0);
+  expect(order[2].entity.id).toBe(3);
   expect(order[3].entity.id).toBe(2);
 });
 
@@ -171,11 +176,11 @@ test("draw order of (x, y, z) eight in a cube", () => {
   expect(drawOrder.length).toBe(8);
   expect(drawOrder[0].entity.id).toBe(1);
   expect(drawOrder[1].entity.id).toBe(5);
-  expect(drawOrder[2].entity.id).toBe(3);
-  expect(drawOrder[3].entity.id).toBe(7);
+  expect(drawOrder[2].entity.id).toBe(0);
+  expect(drawOrder[3].entity.id).toBe(4);
 
-  expect(drawOrder[4].entity.id).toBe(0);
-  expect(drawOrder[5].entity.id).toBe(4);
+  expect(drawOrder[4].entity.id).toBe(3);
+  expect(drawOrder[5].entity.id).toBe(7);
   expect(drawOrder[6].entity.id).toBe(2);
   expect(drawOrder[7].entity.id).toBe(6);
 });
@@ -213,11 +218,11 @@ test("draw order of (x, y, z) updating eight in a cube", () => {
   expect(drawOrder.length).toBe(8);
   expect(drawOrder[0].entity.id).toBe(1);
   expect(drawOrder[1].entity.id).toBe(5);
-  expect(drawOrder[2].entity.id).toBe(3);
-  expect(drawOrder[3].entity.id).toBe(7);
+  expect(drawOrder[2].entity.id).toBe(0);
+  expect(drawOrder[3].entity.id).toBe(4);
 
-  expect(drawOrder[4].entity.id).toBe(0);
-  expect(drawOrder[5].entity.id).toBe(4);
+  expect(drawOrder[4].entity.id).toBe(3);
+  expect(drawOrder[5].entity.id).toBe(7);
   expect(drawOrder[6].entity.id).toBe(2);
   expect(drawOrder[7].entity.id).toBe(6);
 
@@ -226,10 +231,10 @@ test("draw order of (x, y, z) updating eight in a cube", () => {
   expect(drawOrder.length).toBe(8);
   expect(drawOrder[0].entity.id).toBe(1);
   expect(drawOrder[1].entity.id).toBe(5);
-  expect(drawOrder[2].entity.id).toBe(3);
-  expect(drawOrder[3].entity.id).toBe(7);
-  expect(drawOrder[4].entity.id).toBe(0);
-  expect(drawOrder[5].entity.id).toBe(4);
+  expect(drawOrder[2].entity.id).toBe(0);
+  expect(drawOrder[3].entity.id).toBe(4);
+  expect(drawOrder[4].entity.id).toBe(3);
+  expect(drawOrder[5].entity.id).toBe(7);
   expect(drawOrder[6].entity.id).toBe(2);
   expect(drawOrder[7].entity.id).toBe(6);
 });
@@ -294,10 +299,10 @@ test("draw order of (x, y, z) updating level in a cube", () => {
   expect(drawOrder.length).toBe(8);
   expect(drawOrder[0].entity.id).toBe(1);
   expect(drawOrder[1].entity.id).toBe(4);
-  expect(drawOrder[2].entity.id).toBe(3);
-  expect(drawOrder[3].entity.id).toBe(6);
-  expect(drawOrder[4].entity.id).toBe(0);
-  expect(drawOrder[5].entity.id).toBe(movable.id);
+  expect(drawOrder[2].entity.id).toBe(0);
+  expect(drawOrder[3].entity.id).toBe(movable.id);
+  expect(drawOrder[4].entity.id).toBe(3);
+  expect(drawOrder[5].entity.id).toBe(6);
   expect(drawOrder[6].entity.id).toBe(2);
   expect(drawOrder[7].entity.id).toBe(5);
 });
@@ -374,11 +379,11 @@ test("draw order of (x, y, z) levels with a ramp", () => {
   expect(drawOrder.length).toBe(9);
   expect(drawOrder[0].entity.id).toBe(1);
   expect(drawOrder[1].entity.id).toBe(5);
-  expect(drawOrder[2].entity.id).toBe(3);
-  expect(drawOrder[3].entity.id).toBe(0);
+  expect(drawOrder[2].entity.id).toBe(0);
+  expect(drawOrder[3].entity.id).toBe(4);
   expect(drawOrder[4].entity.id).toBe(movable.id);
-  expect(drawOrder[5].entity.id).toBe(7);
-  expect(drawOrder[6].entity.id).toBe(4);
+  expect(drawOrder[5].entity.id).toBe(3);
+  expect(drawOrder[6].entity.id).toBe(7);
   expect(drawOrder[7].entity.id).toBe(2);
   expect(drawOrder[8].entity.id).toBe(6);
 });

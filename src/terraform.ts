@@ -1152,7 +1152,10 @@ class SpriteGenerator {
   private _bottom: Coord;
   private _leftOfBottom: Coord;
   private _bottomLeft: Coord;
+  private _belowBottomLeft: Coord;
   private _topLeft: Coord;
+  private _aboveTopLeft: Coord;
+  private _belowTopLeft: Coord;
   private _leftOfTop: Coord;
   private _mid: Coord;
   private _leftOfMid: Coord;
@@ -1219,7 +1222,10 @@ class SpriteGenerator {
     this.bottom = new Coord(midX, this.height - 1);
     this.leftOfBottom = new Coord(midX - 1, this.height - 1);
     this.bottomLeft = new Coord(0, bottomY);
+    this.belowBottomLeft = new Coord(0, bottomY + 1);
+    this.belowTopLeft = new Coord(0, yDelta + 1);
     this.topLeft = new Coord(0, yDelta); 
+    this.aboveTopLeft = new Coord(0, yDelta - 1);
     this.leftOfTop = new Coord(midX - 1, 0);
     
     this.mid = new Coord(midX, yDelta * 2);
@@ -1280,8 +1286,14 @@ class SpriteGenerator {
   set leftOfBottom(c: Coord) { this._leftOfBottom = c; }
   get bottomLeft(): Coord { return this._bottomLeft; }
   set bottomLeft(c: Coord) { this._bottomLeft = c; }
+  get belowBottomLeft(): Coord { return this._belowBottomLeft; }
+  set belowBottomLeft(c: Coord) { this._belowBottomLeft = c; }
   get topLeft(): Coord { return this._topLeft; }
   set topLeft(c: Coord) { this._topLeft = c; }
+  get aboveTopLeft(): Coord { return this._aboveTopLeft; }
+  set aboveTopLeft(c: Coord) { this._aboveTopLeft = c; }
+  get belowTopLeft(): Coord { return this._belowTopLeft; }
+  set belowTopLeft(c: Coord) { this._belowTopLeft = c; }
   get leftOfTop(): Coord { return this._leftOfTop; }
   set leftOfTop(c: Coord) { this._leftOfTop = c; }
   get mid(): Coord { return this._mid; }
@@ -1416,20 +1428,24 @@ class SpriteGenerator {
       this.mid,
     );
     const leftShape = new Array<Coord>(
+      //this.aboveTopLeft,
+      //this.belowTopLeft,
       this.topLeft,
-      this.bottomLeft,
-      this.leftOfBottom,
+      this.belowBottomLeft,
+      //this.rightOfBottom,
       this.bottom,
       this.mid,
     );
     const topShape = new Array<Coord>(
-      this.leftOfTop,
-      //this.top,
-      this.rightOfTop,
+      //this.leftOfTop,
+      this.top,
+      //this.rightOfTop,
       this.topRight,
       this.rightOfMid,
       this.leftOfMid,
+      this.belowTopLeft,
       this.topLeft,
+      //this.aboveTopLeft,
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];

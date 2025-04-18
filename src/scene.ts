@@ -423,7 +423,7 @@ export class TwoByOneIsometric extends SceneGraph {
     //      322       |     72.001        |       322         |   144.0028
     const oneUnit = spriteWidth * 0.25;
     const twoUnits = spriteWidth * 0.5;
-    const cubeHeight = (spriteWidth - twoUnits) * this._magicRatio;
+    const cubeHeight = (spriteHeight - twoUnits) * this._magicRatio;
     const width = oneUnit * this._magicRatio;
     const depth = width;
     const height = cubeHeight;
@@ -447,6 +447,7 @@ export class TwoByOneIsometric extends SceneGraph {
     // Tiles are placed at each half width, on the x-axis and width/4 on the
     // y-axis. Add or subtract a pixel if it will result in the coordinate
     // being aligned to those values.
+    /*
     const halfWidth = this.spriteWidth >> 1;
     const modX = dx % this.spriteWidth;
     const modY = dy % this.spriteHeight;
@@ -462,6 +463,7 @@ export class TwoByOneIsometric extends SceneGraph {
     } else if (modY == this.spriteHeight - 1 || modY == quarterWidth - 1) {
       dy += 1;
     }
+    */
     return new Point2D(dx, dy);
   }
 
@@ -492,17 +494,26 @@ export class TwoByOneIsometric extends SceneGraph {
     //         y
 
     // First, check whether the sprites could overlap each other.
-    const distanceX = Math.abs(first.drawCoord.x - second.drawCoord.x);
-    const distanceY = Math.abs(first.drawCoord.y - second.drawCoord.y);
-    const widest = Math.max(
-      first.entity.graphics[0].width,
-      second.entity.graphics[0].width
-    );
-    const tallest = Math.max(
-      first.entity.graphics[0].height,
-      second.entity.graphics[0].height
-    );
-    if (distanceX > widest && distanceY > tallest) {
+    const firstX = first.drawCoord.x;
+    const firstWidth = first.entity.graphics[0].width;
+    const secondX = second.drawCoord.x;
+    const secondWidth = second.entity.graphics[0].width;
+
+    if (firstX < secondX && firstX + firstWidth < secondX) {
+      return RenderOrder.Any;
+    }
+    if (secondX < firstX && secondX + secondWidth < firstX) {
+      return RenderOrder.Any;
+    }
+
+    const firstY = first.drawCoord.y;
+    const firstHeight = first.entity.graphics[0].height;
+    const secondY = second.drawCoord.y;
+    const secondHeight = second.entity.graphics[0].height;
+    if (firstY < secondY && firstY + firstHeight < secondY) {
+      return RenderOrder.Any;
+    }
+    if (secondY < firstY && secondY + secondHeight < firstY) {
       return RenderOrder.Any;
     }
 
@@ -568,7 +579,7 @@ export class TwoByOneIsometric extends SceneGraph {
         if (minXB > maxXA) {
           return RenderOrder.After;
         }
-      } 
+      }
 
       const overlapX = EntityBounds.axisOverlapX(ida, idb);
       const overlapY = EntityBounds.axisOverlapY(ida, idb);
