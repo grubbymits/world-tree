@@ -1144,22 +1144,20 @@ class SpriteGenerator {
   private _width: number;
   private _height: number;
   private _colours: Array<string>;
-  private _top: Coord;
-  private _rightOfTop: Coord;
+  private _top1: Coord;
+  private _top4: Coord;
+  private _topLeft: Coord;
+  private _bottomLeft: Coord;
   private _topRight: Coord;
   private _bottomRight: Coord;
-  private _rightOfBottom: Coord;
-  private _bottom: Coord;
-  private _leftOfBottom: Coord;
-  private _bottomLeft: Coord;
-  private _belowBottomLeft: Coord;
-  private _topLeft: Coord;
-  private _aboveTopLeft: Coord;
-  private _belowTopLeft: Coord;
-  private _leftOfTop: Coord;
-  private _mid: Coord;
-  private _leftOfMid: Coord;
-  private _rightOfMid: Coord;
+  private _mid1: Coord;
+  private _mid2: Coord;
+  private _mid3: Coord;
+  private _mid4: Coord;
+  private _bottom1: Coord;
+  private _bottom2: Coord;
+  private _bottom3: Coord;
+  private _bottom4: Coord;
   private _backCorner: Coord;
 
   constructor(private readonly _descriptor: TerrainSpriteDescriptor) {
@@ -1167,71 +1165,52 @@ class SpriteGenerator {
     // the y delta, between top and topLeft/Right, without rounding. We also want
     // a mid point which also doesn't require rounding.
 
-    // So, firstly round the width and calculate yDelta.
+    // https://www.slynyrd.com/blog/2018/4/12/pixelblog-4-graphical-projection-part-2
+    // 0 1 2 3 4 5 6 7 8 9 a b c d e f
+
+    //               top
+    //             1 2 3 4 
+    //             * * * *
+    //         *             *
+    //     *                     *
+    // *                             * topRight
+    // |   *         mid         *   |
+    // |       *   1 2 3 4   *       |
+    // |           * * * *           |
+    // |             | |             |
+    // |             | |             |
+    // *             | |             * bottomRight
+    //    *          | |         *
+    //        *      | |     *
+    //             * * * *
+    //             bottom
+    //             1 2 3 4
     this.width = this.descriptor.spriteWidth;
     this.height = this.descriptor.spriteHeight;
-    /*
-    const widthRem = Math.floor(this.width % 4);
-    if (widthRem < 2) {
-      this.width +- widthRem;
-    } else {
-      this.width += widthRem;
-    }
-    */
-    const yDelta = this.width >> 2;
-    const midX = Math.floor(0.5 * this.width) - 1;
+
+    const midX = this.width >> 1;
+    this.top1 = new Coord(midX - 2, 0);
+    this.top4 = new Coord(midX + 2, 0);
+
+    const xDelta = this.width - this.top4.x;
+    const yDelta = xDelta >> 1;
     const bottomY = this.height - 1 - yDelta;
 
-    // Say we've rounded the width to 20, yDelta would be 5. From the 'top' point
-    // we will move 10 units in the x axis and 5 in the y.
-    // 0 ... 19
-    //
-    // Splitting into two sides gives us two sets of points:
-    // 0,   1,  2,  3,  4,  5,  6,  7,  8,  9
-    // 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
-    //
-    // In the y-axis we have: 0, 1, 2, 3, 4.
-    // If we map the points using the y-axis we get two sets:
-    //
-    // (0, 4),  (2, 3),   (4, 2), (6, 1),  (8, 0)
-    // (10, 0), (12, 1), (14, 2), (16, 3), (18, 4)
-    //
-    // Which means we have a single point (9, 0), that is in the middle, but not
-    // a member of either set.
-    //
-    //
-    //                  * 'top'
-    //                /   \
-    //               /     \
-    //    'topLeft' *       * 'topRight'
-    //              |\     /|
-    //              | \   / |
-    //              |   *   |
-    //'bottomLeft'  *   |   * 'bottomRight'
-    //               \  |  /
-    //                \ | /
-    //                  *
-    //              'bottom'
-
-    // Clockwise from top
-    this.top = new Coord(midX, 0);
-    this.rightOfTop = new Coord(midX + 1, 0);
     this.topRight = new Coord(this.width - 1, yDelta);
     this.bottomRight = new Coord(this.width - 1, bottomY);
-    this.rightOfBottom = new Coord(midX + 1, this.height - 1);
-    this.bottom = new Coord(midX, this.height - 1);
-    this.leftOfBottom = new Coord(midX - 1, this.height - 1);
+    this.topLeft = new Coord(0, yDelta);
     this.bottomLeft = new Coord(0, bottomY);
-    this.belowBottomLeft = new Coord(0, bottomY + 1);
-    this.belowTopLeft = new Coord(0, yDelta + 1);
-    this.topLeft = new Coord(0, yDelta); 
-    this.aboveTopLeft = new Coord(0, yDelta - 1);
-    this.leftOfTop = new Coord(midX - 1, 0);
-    
-    this.mid = new Coord(midX, yDelta * 2);
-    this.leftOfMid = new Coord(midX - 1, yDelta * 2);
-    this.rightOfMid = new Coord(midX + 1, yDelta * 2);
 
+    this.mid1 = new Coord(midX - 2, yDelta << 1);
+    this.mid2 = new Coord(midX - 1, yDelta << 1);
+    this.mid3 = new Coord(midX + 1, yDelta << 1);
+    this.mid4 = new Coord(midX + 2, yDelta << 1);
+
+    this.bottom1 = new Coord(midX - 2, this.height - 1);
+    this.bottom2 = new Coord(midX - 1, this.height - 1);
+    this.bottom3 = new Coord(midX + 1, this.height - 1);
+    this.bottom4 = new Coord(midX + 2, this.height - 1);
+    
     // For ramps
     this.backCorner = new Coord(midX, this.height - yDelta * 2);
     
@@ -1270,38 +1249,34 @@ class SpriteGenerator {
   get colours(): Array<string> { return this._colours; }
   set colours(a: Array<string>) { this._colours = a; }
 
-  get top(): Coord { return this._top; }
-  set top(c: Coord) { this._top = c; }
-  get rightOfTop(): Coord { return this._rightOfTop; }
-  set rightOfTop(c: Coord) { this._rightOfTop = c; }
+  get top1(): Coord { return this._top1; }
+  set top1(c: Coord) { this._top1 = c; }
+  get top4(): Coord { return this._top4; }
+  set top4(c: Coord) { this._top4 = c; }
+  get topLeft(): Coord { return this._topLeft; }
+  set topLeft(c: Coord) { this._topLeft = c; }
+  get bottomLeft(): Coord { return this._bottomLeft; }
+  set bottomLeft(c: Coord) { this._bottomLeft = c; }
   get topRight(): Coord { return this._topRight; }
   set topRight(c: Coord) { this._topRight = c; }
   get bottomRight(): Coord { return this._bottomRight; }
   set bottomRight(c: Coord) { this._bottomRight = c; }
-  get rightOfBottom(): Coord { return this._rightOfBottom; }
-  set rightOfBottom(c: Coord) { this._rightOfBottom = c; }
-  get bottom(): Coord { return this._bottom; }
-  set bottom(c: Coord) { this._bottom = c; }
-  get leftOfBottom(): Coord { return this._leftOfBottom; }
-  set leftOfBottom(c: Coord) { this._leftOfBottom = c; }
-  get bottomLeft(): Coord { return this._bottomLeft; }
-  set bottomLeft(c: Coord) { this._bottomLeft = c; }
-  get belowBottomLeft(): Coord { return this._belowBottomLeft; }
-  set belowBottomLeft(c: Coord) { this._belowBottomLeft = c; }
-  get topLeft(): Coord { return this._topLeft; }
-  set topLeft(c: Coord) { this._topLeft = c; }
-  get aboveTopLeft(): Coord { return this._aboveTopLeft; }
-  set aboveTopLeft(c: Coord) { this._aboveTopLeft = c; }
-  get belowTopLeft(): Coord { return this._belowTopLeft; }
-  set belowTopLeft(c: Coord) { this._belowTopLeft = c; }
-  get leftOfTop(): Coord { return this._leftOfTop; }
-  set leftOfTop(c: Coord) { this._leftOfTop = c; }
-  get mid(): Coord { return this._mid; }
-  set mid(c: Coord) { this._mid = c; }
-  get leftOfMid(): Coord { return this._leftOfMid; }
-  set leftOfMid(c: Coord) { this._leftOfMid = c; }
-  get rightOfMid(): Coord { return this._rightOfMid; }
-  set rightOfMid(c: Coord) { this._rightOfMid = c; }
+  get mid1(): Coord { return this._mid1; }
+  set mid1(c: Coord) { this._mid1 = c; }
+  get mid2(): Coord { return this._mid2; }
+  set mid2(c: Coord) { this._mid2 = c; }
+  get mid3(): Coord { return this._mid3; }
+  set mid3(c: Coord) { this._mid3 = c; }
+  get mid4(): Coord { return this._mid4; }
+  set mid4(c: Coord) { this._mid4 = c; }
+  get bottom1(): Coord { return this._bottom1; }
+  set bottom1(c: Coord) { this._bottom1 = c; }
+  get bottom2(): Coord { return this._bottom2; }
+  set bottom2(c: Coord) { this._bottom2 = c; }
+  get bottom3(): Coord { return this._bottom3; }
+  set bottom3(c: Coord) { this._bottom3 = c; }
+  get bottom4(): Coord { return this._bottom4; }
+  set bottom4(c: Coord) { this._bottom4 = c; }
   get backCorner(): Coord { return this._backCorner; }
   set backCorner(c: Coord) { this._backCorner = c; }
 
@@ -1360,10 +1335,14 @@ class SpriteGenerator {
       this.generatePeninsula(TerrainShape.WestPeninsula);
       this.generatePeninsula(TerrainShape.SouthPeninsula);
       this.generateSpire();
-      this.generateRampNorth();
-      this.generateRampEast();
-      this.generateRampSouth();
-      this.generateRampWest();
+      this.generateSpire();
+      this.generateSpire();
+      this.generateSpire();
+      this.generateSpire();
+      //this.generateRampNorth();
+      //this.generateRampEast();
+      //this.generateRampSouth();
+      //this.generateRampWest();
       const endTime = performance.now();
       console.log('rendered sprite canvas in (msec):', endTime - startTime);
       return this.canvas;
@@ -1374,6 +1353,7 @@ class SpriteGenerator {
   }
 
   drawShadow(coords: Array<Coord>, offset: Coord) {
+    return;
     this.ctx.strokeStyle = "rgb(30 30 30 / 25%)";
     this.ctx.beginPath();
     this.ctx.moveTo(coords[0].x + offset.x, coords[0].y + offset.y);
@@ -1420,32 +1400,29 @@ class SpriteGenerator {
   }
 
   generateFlat(shape: TerrainShape) {
+    const topShape = new Array<Coord>(
+      this.top1,
+      this.top4,
+      this.topRight,
+      this.mid4,
+      this.mid1,
+      this.topLeft,
+    );
     const rightShape = new Array<Coord>(
       this.topRight,
       this.bottomRight,
-      this.rightOfBottom,
-      this.bottom,
-      this.mid,
+      this.bottom4,
+      this.bottom3,
+      this.mid3,
+      this.mid4,
     );
     const leftShape = new Array<Coord>(
-      //this.aboveTopLeft,
-      //this.belowTopLeft,
       this.topLeft,
-      this.belowBottomLeft,
-      //this.rightOfBottom,
-      this.bottom,
-      this.mid,
-    );
-    const topShape = new Array<Coord>(
-      //this.leftOfTop,
-      this.top,
-      //this.rightOfTop,
-      this.topRight,
-      this.rightOfMid,
-      this.leftOfMid,
-      this.belowTopLeft,
-      this.topLeft,
-      //this.aboveTopLeft,
+      this.bottomLeft,
+      this.bottom1,
+      this.bottom2,
+      this.mid2,
+      this.mid1,
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
@@ -1463,25 +1440,28 @@ class SpriteGenerator {
 
   generateRampSouth() {
     const rightShape = new Array<Coord> (
-      this.bottomRight,
-      this.bottom,
-      this.mid,
       this.topRight,
+      this.bottomRight,
+      this.bottom4,
+      this.bottom3,
+      this.mid3,
+      this.mid4,
     );
     const leftShape = new Array<Coord>(
       this.bottomLeft,
-      this.bottom,
-      this.mid,
+      this.bottom1,
+      this.bottom2,
+      this.mid2,
+      this.mid1,
     );
     const topShape = new Array<Coord>(
       this.bottomLeft,
       this.backCorner,
       this.topRight,
-      this.mid,
+      this.mid4,
+      this.mid1,
     );
     const shadows = new Array<Array<Coord>>(
-      [this.mid, this.topRight],
-      [this.backCorner, this.bottomLeft],
     );
     this.drawThreeSides(
       rightShape,
@@ -1495,24 +1475,27 @@ class SpriteGenerator {
   generateRampWest() {
     const rightShape = new Array<Coord> (
       this.bottomRight,
-      this.bottom,
-      this.mid,
+      this.bottom4,
+      this.bottom3,
+      this.mid3,
+      this.mid4,
     );
     const leftShape = new Array<Coord>(
       this.topLeft,
       this.bottomLeft,
-      this.bottom,
-      this.mid,
+      this.bottom1,
+      this.bottom2,
+      this.mid2,
+      this.mid1,
     );
     const topShape = new Array<Coord>(
-      this.topLeft,
-      this.mid,
-      this.bottomRight,
       this.backCorner,
+      this.topLeft,
+      this.mid1,
+      this.mid4,
+      this.bottomRight,
     );
     const shadows = new Array<Array<Coord>>(
-      [this.topLeft, this.mid],
-      [this.backCorner, this.bottomRight],
     );
     this.drawThreeSides(
       rightShape,
@@ -1527,17 +1510,18 @@ class SpriteGenerator {
     const rightShape = new Array<Coord>(
       this.topRight,
       this.bottomRight,
-      this.bottom,
+      this.bottom4,
+      this.bottom2,
     );
     const topShape = new Array<Coord> (
-      this.bottomLeft,
-      this.top,
+      this.top4,
       this.topRight,
-      this.bottom,
+      this.bottom4,
+      this.bottom1,
+      this.bottomLeft,
+      this.top1,
     );
     const shadows = new Array<Array<Coord>>(
-      [this.top, this.topRight],
-      [this.bottomLeft, this.bottom],
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
@@ -1556,19 +1540,20 @@ class SpriteGenerator {
 
   generateRampNorth() {
     const leftShape = new Array<Coord>(
-      this.bottomLeft,
       this.topLeft,
-      this.bottom,
+      this.bottomLeft,
+      this.bottom1,
+      this.bottom2,
     );
     const topShape = new Array<Coord> (
-      this.top,
       this.topLeft,
-      this.bottom,
+      this.bottom2,
+      this.bottom4,
       this.bottomRight,
+      this.top4,
+      this.top1,
     );
     const shadows = new Array<Array<Coord>>(
-      [this.top, this.topLeft],
-      [this.bottomRight, this.bottom],
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
@@ -1593,34 +1578,18 @@ class SpriteGenerator {
       break;
     case TerrainShape.WestEdge:
       shadows = new Array<Coord>(
-        this.topLeft,
-        this.leftOfMid,
-        this.mid,
-        this.rightOfMid,
       );
       break;
     case TerrainShape.NorthEdge:
       shadows = new Array<Coord>(
-        this.topLeft,
-        this.leftOfTop,
-        //this.top,
-        //this.rightOfTop,
       );
       break;
     case TerrainShape.EastEdge:
       shadows = new Array<Coord>(
-        this.topRight,
-        this.rightOfTop,
-        //this.top,
-        //this.leftOfTop,
       );
       break;
     case TerrainShape.SouthEdge:
       shadows = new Array<Coord>(
-        this.topRight,
-        this.rightOfMid,
-        this.mid,
-        this.leftOfMid,
       );
       break;
     }
@@ -1639,41 +1608,18 @@ class SpriteGenerator {
       break;
     case TerrainShape.NorthWestCorner:
       shadows = new Array<Coord>(
-        this.rightOfMid,
-        this.mid,
-        this.leftOfMid,
-        this.topLeft,
-        this.leftOfTop,
-        this.top,
       );
       break;
     case TerrainShape.NorthEastCorner:
       shadows = new Array<Coord>(
-        this.topLeft,
-        this.leftOfTop,
-        this.top,
-        this.rightOfTop,
-        this.topRight,
       );
       break;
     case TerrainShape.SouthEastCorner:
       shadows = new Array<Coord>(
-        this.leftOfTop,
-        this.top,
-        this.rightOfTop,
-        this.topRight,
-        this.rightOfMid,
-        this.mid,
-        this.leftOfMid,
       );
       break;
     case TerrainShape.SouthWestCorner:
       shadows = new Array<Coord>(
-        this.topRight,
-        this.rightOfMid,
-        this.mid,
-        this.leftOfMid,
-        this.topLeft,
       );
       break;
     }
@@ -1693,14 +1639,10 @@ class SpriteGenerator {
       break;
     case TerrainShape.NorthSouthCorridor:
       shadows = new Array<Array<Coord>>(
-        [this.topLeft, this.leftOfMid],
-        [this.top, this.topRight],
       );
       break;
     case TerrainShape.EastWestCorridor:
       shadows = new Array<Array<Coord>>(
-        [this.leftOfTop, this.topLeft],
-        [this.topRight, this.rightOfMid],
       );
       break;
     }
@@ -1716,14 +1658,6 @@ class SpriteGenerator {
     const shape = TerrainShape.Spire;
     this.generateFlat(shape);
     const shadows = new Array<Coord>(
-      this.top,
-      this.rightOfTop,
-      this.topRight,
-      this.rightOfMid,
-      this.leftOfMid,
-      this.topLeft,
-      this.leftOfTop,
-      this.top,
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const offset = new Coord(this.width * shape, this.height * i);
@@ -1739,50 +1673,18 @@ class SpriteGenerator {
       break;
     case TerrainShape.NorthPeninsula:
       shadows = new Array<Coord>(
-        this.rightOfMid,
-        this.mid,
-        this.leftOfMid,
-        this.topLeft,
-        this.leftOfTop,
-        this.top,
-        this.rightOfTop,
-        this.topRight,
       );
       break;
     case TerrainShape.EastPeninsula:
       shadows = new Array<Coord>(
-        this.topLeft,
-        this.leftOfTop,
-        this.top,
-        this.rightOfTop,
-        this.topRight,
-        this.rightOfMid,
-        this.mid,
-        this.leftOfMid,
       );
       break;
     case TerrainShape.SouthPeninsula:
       shadows = new Array<Coord>(
-        this.leftOfTop,
-        this.top,
-        this.rightOfTop,
-        this.topRight,
-        this.rightOfMid,
-        this.mid,
-        this.leftOfMid,
-        this.topLeft,
       );
       break;
     case TerrainShape.WestPeninsula:
       shadows = new Array<Coord>(
-        this.topRight,
-        this.rightOfMid,
-        this.mid,
-        this.leftOfMid,
-        this.topLeft,
-        this.leftOfTop,
-        this.top,
-        this.rightOfTop,
       );
       break;
     }
