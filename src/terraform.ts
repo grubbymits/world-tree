@@ -1145,6 +1145,8 @@ class SpriteGenerator {
   private _height: number;
   private _colours: Array<string>;
   private _top1: Coord;
+  private _top2: Coord;
+  private _top3: Coord;
   private _top4: Coord;
   private _topLeft: Coord;
   private _bottomLeft: Coord;
@@ -1166,14 +1168,16 @@ class SpriteGenerator {
     // a mid point which also doesn't require rounding.
 
     // https://www.slynyrd.com/blog/2018/4/12/pixelblog-4-graphical-projection-part-2
-    // 0 1 2 3 4 5 6 7 8 9 a b c d e f
-
+    // 0                 15
+    // **** **** **** ****
+    //        ** **
+    //        67 89
     //               top
     //             1 2 3 4 
     //             * * * *
     //         *             *
     //     *                     *
-    // *                             * topRight
+    // **                           ** topRight
     // |   *         mid         *   |
     // |       *   1 2 3 4   *       |
     // |           * * * *           |
@@ -1188,28 +1192,37 @@ class SpriteGenerator {
     this.width = this.descriptor.spriteWidth;
     this.height = this.descriptor.spriteHeight;
 
+    const offsetX = 0;
+    const offsetY = 0;
     const midX = this.width >> 1;
-    this.top1 = new Coord(midX - 2, 0);
-    this.top4 = new Coord(midX + 2, 0);
+    this.top1 = new Coord(midX - 2, offsetY);
+    this.top2 = new Coord(midX - 1, offsetY);
+    this.top3 = new Coord(midX, offsetY);
+    this.top4 = new Coord(midX + 1, offsetY);
 
-    const xDelta = this.width - this.top4.x;
+    const xDelta = this.width - offsetX - this.top3.x + 1;
     const yDelta = xDelta >> 1;
-    const bottomY = this.height - 1 - yDelta;
+    console.log('width:', this.width);
+    console.log('xDelta:', xDelta);
+    console.log('yDelta:', yDelta);
+    const minX = this.width - 1;
+    const minY = this.height - 1 - offsetY;
+    const bottomY = minY - yDelta;
 
-    this.topRight = new Coord(this.width - 1, yDelta);
-    this.bottomRight = new Coord(this.width - 1, bottomY);
-    this.topLeft = new Coord(0, yDelta);
-    this.bottomLeft = new Coord(0, bottomY);
+    this.topRight = new Coord(minX - offsetX, yDelta);
+    this.bottomRight = new Coord(minX - offsetX, bottomY);
+    this.topLeft = new Coord(offsetX, yDelta);
+    this.bottomLeft = new Coord(offsetX, bottomY);
 
     this.mid1 = new Coord(midX - 2, yDelta << 1);
     this.mid2 = new Coord(midX - 1, yDelta << 1);
-    this.mid3 = new Coord(midX + 1, yDelta << 1);
-    this.mid4 = new Coord(midX + 2, yDelta << 1);
+    this.mid3 = new Coord(midX, yDelta << 1);
+    this.mid4 = new Coord(midX + 1, yDelta << 1);
 
-    this.bottom1 = new Coord(midX - 2, this.height - 1);
-    this.bottom2 = new Coord(midX - 1, this.height - 1);
-    this.bottom3 = new Coord(midX + 1, this.height - 1);
-    this.bottom4 = new Coord(midX + 2, this.height - 1);
+    this.bottom1 = new Coord(midX - 2, minY);
+    this.bottom2 = new Coord(midX - 1, minY);
+    this.bottom3 = new Coord(midX, minY);
+    this.bottom4 = new Coord(midX + 1, minY);
     
     // For ramps
     this.backCorner = new Coord(midX, this.height - yDelta * 2);
@@ -1251,6 +1264,10 @@ class SpriteGenerator {
 
   get top1(): Coord { return this._top1; }
   set top1(c: Coord) { this._top1 = c; }
+  get top2(): Coord { return this._top2; }
+  set top2(c: Coord) { this._top2 = c; }
+  get top3(): Coord { return this._top3; }
+  set top3(c: Coord) { this._top3 = c; }
   get top4(): Coord { return this._top4; }
   set top4(c: Coord) { this._top4 = c; }
   get topLeft(): Coord { return this._topLeft; }
@@ -1353,7 +1370,9 @@ class SpriteGenerator {
   }
 
   drawShadow(coords: Array<Coord>, offset: Coord) {
-    return;
+    if (coords.length == 0) {
+      return;
+    }
     this.ctx.strokeStyle = "rgb(30 30 30 / 25%)";
     this.ctx.beginPath();
     this.ctx.moveTo(coords[0].x + offset.x, coords[0].y + offset.y);
@@ -1403,26 +1422,34 @@ class SpriteGenerator {
     const topShape = new Array<Coord>(
       this.top1,
       this.top4,
+      this.top3,
       this.topRight,
+      this.mid3,
       this.mid4,
       this.mid1,
+      this.mid2,
       this.topLeft,
+      this.top2,
     );
     const rightShape = new Array<Coord>(
       this.topRight,
       this.bottomRight,
+      this.bottom3,
       this.bottom4,
       this.bottom3,
       this.mid3,
       this.mid4,
+      this.mid3,
     );
     const leftShape = new Array<Coord>(
       this.topLeft,
       this.bottomLeft,
+      this.bottom2,
       this.bottom1,
       this.bottom2,
       this.mid2,
       this.mid1,
+      this.mid2,
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
@@ -1578,18 +1605,30 @@ class SpriteGenerator {
       break;
     case TerrainShape.WestEdge:
       shadows = new Array<Coord>(
+        this.topLeft,
+        this.mid2,
+        this.mid1,
       );
       break;
     case TerrainShape.NorthEdge:
       shadows = new Array<Coord>(
+        this.top1,
+        this.top2,
+        this.topLeft,
       );
       break;
     case TerrainShape.EastEdge:
       shadows = new Array<Coord>(
+        this.top4,
+        this.top3,
+        this.topRight,
       );
       break;
     case TerrainShape.SouthEdge:
       shadows = new Array<Coord>(
+        this.topLeft,
+        this.mid3,
+        this.mid4,
       );
       break;
     }
@@ -1608,18 +1647,40 @@ class SpriteGenerator {
       break;
     case TerrainShape.NorthWestCorner:
       shadows = new Array<Coord>(
+        this.top1,
+        this.top2,
+        this.topLeft,
+        this.mid2,
+        this.mid1,
       );
       break;
     case TerrainShape.NorthEastCorner:
       shadows = new Array<Coord>(
+        this.topLeft,
+        this.top2,
+        this.top1,
+        this.top4,
+        this.top3,
+        this.topRight,
       );
       break;
     case TerrainShape.SouthEastCorner:
       shadows = new Array<Coord>(
+        this.top4,
+        this.top3,
+        this.topRight,
+        this.mid3,
+        this.mid4,
       );
       break;
     case TerrainShape.SouthWestCorner:
       shadows = new Array<Coord>(
+        this.topLeft,
+        this.mid2,
+        this.mid1,
+        this.mid4,
+        this.mid3,
+        this.topRight,
       );
       break;
     }
@@ -1639,10 +1700,26 @@ class SpriteGenerator {
       break;
     case TerrainShape.NorthSouthCorridor:
       shadows = new Array<Array<Coord>>(
+        [ this.topLeft,
+          this.mid2,
+          this.mid1,
+        ],
+        [ this.top4,
+          this.top3,
+          this.topRight,
+        ],
       );
       break;
     case TerrainShape.EastWestCorridor:
       shadows = new Array<Array<Coord>>(
+        [ this.top1,
+          this.top2,
+          this.topLeft,
+        ],
+        [ this.mid4,
+          this.mid3,
+          this.topRight,
+        ],
       );
       break;
     }
@@ -1658,6 +1735,16 @@ class SpriteGenerator {
     const shape = TerrainShape.Spire;
     this.generateFlat(shape);
     const shadows = new Array<Coord>(
+      this.top4,
+      this.top1,
+      this.top2,
+      this.topLeft,
+      this.mid2,
+      this.mid1,
+      this.mid4,
+      this.mid3,
+      this.topRight,
+      this.top3,
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const offset = new Coord(this.width * shape, this.height * i);
@@ -1673,18 +1760,50 @@ class SpriteGenerator {
       break;
     case TerrainShape.NorthPeninsula:
       shadows = new Array<Coord>(
+        this.mid1,
+        this.mid2,
+        this.topLeft,
+        this.top2,
+        this.top1,
+        this.top4,
+        this.top4,
+        this.topRight,
       );
       break;
     case TerrainShape.EastPeninsula:
       shadows = new Array<Coord>(
+        this.topLeft,
+        this.top2,
+        this.top1,
+        this.top4,
+        this.top3,
+        this.topRight,
+        this.mid3,
+        this.mid4,
       );
       break;
     case TerrainShape.SouthPeninsula:
       shadows = new Array<Coord>(
+        this.top4,
+        this.top3,
+        this.topRight,
+        this.mid3,
+        this.mid4,
+        this.mid1,
+        this.mid2,
+        this.topLeft,
       );
       break;
     case TerrainShape.WestPeninsula:
       shadows = new Array<Coord>(
+        this.top1,
+        this.top2,
+        this.topRight,
+        this.mid2,
+        this.mid1,
+        this.mid4,
+        this.mid3,
+        this.topRight,
       );
       break;
     }

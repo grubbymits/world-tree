@@ -443,11 +443,11 @@ export class TwoByOneIsometric extends SceneGraph {
     let dx = ((loc.x + loc.y) * 2 * TwoByOneIsometric._oneOverMagicRatio);
     let dy = ((loc.y - loc.x - loc.z) * TwoByOneIsometric._oneOverMagicRatio);
 
+    /*
     // Attempt snapping.
     // Tiles are placed at each half width, on the x-axis and width/4 on the
     // y-axis. Add or subtract a pixel if it will result in the coordinate
     // being aligned to those values.
-    /*
     const halfWidth = this.spriteWidth >> 1;
     const modX = dx % this.spriteWidth;
     const modY = dy % this.spriteHeight;
@@ -464,6 +464,8 @@ export class TwoByOneIsometric extends SceneGraph {
       dy += 1;
     }
     */
+    //dx += 2;
+    //dy++;
     return new Point2D(dx, dy);
   }
 
