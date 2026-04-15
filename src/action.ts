@@ -48,17 +48,18 @@ class MoveAction extends Action {
 
 export class MoveDirection extends MoveAction {
   private _adjustedD: Vector3D;
-  private _prevCollided: Vertex3D|null;
-  constructor(
-    actor: Actor,
-    private readonly _d: Vector3D
-  ) {
+  private _prevCollided: Vertex3D | null;
+  constructor(actor: Actor, private readonly _d: Vector3D) {
     super(actor);
     this._adjustedD = _d;
   }
 
-  get adjustedD(): Vector3D { return this._adjustedD; }
-  set adjustedD(d: Vector3D) { this._adjustedD = d; }
+  get adjustedD(): Vector3D {
+    return this._adjustedD;
+  }
+  set adjustedD(d: Vector3D) {
+    this._adjustedD = d;
+  }
 
   perform(): boolean {
     if (this._d.zero) {
@@ -75,13 +76,15 @@ export class MoveDirection extends MoveAction {
       if (obstruction.intersectInfo!.face.vertex != this._prevCollided) {
         // Calculate adjustment angle, if possible.
         this._prevCollided = obstruction.intersectInfo!.face.vertex;
-        const obstructionNormal = obstruction.intersectInfo!.face.vertex.normal.norm();
+        const obstructionNormal =
+          obstruction.intersectInfo!.face.vertex.normal.norm();
         if (obstructionNormal.mag() <= this._d.mag()) {
           const theta = obstruction.intersectInfo!.theta;
           const xyScale = theta;
           const xyMag = new Vector2D(
             this._d.x * xyScale,
-            this._d.y * xyScale).mag();
+            this._d.y * xyScale
+          ).mag();
           // Assume we're perpendicular, so subtract theta to calculate the
           // angle of the slope, not the angle between the actor and the slope.
           const angle = 0.5 * Math.PI - theta;
@@ -165,10 +168,12 @@ export class Navigate extends Action {
     actor: Actor,
     private readonly _step: number,
     private readonly _destination: Point3D,
-    private readonly _blockingGrid: Array<Uint8Array>,
+    private readonly _blockingGrid: Array<Uint8Array>
   ) {
     super(actor);
-    const begin = actor.grid.scaleWorldToGrid(EntityBounds.bottomCentre(actor.id));
+    const begin = actor.grid.scaleWorldToGrid(
+      EntityBounds.bottomCentre(actor.id)
+    );
     const end = actor.grid.scaleWorldToGrid(this.destination);
     const gridCoords = findPath(
       new Coord(begin.x, begin.y),
@@ -178,9 +183,15 @@ export class Navigate extends Action {
     if (gridCoords.length != 0) {
       this.waypoints = new Array<Point3D>();
       for (let gridCoord of gridCoords) {
-        this.waypoints.push(actor.grid!.getCentreSurfaceLocationAt(gridCoord.x, gridCoord.y)!);
+        this.waypoints.push(
+          actor.grid!.getCentreSurfaceLocationAt(gridCoord.x, gridCoord.y)!
+        );
       }
-      this._currentStep = new MoveDestination(actor, this.step, this.waypoints[0]);
+      this._currentStep = new MoveDestination(
+        actor,
+        this.step,
+        this.waypoints[0]
+      );
     }
   }
 
@@ -232,10 +243,7 @@ export class Navigate extends Action {
 }
 
 export class Jump extends MoveAction {
-  constructor(
-    actor: Actor,
-    private _d: Vector3D
-  ) {
+  constructor(actor: Actor, private _d: Vector3D) {
     super(actor);
   }
 

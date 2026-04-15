@@ -1,4 +1,4 @@
-import { Point2D, Vector2D } from './geometry.ts';
+import { Point2D, Vector2D } from "./geometry.ts";
 
 function randomRange(min: number, max: number): number {
   return Math.random() * (max - min) + min;
@@ -10,15 +10,21 @@ function normVector2D(min: number, max: number): Vector2D {
   return new Vector2D(x, y).normalise();
 }
 
-type PRNGCallback =
-  (lattice: LatticeNoise, min: number, max: number,
-   x: number, y: number) => number;
+type PRNGCallback = (
+  lattice: LatticeNoise,
+  min: number,
+  max: number,
+  x: number,
+  y: number
+) => number;
 
-type InterpolateCallback =
-  (noise: LatticeNoise, x: number, y: number) => number;
+type InterpolateCallback = (
+  noise: LatticeNoise,
+  x: number,
+  y: number
+) => number;
 
-export function bilinear(noise: LatticeNoise,
-                         x: number, y: number) {
+export function bilinear(noise: LatticeNoise, x: number, y: number) {
   const l00 = noise.lattice.getValue(x, y);
   const l01 = noise.lattice.getValue(x, y + 1);
   const l10 = noise.lattice.getValue(x + 1, y);
@@ -34,14 +40,17 @@ export function bilinear(noise: LatticeNoise,
 
   const lerp = (t: number, l0: number, l1: number): number => {
     return l0 + t * (l1 - l0);
-  }
+  };
   const lerpx = lerp(wx, l00, l10);
   const lerpy = lerp(wx, l01, l11);
   return lerp(wy, lerpx, lerpy);
 }
 
-export function quadraticMean(noise: LatticeNoise,
-                              x: number, y: number): number {
+export function quadraticMean(
+  noise: LatticeNoise,
+  x: number,
+  y: number
+): number {
   const n00 = noise.lattice.getValue(x, y);
   const n01 = noise.lattice.getValue(x, y + 1);
   const n10 = noise.lattice.getValue(x + 1, y);
@@ -49,9 +58,7 @@ export function quadraticMean(noise: LatticeNoise,
   return Math.hypot(n00, n01, n10, n11) * 0.25;
 }
 
-export function mean(noise: LatticeNoise,
-                     x: number, y: number): number {
-
+export function mean(noise: LatticeNoise, x: number, y: number): number {
   const l00 = noise.lattice.getValue(x, y);
   const l01 = noise.lattice.getValue(x, y + 1);
   const l10 = noise.lattice.getValue(x + 1, y);
@@ -81,17 +88,27 @@ class Lattice {
   private _lattice: Array<Float64Array>;
   private readonly _scaleDiv: number;
 
-  constructor(private readonly _width: number,
-              private readonly _height: number) {
+  constructor(
+    private readonly _width: number,
+    private readonly _height: number
+  ) {
     this.lattice = new Array<Float64Array>(this.height);
     for (let y = 0; y < this.lattice.length; ++y) {
       this.lattice[y] = new Float64Array(this.width);
     }
   }
-  get width(): number { return this._width; }
-  get height(): number { return this._height; }
-  get lattice(): Array<Float64Array> { return this._lattice; }
-  set lattice(l: Array<Float64Array>) { this._lattice = l; }
+  get width(): number {
+    return this._width;
+  }
+  get height(): number {
+    return this._height;
+  }
+  get lattice(): Array<Float64Array> {
+    return this._lattice;
+  }
+  set lattice(l: Array<Float64Array>) {
+    this._lattice = l;
+  }
 
   getRow(y: number): Float64Array {
     return this.lattice[y];
@@ -152,20 +169,34 @@ export class DiamondSquare implements LatticeNoise {
   //  4  5  4  5  4  5  4  5  4
   //
   //  0  4  3  4  1  4  3  4  0
-  constructor(private readonly _width: number,
-              private readonly _height: number,
-              private readonly _scale: number,
-              private readonly _beginRoughness: number,
-              private readonly _endRoughness: number) {
+  constructor(
+    private readonly _width: number,
+    private readonly _height: number,
+    private readonly _scale: number,
+    private readonly _beginRoughness: number,
+    private readonly _endRoughness: number
+  ) {
     this._lattice = new Lattice(this.width + 1, this.height + 1);
   }
 
-  get height(): number { return this._height; }
-  get width(): number { return this._width; }
-  get scale(): number { return this._scale; }
-  get lattice(): Lattice { return this._lattice; }
-  get beginRoughness(): number { return this._beginRoughness; }
-  get endRoughness(): number { return this._endRoughness; }
+  get height(): number {
+    return this._height;
+  }
+  get width(): number {
+    return this._width;
+  }
+  get scale(): number {
+    return this._scale;
+  }
+  get lattice(): Lattice {
+    return this._lattice;
+  }
+  get beginRoughness(): number {
+    return this._beginRoughness;
+  }
+  get endRoughness(): number {
+    return this._endRoughness;
+  }
 
   run(prn: PRNGCallback): void {
     const max = this.beginRoughness;
@@ -177,15 +208,14 @@ export class DiamondSquare implements LatticeNoise {
     }
 
     const roughnessDecay =
-      2 * (this.beginRoughness - this.endRoughness) / this.scale;
+      (2 * (this.beginRoughness - this.endRoughness)) / this.scale;
     let roughness = this.beginRoughness - roughnessDecay;
 
     // Initialise the corners.
 
-    let midpoints = new Array<Point2D>(new Point2D(
-      Math.floor(this.width / 2),
-      Math.floor(this.height / 2)
-    ));
+    let midpoints = new Array<Point2D>(
+      new Point2D(Math.floor(this.width / 2), Math.floor(this.height / 2))
+    );
 
     let step = 1;
     while (midpoints.length != 0) {
@@ -221,7 +251,7 @@ export class DiamondSquare implements LatticeNoise {
       new Point2D(mid.x, minY),
       new Point2D(maxX, mid.y),
       new Point2D(mid.x, maxY),
-      new Point2D(minX, mid.y),
+      new Point2D(minX, mid.y)
     );
   }
 
@@ -232,12 +262,12 @@ export class DiamondSquare implements LatticeNoise {
     const maxX = mid.x + halfX - 1;
     const minY = mid.y - halfY;
     const maxY = mid.y + halfY - 1;
-    const avg = 0.25 * (
-      this.lattice.getValue(minX, minY) +
-      this.lattice.getValue(minX, maxY) +
-      this.lattice.getValue(maxX, minY) +
-      this.lattice.getValue(maxX, maxY)
-    );
+    const avg =
+      0.25 *
+      (this.lattice.getValue(minX, minY) +
+        this.lattice.getValue(minX, maxY) +
+        this.lattice.getValue(maxX, minY) +
+        this.lattice.getValue(maxX, maxY));
     this.lattice.setValue(mid.x, mid.y, avg + roughness);
     const points = this.squarePoints(mid, step);
     for (let point of points) {
@@ -257,7 +287,6 @@ export class DiamondSquare implements LatticeNoise {
 }
 
 export class GradientNoise implements LatticeNoise {
-
   // gradients will be generated for '*', then scaled at '+':
   // noise: 6x4
   // scale: 2
@@ -272,7 +301,7 @@ export class GradientNoise implements LatticeNoise {
   //  +  +  +  +  *  +  +
   //
   //  *  +  *  +  *  +  *
-  
+
   // noise: 6x6
   // scale: 3
   // lattice: 7x7
@@ -281,17 +310,20 @@ export class GradientNoise implements LatticeNoise {
   private _gradients: Lattice;
   private _lattice: Lattice;
 
-  constructor(private readonly _width: number,
-              private readonly _height: number,
-              private readonly _scale: number,
-              private readonly _roughness: number) {
+  constructor(
+    private readonly _width: number,
+    private readonly _height: number,
+    private readonly _scale: number,
+    private readonly _roughness: number
+  ) {
     // Create the 2D lattice and the noise output
     // lattice width/height = result width/height + 1;
     this.lattice = new Lattice(this.width + 1, this.height + 1);
     // gradient = (lattice + (scale - 1)) / scale;
     const scaleDiv = 1 / this.scale;
     // `2 x` so we can store x and y in the row
-    const gradientWidth = 2 * (this.lattice.width + (this.scale - 1)) * scaleDiv;
+    const gradientWidth =
+      2 * (this.lattice.width + (this.scale - 1)) * scaleDiv;
     const gradientHeight = (this.lattice.height + (this.scale - 1)) * scaleDiv;
     this.gradients = new Lattice(gradientWidth, gradientHeight);
 
@@ -322,14 +354,30 @@ export class GradientNoise implements LatticeNoise {
     }
   }
 
-  get height(): number { return this._height; }
-  get width(): number { return this._width; }
-  get scale(): number { return this._scale; }
-  get roughness(): number { return this._roughness; }
-  get gradients(): Lattice { return this._gradients; }
-  set gradients(g: Lattice) { this._gradients = g; }
-  get lattice(): Lattice { return this._lattice; }
-  set lattice(d: Lattice) { this._lattice = d; }
+  get height(): number {
+    return this._height;
+  }
+  get width(): number {
+    return this._width;
+  }
+  get scale(): number {
+    return this._scale;
+  }
+  get roughness(): number {
+    return this._roughness;
+  }
+  get gradients(): Lattice {
+    return this._gradients;
+  }
+  set gradients(g: Lattice) {
+    this._gradients = g;
+  }
+  get lattice(): Lattice {
+    return this._lattice;
+  }
+  set lattice(d: Lattice) {
+    this._lattice = d;
+  }
 
   valueGradientNoise(interpolate = quadraticMean): Array<Float64Array> {
     const result = new Array<Float64Array>(this.height);
@@ -351,7 +399,8 @@ export class GradientNoise implements LatticeNoise {
         const gx = Math.floor(x * scaleDiv);
         const grad_noise =
           (this.gradients.getValue(gx * 2, gy) +
-           this.gradients.getValue(gx * 2 + 1, gy)) * 0.5;
+            this.gradients.getValue(gx * 2 + 1, gy)) *
+          0.5;
         row[x] = this.roughness * (row[x] + grad_noise) * 0.5;
       }
     }

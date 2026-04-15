@@ -239,15 +239,12 @@ export class CollisionDetector {
     movable: MovableEntity,
     path: Vector3D
   ): CollisionInfo | null {
-    const dims = EntityBounds.dimensions(movable.id)
+    const dims = EntityBounds.dimensions(movable.id);
     const widthVec3D = new Vector3D(dims.width, 0, 0);
     const depthVec3D = new Vector3D(0, dims.depth, 0);
     const heightVec3D = new Vector3D(0, 0, dims.height);
 
-    const area = new BoundingCuboid(
-      EntityBounds.centre(movable.id),
-      dims
-    );
+    const area = new BoundingCuboid(EntityBounds.centre(movable.id), dims);
     const newBounds = new BoundingCuboid(
       EntityBounds.centre(movable.id).add(path),
       dims
@@ -275,11 +272,13 @@ export class CollisionDetector {
       }
 
       // If the bounds do not intersect, they can't be colliding.
-      if (!EntityBounds.intersectsBounds(
-        entity.id,
-        newBounds.minLocation,
-        newBounds.maxLocation
-      )) {
+      if (
+        !EntityBounds.intersectsBounds(
+          entity.id,
+          newBounds.minLocation,
+          newBounds.maxLocation
+        )
+      ) {
         continue;
       }
 

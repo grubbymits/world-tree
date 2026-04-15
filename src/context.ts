@@ -1,8 +1,5 @@
 import { AudioController } from "./audio.ts";
-import {
-  BiomeConfig,
-  buildBiomes,
-} from "./biomes.ts";
+import { BiomeConfig, buildBiomes } from "./biomes.ts";
 import { Camera } from "./camera.ts";
 import {
   Actor,
@@ -15,19 +12,9 @@ import {
   RampWestEntity,
 } from "./entity.ts";
 import { EntityEvent } from "./events.ts";
-import {
-  CuboidGeometry,
-  Point3D,
-} from "./geometry.ts";
-import {
-  GraphicComponent,
-  SpriteSheet
-} from "./graphics.ts";
-import {
-  TerrainGrid,
-  TerrainGridDescriptorImpl,
-  Tiles,
-} from "./grid.ts";
+import { CuboidGeometry, Point3D } from "./geometry.ts";
+import { GraphicComponent, SpriteSheet } from "./graphics.ts";
+import { TerrainGrid, TerrainGridDescriptorImpl, Tiles } from "./grid.ts";
 import {
   BoundingCuboid,
   CollisionDetector,
@@ -65,19 +52,29 @@ export interface Context {
   update(camera: Camera): void;
   grid: TerrainGrid | null;
   addController(controller: Controller): void;
-  createActor(location: Point3D,
-              dimensions: Dimensions,
-              graphics: GraphicComponent): Actor;
-  createMovableEntity(location: Point3D,
-                      dimensions: Dimensions,
-                      graphics: GraphicComponent): MovableEntity;
-  createTerrain(x: number, y: number, z: number,
-                terrainType: TerrainType,
-                terrainShape: TerrainShape,
-                dimension: Dimensions): PhysicalEntity;
-  createGraphicalEntity(location: Point3D,
-                        dimensions: Dimensions,
-                        graphicComponent: GraphicComponent): PhysicalEntity;
+  createActor(
+    location: Point3D,
+    dimensions: Dimensions,
+    graphics: GraphicComponent
+  ): Actor;
+  createMovableEntity(
+    location: Point3D,
+    dimensions: Dimensions,
+    graphics: GraphicComponent
+  ): MovableEntity;
+  createTerrain(
+    x: number,
+    y: number,
+    z: number,
+    terrainType: TerrainType,
+    terrainShape: TerrainShape,
+    dimension: Dimensions
+  ): PhysicalEntity;
+  createGraphicalEntity(
+    location: Point3D,
+    dimensions: Dimensions,
+    graphicComponent: GraphicComponent
+  ): PhysicalEntity;
   verify(): boolean;
 }
 
@@ -95,16 +92,21 @@ export class ContextImpl implements Context {
   private _controllers: Array<Controller> = new Array<Controller>();
   private _spatialGraph: Octree;
   private _totalEntities = 0;
-  private _grid: TerrainGrid|null;
+  private _grid: TerrainGrid | null;
 
   static reset(): void {
     PhysicalEntity.reset();
     TerrainGraphics.reset();
     SpriteSheet.reset();
+    Tiles.reset();
   }
 
-  constructor(worldDims: Dimensions, perspective: Perspective,
-              terrainSpriteWidth: number, terrainSpriteHeight: number) {
+  constructor(
+    worldDims: Dimensions,
+    perspective: Perspective,
+    terrainSpriteWidth: number,
+    terrainSpriteHeight: number
+  ) {
     this._spatialGraph = new Octree(worldDims);
     CollisionDetector.init(this._spatialGraph);
     switch (perspective) {
@@ -112,7 +114,9 @@ export class ContextImpl implements Context {
         console.error("unhandled perspective");
         break;
       case Perspective.TwoByOneIsometric:
-        this._scene = new Scene(new TwoByOneIsometric(terrainSpriteWidth, terrainSpriteHeight));
+        this._scene = new Scene(
+          new TwoByOneIsometric(terrainSpriteWidth, terrainSpriteHeight)
+        );
         break;
     }
     this._renderer = new DummyRenderer();
@@ -139,7 +143,7 @@ export class ContextImpl implements Context {
   get controllers(): Array<Controller> {
     return this._controllers;
   }
-  set grid(g: TerrainGrid|null) {
+  set grid(g: TerrainGrid | null) {
     this._grid = g;
   }
   get grid(): TerrainGrid | null {
@@ -174,33 +178,37 @@ export class ContextImpl implements Context {
     return entity;
   }
 
-  createTerrain(x: number, y: number, z: number,
-                terrainType: TerrainType,
-                terrainShape: TerrainShape,
-                dimensions: Dimensions): PhysicalEntity {
-    console.assert(x >= 0, 'x < 0');
-    console.assert(y >= 0, 'y < 0');
-    console.assert(z >= 0, 'z < 0');
+  createTerrain(
+    x: number,
+    y: number,
+    z: number,
+    terrainType: TerrainType,
+    terrainShape: TerrainShape,
+    dimensions: Dimensions
+  ): PhysicalEntity {
+    console.assert(x >= 0, "x < 0");
+    console.assert(y >= 0, "y < 0");
+    console.assert(z >= 0, "z < 0");
 
     let terrain: new (...args: any[]) => PhysicalEntity;
     let isRamp = true;
     switch (terrainShape) {
-    default:
-      terrain = CuboidEntity;
-      isRamp = false;
-      break;
-    case TerrainShape.RampNorth:
-      terrain = RampNorthEntity;
-      break;
-    case TerrainShape.RampEast:
-      terrain = RampEastEntity;
-      break;
-    case TerrainShape.RampSouth:
-      terrain = RampSouthEntity;
-      break;
-    case TerrainShape.RampWest:
-      terrain = RampWestEntity;
-      break;
+      default:
+        terrain = CuboidEntity;
+        isRamp = false;
+        break;
+      case TerrainShape.RampNorth:
+        terrain = RampNorthEntity;
+        break;
+      case TerrainShape.RampEast:
+        terrain = RampEastEntity;
+        break;
+      case TerrainShape.RampSouth:
+        terrain = RampSouthEntity;
+        break;
+      case TerrainShape.RampWest:
+        terrain = RampWestEntity;
+        break;
     }
 
     const gapX = x * TerrainGrid.gap();
@@ -209,40 +217,37 @@ export class ContextImpl implements Context {
     const position = new Point3D(
       x * dimensions.width + gapX,
       y * dimensions.depth + gapY,
-      z * dimensions.height + gapZ,
+      z * dimensions.height + gapZ
     );
     if (!this.bounds.contains(position)) {
-      console.error('terrain out-of-bounds:', position);
+      console.error("terrain out-of-bounds:", position);
     }
 
-    const entity = new terrain(
-      position,
-      dimensions,
-    );
+    const entity = new terrain(position, dimensions);
     entity.addGraphic(TerrainGraphics.graphics(terrainType, terrainShape));
     Tiles.add(entity.id, x, y, z);
     this.addEntity(entity);
     return entity;
   }
 
-  createActor(location: Point3D,
-              dimensions: Dimensions,
-              graphics: GraphicComponent): Actor {
-    const actor = new Actor(this.grid!, location, dimensions, graphics);
+  createActor(
+    location: Point3D,
+    dimensions: Dimensions,
+    graphics: GraphicComponent
+  ): Actor {
+    const actor = new Actor(this.grid, location, dimensions, graphics);
     this._updateables.push(actor);
     this.addEntity(actor);
     this.addMovableEntity(actor);
     return actor;
   }
 
-  createMovableEntity(location: Point3D,
-                      dimensions: Dimensions,
-                      graphics: GraphicComponent): MovableEntity {
-    const movable = new MovableEntity(
-      location,
-      dimensions,
-      graphics,
-    );
+  createMovableEntity(
+    location: Point3D,
+    dimensions: Dimensions,
+    graphics: GraphicComponent
+  ): MovableEntity {
+    const movable = new MovableEntity(location, dimensions, graphics);
     this.addEntity(movable);
     this.addMovableEntity(movable);
     return movable;
@@ -331,12 +336,14 @@ export interface WorldDescriptor {
   heightMap: Array<Array<number>>;
   numTerraces: number;
   hasRamps: boolean;
-  defaultTerrainType: TerrainType,
+  defaultTerrainType: TerrainType;
   biomeConfig: BiomeConfig;
   terrainSpriteDescriptor: TerrainSpriteDescriptor;
-};
+}
 
-export async function createWorld(worldDesc: WorldDescriptor): Promise<ContextImpl>{
+export async function createWorld(
+  worldDesc: WorldDescriptor
+): Promise<ContextImpl> {
   const startTime = performance.now();
   const terrainSpriteDesc = worldDesc.terrainSpriteDescriptor;
   const spriteWidth = terrainSpriteDesc.spriteWidth;
@@ -355,7 +362,9 @@ export async function createWorld(worldDesc: WorldDescriptor): Promise<ContextIm
     physicalDims.depth * cellsY,
     physicalDims.height * cellsZ
   );
-  const canvas = <HTMLCanvasElement>document.getElementById(worldDesc.canvasName)!;
+  const canvas = <HTMLCanvasElement>(
+    document.getElementById(worldDesc.canvasName)!
+  );
   const context = createContext(
     canvas,
     worldDims,
@@ -365,25 +374,16 @@ export async function createWorld(worldDesc: WorldDescriptor): Promise<ContextIm
   );
   await TerrainGraphics.generateSprites(terrainSpriteDesc, context).then(() => {
     const terraceSpacing = normaliseHeightGrid(
-      worldDesc.heightMap, 
+      worldDesc.heightMap,
       worldDesc.numTerraces
     );
-    const terraceGrid = buildTerraceGrid(
-      worldDesc.heightMap,
-      terraceSpacing 
-    );
+    const terraceGrid = buildTerraceGrid(worldDesc.heightMap, terraceSpacing);
     const edges = findEdges(terraceGrid);
-    const ramps = worldDesc.hasRamps 
-                ? findRamps(terraceGrid, edges)
-                : [];
-    const shapeGrid = buildTerrainShapeGrid(
-      terraceGrid,
-      edges,
-      ramps
-    );
+    const ramps = worldDesc.hasRamps ? findRamps(terraceGrid, edges) : [];
+    const shapeGrid = buildTerrainShapeGrid(terraceGrid, edges, ramps);
     let typeGrid = new Array<Uint8Array>();
     let biomeGrid = new Array<Uint8Array>();
-    if (Object.hasOwn(worldDesc, 'biomeConfig')) {
+    if (Object.hasOwn(worldDesc, "biomeConfig")) {
       biomeGrid = buildBiomes(
         worldDesc.biomeConfig,
         worldDesc.heightMap,
@@ -406,11 +406,11 @@ export async function createWorld(worldDesc: WorldDescriptor): Promise<ContextIm
       cellsY,
       cellsZ,
       spriteWidth,
-      spriteHeight,
+      spriteHeight
     );
     const grid = new TerrainGrid(context, terrainGridDescriptor);
   });
   const endTime = performance.now();
-  console.log('world generated in (msec):', endTime - startTime);
+  console.log("world generated in (msec):", endTime - startTime);
   return context;
 }

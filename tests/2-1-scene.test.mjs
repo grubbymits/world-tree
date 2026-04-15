@@ -35,7 +35,8 @@ test("draw order of single row", () => {
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
     let minLocation = new WT.Point3D(i * (entityDimensions.width + gap), 0, 0);
-    let entity = new WT.CuboidEntity(context, minLocation, entityDimensions);
+    let entity = new WT.CuboidEntity(minLocation, entityDimensions);
+    context.addEntity(entity);
     entity.addGraphic(dummyGraphic);
     let node = new WT.SceneNode(entity, scene);
     nodes.push(node);
@@ -59,7 +60,8 @@ test("draw order of single column", () => {
   let nodes = new Array();
   for (let i = 0; i < numEntities; i++) {
     let minLocation = new WT.Point3D(0, i * (entityDimensions.depth + gap), 0);
-    let entity = new WT.CuboidEntity(context, minLocation, entityDimensions);
+    let entity = new WT.CuboidEntity(minLocation, entityDimensions);
+    context.addEntity(entity);
     entity.addGraphic(dummyGraphic);
     let node = new WT.SceneNode(entity, scene);
     nodes.push(node);
@@ -87,7 +89,8 @@ test("draw order of (x, y) increasing diagonal", () => {
       i * (entityDimensions.depth + gap),
       0
     );
-    let entity = new WT.CuboidEntity(context, minLocation, entityDimensions);
+    let entity = new WT.CuboidEntity(minLocation, entityDimensions);
+    context.addEntity(entity);
     entity.addGraphic(dummyGraphic);
     let node = new WT.SceneNode(entity, context.scene);
     nodes.push(node);
@@ -119,11 +122,8 @@ test("draw order of (x, y) four in a square", () => {
         y * (entityDimensions.depth + gap),
         0
       );
-      let entity = new WT.CuboidEntity(
-        context,
-        minLocation,
-        entityDimensions
-      );
+      let entity = new WT.CuboidEntity(minLocation, entityDimensions);
+      context.addEntity(entity);
       entity.addGraphic(dummyGraphic);
     }
   }
@@ -157,11 +157,8 @@ test("draw order of (x, y, z) eight in a cube", () => {
           y * (entityDimensions.depth + gap),
           z * (entityDimensions.height + gap)
         );
-        let entity = new WT.CuboidEntity(
-          context,
-          minLocation,
-          entityDimensions
-        );
+        let entity = new WT.CuboidEntity(minLocation, entityDimensions);
+        context.addEntity(entity);
         entity.addGraphic(dummyGraphic);
       }
     }
@@ -200,11 +197,8 @@ test("draw order of (x, y, z) updating eight in a cube", () => {
           y * (entityDimensions.depth + gap),
           z * (entityDimensions.height + gap)
         );
-        let entity = new WT.CuboidEntity(
-          context,
-          minLocation,
-          entityDimensions
-        );
+        let entity = new WT.CuboidEntity(minLocation, entityDimensions);
+        context.addEntity(entity);
         entity.addGraphic(dummyGraphic);
         entities.push(entity);
       }
@@ -252,7 +246,8 @@ test("draw order of (x, y, z) updating level in a cube", () => {
       y * (entityDimensions.depth + gap),
       z * (entityDimensions.height + gap)
     );
-    const entity = new WT.CuboidEntity(context, minLocation, entityDimensions);
+    const entity = new WT.CuboidEntity(minLocation, entityDimensions);
+    context.addEntity(entity);
     entity.addGraphic(dummyGraphic);
     return entity;
   };
@@ -320,7 +315,8 @@ test("draw order of (x, y, z) levels with a ramp", () => {
       y * (entityDimensions.depth + gap),
       z * (entityDimensions.height + gap)
     );
-    const entity = new WT.CuboidEntity(context, minLocation, dims);
+    const entity = new WT.CuboidEntity(minLocation, dims);
+    context.addEntity(entity);
     entity.addGraphic(dummyGraphic);
     return entity;
   };
@@ -334,7 +330,8 @@ test("draw order of (x, y, z) levels with a ramp", () => {
             y * (entityDimensions.depth + gap),
             z * (entityDimensions.height + gap)
           );
-          const entity = new WT.RampSouthEntity(context, minLocation, entityDimensions);
+          const entity = new WT.RampSouthEntity(minLocation, entityDimensions);
+          context.addEntity(entity);
           entity.addGraphic(dummyGraphic);
         } else {
           const entity = addCuboidEntityAt(x, y, z, entityDimensions);
@@ -410,7 +407,8 @@ test("draw order of short and tall", () => {
       y * (terrainDims.depth + gap),
       z * (terrainDims.height + gap)
     );
-    const entity = new WT.CuboidEntity(context, minLocation, entityDimensions);
+    const entity = new WT.CuboidEntity(minLocation, entityDimensions);
+    context.addEntity(entity);
     entity.addGraphic(dummyGraphic);
     return entity;
   };
@@ -435,4 +433,3 @@ test("draw order of short and tall", () => {
   expect(drawOrder.length).toBe(12);
   expect(drawOrder[11].entity.id).toBe(tree.id);
 });
-

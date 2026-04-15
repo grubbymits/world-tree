@@ -131,17 +131,37 @@ test("opposite direction", () => {
 test("direction vector round test", () => {
   for (let direction = 0; direction < WT.Direction.Max; ++direction) {
     const d = WT.Navigation.getDirectionVector(direction);
-    expect(WT.Navigation.getDirectionFromVector(new WT.Vector2D(d.x, d.y))).toBe(direction);
+    expect(
+      WT.Navigation.getDirectionFromVector(new WT.Vector2D(d.x, d.y))
+    ).toBe(direction);
   }
 });
 
 test("adjacent directions", () => {
-  expect(WT.Navigation.getAdjacentDirections(WT.Direction.North)).toStrictEqual([WT.Direction.NorthWest, WT.Direction.NorthEast]);
-  expect(WT.Navigation.getAdjacentDirections(WT.Direction.NorthEast)).toStrictEqual([WT.Direction.North, WT.Direction.East]);
-  expect(WT.Navigation.getAdjacentDirections(WT.Direction.East)).toStrictEqual([WT.Direction.NorthEast, WT.Direction.SouthEast]);
-  expect(WT.Navigation.getAdjacentDirections(WT.Direction.SouthEast)).toStrictEqual([WT.Direction.East, WT.Direction.South]);
-  expect(WT.Navigation.getAdjacentDirections(WT.Direction.South)).toStrictEqual([WT.Direction.SouthEast, WT.Direction.SouthWest]);
-  expect(WT.Navigation.getAdjacentDirections(WT.Direction.SouthWest)).toStrictEqual([WT.Direction.South, WT.Direction.West]);
-  expect(WT.Navigation.getAdjacentDirections(WT.Direction.West)).toStrictEqual([WT.Direction.SouthWest, WT.Direction.NorthWest]);
-  expect(WT.Navigation.getAdjacentDirections(WT.Direction.NorthWest)).toStrictEqual([WT.Direction.West, WT.Direction.North]);
+  expect(WT.Navigation.getAdjacentDirections(WT.Direction.North)).toStrictEqual(
+    [WT.Direction.NorthWest, WT.Direction.NorthEast]
+  );
+  expect(
+    WT.Navigation.getAdjacentDirections(WT.Direction.NorthEast)
+  ).toStrictEqual([WT.Direction.North, WT.Direction.East]);
+  expect(WT.Navigation.getAdjacentDirections(WT.Direction.East)).toStrictEqual([
+    WT.Direction.NorthEast,
+    WT.Direction.SouthEast,
+  ]);
+  expect(
+    WT.Navigation.getAdjacentDirections(WT.Direction.SouthEast)
+  ).toStrictEqual([WT.Direction.East, WT.Direction.South]);
+  expect(WT.Navigation.getAdjacentDirections(WT.Direction.South)).toStrictEqual(
+    [WT.Direction.SouthEast, WT.Direction.SouthWest]
+  );
+  expect(
+    WT.Navigation.getAdjacentDirections(WT.Direction.SouthWest)
+  ).toStrictEqual([WT.Direction.South, WT.Direction.West]);
+  expect(WT.Navigation.getAdjacentDirections(WT.Direction.West)).toStrictEqual([
+    WT.Direction.SouthWest,
+    WT.Direction.NorthWest,
+  ]);
+  expect(
+    WT.Navigation.getAdjacentDirections(WT.Direction.NorthWest)
+  ).toStrictEqual([WT.Direction.West, WT.Direction.North]);
 });

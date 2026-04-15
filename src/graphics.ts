@@ -84,23 +84,28 @@ export class SpriteSheet {
 
   private static load(sheet: SpriteSheet, name: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      sheet.image.onload = () => resolve(sheet.generateBlob())
+      sheet.image.onload = () => resolve(sheet.generateBlob());
       sheet.image.src = name + ".png";
     });
   }
 
-  public static async create(name: string, context: ContextImpl): Promise<SpriteSheet> {
+  public static async create(
+    name: string,
+    context: ContextImpl
+  ): Promise<SpriteSheet> {
     const startTime = performance.now();
     const sheet = new SpriteSheet(context);
     await this.load(sheet, name);
     this.add(sheet);
     const endTime = performance.now();
-    console.log('generated sprite sheet in (msec):', endTime - startTime);
+    console.log("generated sprite sheet in (msec):", endTime - startTime);
     return sheet;
   }
 
-  public static async createFromCanvas(canvas: OffscreenCanvas,
-                                       context: ContextImpl): Promise<SpriteSheet> {
+  public static async createFromCanvas(
+    canvas: OffscreenCanvas,
+    context: ContextImpl
+  ): Promise<SpriteSheet> {
     const startTime = performance.now();
     const sheet = new SpriteSheet(context);
     sheet.canvas = canvas;
@@ -116,7 +121,7 @@ export class SpriteSheet {
       }
     );
     const endTime = performance.now();
-    console.log('generated sprite sheet in (msec):', endTime - startTime);
+    console.log("generated sprite sheet in (msec):", endTime - startTime);
     sheet.loaded = true;
     return sheet;
   }
@@ -207,7 +212,8 @@ export class Sprite {
     x: number,
     y: number,
     width: number,
-    height: number): number {
+    height: number
+  ): number {
     console.assert(sheet.loaded, "sheet is not loaded yet!");
     const sprite = new Sprite(sheet, x, y, width, height);
     this.sprites.push(sprite);
@@ -433,12 +439,13 @@ export interface DirectionalGraphicsDescriptor {
   spriteHeight: number;
   columnDirections: Array<Direction>;
   numFrames: number;
-};
+}
 
-export async function
-createDirectionalGraphics(desc: DirectionalGraphicsDescriptor,
-                          context: ContextImpl): Promise<DirectionalGraphicComponent> {
-  const generate = function(sheet: SpriteSheet) {
+export async function createDirectionalGraphics(
+  desc: DirectionalGraphicsDescriptor,
+  context: ContextImpl
+): Promise<DirectionalGraphicComponent> {
+  const generate = function (sheet: SpriteSheet) {
     const directionGraphicsMap = new Map();
     for (let y = 0; y < desc.numFrames; ++y) {
       for (let x = 0; x < desc.columnDirections.length; ++x) {
@@ -448,23 +455,25 @@ createDirectionalGraphics(desc: DirectionalGraphicsDescriptor,
           x * desc.spriteWidth,
           y * desc.spriteHeight,
           desc.spriteWidth,
-          desc.spriteHeight,
+          desc.spriteHeight
         );
         const graphic = new StaticGraphicComponent(spriteId);
         directionGraphicsMap.set(direction, graphic);
       }
     }
     return new DirectionalGraphicComponent(directionGraphicsMap);
-  }
-  if (Object.hasOwn(desc, 'spriteSheet')) {
+  };
+  if (Object.hasOwn(desc, "spriteSheet")) {
     return generate(desc.spriteSheet);
   }
-  if (!Object.hasOwn(desc, 'spriteSheetName')) {
-    throw new Error('expected spriteSheetName');
+  if (!Object.hasOwn(desc, "spriteSheetName")) {
+    throw new Error("expected spriteSheetName");
   }
-  const graphics = await SpriteSheet.create(desc.spriteSheetName, context).then((sheet) => {
-    return generate(sheet);
-  });
+  const graphics = await SpriteSheet.create(desc.spriteSheetName, context).then(
+    (sheet) => {
+      return generate(sheet);
+    }
+  );
   return graphics;
 }
 

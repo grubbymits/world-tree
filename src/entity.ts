@@ -146,46 +146,31 @@ export class PhysicalEntity {
 }
 
 export class CuboidEntity extends PhysicalEntity {
-  constructor(
-    minLocation: Point3D,
-    dimensions: Dimensions
-  ) {
+  constructor(minLocation: Point3D, dimensions: Dimensions) {
     super(minLocation, dimensions, CuboidGeometry);
   }
 }
 
 export class RampNorthEntity extends PhysicalEntity {
-  constructor(
-    minLocation: Point3D,
-    dimensions: Dimensions
-  ) {
+  constructor(minLocation: Point3D, dimensions: Dimensions) {
     super(minLocation, dimensions, RampUpNorthGeometry);
   }
 }
 
 export class RampEastEntity extends PhysicalEntity {
-  constructor(
-    minLocation: Point3D,
-    dimensions: Dimensions
-  ) {
+  constructor(minLocation: Point3D, dimensions: Dimensions) {
     super(minLocation, dimensions, RampUpEastGeometry);
   }
 }
 
 export class RampSouthEntity extends PhysicalEntity {
-  constructor(
-    minLocation: Point3D,
-    dimensions: Dimensions
-  ) {
+  constructor(minLocation: Point3D, dimensions: Dimensions) {
     super(minLocation, dimensions, RampUpSouthGeometry);
   }
 }
 
 export class RampWestEntity extends PhysicalEntity {
-  constructor(
-    minLocation: Point3D,
-    dimensions: Dimensions
-  ) {
+  constructor(minLocation: Point3D, dimensions: Dimensions) {
     super(minLocation, dimensions, RampUpWestGeometry);
   }
 }
@@ -196,8 +181,11 @@ export class MovableEntity extends CuboidEntity {
   protected _direction: Direction;
   protected _velocity: Vector3D = new Vector3D(0, 0, 0);
 
-  constructor(location: Point3D, dimensions: Dimensions,
-              graphics: GraphicComponent) {
+  constructor(
+    location: Point3D,
+    dimensions: Dimensions,
+    graphics: GraphicComponent
+  ) {
     super(location, dimensions);
     this.addGraphic(graphics);
   }
@@ -240,9 +228,12 @@ export class MovableEntity extends CuboidEntity {
 export class Actor extends MovableEntity {
   protected _action: Action | null;
 
-  constructor(private readonly _grid: TerrainGrid,
-              location: Point3D, dimensions: Dimensions,
-              graphics: GraphicComponent) {
+  constructor(
+    private readonly _grid: TerrainGrid | null,
+    location: Point3D,
+    dimensions: Dimensions,
+    graphics: GraphicComponent
+  ) {
     super(location, dimensions, graphics);
   }
 
@@ -260,7 +251,7 @@ export class Actor extends MovableEntity {
     this._action = action;
   }
   get grid(): TerrainGrid {
-    return this._grid;
+    console.assert(this._grid);
+    return this._grid!;
   }
 }
-

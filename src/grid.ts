@@ -1,22 +1,10 @@
-import { ContextImpl } from './context.ts';
-import { Biome } from './biomes.ts';
-import {
-  TerrainGraphics,
-  TerrainShape,
-  TerrainType,
-} from './terraform.ts';
-import {
-  Direction,
-  Navigation
-} from './navigation.ts';
-import { MinPriorityQueue } from './queue.ts';
-import { Dimensions } from './physics.ts';
-import {
-  Point2D,
-  Point3D,
-  Vector3D,
-  Geometry,
-} from './geometry.ts';
+import { ContextImpl } from "./context.ts";
+import { Biome } from "./biomes.ts";
+import { TerrainGraphics, TerrainShape, TerrainType } from "./terraform.ts";
+import { Direction, Navigation } from "./navigation.ts";
+import { MinPriorityQueue } from "./queue.ts";
+import { Dimensions } from "./physics.ts";
+import { Point2D, Point3D, Vector3D, Geometry } from "./geometry.ts";
 import {
   PhysicalEntity,
   CuboidEntity,
@@ -31,10 +19,18 @@ export class Tiles {
   private static readonly NUM_ELEMENTS = 3;
   private static readonly INITIAL_SIZE = this.NUM_ELEMENTS * this.MAX_TILES;
   private static data: Uint8Array = new Uint8Array(this.INITIAL_SIZE);
-  private static readonly ARRAY_ELEMENT_SIZE = this.data.BYTES_PER_ELEMENT << 8 - 1;
+  private static readonly ARRAY_ELEMENT_SIZE =
+    this.data.BYTES_PER_ELEMENT << (8 - 1);
   private static total = 0;
   private static _width = 0;
   private static _height = 0;
+
+  static reset() {
+    this.total = 0;
+    this._width = 0;
+    this._height = 0;
+    this.data = new Uint8Array(this.INITIAL_SIZE);
+  }
 
   static add(id: number, x: number, y: number, z: number) {
     console.assert(id == this.total);
@@ -88,16 +84,18 @@ export interface TerrainGridDescriptor {
 }
 
 export class TerrainGridDescriptorImpl implements TerrainGridDescriptor {
-  constructor (private readonly _cellHeightGrid: Array<Uint8Array>,
-               private readonly _typeGrid: Array<Uint8Array>,
-               private readonly _shapeGrid: Array<Uint8Array>,
-               private readonly _biomeGrid: Array<Uint8Array>,
-               private readonly _tileDimensions: Dimensions,
-               private readonly _cellsX: number,
-               private readonly _cellsY: number,
-               private readonly _cellsZ: number,
-               private readonly _spriteWidth: number,
-               private readonly _spriteHeight: number) { }
+  constructor(
+    private readonly _cellHeightGrid: Array<Uint8Array>,
+    private readonly _typeGrid: Array<Uint8Array>,
+    private readonly _shapeGrid: Array<Uint8Array>,
+    private readonly _biomeGrid: Array<Uint8Array>,
+    private readonly _tileDimensions: Dimensions,
+    private readonly _cellsX: number,
+    private readonly _cellsY: number,
+    private readonly _cellsZ: number,
+    private readonly _spriteWidth: number,
+    private readonly _spriteHeight: number
+  ) {}
   get cellHeightGrid(): Array<Uint8Array> {
     return this._cellHeightGrid;
   }
@@ -131,7 +129,9 @@ export class TerrainGridDescriptorImpl implements TerrainGridDescriptor {
 }
 
 export class TerrainGrid {
-  private _surfaceGeometry: Array<Array<Geometry>> = new Array<Array<Geometry>>();
+  private _surfaceGeometry: Array<Array<Geometry>> = new Array<
+    Array<Geometry>
+  >();
   private readonly _cellsX: number;
   private readonly _cellsY: number;
   private readonly _dimensions: Dimensions;
@@ -145,7 +145,7 @@ export class TerrainGrid {
 
   constructor(
     private readonly _context: ContextImpl,
-    private readonly _descriptor: TerrainGridDescriptor,
+    private readonly _descriptor: TerrainGridDescriptor
   ) {
     this._context.grid = this;
     this._dimensions = this.descriptor.tileDimensions;
@@ -158,32 +158,29 @@ export class TerrainGrid {
         const terrainShape = this.terrainShapeAt(x, y);
         const terrainType = this.terrainTypeAt(x, y);
 
-        const terrain = this._context.createTerrain(
+        const terrain = this.context.createTerrain(
           x,
           y,
           z,
           terrainType,
           terrainShape,
-          this.descriptor.tileDimensions,
+          this.descriptor.tileDimensions
         );
 
         this.surfaceGeometry[y][x] = terrain.geometry;
         this._totalSurface++;
 
-        const zStop = z - this.calcRelativeHeight(
-          x,
-          y,
-          this.descriptor.cellHeightGrid
-        );
+        const zStop =
+          z - this.calcRelativeHeight(x, y, this.descriptor.cellHeightGrid);
         while (z > zStop) {
           z--;
-          const subSurface = this._context.createTerrain(
+          const subSurface = this.context.createTerrain(
             x,
             y,
             z,
             terrainType,
             TerrainShape.Flat,
-            this.descriptor.tileDimensions,
+            this.descriptor.tileDimensions
           );
           this._totalSubSurface++;
         }
@@ -239,7 +236,11 @@ export class TerrainGrid {
     );
   }
 
-  calcRelativeHeight(x: number, y: number, cellHeightGrid: Array<Uint8Array>): number {
+  calcRelativeHeight(
+    x: number,
+    y: number,
+    cellHeightGrid: Array<Uint8Array>
+  ): number {
     let relativeHeight = 0;
     const centreTerrace = cellHeightGrid[y][x];
 
@@ -262,8 +263,7 @@ export class TerrainGrid {
   }
 
   inbounds(x: number, y: number): boolean {
-    return x >= 0 && x < this.cellsX &&
-           y >= 0 && y < this.cellsY;
+    return x >= 0 && x < this.cellsX && y >= 0 && y < this.cellsY;
   }
 
   getCentreSurfaceLocationAt(x: number, y: number): Point3D | null {
@@ -272,8 +272,8 @@ export class TerrainGrid {
     }
     const gapX = x * TerrainGrid.gap();
     const gapY = y * TerrainGrid.gap();
-    const rayX = (this.dimensions.width / 2) + x * this.dimensions.width + gapX;
-    const rayY = (this.dimensions.depth / 2) + y * this.dimensions.depth + gapY;
+    const rayX = this.dimensions.width / 2 + x * this.dimensions.width + gapX;
+    const rayY = this.dimensions.depth / 2 + y * this.dimensions.depth + gapY;
     const begin = new Point3D(rayX, rayY, this.context.bounds.height);
     const end = new Point3D(rayX, rayY, 0);
 
@@ -281,8 +281,8 @@ export class TerrainGrid {
     const obstructInfo = surfaceGeometry.obstructsRay(begin, end);
     // Adjust it slightly above the contact point.
     return new Point3D(
-      obstructInfo!.i.x, 
-      obstructInfo!.i.y, 
+      obstructInfo!.i.x,
+      obstructInfo!.i.y,
       obstructInfo!.i.z + 0.1
     );
   }

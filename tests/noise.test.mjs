@@ -11,7 +11,7 @@ function run_test(width, height, scale, factor) {
   expect(lattice.height).toBe(height + 1);
   expect(lattice.width).toBe(width + 1);
   expect(gradients.height).toBe((lattice.height + scale - 1) / scale);
-  expect(gradients.width).toBe(2 * (lattice.width + scale - 1) / scale);
+  expect(gradients.width).toBe((2 * (lattice.width + scale - 1)) / scale);
 
   for (let y = 0; y < gradients.height; ++y) {
     for (let x = 0; x < gradients.width; ++x) {
@@ -28,8 +28,8 @@ function run_test(width, height, scale, factor) {
       if (x % scale == 0 && y % scale == 0) {
         expect(Math.abs(value)).toBe(0);
       } else {
-        expect(value).toBeGreaterThanOrEqual(-4/3);
-        expect(value).toBeLessThanOrEqual(4/3);
+        expect(value).toBeGreaterThanOrEqual(-4 / 3);
+        expect(value).toBeLessThanOrEqual(4 / 3);
       }
     }
   }
@@ -43,7 +43,7 @@ function run_test(width, height, scale, factor) {
   }
 }
 
-test('2x2x2x1', () => {
+test("2x2x2x1", () => {
   const width = 2;
   const height = 2;
   const scale = 2;
@@ -51,7 +51,7 @@ test('2x2x2x1', () => {
   run_test(width, height, scale, factor);
 });
 
-test('3x3x3x2', () => {
+test("3x3x3x2", () => {
   const width = 6;
   const height = 6;
   const scale = 3;
@@ -59,7 +59,7 @@ test('3x3x3x2', () => {
   run_test(width, height, scale, factor);
 });
 
-test('6x4x5', () => {
+test("6x4x5", () => {
   const width = 6;
   const height = 4;
   const scale = 2;

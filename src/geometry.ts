@@ -536,7 +536,7 @@ export class NoGeometry extends Geometry {
   obstructs(_begin: Point3D, _end: Point3D): IntersectInfo | null {
     return null;
   }
-  resetWorld(): void { }
+  resetWorld(): void {}
 }
 
 export class CuboidGeometry extends Geometry {

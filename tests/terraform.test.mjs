@@ -2,12 +2,12 @@ import * as WT from "../dist/world-tree.mjs";
 
 test("surrounded", () => {
   const terraceGrid = [
-    new Uint8Array([ 1, 1, 1, 1, 1, 1 ]),
-    new Uint8Array([ 1, 0, 0, 0, 0, 1 ]),
-    new Uint8Array([ 1, 0, 0, 0, 0, 1 ]),
-    new Uint8Array([ 1, 0, 0, 0, 0, 1 ]),
-    new Uint8Array([ 1, 0, 0, 0, 0, 1 ]),
-    new Uint8Array([ 1, 1, 1, 1, 1, 1 ]),
+    new Uint8Array([1, 1, 1, 1, 1, 1]),
+    new Uint8Array([1, 0, 0, 0, 0, 1]),
+    new Uint8Array([1, 0, 0, 0, 0, 1]),
+    new Uint8Array([1, 0, 0, 0, 0, 1]),
+    new Uint8Array([1, 0, 0, 0, 0, 1]),
+    new Uint8Array([1, 1, 1, 1, 1, 1]),
   ];
   const edges = WT.findEdges(terraceGrid);
   expect(edges.length).toBe(16);
@@ -15,9 +15,9 @@ test("surrounded", () => {
   for (let i = 0; i < 4; ++i) {
     expect(edges[i].shape).toBe(WT.EdgeShape.South);
   }
-  for (let i = 4; i < 12; i+=2) {
+  for (let i = 4; i < 12; i += 2) {
     expect(edges[i].shape).toBe(WT.EdgeShape.East);
-    expect(edges[i+1].shape).toBe(WT.EdgeShape.West);
+    expect(edges[i + 1].shape).toBe(WT.EdgeShape.West);
   }
   for (let i = 12; i < 16; ++i) {
     expect(edges[i].shape).toBe(WT.EdgeShape.North);
@@ -26,11 +26,11 @@ test("surrounded", () => {
 
 test("inside peninsulas", () => {
   const terraceGrid = [
-    new Uint8Array([ 0, 0, 0, 0, 0 ]),
-    new Uint8Array([ 0, 0, 1, 0, 0 ]),
-    new Uint8Array([ 0, 1, 1, 1, 0 ]),
-    new Uint8Array([ 0, 0, 1, 0, 0 ]),
-    new Uint8Array([ 0, 0, 0, 0, 0 ]),
+    new Uint8Array([0, 0, 0, 0, 0]),
+    new Uint8Array([0, 0, 1, 0, 0]),
+    new Uint8Array([0, 1, 1, 1, 0]),
+    new Uint8Array([0, 0, 1, 0, 0]),
+    new Uint8Array([0, 0, 0, 0, 0]),
   ];
   const edges = WT.findEdges(terraceGrid);
   expect(edges.length).toBe(4);
@@ -42,9 +42,9 @@ test("inside peninsulas", () => {
 
 test("outside peninsulas", () => {
   const terraceGrid = [
-    new Uint8Array([ 0, 1, 0 ]),
-    new Uint8Array([ 1, 0, 1 ]),
-    new Uint8Array([ 0, 1, 0 ]),
+    new Uint8Array([0, 1, 0]),
+    new Uint8Array([1, 0, 1]),
+    new Uint8Array([0, 1, 0]),
   ];
   const edges = WT.findEdges(terraceGrid);
   expect(edges.length).toBe(4);
@@ -56,11 +56,11 @@ test("outside peninsulas", () => {
 
 test("corners", () => {
   const terraceGrid = [
-    new Uint8Array([ 0, 0, 0, 0, 0 ]),
-    new Uint8Array([ 0, 1, 1, 1, 0 ]),
-    new Uint8Array([ 0, 1, 1, 1, 0 ]),
-    new Uint8Array([ 0, 1, 1, 1, 0 ]),
-    new Uint8Array([ 0, 0, 0, 0, 0 ]),
+    new Uint8Array([0, 0, 0, 0, 0]),
+    new Uint8Array([0, 1, 1, 1, 0]),
+    new Uint8Array([0, 1, 1, 1, 0]),
+    new Uint8Array([0, 1, 1, 1, 0]),
+    new Uint8Array([0, 0, 0, 0, 0]),
   ];
   const edges = WT.findEdges(terraceGrid);
   expect(edges.length).toBe(8);
@@ -76,11 +76,11 @@ test("corners", () => {
 
 test("corridors", () => {
   const terraceGrid = [
-    new Uint8Array([ 0, 0, 0, 0, 0 ]),
-    new Uint8Array([ 0, 1, 1, 1, 0 ]),
-    new Uint8Array([ 0, 1, 0, 0, 0 ]),
-    new Uint8Array([ 0, 1, 0, 0, 0 ]),
-    new Uint8Array([ 0, 0, 0, 0, 0 ]),
+    new Uint8Array([0, 0, 0, 0, 0]),
+    new Uint8Array([0, 1, 1, 1, 0]),
+    new Uint8Array([0, 1, 0, 0, 0]),
+    new Uint8Array([0, 1, 0, 0, 0]),
+    new Uint8Array([0, 0, 0, 0, 0]),
   ];
   const edges = WT.findEdges(terraceGrid);
   expect(edges.length).toBe(5);
@@ -93,9 +93,9 @@ test("corridors", () => {
 
 test("spire", () => {
   const terraceGrid = [
-    new Uint8Array([ 0, 0, 0 ]),
-    new Uint8Array([ 0, 1, 0 ]),
-    new Uint8Array([ 0, 0, 0 ]),
+    new Uint8Array([0, 0, 0]),
+    new Uint8Array([0, 1, 0]),
+    new Uint8Array([0, 0, 0]),
   ];
   const edges = WT.findEdges(terraceGrid);
   expect(edges.length).toBe(1);
@@ -104,15 +104,15 @@ test("spire", () => {
 
 test("centre ramps", () => {
   const terraceGrid = [
-    new Uint8Array([ 1, 1, 1, 1, 1, 1, 1, 1, 1 ]),
-    new Uint8Array([ 1, 0, 0, 0, 0, 0, 0, 0, 1 ]),
-    new Uint8Array([ 1, 0, 0, 0, 0, 0, 0, 0, 1 ]),
-    new Uint8Array([ 1, 0, 0, 0, 1, 0, 0, 0, 1 ]),
-    new Uint8Array([ 1, 0, 0, 1, 1, 1, 0, 0, 1 ]),
-    new Uint8Array([ 1, 0, 0, 0, 1, 0, 0, 0, 1 ]),
-    new Uint8Array([ 1, 0, 0, 0, 0, 0, 0, 0, 1 ]),
-    new Uint8Array([ 1, 0, 0, 0, 0, 0, 0, 0, 1 ]),
-    new Uint8Array([ 1, 1, 1, 1, 1, 1, 1, 1, 1 ]),
+    new Uint8Array([1, 1, 1, 1, 1, 1, 1, 1, 1]),
+    new Uint8Array([1, 0, 0, 0, 0, 0, 0, 0, 1]),
+    new Uint8Array([1, 0, 0, 0, 0, 0, 0, 0, 1]),
+    new Uint8Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
+    new Uint8Array([1, 0, 0, 1, 1, 1, 0, 0, 1]),
+    new Uint8Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
+    new Uint8Array([1, 0, 0, 0, 0, 0, 0, 0, 1]),
+    new Uint8Array([1, 0, 0, 0, 0, 0, 0, 0, 1]),
+    new Uint8Array([1, 1, 1, 1, 1, 1, 1, 1, 1]),
   ];
   const edges = WT.findEdges(terraceGrid);
   expect(edges.length).toBe(32);
@@ -126,11 +126,11 @@ test("centre ramps", () => {
 
 test("cardinals blocking grid", () => {
   const terraceGrid = [
-    new Uint8Array([ 0, 0, 1, 0, 0 ]),
-    new Uint8Array([ 0, 0, 1, 0, 0 ]),
-    new Uint8Array([ 1, 1, 0, 1, 1 ]),
-    new Uint8Array([ 0, 0, 1, 0, 0 ]),
-    new Uint8Array([ 0, 0, 1, 0, 0 ]),
+    new Uint8Array([0, 0, 1, 0, 0]),
+    new Uint8Array([0, 0, 1, 0, 0]),
+    new Uint8Array([1, 1, 0, 1, 1]),
+    new Uint8Array([0, 0, 1, 0, 0]),
+    new Uint8Array([0, 0, 1, 0, 0]),
   ];
   const edges = WT.findEdges(terraceGrid);
   const ramps = [];
@@ -178,57 +178,121 @@ test("cardinals blocking grid", () => {
   let x = 2;
   let y = 2;
   expect(blockingGrid[y][x]).toBe(255);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.North, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthEast, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.East, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthEast, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.South, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthWest, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.West, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthWest, blockingGrid)).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.North, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthEast, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.East, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthEast, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.South, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthWest, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.West, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthWest, blockingGrid)
+  ).toBe(false);
 
   // Top left
   x = 0;
   y = 0;
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.North, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthEast, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.East, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthEast, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.South, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthWest, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.West, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthWest, blockingGrid)).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.North, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthEast, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.East, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthEast, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.South, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthWest, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.West, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthWest, blockingGrid)
+  ).toBe(false);
 
   // Bottom right
   x = 4;
   y = 4;
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.North, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthEast, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.East, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthEast, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.South, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthWest, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.West, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthWest, blockingGrid)).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.North, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthEast, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.East, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthEast, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.South, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthWest, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.West, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthWest, blockingGrid)
+  ).toBe(true);
 
   // Bottom right
   x = 0;
   y = 4;
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.North, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthEast, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.East, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthEast, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.South, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthWest, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.West, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthWest, blockingGrid)).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.North, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthEast, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.East, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthEast, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.South, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.SouthWest, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.West, blockingGrid)
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(x, y, WT.DirectionBit.NorthWest, blockingGrid)
+  ).toBe(false);
 });
 
 test("spire path", () => {
   const terraceGrid = [
-    new Uint8Array([ 0, 0, 0 ]),
-    new Uint8Array([ 0, 1, 0 ]),
-    new Uint8Array([ 0, 0, 0 ]),
+    new Uint8Array([0, 0, 0]),
+    new Uint8Array([0, 1, 0]),
+    new Uint8Array([0, 0, 0]),
   ];
   const edges = WT.findEdges(terraceGrid);
   const blockingRamps = false;
@@ -245,17 +309,29 @@ test("spire path", () => {
   );
   const startX = 0;
   const startY = 0;
-  expect(WT.isNeighbourAccessible(startX, startY, WT.DirectionBit.East, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(startX, startY, WT.DirectionBit.SouthEast, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(startX, startY, WT.DirectionBit.South, blockingGrid)).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(startX, startY, WT.DirectionBit.East, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(
+      startX,
+      startY,
+      WT.DirectionBit.SouthEast,
+      blockingGrid
+    )
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(
+      startX,
+      startY,
+      WT.DirectionBit.South,
+      blockingGrid
+    )
+  ).toBe(true);
 
   const start = new WT.Coord(startX, startY);
   const end = new WT.Coord(2, 2);
-  const path = WT.findPath(
-    start,
-    end,
-    blockingGrid
-  );
+  const path = WT.findPath(start, end, blockingGrid);
   expect(path.length).toBe(4);
   expect(path[0]).toMatchObject(new WT.Coord(1, 0));
   expect(path[1]).toMatchObject(new WT.Coord(2, 0));
@@ -265,15 +341,15 @@ test("spire path", () => {
 
 test("centre ramps path", () => {
   const terraceGrid = [
-    new Uint8Array([ 1, 1, 1, 1, 1, 1, 1, 1, 1 ]),
-    new Uint8Array([ 1, 0, 0, 0, 0, 0, 0, 0, 1 ]),
-    new Uint8Array([ 1, 0, 0, 0, 0, 0, 0, 0, 1 ]),
-    new Uint8Array([ 1, 0, 0, 0, 1, 0, 0, 0, 1 ]),
-    new Uint8Array([ 1, 0, 0, 1, 1, 1, 0, 0, 1 ]),
-    new Uint8Array([ 1, 0, 0, 0, 1, 0, 0, 0, 1 ]),
-    new Uint8Array([ 1, 0, 0, 0, 0, 0, 0, 0, 1 ]),
-    new Uint8Array([ 1, 0, 0, 0, 0, 0, 0, 0, 1 ]),
-    new Uint8Array([ 1, 1, 1, 1, 1, 1, 1, 1, 1 ]),
+    new Uint8Array([1, 1, 1, 1, 1, 1, 1, 1, 1]),
+    new Uint8Array([1, 0, 0, 0, 0, 0, 0, 0, 1]),
+    new Uint8Array([1, 0, 0, 0, 0, 0, 0, 0, 1]),
+    new Uint8Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
+    new Uint8Array([1, 0, 0, 1, 1, 1, 0, 0, 1]),
+    new Uint8Array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
+    new Uint8Array([1, 0, 0, 0, 0, 0, 0, 0, 1]),
+    new Uint8Array([1, 0, 0, 0, 0, 0, 0, 0, 1]),
+    new Uint8Array([1, 1, 1, 1, 1, 1, 1, 1, 1]),
   ];
   const edges = WT.findEdges(terraceGrid);
   const ramps = WT.findRamps(terraceGrid, edges);
@@ -288,19 +364,27 @@ test("centre ramps path", () => {
     blockingUpHeight,
     blockingDownHeight
   );
-  expect(WT.isNeighbourAccessible(3, 4, WT.DirectionBit.East, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(3, 4, WT.DirectionBit.West, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(4, 4, WT.DirectionBit.East, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(4, 4, WT.DirectionBit.West, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(5, 4, WT.DirectionBit.East, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(5, 4, WT.DirectionBit.West, blockingGrid)).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(3, 4, WT.DirectionBit.East, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(3, 4, WT.DirectionBit.West, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(4, 4, WT.DirectionBit.East, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(4, 4, WT.DirectionBit.West, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(5, 4, WT.DirectionBit.East, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(5, 4, WT.DirectionBit.West, blockingGrid)
+  ).toBe(true);
 
   // straight across
-  let path = WT.findPath(
-    new WT.Coord(1, 4),
-    new WT.Coord(7, 4),
-    blockingGrid
-  );
+  let path = WT.findPath(new WT.Coord(1, 4), new WT.Coord(7, 4), blockingGrid);
   expect(path.length).toBe(6);
   expect(path[0]).toMatchObject(new WT.Coord(2, 4));
   expect(path[1]).toMatchObject(new WT.Coord(3, 4));
@@ -310,11 +394,7 @@ test("centre ramps path", () => {
   expect(path[5]).toMatchObject(new WT.Coord(7, 4));
 
   // straight down
-  path = WT.findPath(
-    new WT.Coord(4, 1),
-    new WT.Coord(4, 7),
-    blockingGrid
-  );
+  path = WT.findPath(new WT.Coord(4, 1), new WT.Coord(4, 7), blockingGrid);
   expect(path.length).toBe(6);
   expect(path[0]).toMatchObject(new WT.Coord(4, 2));
   expect(path[1]).toMatchObject(new WT.Coord(4, 3));
@@ -326,19 +406,51 @@ test("centre ramps path", () => {
   // between two ramps to another position between two ramps.
   const midx = 4;
   const midy = 4;
-  expect(WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.North, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.NorthEast, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.East, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.SouthEast, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.South, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.SouthWest, blockingGrid)).toBe(false);
-  expect(WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.West, blockingGrid)).toBe(true);
-  expect(WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.NorthWest, blockingGrid)).toBe(false);
-  path = WT.findPath(
-    new WT.Coord(3, 3),
-    new WT.Coord(5, 5),
-    blockingGrid
-  );
+  expect(
+    WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.North, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(
+      midx,
+      midy,
+      WT.DirectionBit.NorthEast,
+      blockingGrid
+    )
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.East, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(
+      midx,
+      midy,
+      WT.DirectionBit.SouthEast,
+      blockingGrid
+    )
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.South, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(
+      midx,
+      midy,
+      WT.DirectionBit.SouthWest,
+      blockingGrid
+    )
+  ).toBe(false);
+  expect(
+    WT.isNeighbourAccessible(midx, midy, WT.DirectionBit.West, blockingGrid)
+  ).toBe(true);
+  expect(
+    WT.isNeighbourAccessible(
+      midx,
+      midy,
+      WT.DirectionBit.NorthWest,
+      blockingGrid
+    )
+  ).toBe(false);
+  path = WT.findPath(new WT.Coord(3, 3), new WT.Coord(5, 5), blockingGrid);
   expect(path.length).toBe(7);
   expect(path[0]).toMatchObject(new WT.Coord(2, 3));
   expect(path[1]).toMatchObject(new WT.Coord(2, 4));
@@ -447,7 +559,9 @@ test("terrace spacing with positive and negative heights", () => {
   const terraceGrid = WT.buildTerraceGrid(heightMap, terraceSpacing);
   for (let y = 0; y < cellsY; ++y) {
     for (let x = 0; x < cellsX; ++x) {
-      expect(terraceGrid[y][x]).toBe(Math.floor(heightMap[y][x] / terraceSpacing));
+      expect(terraceGrid[y][x]).toBe(
+        Math.floor(heightMap[y][x] / terraceSpacing)
+      );
     }
   }
 });
@@ -478,87 +592,85 @@ test("all ramps and edges supported", () => {
   for (let shape = WT.TerrainShape.Flat; shape < WT.TerrainShape.Max; ++shape) {
     WT.TerrainGraphics.setSupportedShape(shape);
   }
-  const shapeGrid = WT.buildTerrainShapeGrid(
-    terraceGrid,
-    edges,
-    ramps
-  );
+  const shapeGrid = WT.buildTerrainShapeGrid(terraceGrid, edges, ramps);
 
   const edgesToIgnore = [];
   for (const ramp of ramps) {
-    edgesToIgnore.push({x: ramp.x, y: ramp.y});
+    edgesToIgnore.push({ x: ramp.x, y: ramp.y });
     const terrainShape = shapeGrid[ramp.y][ramp.x];
     let expectedShape = WT.TerrainShape.Flat;
     switch (ramp.shape) {
-    case WT.RampShape.North:
-      expectedShape = WT.TerrainShape.RampNorth;
-      break;
-    case WT.RampShape.East:
-      expectedShape = WT.TerrainShape.RampEast;
-      break;
-    case WT.RampShape.South:
-      expectedShape = WT.TerrainShape.RampSouth;
-      break;
-    case WT.RampShape.West:
-      expectedShape = WT.TerrainShape.RampWest;
-      break;
+      case WT.RampShape.North:
+        expectedShape = WT.TerrainShape.RampNorth;
+        break;
+      case WT.RampShape.East:
+        expectedShape = WT.TerrainShape.RampEast;
+        break;
+      case WT.RampShape.South:
+        expectedShape = WT.TerrainShape.RampSouth;
+        break;
+      case WT.RampShape.West:
+        expectedShape = WT.TerrainShape.RampWest;
+        break;
     }
     expect(terrainShape).toBe(expectedShape);
   }
 
   for (const edge of edges) {
-    if (edgesToIgnore.find((ignore) => ignore.x == edge.x && ignore.y == edge.y)) {
+    if (
+      edgesToIgnore.find((ignore) => ignore.x == edge.x && ignore.y == edge.y)
+    ) {
       continue;
     }
     const terrainShape = shapeGrid[edge.y][edge.x];
     let expectedShape = WT.TerrainShape.Flat;
 
     switch (edge.shape) {
-    case WT.EdgeShape.North:
-      expectedShape = WT.TerrainShape.NorthEdge;
-      break;
-    case WT.EdgeShape.East:
-      expectedShape = WT.TerrainShape.EastEdge;
-      break;
-    case WT.EdgeShape.NorthEastCorner:
-      expectedShape = WT.TerrainShape.NorthEastCorner;
-      break;
-    case WT.EdgeShape.South:
-      expectedShape = WT.TerrainShape.SouthEdge;
-      break;
-    case WT.EdgeShape.NorthSouthCorridor:
-      expectedShape = WT.TerrainShape.NorthSouthCorridor;
-      break;
-    case WT.EdgeShape.SouthEastCorner:
-      expectedShape = WT.TerrainShape.SouthEastCorner;
-      break;
-    case WT.EdgeShape.EastPeninsula:
-      expectedShape = WT.TerrainShape.EastPeninsula;
-      break;
-    case WT.EdgeShape.West:
-      expectedShape = WT.TerrainShape.WestEdge;
-      break;
-    case WT.EdgeShape.NorthWestCorner:
-      expectedShape = WT.TerrainShape.NorthWestCorner;
-      break;
-    case WT.EdgeShape.EastWestCorridor:
-      expectedShape = WT.TerrainShape.EastWestCorridor;
-      break;
-    case WT.EdgeShape.NorthPeninsula:
-      expectedShape = WT.TerrainShape.NorthPeninsula;
-      break;
-    case WT.EdgeShape.SouthWestCorner:
-      expectedShape = WT.TerrainShape.SouthWestCorner;
-      break;
-    case WT.EdgeShape.WestPeninsula:
-      expectedShape = WT.TerrainShape.WestPeninsula;
-      break;
-    case WT.EdgeShape.SouthPeninsula:
-      expectedShape = WT.TerrainShape.SouthPeninsula;
-      break;
-    case WT.EdgeShape.Spire:
-      expectedShape = WT.TerrainShape.Spire;
-      break;
+      case WT.EdgeShape.North:
+        expectedShape = WT.TerrainShape.NorthEdge;
+        break;
+      case WT.EdgeShape.East:
+        expectedShape = WT.TerrainShape.EastEdge;
+        break;
+      case WT.EdgeShape.NorthEastCorner:
+        expectedShape = WT.TerrainShape.NorthEastCorner;
+        break;
+      case WT.EdgeShape.South:
+        expectedShape = WT.TerrainShape.SouthEdge;
+        break;
+      case WT.EdgeShape.NorthSouthCorridor:
+        expectedShape = WT.TerrainShape.NorthSouthCorridor;
+        break;
+      case WT.EdgeShape.SouthEastCorner:
+        expectedShape = WT.TerrainShape.SouthEastCorner;
+        break;
+      case WT.EdgeShape.EastPeninsula:
+        expectedShape = WT.TerrainShape.EastPeninsula;
+        break;
+      case WT.EdgeShape.West:
+        expectedShape = WT.TerrainShape.WestEdge;
+        break;
+      case WT.EdgeShape.NorthWestCorner:
+        expectedShape = WT.TerrainShape.NorthWestCorner;
+        break;
+      case WT.EdgeShape.EastWestCorridor:
+        expectedShape = WT.TerrainShape.EastWestCorridor;
+        break;
+      case WT.EdgeShape.NorthPeninsula:
+        expectedShape = WT.TerrainShape.NorthPeninsula;
+        break;
+      case WT.EdgeShape.SouthWestCorner:
+        expectedShape = WT.TerrainShape.SouthWestCorner;
+        break;
+      case WT.EdgeShape.WestPeninsula:
+        expectedShape = WT.TerrainShape.WestPeninsula;
+        break;
+      case WT.EdgeShape.SouthPeninsula:
+        expectedShape = WT.TerrainShape.SouthPeninsula;
+        break;
+      case WT.EdgeShape.Spire:
+        expectedShape = WT.TerrainShape.Spire;
+        break;
     }
     expect(terrainShape).toBe(expectedShape);
   }
@@ -588,11 +700,7 @@ test("only flat supported", () => {
   const ramps = [];
 
   WT.TerrainGraphics.reset();
-  const shapeGrid = WT.buildTerrainShapeGrid(
-    terraceGrid,
-    edges,
-    ramps
-  );
+  const shapeGrid = WT.buildTerrainShapeGrid(terraceGrid, edges, ramps);
 
   for (const edge of edges) {
     const terrainShape = shapeGrid[edge.y][edge.x];
@@ -625,11 +733,7 @@ test("only flat and wall supported", () => {
 
   WT.TerrainGraphics.reset();
   WT.TerrainGraphics.setSupportedShape(WT.TerrainShape.Wall);
-  const shapeGrid = WT.buildTerrainShapeGrid(
-    terraceGrid,
-    edges,
-    ramps
-  );
+  const shapeGrid = WT.buildTerrainShapeGrid(terraceGrid, edges, ramps);
 
   for (const edge of edges) {
     const terrainShape = shapeGrid[edge.y][edge.x];
@@ -665,46 +769,42 @@ test("only basic edges supported", () => {
     WT.TerrainShape.NorthEdge,
     WT.TerrainShape.EastEdge,
     WT.TerrainShape.SouthEdge,
-    WT.TerrainShape.WestEdge
+    WT.TerrainShape.WestEdge,
   ];
 
   WT.TerrainGraphics.reset();
   for (const shape of supportedShapes) {
     WT.TerrainGraphics.setSupportedShape(shape);
   }
-  const shapeGrid = WT.buildTerrainShapeGrid(
-    terraceGrid,
-    edges,
-    ramps
-  );
+  const shapeGrid = WT.buildTerrainShapeGrid(terraceGrid, edges, ramps);
 
   for (const edge of edges) {
     const terrainShape = shapeGrid[edge.y][edge.x];
     let expectedShape = WT.TerrainShape.Flat;
     switch (edge.shape) {
-    case WT.EdgeShape.North:
-    case WT.EdgeShape.NorthSouthCorridor:
-    case WT.EdgeShape.NorthWestCorner:
-    case WT.EdgeShape.EastWestCorridor:
-    case WT.EdgeShape.WestPeninsula:
-      expectedShape = WT.TerrainShape.NorthEdge;
-      break;
-    case WT.EdgeShape.East:
-    case WT.EdgeShape.NorthEastCorner:
-    case WT.EdgeShape.SouthEastCorner:
-    case WT.EdgeShape.NorthPeninsula:
-    case WT.EdgeShape.EastPeninsula:
-    case WT.EdgeShape.SouthPeninsula:
-    case WT.EdgeShape.Spire:
-      expectedShape = WT.TerrainShape.EastEdge;
-      break;
-    case WT.EdgeShape.South:
-    case WT.EdgeShape.SouthWestCorner:
-      expectedShape = WT.TerrainShape.SouthEdge;
-      break;
-    case WT.EdgeShape.West:
-      expectedShape = WT.TerrainShape.WestEdge;
-      break;
+      case WT.EdgeShape.North:
+      case WT.EdgeShape.NorthSouthCorridor:
+      case WT.EdgeShape.NorthWestCorner:
+      case WT.EdgeShape.EastWestCorridor:
+      case WT.EdgeShape.WestPeninsula:
+        expectedShape = WT.TerrainShape.NorthEdge;
+        break;
+      case WT.EdgeShape.East:
+      case WT.EdgeShape.NorthEastCorner:
+      case WT.EdgeShape.SouthEastCorner:
+      case WT.EdgeShape.NorthPeninsula:
+      case WT.EdgeShape.EastPeninsula:
+      case WT.EdgeShape.SouthPeninsula:
+      case WT.EdgeShape.Spire:
+        expectedShape = WT.TerrainShape.EastEdge;
+        break;
+      case WT.EdgeShape.South:
+      case WT.EdgeShape.SouthWestCorner:
+        expectedShape = WT.TerrainShape.SouthEdge;
+        break;
+      case WT.EdgeShape.West:
+        expectedShape = WT.TerrainShape.WestEdge;
+        break;
     }
     expect(terrainShape).toBe(expectedShape);
   }

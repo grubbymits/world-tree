@@ -161,26 +161,26 @@ function createMap() {
   // top row
   for (let i = 0; i < numTilesWide; i++) {
     let minLocation = new WT.Point3D(i * squareTileSize, 0, 0);
-    new WT.CuboidEntity(context, minLocation, tileDims);
+    context.addEntity(new WT.CuboidEntity(minLocation, tileDims));
   }
   // bottom row
   for (let i = 0; i < numTilesWide; i++) {
     let minLocation = new WT.Point3D(i * squareTileSize, squareTileSize * 4, 0);
-    new WT.CuboidEntity(context, minLocation, tileDims);
+    context.addEntity(new WT.CuboidEntity(minLocation, tileDims));
   }
   // left side
   for (let i = 0; i < numTilesDeep; i++) {
     let minLocation = new WT.Point3D(0, i * squareTileSize, 0);
-    new WT.CuboidEntity(context, minLocation, tileDims);
+    context.addEntity(new WT.CuboidEntity(minLocation, tileDims));
   }
   // right side
   for (let i = 0; i < numTilesDeep; i++) {
     let minLocation = new WT.Point3D(4 * squareTileSize, i * squareTileSize, 0);
-    new WT.CuboidEntity(context, minLocation, tileDims);
+    context.addEntity(new WT.CuboidEntity(minLocation, tileDims));
   }
   // middle
   let minLocation = new WT.Point3D(2 * squareTileSize, 2 * squareTileSize, 0);
-  new WT.CuboidEntity(context, minLocation, tileDims);
+  context.addEntity(new WT.CuboidEntity(minLocation, tileDims));
 
   return context;
 }
@@ -193,7 +193,11 @@ function tryMoveFiveSteps(position, path, context) {
     worldDims.height / 2
   );
   const fakeGraphic = {};
-  const movable = context.createMovableEntity(position, entityDims, fakeGraphic);
+  const movable = context.createMovableEntity(
+    position,
+    entityDims,
+    fakeGraphic
+  );
   const area = new WT.BoundingCuboid(worldCentre, worldDims);
   // step 1
   let detection = WT.CollisionDetector.detectInArea(movable, path, area);
@@ -321,39 +325,48 @@ function createMapWithRampUpEast() {
   // top row
   for (let i = 0; i < numTilesWide; i++) {
     let minLocation = new WT.Point3D(i * (squareTileSize + 0.001), 0, 0);
-    context.addEntity(new WT.CuboidEntity(context, minLocation, tileDims));
+    context.addEntity(new WT.CuboidEntity(minLocation, tileDims));
   }
   // bottom row
   for (let i = 0; i < numTilesWide; i++) {
-    let minLocation = new WT.Point3D(i * (squareTileSize + 0.001),
-                                     (squareTileSize + 0.001) * 4, 0);
-    context.addEntity(new WT.CuboidEntity(context, minLocation, tileDims));
+    let minLocation = new WT.Point3D(
+      i * (squareTileSize + 0.001),
+      (squareTileSize + 0.001) * 4,
+      0
+    );
+    context.addEntity(new WT.CuboidEntity(minLocation, tileDims));
   }
   // left side
   for (let i = 0; i < numTilesDeep; i++) {
     let minLocation = new WT.Point3D(0, i * (squareTileSize + 0.001), 0);
-    context.addEntity(new WT.CuboidEntity(context, minLocation, tileDims));
+    context.addEntity(new WT.CuboidEntity(minLocation, tileDims));
   }
   // right side
   for (let i = 0; i < numTilesDeep; i++) {
-    let minLocation = new WT.Point3D(4 * (squareTileSize + 0.001),
-                                     i * (squareTileSize + 0.001), 0);
-    context.addEntity(new WT.CuboidEntity(context, minLocation, tileDims));
+    let minLocation = new WT.Point3D(
+      4 * (squareTileSize + 0.001),
+      i * (squareTileSize + 0.001),
+      0
+    );
+    context.addEntity(new WT.CuboidEntity(minLocation, tileDims));
   }
   // middle
-  const minLocation = new WT.Point3D(2 * (squareTileSize + 0.001),
-                                     2 * (squareTileSize + 0.001), 0);
-  context.addEntity(new WT.RampEastEntity(context, minLocation, tileDims));
+  const minLocation = new WT.Point3D(
+    2 * (squareTileSize + 0.001),
+    2 * (squareTileSize + 0.001),
+    0
+  );
+  context.addEntity(new WT.RampEastEntity(minLocation, tileDims));
 
   return context;
 }
 
-test("detect collision from west", () => {
+test("detect collision from west up ramp", () => {
   const idx = 1;
   const idy = 2;
   const posx = squareTileSize * idx;
   const posy = squareTileSize * idy;
-  const position = new WT.Point3D(posx, posy, 0.000);
+  const position = new WT.Point3D(posx, posy, 0.0);
   const path = new WT.Vector3D(1.001, 0, 0);
   const context = createMapWithRampUpEast();
   tryMoveFiveSteps(position, path, context);

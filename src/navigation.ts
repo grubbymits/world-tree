@@ -45,7 +45,7 @@ export class Navigation {
       case Direction.North:
         return new Vector3D(0, -1, 0);
       case Direction.NorthEast:
-        return new Vector3D(1, -1, 0); 
+        return new Vector3D(1, -1, 0);
       case Direction.East:
         return new Vector3D(1, 0, 0);
       case Direction.SouthEast:
@@ -76,7 +76,7 @@ export class Navigation {
     const mag = w.mag();
     const u = new Vector2D(0, -mag); // 'north'
     // Add 22.5 to allow north to cover -22.5 - 22.5 deg.
-    let theta = ((180 * u.angle(w)) / Math.PI) + 22.5;
+    let theta = (180 * u.angle(w)) / Math.PI + 22.5;
     if (theta < 0) {
       const rotate = 180 + theta;
       theta = 180 + rotate;
@@ -92,17 +92,17 @@ export class Navigation {
   static getAdjacentDirections(direction: Direction): Array<Direction> {
     const anticlockwise = (direction + Direction.Max - 1) % Direction.Max;
     const clockwise = (direction + 1) % Direction.Max;
-    return [ anticlockwise, clockwise ];
+    return [anticlockwise, clockwise];
   }
 
   static readonly neighbourOffsets: Map<Direction, Vector2D> = new Map([
-    [ Direction.North, new Vector2D(0, -1) ],
-    [ Direction.East, new Vector2D(1, 0) ],
-    [ Direction.South, new Vector2D(0, 1) ],
-    [ Direction.West, new Vector2D(-1, 0) ],
-    [ Direction.NorthWest, new Vector2D(-1, -1) ],
-    [ Direction.NorthEast, new Vector2D(1, -1) ],
-    [ Direction.SouthEast, new Vector2D(1, 1) ],
-    [ Direction.SouthWest, new Vector2D(-1, 1) ],
+    [Direction.North, new Vector2D(0, -1)],
+    [Direction.East, new Vector2D(1, 0)],
+    [Direction.South, new Vector2D(0, 1)],
+    [Direction.West, new Vector2D(-1, 0)],
+    [Direction.NorthWest, new Vector2D(-1, -1)],
+    [Direction.NorthEast, new Vector2D(1, -1)],
+    [Direction.SouthEast, new Vector2D(1, 1)],
+    [Direction.SouthWest, new Vector2D(-1, 1)],
   ]);
 }

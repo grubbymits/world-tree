@@ -1,17 +1,19 @@
-import { Point3D, Vector3D } from './geometry.ts'
-import { PhysicalEntity, MovableEntity } from './entity.ts'
-import { EntityEvent } from './events.ts'
+import { Point3D, Vector3D } from "./geometry.ts";
+import { PhysicalEntity, MovableEntity } from "./entity.ts";
+import { EntityEvent } from "./events.ts";
 
 // Work around for having a static variable and jest not having the support.
 class AudioContextMock {
-  constructor() { }
+  constructor() {}
 }
 const AudioContext = window.AudioContext || AudioContextMock;
 
 export class AudioController {
   static _context: AudioContext = new AudioContext();
-  static _sources: Map<number, AudioBufferSourceNode> =
-    new Map<number, AudioBufferSourceNode>();
+  static _sources: Map<number, AudioBufferSourceNode> = new Map<
+    number,
+    AudioBufferSourceNode
+  >();
   static _panners: Map<number, PannerNode> = new Map<number, PannerNode>();
 
   private static _id = 0;
@@ -19,7 +21,8 @@ export class AudioController {
   public static async create(name: string): Promise<number> {
     const source_id = this._id;
     this._id++;
-    await fetch(name).then((response) => response.arrayBuffer())
+    await fetch(name)
+      .then((response) => response.arrayBuffer())
       .then((buffer) => this._context.decodeAudioData(buffer))
       .then((decoded) => {
         const source = new AudioBufferSourceNode(this._context, {
@@ -27,7 +30,7 @@ export class AudioController {
         });
         this._sources.set(source_id, source);
       })
-      .catch((e) => console.error('could not load: ', name));
+      .catch((e) => console.error("could not load: ", name));
     return source_id;
   }
 
@@ -47,7 +50,11 @@ export class AudioController {
     source.start();
   }
 
-  public static loopPanningBackground(id: number, entityIds: Array<number>, volume: number) {
+  public static loopPanningBackground(
+    id: number,
+    entityIds: Array<number>,
+    volume: number
+  ) {
     console.assert(this._sources.has(id));
     const source = this._sources.get(id)!;
     const gainNode = this._context.createGain();
@@ -56,13 +63,21 @@ export class AudioController {
     for (let entity_id of entityIds) {
       console.assert(this._panners.has(entity_id));
       const panner = this._panners.get(entity_id)!;
-      source.connect(panner).connect(gainNode).connect(this._context.destination);
+      source
+        .connect(panner)
+        .connect(gainNode)
+        .connect(this._context.destination);
     }
     source.loop = true;
     source.start();
   }
 
-  public static playPanningOnce(id: number, entity: PhysicalEntity, volume = 1, loop = false) {
+  public static playPanningOnce(
+    id: number,
+    entity: PhysicalEntity,
+    volume = 1,
+    loop = false
+  ) {
     console.assert(this._sources.has(id));
     console.assert(this._panners.has(entity.id));
     const source = this._sources.get(id)!;
@@ -115,8 +130,7 @@ export class AudioController {
     });
     setPos();
 
-    entity.addEventListener(EntityEvent.FaceDirection, () => {
-    });
+    entity.addEventListener(EntityEvent.FaceDirection, () => {});
   }
 
   public static setListeningPosition(location: Point3D): void {

@@ -1,30 +1,27 @@
-import {
-  Biome,
-  getBiomeName
-} from './biomes.ts';
-import { ContextImpl } from './context.ts';
+import { Biome, getBiomeName } from "./biomes.ts";
+import { ContextImpl } from "./context.ts";
 import {
   Sprite,
   SpriteSheet,
   GraphicComponent,
   StaticGraphicComponent,
-} from './graphics.ts';
+} from "./graphics.ts";
 import { Coord } from "./utils.ts";
-import { MinPriorityQueue } from './queue.ts';
+import { MinPriorityQueue } from "./queue.ts";
 
 export type TerraceGrid = Array<Uint8Array>;
 export type BlockingGrid = Array<Uint8Array>;
 
 export const enum DirectionBit {
-  North     = 1 << 0,
+  North = 1 << 0,
   NorthEast = 1 << 1,
-  East      = 1 << 2,
+  East = 1 << 2,
   SouthEast = 1 << 3,
-  South     = 1 << 4,
+  South = 1 << 4,
   SouthWest = 1 << 5,
-  West      = 1 << 6,
+  West = 1 << 6,
   NorthWest = 1 << 7,
-  Max       = 1 << 8,
+  Max = 1 << 8,
 }
 
 function isDiagonal(direction: DirectionBit) {
@@ -38,25 +35,35 @@ function isDiagonal(direction: DirectionBit) {
 
 function directionName(direction: DirectionBit): string {
   switch (direction) {
-  default: console.error('unhandled direction');
-  case DirectionBit.North: return 'North';
-  case DirectionBit.NorthEast: return 'NorthEast';
-  case DirectionBit.East: return 'East';
-  case DirectionBit.SouthEast: return 'SouthEast';
-  case DirectionBit.South: return 'South';
-  case DirectionBit.SouthWest: return 'SouthWest';
-  case DirectionBit.West: return 'West';
-  case DirectionBit.NorthWest: return 'NorthWest';
-  case DirectionBit.Max: return 'Max';
+    default:
+      console.error("unhandled direction");
+    case DirectionBit.North:
+      return "North";
+    case DirectionBit.NorthEast:
+      return "NorthEast";
+    case DirectionBit.East:
+      return "East";
+    case DirectionBit.SouthEast:
+      return "SouthEast";
+    case DirectionBit.South:
+      return "South";
+    case DirectionBit.SouthWest:
+      return "SouthWest";
+    case DirectionBit.West:
+      return "West";
+    case DirectionBit.NorthWest:
+      return "NorthWest";
+    case DirectionBit.Max:
+      return "Max";
   }
 }
 
 function rotateLeft(direction: DirectionBit, n: number): DirectionBit {
-  return 0xFF & ((direction << n) | (direction >>> (8 - n)));
+  return 0xff & ((direction << n) | (direction >>> (8 - n)));
 }
 
 function rotateRight(direction: DirectionBit, n: number): DirectionBit {
-  return 0xFF & ((direction >>> n) | (direction << (8 - n)));
+  return 0xff & ((direction >>> n) | (direction << (8 - n)));
 }
 
 export function getOpposite(direction: DirectionBit): DirectionBit {
@@ -66,65 +73,71 @@ export function getOpposite(direction: DirectionBit): DirectionBit {
 
 // This order is dependent on the loop in findEdges.
 export const enum EdgeShape {
-  None,               // 0
-  North,              // 1
-  East,               // 2
-  NorthEastCorner,    // 3
-  South,              // 4
+  None, // 0
+  North, // 1
+  East, // 2
+  NorthEastCorner, // 3
+  South, // 4
   NorthSouthCorridor, // 5
-  SouthEastCorner,    // 6
-  EastPeninsula,      // 7
-  West,               // 8
-  NorthWestCorner,    // 9
-  EastWestCorridor,   // 10
-  NorthPeninsula,     // 11
-  SouthWestCorner,    // 12
-  WestPeninsula,      // 13
-  SouthPeninsula,     // 14
-  Spire,              // 15
+  SouthEastCorner, // 6
+  EastPeninsula, // 7
+  West, // 8
+  NorthWestCorner, // 9
+  EastWestCorridor, // 10
+  NorthPeninsula, // 11
+  SouthWestCorner, // 12
+  WestPeninsula, // 13
+  SouthPeninsula, // 14
+  Spire, // 15
   Max,
 }
 
 const blockingCardinals = new Array<Uint8Array>(
   // None,
-  new Uint8Array([ ]),
+  new Uint8Array([]),
   // North,
-  new Uint8Array([ DirectionBit.North ]),
+  new Uint8Array([DirectionBit.North]),
   // East,
-  new Uint8Array([ DirectionBit.East ]),
+  new Uint8Array([DirectionBit.East]),
   // NorthEastCorner,
-  new Uint8Array([ DirectionBit.North, DirectionBit.East ]),
+  new Uint8Array([DirectionBit.North, DirectionBit.East]),
   // South,
-  new Uint8Array([ DirectionBit.South ]),
+  new Uint8Array([DirectionBit.South]),
   // NorthSouthCorridor,
-  new Uint8Array([ DirectionBit.North, DirectionBit.South ]),
+  new Uint8Array([DirectionBit.North, DirectionBit.South]),
   // SouthEastCorner,
-  new Uint8Array([ DirectionBit.South, DirectionBit.East ]),
+  new Uint8Array([DirectionBit.South, DirectionBit.East]),
   // EastPeninsula,
-  new Uint8Array([ DirectionBit.North, DirectionBit.South, DirectionBit.East ]),
+  new Uint8Array([DirectionBit.North, DirectionBit.South, DirectionBit.East]),
   // West,
-  new Uint8Array([ DirectionBit.West ]),
+  new Uint8Array([DirectionBit.West]),
   // NorthWestCorner,
-  new Uint8Array([ DirectionBit.North, DirectionBit.West ]),
+  new Uint8Array([DirectionBit.North, DirectionBit.West]),
   // EastWestCorridor,
-  new Uint8Array([ DirectionBit.East, DirectionBit.West ]),
+  new Uint8Array([DirectionBit.East, DirectionBit.West]),
   // NorthPeninsula,
-  new Uint8Array([ DirectionBit.North, DirectionBit.East, DirectionBit.West ]),
+  new Uint8Array([DirectionBit.North, DirectionBit.East, DirectionBit.West]),
   // SouthWestCorner,
-  new Uint8Array([ DirectionBit.South, DirectionBit.West ]),
+  new Uint8Array([DirectionBit.South, DirectionBit.West]),
   // WestPeninsula,
-  new Uint8Array([ DirectionBit.North, DirectionBit.South, DirectionBit.West ]),
+  new Uint8Array([DirectionBit.North, DirectionBit.South, DirectionBit.West]),
   // SouthPeninsula,
-  new Uint8Array([ DirectionBit.South, DirectionBit.East, DirectionBit.West ]),
+  new Uint8Array([DirectionBit.South, DirectionBit.East, DirectionBit.West]),
   // Spire,
-  new Uint8Array([ DirectionBit.North, DirectionBit.South, DirectionBit.East, DirectionBit.West ]),
+  new Uint8Array([
+    DirectionBit.North,
+    DirectionBit.South,
+    DirectionBit.East,
+    DirectionBit.West,
+  ])
 );
 
 export class Edge {
-  constructor(private _shape: EdgeShape,
-              private readonly _x: number,
-              private readonly _y: number) {
-  }
+  constructor(
+    private _shape: EdgeShape,
+    private readonly _x: number,
+    private readonly _y: number
+  ) {}
   get shape(): EdgeShape {
     return this._shape;
   }
@@ -151,21 +164,29 @@ export const enum RampShape {
 }
 
 export class Ramp {
-  constructor(private readonly _shape: RampShape,
-              private readonly _x: number,
-              private readonly _y: number) {
+  constructor(
+    private readonly _shape: RampShape,
+    private readonly _x: number,
+    private readonly _y: number
+  ) {
     Object.freeze(this);
   }
-  get shape(): RampShape { return this._shape; }
-  get x(): number { return this._x; }
-  get y(): number { return this._y; }
+  get shape(): RampShape {
+    return this._shape;
+  }
+  get x(): number {
+    return this._x;
+  }
+  get y(): number {
+    return this._y;
+  }
 }
 
 export function findEdges(terraceGrid: TerraceGrid): Array<Edge> {
   const neighbourOffsets: Array<Coord> = [
     new Coord(0, -1), // N
-    new Coord(1, 0),  // E
-    new Coord(0, 1),  // S
+    new Coord(1, 0), // E
+    new Coord(0, 1), // S
     new Coord(-1, 0), // W
   ];
 
@@ -176,14 +197,18 @@ export function findEdges(terraceGrid: TerraceGrid): Array<Edge> {
   for (let centreY = 0; centreY < maxY; ++centreY) {
     for (let centreX = 0; centreX < maxX; ++centreX) {
       const centreTerrace = terraceGrid[centreY][centreX];
-      let centreEdges = <number> EdgeShape.None;
+      let centreEdges = <number>EdgeShape.None;
       for (let i = 0; i < 4; ++i) {
         const offset = neighbourOffsets[i];
         const neighbourX = centreX + offset.x;
         const neighbourY = centreY + offset.y;
 
-        if (neighbourX < 0 || neighbourX >= maxX ||
-            neighbourY < 0 || neighbourY >= maxY) {
+        if (
+          neighbourX < 0 ||
+          neighbourX >= maxX ||
+          neighbourY < 0 ||
+          neighbourY >= maxY
+        ) {
           continue;
         }
 
@@ -207,18 +232,19 @@ export function findEdges(terraceGrid: TerraceGrid): Array<Edge> {
   return edges;
 }
 
-export function findRamps(terraceGrid: TerraceGrid,
-                          edges: Array<Edge>,
-                          extraDistance = 0): Array<Ramp> {
-
+export function findRamps(
+  terraceGrid: TerraceGrid,
+  edges: Array<Edge>,
+  extraDistance = 0
+): Array<Ramp> {
   const NORTH = 0;
   const EAST = 1;
   const SOUTH = 2;
   const WEST = 3;
   const neighbourOffsets: Array<Coord> = [
     new Coord(0, -1), // N
-    new Coord(1, 0),  // E
-    new Coord(0, 1),  // S
+    new Coord(1, 0), // E
+    new Coord(0, 1), // S
     new Coord(-1, 0), // W
   ];
   // Minimum distance to consider, past the centre position, is two blocks:
@@ -251,11 +277,15 @@ export function findRamps(terraceGrid: TerraceGrid,
     const edge = edges.find((edge) => edge.x == x && edge.y == y);
     if (edge != undefined) {
       return edgesToAvoid.some((avoid) => avoid == edge.shape);
-    };
+    }
     return false;
   };
 
-  const areNeighbourTerracesEqual = (x: number, y: number, direction: number) => {
+  const areNeighbourTerracesEqual = (
+    x: number,
+    y: number,
+    direction: number
+  ) => {
     const offset = neighbourOffsets[direction];
     const closestNeighbourX = x + offset.x;
     const closestNeighbourY = y + offset.y;
@@ -264,17 +294,21 @@ export function findRamps(terraceGrid: TerraceGrid,
     }
     const centreTerrace = terraceGrid[y][x];
     for (let i = 1; i <= distance; ++i) {
-      const neighbourY = y + (i * offset.y);
-      const neighbourX = x + (i * offset.x);
+      const neighbourY = y + i * offset.y;
+      const neighbourX = x + i * offset.x;
       const neighbourTerrace = terraceGrid[neighbourY][neighbourX];
       if (neighbourTerrace != centreTerrace) {
         return false;
       }
     }
     return true;
-  }
+  };
 
-  const areNeighbourTerracesLower = (x: number, y: number, direction: number) => {
+  const areNeighbourTerracesLower = (
+    x: number,
+    y: number,
+    direction: number
+  ) => {
     const offset = neighbourOffsets[direction];
     const closestNeighbourX = x + offset.x;
     const closestNeighbourY = y + offset.y;
@@ -283,15 +317,15 @@ export function findRamps(terraceGrid: TerraceGrid,
     }
     const centreTerrace = terraceGrid[y][x];
     for (let i = 1; i <= distance; ++i) {
-      const neighbourY = y + (i * offset.y);
-      const neighbourX = x + (i * offset.x);
+      const neighbourY = y + i * offset.y;
+      const neighbourX = x + i * offset.x;
       const neighbourTerrace = terraceGrid[neighbourY][neighbourX];
       if (neighbourTerrace != centreTerrace - 1) {
         return false;
       }
     }
     return true;
-  }
+  };
 
   for (let edge of edges) {
     const x = edge.x;
@@ -300,35 +334,44 @@ export function findRamps(terraceGrid: TerraceGrid,
       continue;
     }
     switch (edge.shape) {
-    default: break;
-    case EdgeShape.North:
-    case EdgeShape.NorthPeninsula:
-      if (areNeighbourTerracesLower(x, y, NORTH) &&
-          areNeighbourTerracesEqual(x, y, SOUTH)) {
-        ramps.push(new Ramp(RampShape.South, x, y));
-      }
-      break;
-    case EdgeShape.South:
-    case EdgeShape.SouthPeninsula:
-      if (areNeighbourTerracesLower(x, y, SOUTH) &&
-          areNeighbourTerracesEqual(x, y, NORTH)) {
-        ramps.push(new Ramp(RampShape.North, x, y));
-      }
-      break;
-    case EdgeShape.East:
-    case EdgeShape.EastPeninsula:
-      if (areNeighbourTerracesLower(x, y, EAST) &&
-          areNeighbourTerracesEqual(x, y, WEST)) {
-        ramps.push(new Ramp(RampShape.West, x, y));
-      }
-      break;
-    case EdgeShape.West:
-    case EdgeShape.WestPeninsula:
-      if (areNeighbourTerracesLower(x, y, WEST) &&
-          areNeighbourTerracesEqual(x, y, EAST)) {
-        ramps.push(new Ramp(RampShape.East, x, y));
-      }
-      break;
+      default:
+        break;
+      case EdgeShape.North:
+      case EdgeShape.NorthPeninsula:
+        if (
+          areNeighbourTerracesLower(x, y, NORTH) &&
+          areNeighbourTerracesEqual(x, y, SOUTH)
+        ) {
+          ramps.push(new Ramp(RampShape.South, x, y));
+        }
+        break;
+      case EdgeShape.South:
+      case EdgeShape.SouthPeninsula:
+        if (
+          areNeighbourTerracesLower(x, y, SOUTH) &&
+          areNeighbourTerracesEqual(x, y, NORTH)
+        ) {
+          ramps.push(new Ramp(RampShape.North, x, y));
+        }
+        break;
+      case EdgeShape.East:
+      case EdgeShape.EastPeninsula:
+        if (
+          areNeighbourTerracesLower(x, y, EAST) &&
+          areNeighbourTerracesEqual(x, y, WEST)
+        ) {
+          ramps.push(new Ramp(RampShape.West, x, y));
+        }
+        break;
+      case EdgeShape.West:
+      case EdgeShape.WestPeninsula:
+        if (
+          areNeighbourTerracesLower(x, y, WEST) &&
+          areNeighbourTerracesEqual(x, y, EAST)
+        ) {
+          ramps.push(new Ramp(RampShape.East, x, y));
+        }
+        break;
     }
   }
 
@@ -337,60 +380,67 @@ export function findRamps(terraceGrid: TerraceGrid,
   };
 
   // Adding ramps will create more edges...
-  const addEdge = (x: number, y: number, offset: Coord,
-                   edgeShape: EdgeShape) => {
+  const addEdge = (
+    x: number,
+    y: number,
+    offset: Coord,
+    edgeShape: EdgeShape
+  ) => {
     const neighbourX = x + offset.x;
     const neighbourY = y + offset.y;
     if (isRampAt(neighbourX, neighbourY)) {
       return;
     }
-    const edge = edges.find((edge) => edge.x == neighbourX && edge.y == neighbourY);
+    const edge = edges.find(
+      (edge) => edge.x == neighbourX && edge.y == neighbourY
+    );
     if (edge != undefined) {
       edge.addCardinalEdge(edgeShape);
     } else {
       edges.push(new Edge(edgeShape, neighbourX, neighbourY));
     }
-  }
+  };
   for (const ramp of ramps) {
     const x = ramp.x;
     const y = ramp.y;
     switch (ramp.shape) {
-    case RampShape.North:
-    case RampShape.South:
-      addEdge(x, y, neighbourOffsets[EAST], EdgeShape.West);
-      addEdge(x, y, neighbourOffsets[WEST], EdgeShape.East);
-      break;
-    case RampShape.East:
-    case RampShape.West:
-      addEdge(x, y, neighbourOffsets[NORTH], EdgeShape.South);
-      addEdge(x, y, neighbourOffsets[SOUTH], EdgeShape.North);
-      break;
+      case RampShape.North:
+      case RampShape.South:
+        addEdge(x, y, neighbourOffsets[EAST], EdgeShape.West);
+        addEdge(x, y, neighbourOffsets[WEST], EdgeShape.East);
+        break;
+      case RampShape.East:
+      case RampShape.West:
+        addEdge(x, y, neighbourOffsets[NORTH], EdgeShape.South);
+        addEdge(x, y, neighbourOffsets[SOUTH], EdgeShape.North);
+        break;
     }
   }
   return ramps;
 }
 
 const neighbourOffsets = new Map<DirectionBit, Coord>([
-  [ DirectionBit.North, new Coord(0, -1) ],
-  [ DirectionBit.NorthEast, new Coord(1, -1) ],
-  [ DirectionBit.East, new Coord(1, 0) ],
-  [ DirectionBit.SouthEast, new Coord(1, 1) ],
-  [ DirectionBit.South, new Coord(0, 1) ],
-  [ DirectionBit.SouthWest, new Coord(-1, 1) ],
-  [ DirectionBit.West, new Coord(-1, 0) ],
-  [ DirectionBit.NorthWest, new Coord(-1, -1) ],
+  [DirectionBit.North, new Coord(0, -1)],
+  [DirectionBit.NorthEast, new Coord(1, -1)],
+  [DirectionBit.East, new Coord(1, 0)],
+  [DirectionBit.SouthEast, new Coord(1, 1)],
+  [DirectionBit.South, new Coord(0, 1)],
+  [DirectionBit.SouthWest, new Coord(-1, 1)],
+  [DirectionBit.West, new Coord(-1, 0)],
+  [DirectionBit.NorthWest, new Coord(-1, -1)],
 ]);
 
-function getNeighbourCoord(x: number,
-                           y: number,
-                           direction: DirectionBit): Coord {
+function getNeighbourCoord(
+  x: number,
+  y: number,
+  direction: DirectionBit
+): Coord {
   console.assert(neighbourOffsets.has(direction));
   const offset = neighbourOffsets.get(direction)!;
   return new Coord(x + offset.x, y + offset.y);
 }
 
-function inrange(coord: Coord,
-                 grid: Array<Uint8Array>): boolean {
+function inrange(coord: Coord, grid: Array<Uint8Array>): boolean {
   if (coord.y < 0 || coord.y >= grid.length) {
     return false;
   }
@@ -400,13 +450,14 @@ function inrange(coord: Coord,
   return true;
 }
 
-export function buildBlockingGrid(terraceGrid: TerraceGrid,
-                                  edges: Array<Edge>,
-                                  ramps: Array<Ramp>,
-                                  blockingRamps = false,
-                                  blockingUpHeight = 1,
-                                  blockingDownHeight = 1): BlockingGrid {
-
+export function buildBlockingGrid(
+  terraceGrid: TerraceGrid,
+  edges: Array<Edge>,
+  ramps: Array<Ramp>,
+  blockingRamps = false,
+  blockingUpHeight = 1,
+  blockingDownHeight = 1
+): BlockingGrid {
   // Initialise new grid
   const blockingGrid = new Array<Uint8Array>();
   for (let i = 0; i < terraceGrid.length; ++i) {
@@ -416,32 +467,24 @@ export function buildBlockingGrid(terraceGrid: TerraceGrid,
   // Top edge
   for (let x = 0; x < blockingGrid[0].length; ++x) {
     blockingGrid[0][x] |=
-      DirectionBit.North |
-      DirectionBit.NorthWest |
-      DirectionBit.NorthEast;
+      DirectionBit.North | DirectionBit.NorthWest | DirectionBit.NorthEast;
   }
   // Bottom edge
   for (let x = 0; x < blockingGrid[blockingGrid.length - 1].length; ++x) {
     const y = blockingGrid.length - 1;
     blockingGrid[y][x] |=
-      DirectionBit.South |
-      DirectionBit.SouthWest |
-      DirectionBit.SouthEast;
+      DirectionBit.South | DirectionBit.SouthWest | DirectionBit.SouthEast;
   }
   // Left edge
   for (let y = 0; y < blockingGrid.length; ++y) {
     blockingGrid[y][0] |=
-      DirectionBit.West |
-      DirectionBit.NorthWest |
-      DirectionBit.SouthWest;
+      DirectionBit.West | DirectionBit.NorthWest | DirectionBit.SouthWest;
   }
   // Right edge
   for (let y = 0; y < blockingGrid.length; ++y) {
     const x = blockingGrid[y].length - 1;
     blockingGrid[y][x] |=
-      DirectionBit.East |
-      DirectionBit.NorthEast |
-      DirectionBit.SouthEast;
+      DirectionBit.East | DirectionBit.NorthEast | DirectionBit.SouthEast;
   }
 
   // Nothing to do.
@@ -451,9 +494,14 @@ export function buildBlockingGrid(terraceGrid: TerraceGrid,
 
   for (let edge of edges) {
     for (let cardinalDirection of blockingCardinals[edge.shape]) {
-      const cardinalNeighbour: Coord = getNeighbourCoord(edge.x, edge.y, cardinalDirection);
+      const cardinalNeighbour: Coord = getNeighbourCoord(
+        edge.x,
+        edge.y,
+        cardinalDirection
+      );
       const edgeHeight = terraceGrid[edge.y][edge.x];
-      const neighbourHeight = terraceGrid[cardinalNeighbour.y][cardinalNeighbour.x];
+      const neighbourHeight =
+        terraceGrid[cardinalNeighbour.y][cardinalNeighbour.x];
       const heightDiff = edgeHeight - neighbourHeight;
 
       const otherDirections = [
@@ -471,13 +519,14 @@ export function buildBlockingGrid(terraceGrid: TerraceGrid,
         for (let d of allDirections) {
           const fromDirectionBit = getOpposite(d);
           // block the cardinal neighbour
-          blockingGrid[cardinalNeighbour.y][cardinalNeighbour.x] |= fromDirectionBit;
+          blockingGrid[cardinalNeighbour.y][cardinalNeighbour.x] |=
+            fromDirectionBit;
 
           // block the neighbours of the cardinal neighbour, including this edge.
           const neighbour = getNeighbourCoord(
             cardinalNeighbour.x,
             cardinalNeighbour.y,
-            fromDirectionBit,
+            fromDirectionBit
           );
           if (inrange(neighbour, blockingGrid)) {
             blockingGrid[neighbour.y][neighbour.x] |= d;
@@ -497,10 +546,10 @@ export function buildBlockingGrid(terraceGrid: TerraceGrid,
 
   // Some edges will be ramps, so undo some of the blocking.
   const rampDirections = new Map<RampShape, DirectionBit>([
-    [ RampShape.North, DirectionBit.North ],
-    [ RampShape.East, DirectionBit.East ],
-    [ RampShape.South, DirectionBit.South ],
-    [ RampShape.West, DirectionBit.West ],
+    [RampShape.North, DirectionBit.North],
+    [RampShape.East, DirectionBit.East],
+    [RampShape.South, DirectionBit.South],
+    [RampShape.West, DirectionBit.West],
   ]);
 
   for (let ramp of ramps) {
@@ -520,18 +569,22 @@ export function buildBlockingGrid(terraceGrid: TerraceGrid,
   return blockingGrid;
 }
 
-export function isNeighbourAccessible(x: number,
-                                      y: number,
-                                      direction: DirectionBit,
-                                      grid: BlockingGrid): boolean {
+export function isNeighbourAccessible(
+  x: number,
+  y: number,
+  direction: DirectionBit,
+  grid: BlockingGrid
+): boolean {
   console.assert(y >= 0 && y < grid.length);
   console.assert(x >= 0 && x < grid[y].length);
   return (grid[y][x] & direction) == 0;
 }
 
-export function isCompletelyBlocked(x: number,
-                                    y: number,
-                                    grid: BlockingGrid): boolean {
+export function isCompletelyBlocked(
+  x: number,
+  y: number,
+  grid: BlockingGrid
+): boolean {
   console.assert(y >= 0 && y < grid.length);
   console.assert(x >= 0 && x < grid[y].length);
   return grid[y][x] == 255;
@@ -548,19 +601,23 @@ const allDirections = new Array<DirectionBit>(
   DirectionBit.NorthWest
 );
 
-export function findPath(start: Coord,
-                         end: Coord,
-                         blockingGrid: BlockingGrid): Array<Coord> {
+export function findPath(
+  start: Coord,
+  end: Coord,
+  blockingGrid: BlockingGrid
+): Array<Coord> {
   if (start.x == end.x && start.y == end.y) {
     return new Array<Coord>();
   }
 
-  if (isCompletelyBlocked(start.x, start.y, blockingGrid) ||
-      isCompletelyBlocked(end.x, end.y, blockingGrid)) {
+  if (
+    isCompletelyBlocked(start.x, start.y, blockingGrid) ||
+    isCompletelyBlocked(end.x, end.y, blockingGrid)
+  ) {
     return new Array<Coord>();
   }
 
-  const coord  = (id: number): Coord => {
+  const coord = (id: number): Coord => {
     const depth = blockingGrid.length;
     const width = blockingGrid[0].length;
     const x = Math.floor(id % width);
@@ -570,7 +627,7 @@ export function findPath(start: Coord,
 
   const id = (coord: Coord): number => {
     const width = blockingGrid[0].length;
-    return (width * coord.y) + coord.x;
+    return width * coord.y + coord.x;
   };
 
   // https://www.redblobgames.com/pathfinding/a-star/introduction.html
@@ -591,7 +648,9 @@ export function findPath(start: Coord,
     }
     const current = coord(currentId);
     for (let direction of allDirections) {
-      if (isNeighbourAccessible(current.x, current.y, direction, blockingGrid)) {
+      if (
+        isNeighbourAccessible(current.x, current.y, direction, blockingGrid)
+      ) {
         const nextCoord = getNeighbourCoord(current.x, current.y, direction);
         const nextId = id(nextCoord);
         // TODO: ramps should cost more.
@@ -620,8 +679,10 @@ export function findPath(start: Coord,
   return path.splice(1);
 }
 
-export function normaliseHeightGrid(heightGrid: Array<Array<number>>,
-                                    numTerraces: number): number {
+export function normaliseHeightGrid(
+  heightGrid: Array<Array<number>>,
+  numTerraces: number
+): number {
   // Normalise heights, minimum = 0;
   const cellsY = heightGrid.length;
   const cellsX = heightGrid[0].length;
@@ -650,8 +711,10 @@ export function normaliseHeightGrid(heightGrid: Array<Array<number>>,
   return maxHeight / numTerraces;
 }
 
-export function buildTerraceGrid(heightGrid: Array<Array<number>>,
-                                 terraceSpacing: number): Array<Uint8Array> {
+export function buildTerraceGrid(
+  heightGrid: Array<Array<number>>,
+  terraceSpacing: number
+): Array<Uint8Array> {
   const cellsY = heightGrid.length;
   const cellsX = heightGrid[0].length;
   const terraceGrid = new Array<Uint8Array>();
@@ -659,36 +722,35 @@ export function buildTerraceGrid(heightGrid: Array<Array<number>>,
     terraceGrid[y] = new Uint8Array(cellsX);
     for (let x = 0; x < cellsX; x++) {
       const surfaceHeight = heightGrid[y][x];
-      terraceGrid[y][x] =
-        Math.floor(surfaceHeight / terraceSpacing);
+      terraceGrid[y][x] = Math.floor(surfaceHeight / terraceSpacing);
     }
   }
   return terraceGrid;
 }
 
 export const enum TerrainShape {
-  Flat,                 // 0
-  Wall,                 // 1
-  NorthEdge,            // 2
-  EastEdge,             // 3
-  NorthEastCorner,      // 4
-  SouthEdge,            // 5
-  NorthSouthCorridor,   // 6
-  SouthEastCorner,      // 7
-  EastPeninsula,        // 8
-  WestEdge,             // 9
-  NorthWestCorner,      // 10
-  EastWestCorridor,     // 11
-  NorthPeninsula,       // 12
-  SouthWestCorner,      // 13
-  WestPeninsula,        // 14
-  SouthPeninsula,       // 15
-  Spire,                // 16
-  RampNorth,            // 17
-  RampEast,             // 18
-  RampSouth,            // 19
-  RampWest,             // 20
-  Max,                  // 21
+  Flat, // 0
+  Wall, // 1
+  NorthEdge, // 2
+  EastEdge, // 3
+  NorthEastCorner, // 4
+  SouthEdge, // 5
+  NorthSouthCorridor, // 6
+  SouthEastCorner, // 7
+  EastPeninsula, // 8
+  WestEdge, // 9
+  NorthWestCorner, // 10
+  EastWestCorridor, // 11
+  NorthPeninsula, // 12
+  SouthWestCorner, // 13
+  WestPeninsula, // 14
+  SouthPeninsula, // 15
+  Spire, // 16
+  RampNorth, // 17
+  RampEast, // 18
+  RampSouth, // 19
+  RampWest, // 20
+  Max, // 21
 }
 
 export const enum TerrainType {
@@ -698,7 +760,7 @@ export const enum TerrainType {
   Rock,
   Mud,
   DryGrass,
-  WetGrass
+  WetGrass,
 }
 
 export function getTerrainShapeName(terrain: TerrainShape): string {
@@ -753,23 +815,23 @@ export function getTerrainShapeName(terrain: TerrainShape): string {
 
 export function getTerrainTypeName(terrain: TerrainType): string {
   switch (terrain) {
-  default:
-    console.error("unhandled terrain type:", terrain);
-    return "invalid terrain";
-  case TerrainType.Water:
-    return "TerrainType.Water";
-  case TerrainType.Snow:
-    return "TerrainType.Snow";
-  case TerrainType.Sand:
-    return "TerrainType.Sand";
-  case TerrainType.Rock:
-    return "TerrainType.Rock";
-  case TerrainType.Mud:
-    return "TerrainType.Mud";
-  case TerrainType.DryGrass:
-    return "TerrainType.DryGrass";
-  case TerrainType.WetGrass:
-    return "TerrainType.WetGrass";
+    default:
+      console.error("unhandled terrain type:", terrain);
+      return "invalid terrain";
+    case TerrainType.Water:
+      return "TerrainType.Water";
+    case TerrainType.Snow:
+      return "TerrainType.Snow";
+    case TerrainType.Sand:
+      return "TerrainType.Sand";
+    case TerrainType.Rock:
+      return "TerrainType.Rock";
+    case TerrainType.Mud:
+      return "TerrainType.Mud";
+    case TerrainType.DryGrass:
+      return "TerrainType.DryGrass";
+    case TerrainType.WetGrass:
+      return "TerrainType.WetGrass";
   }
 }
 
@@ -790,34 +852,39 @@ export interface TerrainSpriteDescriptor {
   darkUndergroundColour: string;
   lightUnderwaterColour: string;
   darkUnderwaterColour: string;
-};
+}
 
 export class TerrainGraphics {
-  private static readonly defaultSupportedShapes_ = new Map<TerrainShape, boolean>([
-    [ TerrainShape.Flat,               true ],
-    [ TerrainShape.Wall,               false ],
-    [ TerrainShape.NorthEdge,          false ],
-    [ TerrainShape.EastEdge,           false ],
-    [ TerrainShape.NorthEastCorner,    false ],
-    [ TerrainShape.SouthEdge,          false ],
-    [ TerrainShape.NorthSouthCorridor, false ],
-    [ TerrainShape.SouthEastCorner,    false ],
-    [ TerrainShape.EastPeninsula,      false ],
-    [ TerrainShape.WestEdge,           false ],
-    [ TerrainShape.NorthWestCorner,    false ],
-    [ TerrainShape.EastWestCorridor,   false ],
-    [ TerrainShape.NorthPeninsula,     false ],
-    [ TerrainShape.SouthWestCorner,    false ],
-    [ TerrainShape.WestPeninsula,      false ],
-    [ TerrainShape.SouthPeninsula,     false ],
-    [ TerrainShape.Spire,              false ],
-    [ TerrainShape.RampNorth,          false ],
-    [ TerrainShape.RampEast,           false ],
-    [ TerrainShape.RampSouth,          false ],
-    [ TerrainShape.RampWest,           false ],
+  private static readonly defaultSupportedShapes_ = new Map<
+    TerrainShape,
+    boolean
+  >([
+    [TerrainShape.Flat, true],
+    [TerrainShape.Wall, false],
+    [TerrainShape.NorthEdge, false],
+    [TerrainShape.EastEdge, false],
+    [TerrainShape.NorthEastCorner, false],
+    [TerrainShape.SouthEdge, false],
+    [TerrainShape.NorthSouthCorridor, false],
+    [TerrainShape.SouthEastCorner, false],
+    [TerrainShape.EastPeninsula, false],
+    [TerrainShape.WestEdge, false],
+    [TerrainShape.NorthWestCorner, false],
+    [TerrainShape.EastWestCorridor, false],
+    [TerrainShape.NorthPeninsula, false],
+    [TerrainShape.SouthWestCorner, false],
+    [TerrainShape.WestPeninsula, false],
+    [TerrainShape.SouthPeninsula, false],
+    [TerrainShape.Spire, false],
+    [TerrainShape.RampNorth, false],
+    [TerrainShape.RampEast, false],
+    [TerrainShape.RampSouth, false],
+    [TerrainShape.RampWest, false],
   ]);
-  private static supportedShapes_ = new Map<TerrainShape, boolean>(this.defaultSupportedShapes_);
-    
+  private static supportedShapes_ = new Map<TerrainShape, boolean>(
+    this.defaultSupportedShapes_
+  );
+
   private static graphics_ = new Map<
     TerrainType,
     Map<TerrainShape, GraphicComponent>
@@ -828,7 +895,9 @@ export class TerrainGraphics {
       TerrainType,
       Map<TerrainShape, GraphicComponent>
     >();
-    this.supportedShapes_ = new Map<TerrainShape, boolean>(this.defaultSupportedShapes_);
+    this.supportedShapes_ = new Map<TerrainShape, boolean>(
+      this.defaultSupportedShapes_
+    );
   }
 
   static isSupportedShape(shape: TerrainShape): boolean {
@@ -882,10 +951,12 @@ export class TerrainGraphics {
     this.setSupportedShape(terrainShape);
   }
 
-  static async generateSprites(desc: TerrainSpriteDescriptor,
-                               context: ContextImpl): Promise<void> {
-    console.log('generateSprites');
-    if (Object.hasOwn(desc, 'spriteSheetName')) {
+  static async generateSprites(
+    desc: TerrainSpriteDescriptor,
+    context: ContextImpl
+  ): Promise<void> {
+    console.log("generateSprites");
+    if (Object.hasOwn(desc, "spriteSheetName")) {
       await SpriteSheet.create(desc.spriteSheetName, context).then((sheet) => {
         const width = desc.spriteWidth;
         const height = desc.spriteHeight;
@@ -937,13 +1008,13 @@ export class TerrainGraphics {
 
 export function isRamp(terrain: TerrainShape): boolean {
   switch (terrain) {
-  default:
-     break;
-  case TerrainShape.RampNorth:
-  case TerrainShape.RampEast:
-  case TerrainShape.RampSouth:
-  case TerrainShape.RampWest:
-    return true;
+    default:
+      break;
+    case TerrainShape.RampNorth:
+    case TerrainShape.RampEast:
+    case TerrainShape.RampSouth:
+    case TerrainShape.RampWest:
+      return true;
   }
   return false;
 }
@@ -952,10 +1023,11 @@ export function isEdge(terrain: TerrainShape): boolean {
   return !isRamp(terrain) && terrain != TerrainShape.Flat;
 }
 
-export function buildTerrainShapeGrid(terraceGrid: Array<Uint8Array>,
-                                      edges: Array<Edge>,
-                                      ramps: Array<Ramp>): Array<Uint8Array> {
-
+export function buildTerrainShapeGrid(
+  terraceGrid: Array<Uint8Array>,
+  edges: Array<Edge>,
+  ramps: Array<Ramp>
+): Array<Uint8Array> {
   const cellsY = terraceGrid.length;
   const cellsX = terraceGrid[0].length;
   const terrainShapes = new Array<Uint8Array>();
@@ -964,90 +1036,110 @@ export function buildTerrainShapeGrid(terraceGrid: Array<Uint8Array>,
   }
 
   const edgeToShape = new Map<EdgeShape, Uint8Array>([
-    [ EdgeShape.None,
-      new Uint8Array([ TerrainShape.Flat ])
+    [EdgeShape.None, new Uint8Array([TerrainShape.Flat])],
+    [EdgeShape.North, new Uint8Array([TerrainShape.NorthEdge])],
+    [EdgeShape.East, new Uint8Array([TerrainShape.EastEdge])],
+    [
+      EdgeShape.NorthEastCorner,
+      new Uint8Array([
+        TerrainShape.NorthEastCorner,
+        TerrainShape.EastEdge,
+        TerrainShape.NorthEdge,
+      ]),
     ],
-    [ EdgeShape.North,
-      new Uint8Array([ TerrainShape.NorthEdge ])
+    [EdgeShape.South, new Uint8Array([TerrainShape.SouthEdge])],
+    [
+      EdgeShape.NorthSouthCorridor,
+      new Uint8Array([TerrainShape.NorthSouthCorridor, TerrainShape.EastEdge]),
     ],
-    [ EdgeShape.East,
-      new Uint8Array([ TerrainShape.EastEdge ])
+    [
+      EdgeShape.SouthEastCorner,
+      new Uint8Array([
+        TerrainShape.SouthEastCorner,
+        TerrainShape.EastEdge,
+        TerrainShape.SouthEdge,
+      ]),
     ],
-    [ EdgeShape.NorthEastCorner,
-      new Uint8Array([ TerrainShape.NorthEastCorner,
-                       TerrainShape.EastEdge,
-                       TerrainShape.NorthEdge ])
+    [
+      EdgeShape.EastPeninsula,
+      new Uint8Array([
+        TerrainShape.EastPeninsula,
+        TerrainShape.NorthEastCorner,
+        TerrainShape.SouthEastCorner,
+        TerrainShape.EastEdge,
+        TerrainShape.NorthEdge,
+        TerrainShape.SouthEdge,
+      ]),
     ],
-    [ EdgeShape.South,
-      new Uint8Array([ TerrainShape.SouthEdge ])
+    [EdgeShape.West, new Uint8Array([TerrainShape.WestEdge])],
+    [
+      EdgeShape.NorthWestCorner,
+      new Uint8Array([
+        TerrainShape.NorthWestCorner,
+        TerrainShape.NorthEdge,
+        TerrainShape.WestEdge,
+      ]),
     ],
-    [ EdgeShape.NorthSouthCorridor,
-      new Uint8Array([ TerrainShape.NorthSouthCorridor,
-                       TerrainShape.EastEdge ])
+    [
+      EdgeShape.EastWestCorridor,
+      new Uint8Array([
+        TerrainShape.EastWestCorridor,
+        TerrainShape.NorthEdge,
+        TerrainShape.SouthEdge,
+      ]),
     ],
-    [ EdgeShape.SouthEastCorner,
-      new Uint8Array([ TerrainShape.SouthEastCorner,
-                       TerrainShape.EastEdge,
-                       TerrainShape.SouthEdge ])
+    [
+      EdgeShape.NorthPeninsula,
+      new Uint8Array([
+        TerrainShape.NorthPeninsula,
+        TerrainShape.NorthEastCorner,
+        TerrainShape.NorthWestCorner,
+        TerrainShape.EastEdge,
+        TerrainShape.NorthEdge,
+        TerrainShape.WestEdge,
+      ]),
     ],
-    [ EdgeShape.EastPeninsula,
-      new Uint8Array([ TerrainShape.EastPeninsula,
-                       TerrainShape.NorthEastCorner,
-                       TerrainShape.SouthEastCorner,
-                       TerrainShape.EastEdge,
-                       TerrainShape.NorthEdge,
-                       TerrainShape.SouthEdge ])
+    [
+      EdgeShape.SouthWestCorner,
+      new Uint8Array([
+        TerrainShape.SouthWestCorner,
+        TerrainShape.SouthEdge,
+        TerrainShape.WestEdge,
+      ]),
     ],
-    [ EdgeShape.West,
-      new Uint8Array([ TerrainShape.WestEdge ])
+    [
+      EdgeShape.WestPeninsula,
+      new Uint8Array([
+        TerrainShape.WestPeninsula,
+        TerrainShape.NorthWestCorner,
+        TerrainShape.NorthEdge,
+        TerrainShape.SouthEdge,
+        TerrainShape.WestEdge,
+      ]),
     ],
-    [ EdgeShape.NorthWestCorner,
-      new Uint8Array([ TerrainShape.NorthWestCorner,
-                       TerrainShape.NorthEdge,
-                       TerrainShape.WestEdge ])
+    [
+      EdgeShape.SouthPeninsula,
+      new Uint8Array([
+        TerrainShape.SouthPeninsula,
+        TerrainShape.SouthEastCorner,
+        TerrainShape.SouthWestCorner,
+        TerrainShape.EastEdge,
+        TerrainShape.NorthEdge,
+        TerrainShape.WestEdge,
+      ]),
     ],
-    [ EdgeShape.EastWestCorridor,
-      new Uint8Array([ TerrainShape.EastWestCorridor,
-                       TerrainShape.NorthEdge,
-                       TerrainShape.SouthEdge ])
-    ],
-    [ EdgeShape.NorthPeninsula,
-      new Uint8Array([ TerrainShape.NorthPeninsula,
-                       TerrainShape.NorthEastCorner,
-                       TerrainShape.NorthWestCorner,
-                       TerrainShape.EastEdge,
-                       TerrainShape.NorthEdge,
-                       TerrainShape.WestEdge ])
-    ],
-    [ EdgeShape.SouthWestCorner,
-      new Uint8Array([ TerrainShape.SouthWestCorner,
-                       TerrainShape.SouthEdge,
-                       TerrainShape.WestEdge ])
-    ],
-    [ EdgeShape.WestPeninsula,
-      new Uint8Array([ TerrainShape.WestPeninsula,
-                       TerrainShape.NorthWestCorner,
-                       TerrainShape.NorthEdge,
-                       TerrainShape.SouthEdge,
-                       TerrainShape.WestEdge ])
-    ],
-    [ EdgeShape.SouthPeninsula,
-      new Uint8Array([ TerrainShape.SouthPeninsula,
-                       TerrainShape.SouthEastCorner,
-                       TerrainShape.SouthWestCorner,
-                       TerrainShape.EastEdge,
-                       TerrainShape.NorthEdge,
-                       TerrainShape.WestEdge ])
-    ],
-    [ EdgeShape.Spire,
-      new Uint8Array([ TerrainShape.Spire,
-                       TerrainShape.EastPeninsula,
-                       TerrainShape.NorthPeninsula,
-                       TerrainShape.NorthEastCorner,
-                       TerrainShape.EastEdge,
-                       TerrainShape.NorthEdge,
-                       TerrainShape.SouthEdge,
-                       TerrainShape.WestEdge ])
+    [
+      EdgeShape.Spire,
+      new Uint8Array([
+        TerrainShape.Spire,
+        TerrainShape.EastPeninsula,
+        TerrainShape.NorthPeninsula,
+        TerrainShape.NorthEastCorner,
+        TerrainShape.EastEdge,
+        TerrainShape.NorthEdge,
+        TerrainShape.SouthEdge,
+        TerrainShape.WestEdge,
+      ]),
     ],
   ]);
 
@@ -1064,8 +1156,8 @@ export function buildTerrainShapeGrid(terraceGrid: Array<Uint8Array>,
   };
 
   const defaultWall = TerrainGraphics.isSupportedShape(TerrainShape.Wall)
-                    ? TerrainShape.Wall
-                    : TerrainShape.Flat;
+    ? TerrainShape.Wall
+    : TerrainShape.Flat;
   for (let edge of edges) {
     if (!foundSupported(edge)) {
       terrainShapes[edge.y][edge.x] = defaultWall;
@@ -1074,10 +1166,10 @@ export function buildTerrainShapeGrid(terraceGrid: Array<Uint8Array>,
 
   // If ramps are requested, all ramps are supported.
   const rampToShape = new Map<RampShape, TerrainShape>([
-    [ RampShape.North,  TerrainShape.RampNorth ],
-    [ RampShape.East,   TerrainShape.RampEast ],
-    [ RampShape.South,  TerrainShape.RampSouth ],
-    [ RampShape.West,   TerrainShape.RampWest ],
+    [RampShape.North, TerrainShape.RampNorth],
+    [RampShape.East, TerrainShape.RampEast],
+    [RampShape.South, TerrainShape.RampSouth],
+    [RampShape.West, TerrainShape.RampWest],
   ]);
   for (let ramp of ramps) {
     terrainShapes[ramp.y][ramp.x] = rampToShape.get(ramp.shape)!;
@@ -1086,8 +1178,10 @@ export function buildTerrainShapeGrid(terraceGrid: Array<Uint8Array>,
   return terrainShapes;
 }
 
-export function buildTerrainTypeGrid(biomeGrid: Array<Uint8Array>,
-                                     defaultTerrainType: TerrainType): Array<Uint8Array> {
+export function buildTerrainTypeGrid(
+  biomeGrid: Array<Uint8Array>,
+  defaultTerrainType: TerrainType
+): Array<Uint8Array> {
   const cellsY = biomeGrid.length;
   const cellsX = biomeGrid[0].length;
   const typeGrid = new Array<Uint8Array>();
@@ -1168,7 +1262,7 @@ class SpriteGenerator {
 
     // https://www.slynyrd.com/blog/2018/4/12/pixelblog-4-graphical-projection-part-2
     //               top
-    //             1 2 3 4 
+    //             1 2 3 4
     //             * * * *
     //         *             *
     //     *                     *
@@ -1197,9 +1291,9 @@ class SpriteGenerator {
 
     const xDelta = this.width - offsetX - this.top3.x;
     const yDelta = xDelta >> 1;
-    console.log('width:', this.width);
-    console.log('xDelta:', xDelta);
-    console.log('yDelta:', yDelta);
+    console.log("width:", this.width);
+    console.log("xDelta:", xDelta);
+    console.log("yDelta:", yDelta);
     const minX = this.width - 1;
     const minY = this.height - 1 - offsetY;
     const bottomY = minY - yDelta;
@@ -1218,10 +1312,10 @@ class SpriteGenerator {
     this.bottom2 = new Coord(midX - 1, minY);
     this.bottom3 = new Coord(midX, minY);
     this.bottom4 = new Coord(midX + 1, minY);
-    
+
     // For ramps
     this.backCorner = new Coord(midX, this.height - yDelta * 2);
-    
+
     this.colours = new Array<string>(
       this.descriptor.waterColour,
       this.descriptor.snowColour,
@@ -1229,13 +1323,13 @@ class SpriteGenerator {
       this.descriptor.rockColour,
       this.descriptor.mudColour,
       this.descriptor.dryGrassColour,
-      this.descriptor.wetGrassColour,
+      this.descriptor.wetGrassColour
     );
 
     const numTerrains = this.colours.length;
     this.canvas = new OffscreenCanvas(
       TerrainShape.Max * this.width,
-      numTerrains * this.height 
+      numTerrains * this.height
     );
     const ctx = this.canvas.getContext("2d", {
       willReadFrequently: true,
@@ -1245,55 +1339,149 @@ class SpriteGenerator {
     }
   }
 
-  get width(): number { return this._width; }
-  set width(w: number) { this._width = w; }
-  get height(): number { return this._height; }
-  set height(h: number) { this._height = h; }
-  get canvas(): OffscreenCanvas { return this._canvas; }
-  set canvas(c: OffscreenCanvas) { this._canvas = c; }
-  get ctx(): OffscreenCanvasRenderingContext2D { return this._ctx; }
-  set ctx(c: OffscreenCanvasRenderingContext2D) { this._ctx = c; }
-  get descriptor(): TerrainSpriteDescriptor { return this._descriptor; }
-  get colours(): Array<string> { return this._colours; }
-  set colours(a: Array<string>) { this._colours = a; }
+  get width(): number {
+    return this._width;
+  }
+  set width(w: number) {
+    this._width = w;
+  }
+  get height(): number {
+    return this._height;
+  }
+  set height(h: number) {
+    this._height = h;
+  }
+  get canvas(): OffscreenCanvas {
+    return this._canvas;
+  }
+  set canvas(c: OffscreenCanvas) {
+    this._canvas = c;
+  }
+  get ctx(): OffscreenCanvasRenderingContext2D {
+    return this._ctx;
+  }
+  set ctx(c: OffscreenCanvasRenderingContext2D) {
+    this._ctx = c;
+  }
+  get descriptor(): TerrainSpriteDescriptor {
+    return this._descriptor;
+  }
+  get colours(): Array<string> {
+    return this._colours;
+  }
+  set colours(a: Array<string>) {
+    this._colours = a;
+  }
 
-  get top1(): Coord { return this._top1; }
-  set top1(c: Coord) { this._top1 = c; }
-  get top2(): Coord { return this._top2; }
-  set top2(c: Coord) { this._top2 = c; }
-  get top3(): Coord { return this._top3; }
-  set top3(c: Coord) { this._top3 = c; }
-  get top4(): Coord { return this._top4; }
-  set top4(c: Coord) { this._top4 = c; }
-  get topLeft(): Coord { return this._topLeft; }
-  set topLeft(c: Coord) { this._topLeft = c; }
-  get bottomLeft(): Coord { return this._bottomLeft; }
-  set bottomLeft(c: Coord) { this._bottomLeft = c; }
-  get topRight(): Coord { return this._topRight; }
-  set topRight(c: Coord) { this._topRight = c; }
-  get bottomRight(): Coord { return this._bottomRight; }
-  set bottomRight(c: Coord) { this._bottomRight = c; }
-  get mid1(): Coord { return this._mid1; }
-  set mid1(c: Coord) { this._mid1 = c; }
-  get mid2(): Coord { return this._mid2; }
-  set mid2(c: Coord) { this._mid2 = c; }
-  get mid3(): Coord { return this._mid3; }
-  set mid3(c: Coord) { this._mid3 = c; }
-  get mid4(): Coord { return this._mid4; }
-  set mid4(c: Coord) { this._mid4 = c; }
-  get bottom1(): Coord { return this._bottom1; }
-  set bottom1(c: Coord) { this._bottom1 = c; }
-  get bottom2(): Coord { return this._bottom2; }
-  set bottom2(c: Coord) { this._bottom2 = c; }
-  get bottom3(): Coord { return this._bottom3; }
-  set bottom3(c: Coord) { this._bottom3 = c; }
-  get bottom4(): Coord { return this._bottom4; }
-  set bottom4(c: Coord) { this._bottom4 = c; }
-  get backCorner(): Coord { return this._backCorner; }
-  set backCorner(c: Coord) { this._backCorner = c; }
+  get top1(): Coord {
+    return this._top1;
+  }
+  set top1(c: Coord) {
+    this._top1 = c;
+  }
+  get top2(): Coord {
+    return this._top2;
+  }
+  set top2(c: Coord) {
+    this._top2 = c;
+  }
+  get top3(): Coord {
+    return this._top3;
+  }
+  set top3(c: Coord) {
+    this._top3 = c;
+  }
+  get top4(): Coord {
+    return this._top4;
+  }
+  set top4(c: Coord) {
+    this._top4 = c;
+  }
+  get topLeft(): Coord {
+    return this._topLeft;
+  }
+  set topLeft(c: Coord) {
+    this._topLeft = c;
+  }
+  get bottomLeft(): Coord {
+    return this._bottomLeft;
+  }
+  set bottomLeft(c: Coord) {
+    this._bottomLeft = c;
+  }
+  get topRight(): Coord {
+    return this._topRight;
+  }
+  set topRight(c: Coord) {
+    this._topRight = c;
+  }
+  get bottomRight(): Coord {
+    return this._bottomRight;
+  }
+  set bottomRight(c: Coord) {
+    this._bottomRight = c;
+  }
+  get mid1(): Coord {
+    return this._mid1;
+  }
+  set mid1(c: Coord) {
+    this._mid1 = c;
+  }
+  get mid2(): Coord {
+    return this._mid2;
+  }
+  set mid2(c: Coord) {
+    this._mid2 = c;
+  }
+  get mid3(): Coord {
+    return this._mid3;
+  }
+  set mid3(c: Coord) {
+    this._mid3 = c;
+  }
+  get mid4(): Coord {
+    return this._mid4;
+  }
+  set mid4(c: Coord) {
+    this._mid4 = c;
+  }
+  get bottom1(): Coord {
+    return this._bottom1;
+  }
+  set bottom1(c: Coord) {
+    this._bottom1 = c;
+  }
+  get bottom2(): Coord {
+    return this._bottom2;
+  }
+  set bottom2(c: Coord) {
+    this._bottom2 = c;
+  }
+  get bottom3(): Coord {
+    return this._bottom3;
+  }
+  set bottom3(c: Coord) {
+    this._bottom3 = c;
+  }
+  get bottom4(): Coord {
+    return this._bottom4;
+  }
+  set bottom4(c: Coord) {
+    this._bottom4 = c;
+  }
+  get backCorner(): Coord {
+    return this._backCorner;
+  }
+  set backCorner(c: Coord) {
+    this._backCorner = c;
+  }
 
   generateCanvas(): OffscreenCanvas {
-    console.log('generating sprite sheet', this.canvas.width, this.canvas.height);
+    console.log(
+      "generating sprite sheet",
+      this.canvas.width,
+      this.canvas.height
+    );
     const startTime = performance.now();
     // Populate the descriptor with the row and column information.
     this.descriptor.tileRowTypes = new Array<TerrainType>(
@@ -1303,7 +1491,7 @@ class SpriteGenerator {
       TerrainType.Rock,
       TerrainType.Mud,
       TerrainType.DryGrass,
-      TerrainType.WetGrass,
+      TerrainType.WetGrass
     );
     this.descriptor.tileColumnShapes = new Array<TerrainShape>(
       TerrainShape.Flat,
@@ -1326,7 +1514,7 @@ class SpriteGenerator {
       TerrainShape.RampNorth,
       TerrainShape.RampEast,
       TerrainShape.RampSouth,
-      TerrainShape.RampWest,
+      TerrainShape.RampWest
     );
 
     if (this.ctx) {
@@ -1352,10 +1540,10 @@ class SpriteGenerator {
       this.generateRampWest();
       this.generateSpire();
       const endTime = performance.now();
-      console.log('rendered sprite canvas in (msec):', endTime - startTime);
+      console.log("rendered sprite canvas in (msec):", endTime - startTime);
       return this.canvas;
     } else {
-      throw new Error('no offscreen rendering context');
+      throw new Error("no offscreen rendering context");
     }
     return this.canvas;
   }
@@ -1370,9 +1558,13 @@ class SpriteGenerator {
     let maxY = offset.y + beginCoord.y;
 
     const size = 4;
-    for (let x = beginCoord.x + size; x < (endCoord.x / 2) - size; x += size * 2) {
+    for (
+      let x = beginCoord.x + size;
+      x < endCoord.x / 2 - size;
+      x += size * 2
+    ) {
       const y = Math.random() * (maxY - minY) + minY;
-      this.ctx.fillRect(offset.x + x, y, size, size );
+      this.ctx.fillRect(offset.x + x, y, size, size);
       minY -= size / 2;
       maxY += size / 2;
     }
@@ -1405,19 +1597,29 @@ class SpriteGenerator {
     this.ctx.fill();
   }
 
-  drawThreeSides(rightShape: Array<Coord>,
-                 leftShape: Array<Coord>,
-                 topShape: Array<Coord>,
-                 shadows: Array<Array<Coord>>,
-                 shape: TerrainShape) {
+  drawThreeSides(
+    rightShape: Array<Coord>,
+    leftShape: Array<Coord>,
+    topShape: Array<Coord>,
+    shadows: Array<Array<Coord>>,
+    shape: TerrainShape
+  ) {
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
       const offset = new Coord(this.width * shape, this.height * i);
       if (topColour == this.descriptor.waterColour) {
-        this.drawSide(rightShape, this.descriptor.lightUnderwaterColour, offset);
+        this.drawSide(
+          rightShape,
+          this.descriptor.lightUnderwaterColour,
+          offset
+        );
         this.drawSide(leftShape, this.descriptor.darkUnderwaterColour, offset);
       } else {
-        this.drawSide(rightShape, this.descriptor.lightUndergroundColour, offset);
+        this.drawSide(
+          rightShape,
+          this.descriptor.lightUndergroundColour,
+          offset
+        );
         this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
       }
       this.drawSide(topShape, topColour, offset);
@@ -1440,7 +1642,7 @@ class SpriteGenerator {
       this.mid1,
       this.mid2,
       this.topLeft,
-      this.top2,
+      this.top2
     );
     const rightShape = new Array<Coord>(
       this.topRight,
@@ -1450,7 +1652,7 @@ class SpriteGenerator {
       this.bottom3,
       this.mid3,
       this.mid4,
-      this.mid3,
+      this.mid3
     );
     const leftShape = new Array<Coord>(
       this.topLeft,
@@ -1460,17 +1662,25 @@ class SpriteGenerator {
       this.bottom2,
       this.mid2,
       this.mid1,
-      this.mid2,
+      this.mid2
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
-      const offset = new Coord(this.width * shape, this.height * i); 
+      const offset = new Coord(this.width * shape, this.height * i);
       if (topColour == this.descriptor.waterColour) {
-        this.drawSide(rightShape, this.descriptor.lightUnderwaterColour, offset);
+        this.drawSide(
+          rightShape,
+          this.descriptor.lightUnderwaterColour,
+          offset
+        );
         this.drawSide(leftShape, this.descriptor.darkUnderwaterColour, offset);
         this.drawSide(topShape, topColour, offset);
       } else {
-        this.drawSide(rightShape, this.descriptor.lightUndergroundColour, offset);
+        this.drawSide(
+          rightShape,
+          this.descriptor.lightUndergroundColour,
+          offset
+        );
         this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
         this.drawSide(topShape, topColour, offset);
         this.drawFlatTexture(this.descriptor.darkUndergroundColour, offset);
@@ -1479,30 +1689,29 @@ class SpriteGenerator {
   }
 
   generateRampSouth() {
-    const rightShape = new Array<Coord> (
+    const rightShape = new Array<Coord>(
       this.topRight,
       this.bottomRight,
       this.bottom4,
       this.bottom3,
       this.mid3,
-      this.mid4,
+      this.mid4
     );
     const leftShape = new Array<Coord>(
       this.bottomLeft,
       this.bottom1,
       this.bottom2,
       this.mid2,
-      this.mid1,
+      this.mid1
     );
     const topShape = new Array<Coord>(
       this.bottomLeft,
       this.backCorner,
       this.topRight,
       this.mid4,
-      this.mid1,
+      this.mid1
     );
-    const shadows = new Array<Array<Coord>>(
-    );
+    const shadows = new Array<Array<Coord>>();
     this.drawThreeSides(
       rightShape,
       leftShape,
@@ -1513,12 +1722,12 @@ class SpriteGenerator {
   }
 
   generateRampWest() {
-    const rightShape = new Array<Coord> (
+    const rightShape = new Array<Coord>(
       this.bottomRight,
       this.bottom4,
       this.bottom3,
       this.mid3,
-      this.mid4,
+      this.mid4
     );
     const leftShape = new Array<Coord>(
       this.topLeft,
@@ -1526,17 +1735,16 @@ class SpriteGenerator {
       this.bottom1,
       this.bottom2,
       this.mid2,
-      this.mid1,
+      this.mid1
     );
     const topShape = new Array<Coord>(
       this.backCorner,
       this.topLeft,
       this.mid1,
       this.mid4,
-      this.bottomRight,
+      this.bottomRight
     );
-    const shadows = new Array<Array<Coord>>(
-    );
+    const shadows = new Array<Array<Coord>>();
     this.drawThreeSides(
       rightShape,
       leftShape,
@@ -1551,25 +1759,35 @@ class SpriteGenerator {
       this.topRight,
       this.bottomRight,
       this.bottom4,
-      this.bottom2,
+      this.bottom2
     );
-    const topShape = new Array<Coord> (
+    const topShape = new Array<Coord>(
       this.top4,
       this.topRight,
       this.bottom4,
       this.bottom1,
       this.bottomLeft,
-      this.top1,
+      this.top1
     );
-    const shadows = new Array<Array<Coord>>(
-    );
+    const shadows = new Array<Array<Coord>>();
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
-      const offset = new Coord(this.width * TerrainShape.RampEast, this.height * i);
+      const offset = new Coord(
+        this.width * TerrainShape.RampEast,
+        this.height * i
+      );
       if (topColour == this.descriptor.waterColour) {
-        this.drawSide(rightShape, this.descriptor.lightUnderwaterColour, offset);
+        this.drawSide(
+          rightShape,
+          this.descriptor.lightUnderwaterColour,
+          offset
+        );
       } else {
-        this.drawSide(rightShape, this.descriptor.lightUndergroundColour, offset);
+        this.drawSide(
+          rightShape,
+          this.descriptor.lightUndergroundColour,
+          offset
+        );
       }
       this.drawSide(topShape, topColour, offset);
       /*
@@ -1585,21 +1803,23 @@ class SpriteGenerator {
       this.topLeft,
       this.bottomLeft,
       this.bottom1,
-      this.bottom2,
+      this.bottom2
     );
-    const topShape = new Array<Coord> (
+    const topShape = new Array<Coord>(
       this.topLeft,
       this.bottom2,
       this.bottom4,
       this.bottomRight,
       this.top4,
-      this.top1,
+      this.top1
     );
-    const shadows = new Array<Array<Coord>>(
-    );
+    const shadows = new Array<Array<Coord>>();
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
-      const offset = new Coord(this.width * TerrainShape.RampNorth, this.height * i); 
+      const offset = new Coord(
+        this.width * TerrainShape.RampNorth,
+        this.height * i
+      );
       if (topColour == this.descriptor.waterColour) {
         this.drawSide(leftShape, this.descriptor.darkUnderwaterColour, offset);
       } else {
@@ -1617,37 +1837,21 @@ class SpriteGenerator {
   generateEdge(shape: TerrainShape) {
     let shadows: Array<Coord>;
     switch (shape) {
-    default:
-      throw new Error('unhandled edge');
-      break;
-    case TerrainShape.WestEdge:
-      shadows = new Array<Coord>(
-        this.topLeft,
-        this.mid2,
-        this.mid1,
-      );
-      break;
-    case TerrainShape.NorthEdge:
-      shadows = new Array<Coord>(
-        this.top1,
-        this.top2,
-        this.topLeft,
-      );
-      break;
-    case TerrainShape.EastEdge:
-      shadows = new Array<Coord>(
-        this.top4,
-        this.top3,
-        this.topRight,
-      );
-      break;
-    case TerrainShape.SouthEdge:
-      shadows = new Array<Coord>(
-        this.topRight,
-        this.mid3,
-        this.mid4,
-      );
-      break;
+      default:
+        throw new Error("unhandled edge");
+        break;
+      case TerrainShape.WestEdge:
+        shadows = new Array<Coord>(this.topLeft, this.mid2, this.mid1);
+        break;
+      case TerrainShape.NorthEdge:
+        shadows = new Array<Coord>(this.top1, this.top2, this.topLeft);
+        break;
+      case TerrainShape.EastEdge:
+        shadows = new Array<Coord>(this.top4, this.top3, this.topRight);
+        break;
+      case TerrainShape.SouthEdge:
+        shadows = new Array<Coord>(this.topRight, this.mid3, this.mid4);
+        break;
     }
     this.generateFlat(shape);
     /*
@@ -1661,47 +1865,47 @@ class SpriteGenerator {
   generateCorner(shape: TerrainShape) {
     let shadows: Array<Coord>;
     switch (shape) {
-    default:
-      throw new Error('unhandled corner');
-      break;
-    case TerrainShape.NorthWestCorner:
-      shadows = new Array<Coord>(
-        this.top1,
-        this.top2,
-        this.topLeft,
-        this.mid2,
-        this.mid1,
-      );
-      break;
-    case TerrainShape.NorthEastCorner:
-      shadows = new Array<Coord>(
-        this.topLeft,
-        this.top2,
-        this.top1,
-        this.top4,
-        this.top3,
-        this.topRight,
-      );
-      break;
-    case TerrainShape.SouthEastCorner:
-      shadows = new Array<Coord>(
-        this.top4,
-        this.top3,
-        this.topRight,
-        this.mid3,
-        this.mid4,
-      );
-      break;
-    case TerrainShape.SouthWestCorner:
-      shadows = new Array<Coord>(
-        this.topLeft,
-        this.mid2,
-        this.mid1,
-        this.mid4,
-        this.mid3,
-        this.topRight,
-      );
-      break;
+      default:
+        throw new Error("unhandled corner");
+        break;
+      case TerrainShape.NorthWestCorner:
+        shadows = new Array<Coord>(
+          this.top1,
+          this.top2,
+          this.topLeft,
+          this.mid2,
+          this.mid1
+        );
+        break;
+      case TerrainShape.NorthEastCorner:
+        shadows = new Array<Coord>(
+          this.topLeft,
+          this.top2,
+          this.top1,
+          this.top4,
+          this.top3,
+          this.topRight
+        );
+        break;
+      case TerrainShape.SouthEastCorner:
+        shadows = new Array<Coord>(
+          this.top4,
+          this.top3,
+          this.topRight,
+          this.mid3,
+          this.mid4
+        );
+        break;
+      case TerrainShape.SouthWestCorner:
+        shadows = new Array<Coord>(
+          this.topLeft,
+          this.mid2,
+          this.mid1,
+          this.mid4,
+          this.mid3,
+          this.topRight
+        );
+        break;
     }
     this.generateFlat(shape);
     /*
@@ -1716,33 +1920,21 @@ class SpriteGenerator {
     this.generateFlat(shape);
     let shadows: Array<Array<Coord>>;
     switch (shape) {
-    default:
-      throw new Error('unhandled corner');
-      break;
-    case TerrainShape.NorthSouthCorridor:
-      shadows = new Array<Array<Coord>>(
-        [ this.topLeft,
-          this.mid2,
-          this.mid1,
-        ],
-        [ this.top4,
-          this.top3,
-          this.topRight,
-        ],
-      );
-      break;
-    case TerrainShape.EastWestCorridor:
-      shadows = new Array<Array<Coord>>(
-        [ this.top1,
-          this.top2,
-          this.topLeft,
-        ],
-        [ this.mid4,
-          this.mid3,
-          this.topRight,
-        ],
-      );
-      break;
+      default:
+        throw new Error("unhandled corner");
+        break;
+      case TerrainShape.NorthSouthCorridor:
+        shadows = new Array<Array<Coord>>(
+          [this.topLeft, this.mid2, this.mid1],
+          [this.top4, this.top3, this.topRight]
+        );
+        break;
+      case TerrainShape.EastWestCorridor:
+        shadows = new Array<Array<Coord>>(
+          [this.top1, this.top2, this.topLeft],
+          [this.mid4, this.mid3, this.topRight]
+        );
+        break;
     }
     /*
     for (let shadow of shadows) {
@@ -1767,7 +1959,7 @@ class SpriteGenerator {
       this.mid4,
       this.mid3,
       this.topRight,
-      this.top3,
+      this.top3
     );
     /*
     for (let i = 0; i < this.colours.length; ++i) {
@@ -1780,57 +1972,57 @@ class SpriteGenerator {
   generatePeninsula(shape: TerrainShape) {
     let shadows: Array<Coord>;
     switch (shape) {
-    default:
-      throw new Error('unhandled peninsula');
-      break;
-    case TerrainShape.NorthPeninsula:
-      shadows = new Array<Coord>(
-        this.mid1,
-        this.mid2,
-        this.topLeft,
-        this.top2,
-        this.top1,
-        this.top4,
-        this.top4,
-        this.topRight,
-      );
-      break;
-    case TerrainShape.EastPeninsula:
-      shadows = new Array<Coord>(
-        this.topLeft,
-        this.top2,
-        this.top1,
-        this.top4,
-        this.top3,
-        this.topRight,
-        this.mid3,
-        this.mid4,
-      );
-      break;
-    case TerrainShape.SouthPeninsula:
-      shadows = new Array<Coord>(
-        this.top4,
-        this.top3,
-        this.topRight,
-        this.mid3,
-        this.mid4,
-        this.mid1,
-        this.mid2,
-        this.topLeft,
-      );
-      break;
-    case TerrainShape.WestPeninsula:
-      shadows = new Array<Coord>(
-        this.top1,
-        this.top2,
-        this.topLeft,
-        this.mid2,
-        this.mid1,
-        this.mid4,
-        this.mid3,
-        this.topRight,
-      );
-      break;
+      default:
+        throw new Error("unhandled peninsula");
+        break;
+      case TerrainShape.NorthPeninsula:
+        shadows = new Array<Coord>(
+          this.mid1,
+          this.mid2,
+          this.topLeft,
+          this.top2,
+          this.top1,
+          this.top4,
+          this.top4,
+          this.topRight
+        );
+        break;
+      case TerrainShape.EastPeninsula:
+        shadows = new Array<Coord>(
+          this.topLeft,
+          this.top2,
+          this.top1,
+          this.top4,
+          this.top3,
+          this.topRight,
+          this.mid3,
+          this.mid4
+        );
+        break;
+      case TerrainShape.SouthPeninsula:
+        shadows = new Array<Coord>(
+          this.top4,
+          this.top3,
+          this.topRight,
+          this.mid3,
+          this.mid4,
+          this.mid1,
+          this.mid2,
+          this.topLeft
+        );
+        break;
+      case TerrainShape.WestPeninsula:
+        shadows = new Array<Coord>(
+          this.top1,
+          this.top2,
+          this.topLeft,
+          this.mid2,
+          this.mid1,
+          this.mid4,
+          this.mid3,
+          this.topRight
+        );
+        break;
     }
     this.generateFlat(shape);
     /*
@@ -1841,4 +2033,3 @@ class SpriteGenerator {
     */
   }
 }
-

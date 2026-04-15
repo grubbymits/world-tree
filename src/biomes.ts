@@ -1,4 +1,4 @@
-import { Direction, Navigation } from "./navigation.ts"
+import { Direction, Navigation } from "./navigation.ts";
 import { Point2D } from "./geometry.ts";
 
 export const enum Biome {
@@ -40,20 +40,32 @@ export function getBiomeName(biome: Biome): string {
 }
 
 export class BiomeConfig {
-  constructor(private readonly _waterLine: number,
-              private readonly _uplandThreshold: number,
-              private readonly _rainfall: number,
-              private readonly _rainDirection: Direction) { }
+  constructor(
+    private readonly _waterLine: number,
+    private readonly _uplandThreshold: number,
+    private readonly _rainfall: number,
+    private readonly _rainDirection: Direction
+  ) {}
 
-  get waterLine(): number { return this._waterLine; }
-  get uplandThreshold(): number { return this._uplandThreshold; }
-  get rainfall(): number { return this._rainfall; }
-  get rainDirection(): Direction { return this._rainDirection; }
+  get waterLine(): number {
+    return this._waterLine;
+  }
+  get uplandThreshold(): number {
+    return this._uplandThreshold;
+  }
+  get rainfall(): number {
+    return this._rainfall;
+  }
+  get rainDirection(): Direction {
+    return this._rainDirection;
+  }
 }
 
-export function generateBiomeGrid(config: BiomeConfig,
-                                  heightGrid: Array<Array<number>>,
-                                  moistureGrid: Array<Array<number>>): Array<Uint8Array> {
+export function generateBiomeGrid(
+  config: BiomeConfig,
+  heightGrid: Array<Array<number>>,
+  moistureGrid: Array<Array<number>>
+): Array<Uint8Array> {
   const cellsX = heightGrid[0].length;
   const cellsY = heightGrid.length;
 
@@ -61,8 +73,8 @@ export function generateBiomeGrid(config: BiomeConfig,
   let minMoisture = Number.MAX_VALUE;
   for (let y = 0; y < cellsY; y++) {
     const moistureArray = moistureGrid[y];
-    const max = moistureArray.reduce((acc, curr) => acc > curr ? acc: curr);
-    const min = moistureArray.reduce((acc, curr) => acc < curr ? acc: curr);
+    const max = moistureArray.reduce((acc, curr) => (acc > curr ? acc : curr));
+    const min = moistureArray.reduce((acc, curr) => (acc < curr ? acc : curr));
     if (max > maxMoisture) {
       maxMoisture = max;
     }
@@ -186,8 +198,12 @@ class Cloud {
   }
 
   inbounds(pos: Point2D): boolean {
-    return (pos.x >= 0 && pos.x < this.rain.cellsX &&
-            pos.y >= 0 && pos.y < this.rain.cellsY);
+    return (
+      pos.x >= 0 &&
+      pos.x < this.rain.cellsX &&
+      pos.y >= 0 &&
+      pos.y < this.rain.cellsY
+    );
   }
 
   move(): void {
@@ -200,14 +216,19 @@ class Cloud {
       }
 
       // Don't start raining until we've reached land, and not on a beach.
-      if (this.heightAt(this.x, this.y) <= this.minHeight || this.terraceAt(this.x, this.y) < 1) {
+      if (
+        this.heightAt(this.x, this.y) <= this.minHeight ||
+        this.terraceAt(this.x, this.y) < 1
+      ) {
         this.pos = nextCoord;
         continue;
       }
 
       const multiplier =
-        this.terraceAt(nextCoord.x, nextCoord.y) > this.terraceAt(this.x, this.y)
-        ? 1.5 : 1;
+        this.terraceAt(nextCoord.x, nextCoord.y) >
+        this.terraceAt(this.x, this.y)
+          ? 1.5
+          : 1;
       this.dropMoisture(multiplier);
       this.pos = nextCoord;
     }
@@ -441,25 +462,34 @@ function gaussianBlur(
 }
 
 // Take a height map and return a moisture map.
-export function addRain(heightGrid: Array<Array<number>>,
-                        terraceGrid: Array<Uint8Array>,
-                        towards: Direction, water: number, waterLine: number):
-                        Array<Array<number>> {
+export function addRain(
+  heightGrid: Array<Array<number>>,
+  terraceGrid: Array<Uint8Array>,
+  towards: Direction,
+  water: number,
+  waterLine: number
+): Array<Array<number>> {
   const cellsX = heightGrid[0].length;
   const cellsY = heightGrid.length;
-  const rain = new Rain(cellsX, cellsY, heightGrid, terraceGrid, waterLine, water, towards);
-  rain.run();
-  const moisture = gaussianBlur(
-    rain.moistureGrid,
+  const rain = new Rain(
     cellsX,
-    cellsY
+    cellsY,
+    heightGrid,
+    terraceGrid,
+    waterLine,
+    water,
+    towards
   );
+  rain.run();
+  const moisture = gaussianBlur(rain.moistureGrid, cellsX, cellsY);
   return moisture;
 }
 
-export function buildBiomes(biomeConfig: BiomeConfig,
-                            heightGrid: Array<Array<number>>,
-                            terraceGrid: Array<Uint8Array>): Array<Uint8Array> {
+export function buildBiomes(
+  biomeConfig: BiomeConfig,
+  heightGrid: Array<Array<number>>,
+  terraceGrid: Array<Uint8Array>
+): Array<Uint8Array> {
   let moistureGrid = new Array<Array<number>>();
   if (biomeConfig.rainfall > 0) {
     moistureGrid = addRain(

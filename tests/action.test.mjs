@@ -34,30 +34,32 @@ function createMap() {
   // top row
   for (let i = 0; i < numTilesWide; i++) {
     let minLocation = new WT.Point3D(i * squareTileSize, 0, 0);
-    new WT.CuboidEntity(context, minLocation, tileDims);
+    context.addEntity(new WT.CuboidEntity(minLocation, tileDims));
   }
   // bottom row
   for (let i = 0; i < numTilesWide; i++) {
     let minLocation = new WT.Point3D(i * squareTileSize, squareTileSize * 4, 0);
-    new WT.CuboidEntity(context, minLocation, tileDims);
+    context.addEntity(new WT.CuboidEntity(minLocation, tileDims));
   }
   // left side
   for (let i = 0; i < numTilesDeep; i++) {
     let minLocation = new WT.Point3D(0, i * squareTileSize, 0);
-    new WT.CuboidEntity(context, minLocation, tileDims);
+    context.addEntity(new WT.CuboidEntity(minLocation, tileDims));
   }
   // right side
   for (let i = 0; i < numTilesDeep; i++) {
     let minLocation = new WT.Point3D(4 * squareTileSize, i * squareTileSize, 0);
-    new WT.CuboidEntity(context, minLocation, tileDims);
+    context.addEntity(new WT.CuboidEntity(minLocation, tileDims));
   }
   return context;
 }
 
 function getTileSurfaceCentre(x, y) {
-  return new WT.Point3D(x * squareTileSize + squareTileSize / 2,
-                        y * squareTileSize + squareTileSize / 2,
-                        squareTileSize + 1);
+  return new WT.Point3D(
+    x * squareTileSize + squareTileSize / 2,
+    y * squareTileSize + squareTileSize / 2,
+    squareTileSize + 1
+  );
 }
 
 test("move direction south flat", () => {
@@ -68,7 +70,8 @@ test("move direction south flat", () => {
   const pos = new WT.Point3D(posx, posy, 1);
   const moveVector = new WT.Vector3D(0, 1, 0);
   const context = createMap();
-  const actor = new WT.Actor(context, pos, entityDims);
+  const fakeGraphic = {};
+  const actor = context.createActor(pos, entityDims, fakeGraphic);
   actor.action = new WT.MoveDirection(actor, moveVector);
   actor.update();
   expect(actor.x).toBe(pos.x + moveVector.x);
@@ -83,7 +86,8 @@ test("move direction west flat obstructed", () => {
   const pos = new WT.Point3D(posx, posy, 0);
   const moveVector = new WT.Vector3D(-1, 0, 0);
   const context = createMap();
-  const actor = new WT.Actor(context, pos, entityDims);
+  const fakeGraphic = {};
+  const actor = context.createActor(pos, entityDims, fakeGraphic);
   actor.action = new WT.MoveDirection(actor, moveVector);
   actor.update();
   expect(actor.x).toBe(pos.x);
@@ -95,7 +99,8 @@ test("move destination north flat", () => {
   const beginPos = getTileSurfaceCentre(1, 3);
   const destination = getTileSurfaceCentre(1, 1);
   const context = createMap();
-  const actor = new WT.Actor(context, beginPos, entityDims);
+  const fakeGraphic = {};
+  const actor = context.createActor(beginPos, entityDims, fakeGraphic);
   const velocity = 2;
   const action = new WT.MoveDestination(actor, velocity, destination);
   actor.action = action;
@@ -107,7 +112,7 @@ test("move destination north flat", () => {
     -entityDims.width / 2,
     -2 * squareTileSize - entityDims.depth / 2,
     0
-  ); 
+  );
   expect(moveVector).toStrictEqual(expectedVector);
 
   moveVector = moveVector.norm().scale(velocity);
@@ -122,7 +127,8 @@ test("move destination south east", () => {
   const beginPos = getTileSurfaceCentre(1, 1);
   const destination = getTileSurfaceCentre(3, 2);
   const context = createMap();
-  const actor = new WT.Actor(context, beginPos, entityDims);
+  const fakeGraphic = {};
+  const actor = context.createActor(beginPos, entityDims, fakeGraphic);
   const velocity = 2;
   const action = new WT.MoveDestination(actor, velocity, destination);
   actor.action = action;
@@ -134,7 +140,7 @@ test("move destination south east", () => {
     2 * squareTileSize - entityDims.width / 2,
     squareTileSize - entityDims.depth / 2,
     0
-  ); 
+  );
   expect(moveVector).toStrictEqual(expectedVector);
 
   moveVector = moveVector.norm().scale(velocity);
@@ -180,16 +186,17 @@ test("move around object", () => {
   const grid = new WT.TerrainGrid(context, terrainGridDescriptor);
 
   const minLocation = new WT.Point3D(2 * squareTileSize, 2 * squareTileSize, 0);
-  new WT.CuboidEntity(context, minLocation, tileDims);
+  context.addEntity(new WT.CuboidEntity(minLocation, tileDims));
   const beginPos = getTileSurfaceCentre(1, 1);
   const destination = getTileSurfaceCentre(3, 3);
-  const actor = new WT.Actor(context, beginPos, entityDims);
+  const fakeGraphic = {};
+  const actor = context.createActor(beginPos, entityDims, fakeGraphic);
 
   const edges = WT.findEdges(terrainGridDescriptor.cellHeightGrid);
   const blockingGrid = WT.buildBlockingGrid(
     terrainGridDescriptor.cellHeightGrid,
     edges,
-    [], // ramps
+    [] // ramps
   );
   const velocity = 5;
   const action = new WT.Navigate(actor, velocity, destination, blockingGrid);
@@ -279,7 +286,8 @@ test("move down ramp", () => {
   const grid = new WT.TerrainGrid(context, terrainGridDescriptor);
 
   const beginPos = context.grid.getCentreSurfaceLocationAt(2, 1);
-  const actor = new WT.Actor(context, beginPos, entityDims);
+  const fakeGraphic = {};
+  const actor = context.createActor(beginPos, entityDims, fakeGraphic);
   actor.gravitySpeed = 0.1;
   const d = WT.Navigation.getDirectionVector(WT.Direction.South).scale(2);
   actor.action = new WT.MoveDirection(actor, d);
@@ -361,7 +369,8 @@ test("move up ramp", () => {
   const grid = new WT.TerrainGrid(context, terrainGridDescriptor);
 
   const beginPos = context.grid.getCentreSurfaceLocationAt(2, 3);
-  const actor = new WT.Actor(context, beginPos, entityDims);
+  const fakeGraphic = {};
+  const actor = context.createActor(beginPos, entityDims, fakeGraphic);
   actor.gravitySpeed = 0.1;
   const d = WT.Navigation.getDirectionVector(WT.Direction.North).scale(2);
   actor.action = new WT.MoveDirection(actor, d);

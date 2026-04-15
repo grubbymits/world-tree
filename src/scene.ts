@@ -17,8 +17,10 @@ export enum RenderOrder {
 export class SceneNode {
   private _succs: Array<SceneNode> = new Array<SceneNode>();
 
-  constructor(private readonly _entity: PhysicalEntity,
-              private _drawCoord: Point2D) { }
+  constructor(
+    private readonly _entity: PhysicalEntity,
+    private _drawCoord: Point2D
+  ) {}
   get id(): number {
     return this._entity.id;
   }
@@ -63,8 +65,8 @@ export abstract class SceneGraph {
     this.dirty = true;
     const entity: PhysicalEntity = node.entity;
     const drawCoord = Tiles.contains(entity.id)
-                    ? this.getTileDrawCoord(entity.id)
-                    : this.adjustedDrawCoord(entity);
+      ? this.getTileDrawCoord(entity.id)
+      : this.adjustedDrawCoord(entity);
     node.drawCoord = drawCoord;
   }
 
@@ -88,10 +90,7 @@ export abstract class SceneGraph {
     //                  *
     //              'bottom2D'
     const drawHeightOffset = min2D.diff(top2D);
-    const adjustedCoord = new Point2D(
-      min2D.x,
-      min2D.y - drawHeightOffset.y
-    );
+    const adjustedCoord = new Point2D(min2D.x, min2D.y - drawHeightOffset.y);
     return adjustedCoord;
   }
 
@@ -213,8 +212,8 @@ export class Scene {
 
   insertEntity(entity: PhysicalEntity): void {
     const drawCoord = Tiles.contains(entity.id)
-                    ? this.graph.getTileDrawCoord(entity.id)
-                    : this.graph.adjustedDrawCoord(entity);
+      ? this.graph.getTileDrawCoord(entity.id)
+      : this.graph.adjustedDrawCoord(entity);
     const node = new SceneNode(entity, drawCoord);
     this.nodes.set(node.id, node);
     this.graph.insertNode(node);
@@ -400,13 +399,19 @@ export enum Perspective {
 // - the short diagonal is length = 2,
 // - the long diagonal is length = 4.
 export class TwoByOneIsometric extends SceneGraph {
-  constructor(private readonly _spriteWidth: number,
-              private readonly _spriteHeight: number) {
+  constructor(
+    private readonly _spriteWidth: number,
+    private readonly _spriteHeight: number
+  ) {
     super();
   }
 
-  get spriteWidth(): number { return this._spriteWidth; }
-  get spriteHeight(): number { return this._spriteHeight; }
+  get spriteWidth(): number {
+    return this._spriteWidth;
+  }
+  get spriteHeight(): number {
+    return this._spriteHeight;
+  }
 
   // atan(0.5) = 26.565
   // cos(26.565) = 0.8944
@@ -432,17 +437,17 @@ export class TwoByOneIsometric extends SceneGraph {
     const width = oneUnit * this._magicRatio;
     const depth = width;
     const height = cubeHeight;
-    console.assert(width >= 0, 'width < 0');
-    console.assert(depth >= 0, 'depth < 0');
-    console.assert(height >= 0, 'height < 0');
+    console.assert(width >= 0, "width < 0");
+    console.assert(depth >= 0, "depth < 0");
+    console.assert(height >= 0, "height < 0");
     return new Dimensions(width, depth, height);
   }
 
   getDrawCoord(loc: Point3D): Point2D {
     // Tiles are placed overlapping each other by half.
     // If we use the scale above, it means an onscreen x,y (dx,dy) should be:
-    let dx = ((loc.x + loc.y) * 2 * TwoByOneIsometric._oneOverMagicRatio);
-    let dy = ((loc.y - loc.x - loc.z) * TwoByOneIsometric._oneOverMagicRatio);
+    let dx = (loc.x + loc.y) * 2 * TwoByOneIsometric._oneOverMagicRatio;
+    let dy = (loc.y - loc.x - loc.z) * TwoByOneIsometric._oneOverMagicRatio;
 
     return new Point2D(dx, dy);
   }
@@ -459,7 +464,9 @@ export class TwoByOneIsometric extends SceneGraph {
     // minus halfWidth (2:1 height) for the adjustment, similar to what we do
     // with other entities.
     const y =
-        (tileY - tileX) * halfHeight - tileZ * (Tiles.height() - height) - halfWidth;
+      (tileY - tileX) * halfHeight -
+      tileZ * (Tiles.height() - height) -
+      halfWidth;
     return new Point2D(x, y);
   }
 
@@ -563,7 +570,10 @@ export class TwoByOneIsometric extends SceneGraph {
       const maxXB = EntityBounds.maxX(idb);
       const maxYB = EntityBounds.maxY(idb);
 
-      const maxWidth = Math.max(EntityBounds.width(ida), EntityBounds.width(idb));
+      const maxWidth = Math.max(
+        EntityBounds.width(ida),
+        EntityBounds.width(idb)
+      );
       const distanceX = Math.min(
         Math.abs(minXA - maxXB),
         Math.abs(maxXA - minXB)
@@ -576,8 +586,11 @@ export class TwoByOneIsometric extends SceneGraph {
         if (maxYB < minYA) {
           return RenderOrder.After;
         }
-      }    
-      const maxDepth = Math.max(EntityBounds.depth(ida), EntityBounds.depth(idb));
+      }
+      const maxDepth = Math.max(
+        EntityBounds.depth(ida),
+        EntityBounds.depth(idb)
+      );
       const distanceY = Math.min(
         Math.abs(minYA - maxYB),
         Math.abs(maxYA - minYB)
@@ -603,13 +616,18 @@ export class TwoByOneIsometric extends SceneGraph {
         }
         return RenderOrder.After;
       }
-    } else if (EntityBounds.axisOverlapX(ida, idb) &&
-               EntityBounds.axisOverlapY(ida, idb)) {
+    } else if (
+      EntityBounds.axisOverlapX(ida, idb) &&
+      EntityBounds.axisOverlapY(ida, idb)
+    ) {
       const minZA = EntityBounds.minZ(ida);
       const maxZA = EntityBounds.maxZ(ida);
       const minZB = EntityBounds.minZ(idb);
       const maxZB = EntityBounds.maxZ(idb);
-      const maxHeight = Math.max(EntityBounds.height(ida), EntityBounds.height(idb));
+      const maxHeight = Math.max(
+        EntityBounds.height(ida),
+        EntityBounds.height(idb)
+      );
       const distanceZ = Math.min(
         Math.abs(minZA - maxZB),
         Math.abs(maxZA - minZB)
@@ -628,12 +646,14 @@ export class TwoByOneIsometric extends SceneGraph {
   }
 }
 
-export function getDimensionsFromPerspective(spriteWidth: number,
-                                             spriteHeight: number,
-                                             perspective: Perspective): Dimensions {
+export function getDimensionsFromPerspective(
+  spriteWidth: number,
+  spriteHeight: number,
+  perspective: Perspective
+): Dimensions {
   switch (perspective) {
     default:
-      throw new Error('unsupported perspective');
+      throw new Error("unsupported perspective");
       break;
     case Perspective.TwoByOneIsometric:
       return TwoByOneIsometric.getDimensions(spriteWidth, spriteHeight);
@@ -643,10 +663,9 @@ export function getDimensionsFromPerspective(spriteWidth: number,
 export function getPerspectiveFromString(name: string): Perspective {
   switch (name) {
     default:
-      throw new Error('unsupported perspective name');
+      throw new Error("unsupported perspective name");
       break;
-    case 'TwoByOneIsometric':
+    case "TwoByOneIsometric":
       return Perspective.TwoByOneIsometric;
   }
 }
-

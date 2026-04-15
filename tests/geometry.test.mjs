@@ -161,7 +161,8 @@ test("cuboid obstruction", () => {
   );
   const dims = new WT.Dimensions(10, 10, 10);
   const minLocation = new WT.Point3D(0, 0, 0);
-  const entity = new WT.CuboidEntity(context, minLocation, dims);
+  const entity = new WT.CuboidEntity(minLocation, dims);
+  context.addEntity(entity);
   const cube = entity.geometry;
   const p0 = new WT.Point3D(5, 5, 11);
   const p1 = new WT.Point3D(5, 5, -1);
@@ -280,7 +281,7 @@ test("ramp up west obstruction", () => {
   );
   const dims = new WT.Dimensions(10, 10, 10);
   const minLocation = new WT.Point3D(0, 0, 0);
-  const entity = new WT.RampWestEntity(context, minLocation, dims);
+  const entity = new WT.RampWestEntity(minLocation, dims);
   context.addEntity(entity);
   const ramp = entity.geometry;
 
@@ -317,7 +318,7 @@ test("ramp up east obstruction", () => {
   );
   const dims = new WT.Dimensions(10, 10, 10);
   const minLocation = new WT.Point3D(0, 0, 0);
-  const entity = new WT.RampEastEntity(context, minLocation, dims);
+  const entity = new WT.RampEastEntity(minLocation, dims);
   context.addEntity(entity);
   const ramp = entity.geometry;
 
@@ -362,7 +363,7 @@ test("ramp up north obstruction", () => {
   );
   const dims = new WT.Dimensions(10, 10, 10);
   const minLocation = new WT.Point3D(0, 0, 0);
-  const entity = new WT.RampNorthEntity(context, minLocation, dims);
+  const entity = new WT.RampNorthEntity(minLocation, dims);
   context.addEntity(entity);
   const ramp = entity.geometry;
 
@@ -392,8 +393,9 @@ test("ramp up north obstruction", () => {
 
   // up/down the ramp between min to max.
   const topCorner = minLocation.add(new WT.Vector3D(0, 0, 10.1));
-  const bottomCorner =
-    WT.EntityBounds.maxLocation(entity.id).sub(new WT.Vector3D(0, 0, 9.9));
+  const bottomCorner = WT.EntityBounds.maxLocation(entity.id).sub(
+    new WT.Vector3D(0, 0, 9.9)
+  );
   expect(ramp.obstructsRay(topCorner, bottomCorner)).toBeNull();
   expect(ramp.obstructsRay(bottomCorner, topCorner)).toBeNull();
   expect(ramp.obstructsRay(topCorner, minLocation)).not.toBeNull();
@@ -408,7 +410,7 @@ test("ramp up south obstruction", () => {
   );
   const dims = new WT.Dimensions(10, 10, 10);
   const minLocation = new WT.Point3D(0, 0, 0);
-  const entity = new WT.RampSouthEntity(context, minLocation, dims);
+  const entity = new WT.RampSouthEntity(minLocation, dims);
   context.addEntity(entity);
   const ramp = entity.geometry;
 
@@ -437,8 +439,9 @@ test("ramp up south obstruction", () => {
   expect(ramp.obstructsRay(p7, p6)).not.toBeNull();
 
   // up/down the ramp between min to max.
-  const topCorner =
-    WT.EntityBounds.maxLocation(entity.id).add(new WT.Vector3D(0, 0, 0.1));
+  const topCorner = WT.EntityBounds.maxLocation(entity.id).add(
+    new WT.Vector3D(0, 0, 0.1)
+  );
   const bottomCorner = minLocation.add(new WT.Vector3D(0, 0, 0.1));
   expect(ramp.obstructsRay(topCorner, bottomCorner)).toBeNull();
   expect(ramp.obstructsRay(bottomCorner, topCorner)).toBeNull();
