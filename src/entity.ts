@@ -14,6 +14,7 @@ import {
   RampUpWestGeometry,
 } from "./geometry.ts";
 import { GraphicComponent } from "./graphics.ts";
+import { TerrainGrid } from "./grid.ts";
 import { ContextImpl } from "./context.ts";
 import { Action } from "./action.ts";
 import { EntityEvent, EventHandler } from "./events.ts";
@@ -40,8 +41,11 @@ export class PhysicalEntity {
     return this._ids;
   }
 
+  static getNextId(): number {
+    return this._ids;
+  }
+
   constructor(
-    protected _context: ContextImpl,
     minLocation: Point3D,
     dimensions: Dimensions,
     geometry: new (...args: any[]) => Geometry
@@ -55,12 +59,8 @@ export class PhysicalEntity {
     );
     EntityBounds.addEntity(this.id, minLocation, dimensions);
     this._geometry = new geometry(this.id);
-    this._context.addEntity(this);
   }
 
-  get context(): ContextImpl {
-    return this._context;
-  }
   get geometry(): Geometry {
     return this._geometry;
   }
@@ -147,51 +147,46 @@ export class PhysicalEntity {
 
 export class CuboidEntity extends PhysicalEntity {
   constructor(
-    context: ContextImpl,
     minLocation: Point3D,
     dimensions: Dimensions
   ) {
-    super(context, minLocation, dimensions, CuboidGeometry);
+    super(minLocation, dimensions, CuboidGeometry);
   }
 }
 
 export class RampNorthEntity extends PhysicalEntity {
   constructor(
-    context: ContextImpl,
     minLocation: Point3D,
     dimensions: Dimensions
   ) {
-    super(context, minLocation, dimensions, RampUpNorthGeometry);
+    super(minLocation, dimensions, RampUpNorthGeometry);
   }
 }
 
 export class RampEastEntity extends PhysicalEntity {
   constructor(
-    context: ContextImpl,
     minLocation: Point3D,
     dimensions: Dimensions
   ) {
-    super(context, minLocation, dimensions, RampUpEastGeometry);
+    super(minLocation, dimensions, RampUpEastGeometry);
   }
 }
 
 export class RampSouthEntity extends PhysicalEntity {
   constructor(
-    context: ContextImpl,
     minLocation: Point3D,
     dimensions: Dimensions
   ) {
-    super(context, minLocation, dimensions, RampUpSouthGeometry);
+    super(minLocation, dimensions, RampUpSouthGeometry);
   }
 }
 
 export class RampWestEntity extends PhysicalEntity {
   constructor(
-    context: ContextImpl,
     minLocation: Point3D,
     dimensions: Dimensions
   ) {
-    super(context, minLocation, dimensions, RampUpWestGeometry);
+    super(minLocation, dimensions, RampUpWestGeometry);
   }
 }
 
@@ -201,11 +196,10 @@ export class MovableEntity extends CuboidEntity {
   protected _direction: Direction;
   protected _velocity: Vector3D = new Vector3D(0, 0, 0);
 
-  constructor(context: ContextImpl, location: Point3D, dimensions: Dimensions,
+  constructor(location: Point3D, dimensions: Dimensions,
               graphics: GraphicComponent) {
-    super(context, location, dimensions);
+    super(location, dimensions);
     this.addGraphic(graphics);
-    context.addMovableEntity(this);
   }
 
   updatePosition(d: Vector3D): void {
@@ -246,10 +240,10 @@ export class MovableEntity extends CuboidEntity {
 export class Actor extends MovableEntity {
   protected _action: Action | null;
 
-  constructor(context: ContextImpl, location: Point3D, dimensions: Dimensions,
+  constructor(private readonly _grid: TerrainGrid,
+              location: Point3D, dimensions: Dimensions,
               graphics: GraphicComponent) {
-    super(context, location, dimensions, graphics);
-    context.addUpdateableEntity(this);
+    super(location, dimensions, graphics);
   }
 
   update(): void {
@@ -265,15 +259,8 @@ export class Actor extends MovableEntity {
   set action(action: Action) {
     this._action = action;
   }
+  get grid(): TerrainGrid {
+    return this._grid;
+  }
 }
 
-export function createGraphicalEntity(
-  context: ContextImpl,
-  location: Point3D,
-  dimensions: Dimensions,
-  graphicComponent: GraphicComponent
-) {
-  const entity = new PhysicalEntity(context, location, dimensions, CuboidGeometry);
-  entity.addGraphic(graphicComponent);
-  return entity;
-}

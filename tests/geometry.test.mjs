@@ -281,6 +281,7 @@ test("ramp up west obstruction", () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const minLocation = new WT.Point3D(0, 0, 0);
   const entity = new WT.RampWestEntity(context, minLocation, dims);
+  context.addEntity(entity);
   const ramp = entity.geometry;
 
   const p0 = new WT.Point3D(-1, 5, 1);
@@ -317,6 +318,7 @@ test("ramp up east obstruction", () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const minLocation = new WT.Point3D(0, 0, 0);
   const entity = new WT.RampEastEntity(context, minLocation, dims);
+  context.addEntity(entity);
   const ramp = entity.geometry;
 
   const p0 = new WT.Point3D(-1, 5, 1);
@@ -361,6 +363,7 @@ test("ramp up north obstruction", () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const minLocation = new WT.Point3D(0, 0, 0);
   const entity = new WT.RampNorthEntity(context, minLocation, dims);
+  context.addEntity(entity);
   const ramp = entity.geometry;
 
   const p0 = new WT.Point3D(-1, 5, 5.2);
@@ -406,6 +409,7 @@ test("ramp up south obstruction", () => {
   const dims = new WT.Dimensions(10, 10, 10);
   const minLocation = new WT.Point3D(0, 0, 0);
   const entity = new WT.RampSouthEntity(context, minLocation, dims);
+  context.addEntity(entity);
   const ramp = entity.geometry;
 
   const p0 = new WT.Point3D(-1, 5, 5.2);

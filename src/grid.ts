@@ -26,6 +26,54 @@ import {
   RampWestEntity,
 } from "./entity.ts";
 
+export class Tiles {
+  private static MAX_TILES = 1024;
+  private static readonly NUM_ELEMENTS = 3;
+  private static readonly INITIAL_SIZE = this.NUM_ELEMENTS * this.MAX_TILES;
+  private static data: Uint8Array = new Uint8Array(this.INITIAL_SIZE);
+  private static readonly ARRAY_ELEMENT_SIZE = this.data.BYTES_PER_ELEMENT << 8 - 1;
+  private static total = 0;
+  private static _width = 0;
+  private static _height = 0;
+
+  static add(id: number, x: number, y: number, z: number) {
+    console.assert(id == this.total);
+    console.assert(x <= this.ARRAY_ELEMENT_SIZE);
+    console.assert(y <= this.ARRAY_ELEMENT_SIZE);
+    console.assert(z <= this.ARRAY_ELEMENT_SIZE);
+    this.data[id * this.NUM_ELEMENTS] = x;
+    this.data[id * this.NUM_ELEMENTS + 1] = y;
+    this.data[id * this.NUM_ELEMENTS + 2] = z;
+    this.total++;
+  }
+  static setWidth(width: number) {
+    console.assert(this._width == 0);
+    this._width = width;
+  }
+  static setHeight(height: number) {
+    console.assert(this._height == 0);
+    this._height = height;
+  }
+  static contains(id: number): boolean {
+    return id < this.total;
+  }
+  static x(id: number): number {
+    return this.data[id * this.NUM_ELEMENTS];
+  }
+  static y(id: number): number {
+    return this.data[id * this.NUM_ELEMENTS + 1];
+  }
+  static z(id: number): number {
+    return this.data[id * this.NUM_ELEMENTS + 2];
+  }
+  static width(): number {
+    return this._width;
+  }
+  static height(): number {
+    return this._height;
+  }
+}
+
 export interface TerrainGridDescriptor {
   cellHeightGrid: Array<Uint8Array>;
   typeGrid: Array<Uint8Array>;
@@ -35,6 +83,8 @@ export interface TerrainGridDescriptor {
   cellsX: number;
   cellsY: number;
   cellsZ: number;
+  spriteWidth: number;
+  spriteHeight: number;
 }
 
 export class TerrainGridDescriptorImpl implements TerrainGridDescriptor {
@@ -45,7 +95,9 @@ export class TerrainGridDescriptorImpl implements TerrainGridDescriptor {
                private readonly _tileDimensions: Dimensions,
                private readonly _cellsX: number,
                private readonly _cellsY: number,
-               private readonly _cellsZ: number) { }
+               private readonly _cellsZ: number,
+               private readonly _spriteWidth: number,
+               private readonly _spriteHeight: number) { }
   get cellHeightGrid(): Array<Uint8Array> {
     return this._cellHeightGrid;
   }
@@ -70,6 +122,12 @@ export class TerrainGridDescriptorImpl implements TerrainGridDescriptor {
   get cellsZ(): number {
     return this._cellsZ;
   }
+  get spriteWidth(): number {
+    return this._spriteWidth;
+  }
+  get spriteHeight(): number {
+    return this._spriteHeight;
+  }
 }
 
 export class TerrainGrid {
@@ -79,7 +137,11 @@ export class TerrainGrid {
   private readonly _dimensions: Dimensions;
   private _totalSurface = 0;
   private _totalSubSurface = 0;
-  private _gap = 0.0001;
+  private static readonly _gap = 0.0001;
+
+  static gap(): number {
+    return this._gap;
+  }
 
   constructor(
     private readonly _context: ContextImpl,
@@ -87,43 +149,25 @@ export class TerrainGrid {
   ) {
     this._context.grid = this;
     this._dimensions = this.descriptor.tileDimensions;
+    Tiles.setWidth(this.descriptor.spriteWidth);
+    Tiles.setHeight(this.descriptor.spriteHeight);
     for (let y = 0; y < this.cellsY; ++y) {
       this.surfaceGeometry.push(new Array<Geometry>(this.cellsX));
       for (let x = 0; x < this.cellsX; ++x) {
         let z = this.descriptor.cellHeightGrid[y][x];
         const terrainShape = this.terrainShapeAt(x, y);
         const terrainType = this.terrainTypeAt(x, y);
-        const position = this.scaleGridToWorld(x, y, z);
 
-        if (!this._context.bounds.contains(position)) {
-          console.error('terrain out-of-bounds:', position);
-        }
-
-        let physical: new (...args: any[]) => PhysicalEntity;
-        switch (terrainShape) {
-        default:
-          physical = CuboidEntity;
-          break;
-        case TerrainShape.RampNorth:
-          physical = RampNorthEntity;
-          break;
-        case TerrainShape.RampEast:
-          physical = RampEastEntity;
-          break;
-        case TerrainShape.RampSouth:
-          physical = RampSouthEntity;
-          break;
-        case TerrainShape.RampWest:
-          physical = RampWestEntity;
-          break;
-        }
-        const entity = new physical(
-          this.context,
-          position,
-          this.descriptor.tileDimensions
+        const terrain = this._context.createTerrain(
+          x,
+          y,
+          z,
+          terrainType,
+          terrainShape,
+          this.descriptor.tileDimensions,
         );
-        entity.addGraphic(TerrainGraphics.graphics(terrainType, terrainShape));
-        this.surfaceGeometry[y][x] = entity.geometry;
+
+        this.surfaceGeometry[y][x] = terrain.geometry;
         this._totalSurface++;
 
         const zStop = z - this.calcRelativeHeight(
@@ -131,16 +175,16 @@ export class TerrainGrid {
           y,
           this.descriptor.cellHeightGrid
         );
-        const subSurfaceShape = TerrainShape.Flat;
         while (z > zStop) {
           z--;
-          const subSurfacePosition = this.scaleGridToWorld(x, y, z);
-          const subSurfaceEntity = new CuboidEntity(
-            this.context,
-            subSurfacePosition,
-            this.descriptor.tileDimensions
+          const subSurface = this._context.createTerrain(
+            x,
+            y,
+            z,
+            terrainType,
+            TerrainShape.Flat,
+            this.descriptor.tileDimensions,
           );
-          subSurfaceEntity.addGraphic(TerrainGraphics.graphics(terrainType, subSurfaceShape));
           this._totalSubSurface++;
         }
       }
@@ -182,26 +226,11 @@ export class TerrainGrid {
     return this.descriptor.biomeGrid[y][x];
   }
 
-  scaleGridToWorld(x: number, y: number, z: number): Point3D {
-    console.assert(x >= 0, 'x < 0');
-    console.assert(y >= 0, 'y < 0');
-    console.assert(z >= 0, 'z < 0');
-    const gapX = x * this._gap;
-    const gapY = y * this._gap;
-    const gapZ = z * this._gap;
-    return new Point3D(x * this.dimensions.width + gapX,
-                       y * this.dimensions.depth + gapY,
-                       z * this.dimensions.height + gapZ);
-  }
-
   scaleWorldToGrid(loc: Point3D): Point3D {
     // round down
     const width = this.dimensions.width;
     const depth = this.dimensions.depth;
     const height = this.dimensions.height;
-    //const x = loc.x - (loc.x % width);
-    //const y = loc.y - (loc.y % depth);
-    //const z = loc.z - (loc.z % height);
     // then scale to grid
     return new Point3D(
       Math.floor(loc.x / width),
@@ -241,8 +270,8 @@ export class TerrainGrid {
     if (!this.inbounds(x, y)) {
       return null;
     }
-    const gapX = x * this._gap;
-    const gapY = y * this._gap;
+    const gapX = x * TerrainGrid.gap();
+    const gapY = y * TerrainGrid.gap();
     const rayX = (this.dimensions.width / 2) + x * this.dimensions.width + gapX;
     const rayY = (this.dimensions.depth / 2) + y * this.dimensions.depth + gapY;
     const begin = new Point3D(rayX, rayY, this.context.bounds.height);

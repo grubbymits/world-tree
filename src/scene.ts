@@ -6,15 +6,12 @@ import { Dimensions } from "./physics.ts";
 import { TimedEventHandler } from "./events.ts";
 import { DrawElementList } from "./render.ts";
 import { EntityBounds } from "./bounds.ts";
+import { Tiles } from "./grid.ts";
 
 export enum RenderOrder {
   Before = -1,
   Any = 0,
   After = 1,
-}
-
-function inRange(n: number, lower: number, upper: number): boolean {
-  return n >= lower && n <= upper;
 }
 
 export class SceneNode {
@@ -56,6 +53,7 @@ export abstract class SceneGraph {
   protected _prevCameraUpper: Point2D = new Point2D(0, 0);
   protected _dirty = true;
 
+  abstract getTileDrawCoord(id: number): Point2D;
   abstract getDrawCoord(location: Point3D): Point2D;
   abstract drawOrder(first: SceneNode, second: SceneNode): RenderOrder;
 
@@ -64,7 +62,10 @@ export abstract class SceneGraph {
   update(node: SceneNode): void {
     this.dirty = true;
     const entity: PhysicalEntity = node.entity;
-    node.drawCoord = this.adjustedDrawCoord(entity);
+    const drawCoord = Tiles.contains(entity.id)
+                    ? this.getTileDrawCoord(entity.id)
+                    : this.adjustedDrawCoord(entity);
+    node.drawCoord = drawCoord;
   }
 
   adjustedDrawCoord(entity: PhysicalEntity): Point2D {
@@ -211,7 +212,10 @@ export class Scene {
   }
 
   insertEntity(entity: PhysicalEntity): void {
-    const node = new SceneNode(entity, this.graph.adjustedDrawCoord(entity));
+    const drawCoord = Tiles.contains(entity.id)
+                    ? this.graph.getTileDrawCoord(entity.id)
+                    : this.graph.adjustedDrawCoord(entity);
+    const node = new SceneNode(entity, drawCoord);
     this.nodes.set(node.id, node);
     this.graph.insertNode(node);
   }
@@ -227,7 +231,8 @@ export class Scene {
   getLocationAt(x: number, y: number, camera: Camera): Point3D | null {
     const entity: PhysicalEntity | null = this.getEntityDrawnAt(x, y, camera);
     if (entity != null) {
-      return EntityBounds.centre(entity.id);
+      let centre = EntityBounds.centre(entity.id);
+      return centre;
     }
     return null;
   }
@@ -430,11 +435,7 @@ export class TwoByOneIsometric extends SceneGraph {
     console.assert(width >= 0, 'width < 0');
     console.assert(depth >= 0, 'depth < 0');
     console.assert(height >= 0, 'height < 0');
-    return new Dimensions(width, depth, height
-      //Math.floor(width),
-      //Math.floor(depth),
-      //Math.floor(height)
-    );
+    return new Dimensions(width, depth, height);
   }
 
   getDrawCoord(loc: Point3D): Point2D {
@@ -443,30 +444,23 @@ export class TwoByOneIsometric extends SceneGraph {
     let dx = ((loc.x + loc.y) * 2 * TwoByOneIsometric._oneOverMagicRatio);
     let dy = ((loc.y - loc.x - loc.z) * TwoByOneIsometric._oneOverMagicRatio);
 
-    /*
-    // Attempt snapping.
-    // Tiles are placed at each half width, on the x-axis and width/4 on the
-    // y-axis. Add or subtract a pixel if it will result in the coordinate
-    // being aligned to those values.
-    const halfWidth = this.spriteWidth >> 1;
-    const modX = dx % this.spriteWidth;
-    const modY = dy % this.spriteHeight;
-    if (modX == 1 || modX == halfWidth + 1) {
-      dx -= 1;
-    } else if (modX == this.spriteWidth - 1 || modX == halfWidth - 1) {
-      dx += 1;
-    }
-
-    const quarterWidth = this.spriteWidth >> 2;
-    if (modY == 1 || modY == quarterWidth + 1) {
-      dy -= 1;
-    } else if (modY == this.spriteHeight - 1 || modY == quarterWidth - 1) {
-      dy += 1;
-    }
-    */
-    //dx += 2;
-    //dy++;
     return new Point2D(dx, dy);
+  }
+
+  getTileDrawCoord(id: number): Point2D {
+    const tileX = Tiles.x(id);
+    const tileY = Tiles.y(id);
+    const tileZ = Tiles.z(id);
+    const width = Tiles.width();
+    const halfWidth = width * 0.5;
+    const height = Tiles.width() * 0.5;
+    const halfHeight = height * 0.5;
+    const x = (tileX + tileY) * halfWidth;
+    // minus halfWidth (2:1 height) for the adjustment, similar to what we do
+    // with other entities.
+    const y =
+        (tileY - tileX) * halfHeight - tileZ * (Tiles.height() - height) - halfWidth;
+    return new Point2D(x, y);
   }
 
   drawOrder(first: SceneNode, second: SceneNode): RenderOrder {
@@ -518,6 +512,21 @@ export class TwoByOneIsometric extends SceneGraph {
     if (secondY < firstY && secondY + secondHeight < firstY) {
       return RenderOrder.Any;
     }
+
+    /*
+    if (Tiles.contains(first.entity.id) && Tiles.contains(second.entity.id)) {
+      const firstSum =
+          Tiles.x(first.entity.id) + Tiles.y(first.entity.id) + Tiles.z(first.entity.id);
+      const secondSum =
+          Tiles.x(second.entity.id) + Tiles.y(second.entity.id) +
+                  Tiles.z(second.entity.id);
+      if (firstSum < secondSum) {
+        return RenderOrder.Before;
+      } else {
+        return RenderOrder.After;
+      }
+    }
+    */
 
     const ida = first.entity.id;
     const idb = second.entity.id;

@@ -168,8 +168,8 @@ export class Navigate extends Action {
     private readonly _blockingGrid: Array<Uint8Array>,
   ) {
     super(actor);
-    const begin = actor.context.grid!.scaleWorldToGrid(EntityBounds.bottomCentre(actor.id));
-    const end = actor.context.grid!.scaleWorldToGrid(this.destination);
+    const begin = actor.grid.scaleWorldToGrid(EntityBounds.bottomCentre(actor.id));
+    const end = actor.grid.scaleWorldToGrid(this.destination);
     const gridCoords = findPath(
       new Coord(begin.x, begin.y),
       new Coord(end.x, end.y),
@@ -178,7 +178,7 @@ export class Navigate extends Action {
     if (gridCoords.length != 0) {
       this.waypoints = new Array<Point3D>();
       for (let gridCoord of gridCoords) {
-        this.waypoints.push(actor.context.grid!.getCentreSurfaceLocationAt(gridCoord.x, gridCoord.y)!);
+        this.waypoints.push(actor.grid!.getCentreSurfaceLocationAt(gridCoord.x, gridCoord.y)!);
       }
       this._currentStep = new MoveDestination(actor, this.step, this.waypoints[0]);
     }

@@ -192,7 +192,8 @@ function tryMoveFiveSteps(position, path, context) {
     worldDims.depth / 2,
     worldDims.height / 2
   );
-  const movable = new WT.MovableEntity(context, position, entityDims);
+  const fakeGraphic = {};
+  const movable = context.createMovableEntity(position, entityDims, fakeGraphic);
   const area = new WT.BoundingCuboid(worldCentre, worldDims);
   // step 1
   let detection = WT.CollisionDetector.detectInArea(movable, path, area);
@@ -320,29 +321,29 @@ function createMapWithRampUpEast() {
   // top row
   for (let i = 0; i < numTilesWide; i++) {
     let minLocation = new WT.Point3D(i * (squareTileSize + 0.001), 0, 0);
-    new WT.CuboidEntity(context, minLocation, tileDims);
+    context.addEntity(new WT.CuboidEntity(context, minLocation, tileDims));
   }
   // bottom row
   for (let i = 0; i < numTilesWide; i++) {
     let minLocation = new WT.Point3D(i * (squareTileSize + 0.001),
                                      (squareTileSize + 0.001) * 4, 0);
-    new WT.CuboidEntity(context, minLocation, tileDims);
+    context.addEntity(new WT.CuboidEntity(context, minLocation, tileDims));
   }
   // left side
   for (let i = 0; i < numTilesDeep; i++) {
     let minLocation = new WT.Point3D(0, i * (squareTileSize + 0.001), 0);
-    new WT.CuboidEntity(context, minLocation, tileDims);
+    context.addEntity(new WT.CuboidEntity(context, minLocation, tileDims));
   }
   // right side
   for (let i = 0; i < numTilesDeep; i++) {
     let minLocation = new WT.Point3D(4 * (squareTileSize + 0.001),
                                      i * (squareTileSize + 0.001), 0);
-    new WT.CuboidEntity(context, minLocation, tileDims);
+    context.addEntity(new WT.CuboidEntity(context, minLocation, tileDims));
   }
   // middle
   const minLocation = new WT.Point3D(2 * (squareTileSize + 0.001),
                                      2 * (squareTileSize + 0.001), 0);
-  const entity = new WT.RampEastEntity(context, minLocation, tileDims);
+  context.addEntity(new WT.RampEastEntity(context, minLocation, tileDims));
 
   return context;
 }

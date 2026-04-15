@@ -56,18 +56,36 @@ export function generateBiomeGrid(config: BiomeConfig,
                                   moistureGrid: Array<Array<number>>): Array<Uint8Array> {
   const cellsX = heightGrid[0].length;
   const cellsY = heightGrid.length;
-  const moistureRange = 6;
+
+  let maxMoisture = Number.MIN_VALUE;
+  let minMoisture = Number.MAX_VALUE;
+  for (let y = 0; y < cellsY; y++) {
+    const moistureArray = moistureGrid[y];
+    const max = moistureArray.reduce((acc, curr) => acc > curr ? acc: curr);
+    const min = moistureArray.reduce((acc, curr) => acc < curr ? acc: curr);
+    if (max > maxMoisture) {
+      maxMoisture = max;
+    }
+    if (min < minMoisture) {
+      minMoisture = min;
+    }
+  }
+  const moistureRange = maxMoisture - minMoisture;
+
   const biomeGrid: Array<Uint8Array> = new Array<Uint8Array>();
   for (let y = 0; y < cellsY; y++) {
     biomeGrid[y] = new Uint8Array(cellsX);
     for (let x = 0; x < cellsX; x++) {
       let biome: Biome = Biome.Water;
-      const moisture = moistureGrid[y][x];
-      const moisturePercent = Math.min(1, moisture / moistureRange);
+      let moisture = moistureGrid[y][x];
+      if (!moisture) {
+        moisture = 0.0;
+      }
+
+      const moisturePercent = moisture / moistureRange;
       // Split into four biomes based on moisture.
       const moistureScaled = Math.floor(3 * moisturePercent);
       const surfaceHeight = heightGrid[y][x];
-
       if (surfaceHeight <= config.waterLine) {
         biome = Biome.Water;
       } else if (surfaceHeight >= config.uplandThreshold) {
