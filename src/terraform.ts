@@ -1,4 +1,5 @@
 import { Biome, getBiomeName } from "./biomes.ts";
+import { HSL, RGB } from "./colours.ts";
 import { ContextImpl } from "./context.ts";
 import {
   Sprite,
@@ -1194,9 +1195,8 @@ export function buildTerrainTypeGrid(
           break;
         case Biome.Savanna:
         case Biome.Steppe:
-          terrain = TerrainType.Grass;
-          break;
         case Biome.Woodland:
+          terrain = TerrainType.Grass;
           terrain = TerrainType.Grass;
           break;
         case Biome.Rainforest:
@@ -1230,6 +1230,7 @@ class SpriteGenerator {
   private _width: number;
   private _height: number;
   private _colours: Array<string>;
+  private _groundColours: Map<string, string>;
   private _top1: Coord;
   private _top2: Coord;
   private _top3: Coord;
@@ -1308,15 +1309,30 @@ class SpriteGenerator {
     // For ramps
     this.backCorner = new Coord(midX, this.height - yDelta * 2);
 
+    const waterHSL = RGB.fromHex(this.descriptor.waterColour).toHSL().toString();
+    const snowHSL = RGB.fromHex(this.descriptor.snowColour).toHSL().toString();
+    const sandHSL = RGB.fromHex(this.descriptor.sandColour).toHSL().toString();
+    const rockHSL = RGB.fromHex(this.descriptor.rockColour).toHSL().toString();
+    const soilHSL = RGB.fromHex(this.descriptor.soilColour).toHSL().toString();
+    const grassHSL = RGB.fromHex(this.descriptor.grassColour).toHSL().toString();
+
     this.colours = new Array<string>(
-      this.descriptor.waterColour,
-      this.descriptor.snowColour,
-      this.descriptor.sandColour,
-      this.descriptor.rockColour,
-      this.descriptor.soilColour,
-      this.descriptor.dryGrassColour,
-      this.descriptor.wetGrassColour
+      waterHSL,
+      snowHSL,
+      sandHSL,
+      rockHSL,
+      soilHSL,
+      grassHSL,
     );
+
+    this.groundColours = new Map<string, string> ([
+      [ waterHSL, waterHSL ],
+      [ snowHSL, rockHSL ],
+      [ sandHSL, rockHSL ],
+      [ rockHSL, rockHSL ],
+      [ soilHSL, rockHSL ],
+      [ grassHSL, soilHSL ],
+    ]);
 
     const numTerrains = this.colours.length;
     this.canvas = new OffscreenCanvas(
@@ -1363,6 +1379,12 @@ class SpriteGenerator {
   }
   set colours(a: Array<string>) {
     this._colours = a;
+  }
+  get groundColours(): Map<string, string> {
+    return this._groundColours;
+  }
+  set groundColours(a: Map<string, string>) {
+    this._groundColours = a;
   }
 
   get top1(): Coord {
@@ -1539,23 +1561,10 @@ class SpriteGenerator {
     return this.canvas;
   }
 
-  drawShadow(coords: Array<Coord>, offset: Coord) {
-    if (coords.length == 0) {
-      return;
-    }
-    this.ctx.strokeStyle = "rgb(30 30 30 / 50%)";
-    this.ctx.beginPath();
-    this.ctx.moveTo(coords[0].x + offset.x, coords[0].y + offset.y);
-    for (let i = 1; i < coords.length; ++i) {
-      const coord = coords[i];
-      this.ctx.lineTo(coord.x + offset.x, coord.y + offset.y);
-      this.ctx.stroke();
-    }
-  }
-
-  drawSide(coords: Array<Coord>, colour: string, offset: Coord) {
-    this.ctx.fillStyle = colour;
-    this.ctx.strokeStyle = colour;
+  drawSide(coords: Array<Coord>, colour_hsl: string, offset: Coord) {
+    const colour_rgb = HSL.fromString(colour_hsl).toRGB().toString();
+    this.ctx.fillStyle = colour_rgb;
+    this.ctx.strokeStyle = colour_rgb;
     this.ctx.beginPath();
     this.ctx.moveTo(coords[0].x + offset.x, coords[0].y + offset.y);
     for (let i = 1; i < coords.length; ++i) {
@@ -1564,34 +1573,6 @@ class SpriteGenerator {
       this.ctx.stroke();
     }
     this.ctx.fill();
-  }
-
-  drawThreeSides(
-    rightShape: Array<Coord>,
-    leftShape: Array<Coord>,
-    topShape: Array<Coord>,
-    shape: TerrainShape
-  ) {
-    for (let i = 0; i < this.colours.length; ++i) {
-      const topColour = this.colours[i];
-      const offset = new Coord(this.width * shape, this.height * i);
-      if (topColour == this.descriptor.waterColour) {
-        this.drawSide(
-          rightShape,
-          this.descriptor.lightUnderwaterColour,
-          offset
-        );
-        this.drawSide(leftShape, this.descriptor.darkUnderwaterColour, offset);
-      } else {
-        this.drawSide(
-          rightShape,
-          this.descriptor.lightUndergroundColour,
-          offset
-        );
-        this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
-      }
-      this.drawSide(topShape, topColour, offset);
-    }
   }
 
   generateFlat(shape: TerrainShape) {
@@ -1629,24 +1610,17 @@ class SpriteGenerator {
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
+      const groundColour = this.groundColours.get(topColour)!;
+      const lightGroundColour = HSL.fromString(groundColour).changeLight(5).toString();
+      const darkGroundColour = HSL.fromString(groundColour).changeLight(-5).toString();
       const offset = new Coord(this.width * shape, this.height * i);
-      if (topColour == this.descriptor.waterColour) {
-        this.drawSide(
-          rightShape,
-          this.descriptor.lightUnderwaterColour,
-          offset
-        );
-        this.drawSide(leftShape, this.descriptor.darkUnderwaterColour, offset);
-        this.drawSide(topShape, topColour, offset);
-      } else {
-        this.drawSide(
-          rightShape,
-          this.descriptor.lightUndergroundColour,
-          offset
-        );
-        this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
-        this.drawSide(topShape, topColour, offset);
-      }
+      this.drawSide(
+        rightShape,
+        lightGroundColour,
+        offset
+      );
+      this.drawSide(leftShape, darkGroundColour, offset);
+      this.drawSide(topShape, topColour, offset);
     }
   }
 
@@ -1673,12 +1647,21 @@ class SpriteGenerator {
       this.mid4,
       this.mid1
     );
-    this.drawThreeSides(
-      rightShape,
-      leftShape,
-      topShape,
-      TerrainShape.RampSouth
-    );
+    for (let i = 0; i < this.colours.length; ++i) {
+      const topColour = this.colours[i];
+      const darkTopColour = HSL.fromString(topColour).changeLight(-5).toString();
+      const groundColour = this.groundColours.get(topColour)!;
+      const lightGroundColour = HSL.fromString(groundColour).changeLight(5).toString();
+      const darkGroundColour = HSL.fromString(groundColour).changeLight(-5).toString();
+      const offset = new Coord(this.width * TerrainShape.RampSouth, this.height * i);
+      this.drawSide(
+        rightShape,
+        lightGroundColour,
+        offset
+      );
+      this.drawSide(leftShape, darkGroundColour, offset);
+      this.drawSide(topShape, darkTopColour, offset);
+    }
   }
 
   generateRampWest() {
@@ -1704,7 +1687,21 @@ class SpriteGenerator {
       this.mid4,
       this.bottomRight
     );
-    this.drawThreeSides(rightShape, leftShape, topShape, TerrainShape.RampWest);
+    for (let i = 0; i < this.colours.length; ++i) {
+      const topColour = this.colours[i];
+      const lightTopColour = HSL.fromString(topColour).changeLight(5).toString();
+      const groundColour = this.groundColours.get(topColour)!;
+      const darkGroundColour = HSL.fromString(groundColour).changeLight(-5).toString();
+      const lightGroundColour = HSL.fromString(groundColour).changeLight(5).toString();
+      const offset = new Coord(this.width * TerrainShape.RampWest, this.height * i);
+      this.drawSide(
+        rightShape,
+        lightGroundColour,
+        offset
+      );
+      this.drawSide(leftShape, darkGroundColour, offset);
+      this.drawSide(topShape, lightTopColour, offset);
+    }
   }
 
   generateRampEast() {
@@ -1724,24 +1721,19 @@ class SpriteGenerator {
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
+      const darkTopColour = HSL.fromString(topColour).changeLight(-5).toString();
+      const groundColour = this.groundColours.get(topColour)!;
+      const lightGroundColour = HSL.fromString(groundColour).changeLight(5).toString();
       const offset = new Coord(
         this.width * TerrainShape.RampEast,
         this.height * i
       );
-      if (topColour == this.descriptor.waterColour) {
-        this.drawSide(
-          rightShape,
-          this.descriptor.lightUnderwaterColour,
-          offset
-        );
-      } else {
-        this.drawSide(
-          rightShape,
-          this.descriptor.lightUndergroundColour,
-          offset
-        );
-      }
-      this.drawSide(topShape, topColour, offset);
+      this.drawSide(
+        rightShape,
+        lightGroundColour,
+        offset
+      );
+      this.drawSide(topShape, darkTopColour, offset);
     }
   }
 
@@ -1762,16 +1754,15 @@ class SpriteGenerator {
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
+      const lightTopColour = HSL.fromString(topColour).changeLight(5).toString();
+      const groundColour = this.groundColours.get(topColour)!;
+      const darkGroundColour = HSL.fromString(groundColour).changeLight(-5).toString();
       const offset = new Coord(
         this.width * TerrainShape.RampNorth,
         this.height * i
       );
-      if (topColour == this.descriptor.waterColour) {
-        this.drawSide(leftShape, this.descriptor.darkUnderwaterColour, offset);
-      } else {
-        this.drawSide(leftShape, this.descriptor.darkUndergroundColour, offset);
-      }
-      this.drawSide(topShape, topColour, offset);
+      this.drawSide(leftShape, darkGroundColour, offset);
+      this.drawSide(topShape, lightTopColour, offset);
     }
   }
 
