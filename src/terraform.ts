@@ -758,9 +758,8 @@ export const enum TerrainType {
   Snow,
   Sand,
   Rock,
-  Mud,
-  DryGrass,
-  WetGrass,
+  Soil,
+  Grass,
 }
 
 export function getTerrainShapeName(terrain: TerrainShape): string {
@@ -826,12 +825,10 @@ export function getTerrainTypeName(terrain: TerrainType): string {
       return "TerrainType.Sand";
     case TerrainType.Rock:
       return "TerrainType.Rock";
-    case TerrainType.Mud:
-      return "TerrainType.Mud";
-    case TerrainType.DryGrass:
-      return "TerrainType.DryGrass";
-    case TerrainType.WetGrass:
-      return "TerrainType.WetGrass";
+    case TerrainType.Soil:
+      return "TerrainType.Soil";
+    case TerrainType.Grass:
+      return "TerrainType.Grass";
   }
 }
 
@@ -845,13 +842,8 @@ export interface TerrainSpriteDescriptor {
   snowColour: string;
   sandColour: string;
   rockColour: string;
-  mudColour: string;
-  dryGrassColour: string;
-  wetGrassColour: string;
-  lightUndergroundColour: string;
-  darkUndergroundColour: string;
-  lightUnderwaterColour: string;
-  darkUnderwaterColour: string;
+  soilColour: string;
+  grassColour: string;
 }
 
 export class TerrainGraphics {
@@ -1202,13 +1194,13 @@ export function buildTerrainTypeGrid(
           break;
         case Biome.Savanna:
         case Biome.Steppe:
-          terrain = TerrainType.DryGrass;
+          terrain = TerrainType.Grass;
           break;
         case Biome.Woodland:
-          terrain = TerrainType.WetGrass;
+          terrain = TerrainType.Grass;
           break;
         case Biome.Rainforest:
-          terrain = TerrainType.Mud;
+          terrain = TerrainType.Soil;
           break;
         case Biome.AlpineDesert:
           terrain = TerrainType.Snow;
@@ -1321,7 +1313,7 @@ class SpriteGenerator {
       this.descriptor.snowColour,
       this.descriptor.sandColour,
       this.descriptor.rockColour,
-      this.descriptor.mudColour,
+      this.descriptor.soilColour,
       this.descriptor.dryGrassColour,
       this.descriptor.wetGrassColour
     );
@@ -1489,9 +1481,8 @@ class SpriteGenerator {
       TerrainType.Snow,
       TerrainType.Sand,
       TerrainType.Rock,
-      TerrainType.Mud,
-      TerrainType.DryGrass,
-      TerrainType.WetGrass
+      TerrainType.Soil,
+      TerrainType.Grass
     );
     this.descriptor.tileColumnShapes = new Array<TerrainShape>(
       TerrainShape.Flat,
