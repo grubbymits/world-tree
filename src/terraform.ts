@@ -1595,6 +1595,83 @@ class SpriteGenerator {
     this.ctx.fill();
   }
 
+  drawGradientSide(
+    coords: Array<Coord>,
+    colour_hsl: string,
+    gradient: CanvasGradient,
+    offset: Coord
+  ) {
+    const colour_rgb = HSL.fromString(colour_hsl).toRGB().toString();
+    this.ctx.fillStyle = gradient;
+    this.ctx.strokeStyle = colour_rgb;
+    this.ctx.beginPath();
+    this.ctx.moveTo(coords[0].x + offset.x, coords[0].y + offset.y);
+    for (let i = 1; i < coords.length; ++i) {
+      const coord = coords[i];
+      this.ctx.lineTo(coord.x + offset.x, coord.y + offset.y);
+      this.ctx.stroke();
+    }
+    this.ctx.fill();
+  }
+
+  drawGradientTop(shape: TerrainShape, shadowDirection: DirectionBit) {
+    let begin: Coord;
+    let end: Coord;
+    switch (shadowDirection) {
+      default:
+        console.error("unhandled direction");
+      case DirectionBit.North:
+        begin = this.top2;
+        end = this.mid2;
+        break;
+      case DirectionBit.East:
+        begin = this.topRight;
+        end = this.topLeft;
+        break;
+      case DirectionBit.South:
+        begin = this.mid2;
+        end = this.top2;
+        break;
+      case DirectionBit.West:
+        begin = this.topLeft;
+        end = this.topRight;
+    }
+
+    const coords = new Array<Coord>(
+      this.top1,
+      this.top4,
+      this.top3,
+      this.topRight,
+      this.mid3,
+      this.mid4,
+      this.mid1,
+      this.mid2,
+      this.topLeft,
+      this.top2
+    );
+
+    for (let i = 0; i < this.colours.length; ++i) {
+      const topColour = this.colours[i];
+      const offset = new Coord(this.width * shape, this.height * i);
+      const gradient = this.ctx.createLinearGradient(
+        begin.x + offset.x,
+        begin.y + offset.y,
+        end.x + offset.x,
+        end.y + offset.y
+      );
+      gradient.addColorStop(0, this.partialShadow(topColour));
+      gradient.addColorStop(0.2, topColour);
+      gradient.addColorStop(0.3, this.partialBright(topColour));
+      gradient.addColorStop(0.4, this.fullBright(topColour));
+      this.drawGradientSide(
+        coords,
+        this.fullBright(topColour),
+        gradient,
+        offset
+      );
+    }
+  }
+
   generateFlat(shape: TerrainShape) {
     const topShape = new Array<Coord>(
       this.top1,
@@ -1769,7 +1846,26 @@ class SpriteGenerator {
   }
 
   generateCorner(shape: TerrainShape) {
-    this.generateFlat(shape);
+    switch (shape) {
+      default:
+        console.error("unhandled shape");
+      case TerrainShape.NorthEastCorner:
+        this.generateFlat(shape);
+        this.drawGradientTop(shape, DirectionBit.North);
+        break;
+      case TerrainShape.SouthEastCorner:
+        this.generateFlat(shape);
+        this.drawGradientTop(shape, DirectionBit.East);
+        break;
+      case TerrainShape.SouthWestCorner:
+        this.generateFlat(shape);
+        this.drawGradientTop(shape, DirectionBit.South);
+        break;
+      case TerrainShape.NorthWestCorner:
+        this.generateFlat(shape);
+        this.drawGradientTop(shape, DirectionBit.West);
+        break;
+    }
   }
 
   generateCorridor(shape: TerrainShape) {
