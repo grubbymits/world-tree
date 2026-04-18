@@ -1309,12 +1309,16 @@ class SpriteGenerator {
     // For ramps
     this.backCorner = new Coord(midX, this.height - yDelta * 2);
 
-    const waterHSL = RGB.fromHex(this.descriptor.waterColour).toHSL().toString();
+    const waterHSL = RGB.fromHex(this.descriptor.waterColour)
+      .toHSL()
+      .toString();
     const snowHSL = RGB.fromHex(this.descriptor.snowColour).toHSL().toString();
     const sandHSL = RGB.fromHex(this.descriptor.sandColour).toHSL().toString();
     const rockHSL = RGB.fromHex(this.descriptor.rockColour).toHSL().toString();
     const soilHSL = RGB.fromHex(this.descriptor.soilColour).toHSL().toString();
-    const grassHSL = RGB.fromHex(this.descriptor.grassColour).toHSL().toString();
+    const grassHSL = RGB.fromHex(this.descriptor.grassColour)
+      .toHSL()
+      .toString();
 
     this.colours = new Array<string>(
       waterHSL,
@@ -1322,16 +1326,16 @@ class SpriteGenerator {
       sandHSL,
       rockHSL,
       soilHSL,
-      grassHSL,
+      grassHSL
     );
 
-    this.groundColours = new Map<string, string> ([
-      [ waterHSL, waterHSL ],
-      [ snowHSL, rockHSL ],
-      [ sandHSL, rockHSL ],
-      [ rockHSL, rockHSL ],
-      [ soilHSL, rockHSL ],
-      [ grassHSL, soilHSL ],
+    this.groundColours = new Map<string, string>([
+      [waterHSL, waterHSL],
+      [snowHSL, rockHSL],
+      [sandHSL, rockHSL],
+      [rockHSL, rockHSL],
+      [soilHSL, rockHSL],
+      [grassHSL, soilHSL],
     ]);
 
     const numTerrains = this.colours.length;
@@ -1561,6 +1565,22 @@ class SpriteGenerator {
     return this.canvas;
   }
 
+  fullShadow(colourHSL: string): string {
+    return HSL.fromString(colourHSL).changeLight(-4).toString();
+  }
+
+  partialShadow(colourHSL: string): string {
+    return HSL.fromString(colourHSL).changeLight(-2).toString();
+  }
+
+  fullBright(colourHSL: string): string {
+    return HSL.fromString(colourHSL).changeLight(4).toString();
+  }
+
+  partialBright(colourHSL: string): string {
+    return HSL.fromString(colourHSL).changeLight(2).toString();
+  }
+
   drawSide(coords: Array<Coord>, colour_hsl: string, offset: Coord) {
     const colour_rgb = HSL.fromString(colour_hsl).toRGB().toString();
     this.ctx.fillStyle = colour_rgb;
@@ -1611,16 +1631,10 @@ class SpriteGenerator {
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
       const groundColour = this.groundColours.get(topColour)!;
-      const lightGroundColour = HSL.fromString(groundColour).changeLight(5).toString();
-      const darkGroundColour = HSL.fromString(groundColour).changeLight(-5).toString();
       const offset = new Coord(this.width * shape, this.height * i);
-      this.drawSide(
-        rightShape,
-        lightGroundColour,
-        offset
-      );
-      this.drawSide(leftShape, darkGroundColour, offset);
-      this.drawSide(topShape, topColour, offset);
+      this.drawSide(rightShape, this.partialShadow(groundColour), offset);
+      this.drawSide(leftShape, this.fullShadow(groundColour), offset);
+      this.drawSide(topShape, this.fullBright(topColour), offset);
     }
   }
 
@@ -1649,18 +1663,14 @@ class SpriteGenerator {
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
-      const darkTopColour = HSL.fromString(topColour).changeLight(-5).toString();
       const groundColour = this.groundColours.get(topColour)!;
-      const lightGroundColour = HSL.fromString(groundColour).changeLight(5).toString();
-      const darkGroundColour = HSL.fromString(groundColour).changeLight(-5).toString();
-      const offset = new Coord(this.width * TerrainShape.RampSouth, this.height * i);
-      this.drawSide(
-        rightShape,
-        lightGroundColour,
-        offset
+      const offset = new Coord(
+        this.width * TerrainShape.RampSouth,
+        this.height * i
       );
-      this.drawSide(leftShape, darkGroundColour, offset);
-      this.drawSide(topShape, darkTopColour, offset);
+      this.drawSide(rightShape, this.partialShadow(groundColour), offset);
+      this.drawSide(leftShape, this.fullShadow(groundColour), offset);
+      this.drawSide(topShape, topColour, offset);
     }
   }
 
@@ -1689,18 +1699,14 @@ class SpriteGenerator {
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
-      const lightTopColour = HSL.fromString(topColour).changeLight(5).toString();
       const groundColour = this.groundColours.get(topColour)!;
-      const darkGroundColour = HSL.fromString(groundColour).changeLight(-5).toString();
-      const lightGroundColour = HSL.fromString(groundColour).changeLight(5).toString();
-      const offset = new Coord(this.width * TerrainShape.RampWest, this.height * i);
-      this.drawSide(
-        rightShape,
-        lightGroundColour,
-        offset
+      const offset = new Coord(
+        this.width * TerrainShape.RampWest,
+        this.height * i
       );
-      this.drawSide(leftShape, darkGroundColour, offset);
-      this.drawSide(topShape, lightTopColour, offset);
+      this.drawSide(rightShape, this.partialShadow(groundColour), offset);
+      this.drawSide(leftShape, this.fullShadow(groundColour), offset);
+      this.drawSide(topShape, this.partialBright(topColour), offset);
     }
   }
 
@@ -1721,19 +1727,13 @@ class SpriteGenerator {
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
-      const darkTopColour = HSL.fromString(topColour).changeLight(-5).toString();
       const groundColour = this.groundColours.get(topColour)!;
-      const lightGroundColour = HSL.fromString(groundColour).changeLight(5).toString();
       const offset = new Coord(
         this.width * TerrainShape.RampEast,
         this.height * i
       );
-      this.drawSide(
-        rightShape,
-        lightGroundColour,
-        offset
-      );
-      this.drawSide(topShape, darkTopColour, offset);
+      this.drawSide(rightShape, this.partialShadow(groundColour), offset);
+      this.drawSide(topShape, this.fullShadow(topColour), offset);
     }
   }
 
@@ -1754,15 +1754,13 @@ class SpriteGenerator {
     );
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
-      const lightTopColour = HSL.fromString(topColour).changeLight(5).toString();
       const groundColour = this.groundColours.get(topColour)!;
-      const darkGroundColour = HSL.fromString(groundColour).changeLight(-5).toString();
       const offset = new Coord(
         this.width * TerrainShape.RampNorth,
         this.height * i
       );
-      this.drawSide(leftShape, darkGroundColour, offset);
-      this.drawSide(topShape, lightTopColour, offset);
+      this.drawSide(leftShape, this.fullShadow(groundColour), offset);
+      this.drawSide(topShape, this.partialShadow(topColour), offset);
     }
   }
 
