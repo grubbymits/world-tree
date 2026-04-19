@@ -1231,6 +1231,8 @@ class SpriteGenerator {
   private _height: number;
   private _colours: Array<string>;
   private _groundColours: Map<string, string>;
+  private readonly _xDelta: number;
+  private readonly _yDelta: number;
   private _top1: Coord;
   private _top2: Coord;
   private _top3: Coord;
@@ -1282,24 +1284,24 @@ class SpriteGenerator {
     this.top3 = new Coord(midX, offsetY);
     this.top4 = new Coord(midX + 1, offsetY);
 
-    const xDelta = this.width - offsetX - this.top3.x;
-    const yDelta = xDelta >> 1;
+    this._xDelta = this.width - offsetX - this.top3.x;
+    this._yDelta = this.xDelta >> 1;
     console.log("width:", this.width);
-    console.log("xDelta:", xDelta);
-    console.log("yDelta:", yDelta);
+    console.log("this.xDelta:", this.xDelta);
+    console.log("this.yDelta:", this.yDelta);
     const minX = this.width - 1;
     const minY = this.height - 1 - offsetY;
-    const bottomY = minY - yDelta;
+    const bottomY = minY - this.yDelta;
 
-    this.topRight = new Coord(minX - offsetX, yDelta);
+    this.topRight = new Coord(minX - offsetX, this.yDelta);
     this.bottomRight = new Coord(minX - offsetX, bottomY);
-    this.topLeft = new Coord(offsetX, yDelta);
+    this.topLeft = new Coord(offsetX, this.yDelta);
     this.bottomLeft = new Coord(offsetX, bottomY);
 
-    this.mid1 = new Coord(midX - 2, yDelta << 1);
-    this.mid2 = new Coord(midX - 1, yDelta << 1);
-    this.mid3 = new Coord(midX, yDelta << 1);
-    this.mid4 = new Coord(midX + 1, yDelta << 1);
+    this.mid1 = new Coord(midX - 2, this.yDelta << 1);
+    this.mid2 = new Coord(midX - 1, this.yDelta << 1);
+    this.mid3 = new Coord(midX, this.yDelta << 1);
+    this.mid4 = new Coord(midX + 1, this.yDelta << 1);
 
     this.bottom1 = new Coord(midX - 2, minY);
     this.bottom2 = new Coord(midX - 1, minY);
@@ -1307,7 +1309,7 @@ class SpriteGenerator {
     this.bottom4 = new Coord(midX + 1, minY);
 
     // For ramps
-    this.backCorner = new Coord(midX, this.height - yDelta * 2);
+    this.backCorner = new Coord(midX, this.height - this.yDelta * 2);
 
     const waterHSL = RGB.fromHex(this.descriptor.waterColour)
       .toHSL()
@@ -1390,7 +1392,12 @@ class SpriteGenerator {
   set groundColours(a: Map<string, string>) {
     this._groundColours = a;
   }
-
+  get xDelta(): number {
+    return this._xDelta;
+  }
+  get yDelta(): number {
+    return this._yDelta;
+  }
   get top1(): Coord {
     return this._top1;
   }
@@ -1614,9 +1621,35 @@ class SpriteGenerator {
     this.ctx.fill();
   }
 
+  getBeginAndEnd(angleInDeg: number): Array<Coord> {
+    // 1. Convert CSS angle to Canvas-friendly radians
+    const angle = ((180 - angleInDeg) / 180) * Math.PI;
+
+    // 2. Calculate length to fit the container perfectly
+    const length = Math.abs(this.width * Math.sin(angle)) +
+      Math.abs(this.yDelta * 2 * Math.cos(angle));
+
+    // 3. Find start and end points relative to center
+    const cx = this.xDelta;
+    const cy = this.yDelta;
+    const x1 = cx - (Math.sin(angle) * length) / 2;
+    const y1 = cy - (Math.cos(angle) * length) / 2;
+    const x2 = cx + (Math.sin(angle) * length) / 2;
+    const y2 = cy + (Math.cos(angle) * length) / 2;
+
+    return [ new Coord(x1, y1), new Coord(x2, y2) ];
+  }
+
+
   drawGradientTop(shape: TerrainShape, shadowDirection: DirectionBit) {
     let begin: Coord;
     let end: Coord;
+    const angleInDeg = 26.57;
+    const northEastAngle = angleInDeg + 270;
+    const southEastAngle = angleInDeg + 180;
+    const southWestAngle = angleInDeg + 90;
+    const northWestAngle = angleInDeg;
+
     switch (shadowDirection) {
       default:
         console.error("unhandled direction");
@@ -1624,10 +1657,22 @@ class SpriteGenerator {
         begin = this.top2;
         end = this.mid2;
         break;
+      case DirectionBit.NorthEast: {
+        const coords = this.getBeginAndEnd(northEastAngle);
+        begin = coords[0];
+        end = coords[1];
+        break;
+      }
       case DirectionBit.East:
         begin = this.topRight;
         end = this.topLeft;
         break;
+      case DirectionBit.SouthEast: {
+        const coords = this.getBeginAndEnd(southEastAngle);
+        begin = coords[0];
+        end = coords[1];
+        break;
+      }
       case DirectionBit.South:
         begin = this.mid2;
         end = this.top2;
@@ -1843,26 +1888,32 @@ class SpriteGenerator {
 
   generateEdge(shape: TerrainShape) {
     this.generateFlat(shape);
+    switch (shape) {
+      default: break;
+      case TerrainShape.EastEdge:
+        this.drawGradientTop(shape, DirectionBit.NorthEast);
+        break;
+      case TerrainShape.SouthEdge:
+        this.drawGradientTop(shape, DirectionBit.SouthEast);
+        break;
+    }
   }
 
   generateCorner(shape: TerrainShape) {
+    this.generateFlat(shape);
     switch (shape) {
       default:
         console.error("unhandled shape");
       case TerrainShape.NorthEastCorner:
-        this.generateFlat(shape);
         this.drawGradientTop(shape, DirectionBit.North);
         break;
       case TerrainShape.SouthEastCorner:
-        this.generateFlat(shape);
         this.drawGradientTop(shape, DirectionBit.East);
         break;
       case TerrainShape.SouthWestCorner:
-        this.generateFlat(shape);
         this.drawGradientTop(shape, DirectionBit.South);
         break;
       case TerrainShape.NorthWestCorner:
-        this.generateFlat(shape);
         this.drawGradientTop(shape, DirectionBit.West);
         break;
     }
