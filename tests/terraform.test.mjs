@@ -85,9 +85,9 @@ test("corridors", () => {
   const edges = WT.findEdges(terraceGrid);
   expect(edges.length).toBe(5);
   expect(edges[0].shape).toBe(WT.EdgeShape.NorthWestCorner);
-  expect(edges[1].shape).toBe(WT.EdgeShape.NorthSouthCorridor);
+  expect(edges[1].shape).toBe(WT.EdgeShape.EastWestCorridor);
   expect(edges[2].shape).toBe(WT.EdgeShape.EastPeninsula);
-  expect(edges[3].shape).toBe(WT.EdgeShape.EastWestCorridor);
+  expect(edges[3].shape).toBe(WT.EdgeShape.NorthSouthCorridor);
   expect(edges[4].shape).toBe(WT.EdgeShape.SouthPeninsula);
 });
 

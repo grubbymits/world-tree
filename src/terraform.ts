@@ -79,12 +79,12 @@ export const enum EdgeShape {
   East, // 2
   NorthEastCorner, // 3
   South, // 4
-  NorthSouthCorridor, // 5
+  EastWestCorridor, // 5
   SouthEastCorner, // 6
   EastPeninsula, // 7
   West, // 8
   NorthWestCorner, // 9
-  EastWestCorridor, // 10
+  NorthSouthCorridor, // 10
   NorthPeninsula, // 11
   SouthWestCorner, // 12
   WestPeninsula, // 13
@@ -93,6 +93,7 @@ export const enum EdgeShape {
   Max,
 }
 
+// Also dependent on the above enum ordering.
 const blockingCardinals = new Array<Uint8Array>(
   // None,
   new Uint8Array([]),
@@ -104,7 +105,7 @@ const blockingCardinals = new Array<Uint8Array>(
   new Uint8Array([DirectionBit.North, DirectionBit.East]),
   // South,
   new Uint8Array([DirectionBit.South]),
-  // NorthSouthCorridor,
+  // EastWestCorridor,
   new Uint8Array([DirectionBit.North, DirectionBit.South]),
   // SouthEastCorner,
   new Uint8Array([DirectionBit.South, DirectionBit.East]),
@@ -114,7 +115,7 @@ const blockingCardinals = new Array<Uint8Array>(
   new Uint8Array([DirectionBit.West]),
   // NorthWestCorner,
   new Uint8Array([DirectionBit.North, DirectionBit.West]),
-  // EastWestCorridor,
+  // NorthSouthCorridor,
   new Uint8Array([DirectionBit.East, DirectionBit.West]),
   // NorthPeninsula,
   new Uint8Array([DirectionBit.North, DirectionBit.East, DirectionBit.West]),
@@ -501,6 +502,10 @@ export function buildBlockingGrid(
         cardinalDirection
       );
       const edgeHeight = terraceGrid[edge.y][edge.x];
+      console.assert(terraceGrid.length > cardinalNeighbour.y);
+      console.assert(
+        terraceGrid[cardinalNeighbour.y].length > cardinalNeighbour.x
+      );
       const neighbourHeight =
         terraceGrid[cardinalNeighbour.y][cardinalNeighbour.x];
       const heightDiff = edgeHeight - neighbourHeight;
@@ -1233,6 +1238,8 @@ class SpriteGenerator {
   private _groundColours: Map<string, string>;
   private readonly _xDelta: number;
   private readonly _yDelta: number;
+  private readonly _grad: Coord;
+  private readonly _centre: Coord;
   private _top1: Coord;
   private _top2: Coord;
   private _top3: Coord;
@@ -1286,9 +1293,20 @@ class SpriteGenerator {
 
     this._xDelta = this.width - offsetX - this.top3.x;
     this._yDelta = this.xDelta >> 1;
-    console.log("width:", this.width);
-    console.log("this.xDelta:", this.xDelta);
-    console.log("this.yDelta:", this.yDelta);
+
+    // Angle for gradients
+    const twoByOneAngle = 26.57;
+    const gradientAngle = 180 - twoByOneAngle;
+    const angle = ((180 - gradientAngle) / 180) * Math.PI;
+    const length = Math.sqrt(
+      Math.pow(this.xDelta, 2) + Math.pow(this.yDelta, 2)
+    );
+    this._centre = new Coord(this.xDelta, this.yDelta);
+    this._grad = new Coord(
+      (Math.sin(angle) * length) / 2,
+      (Math.cos(angle) * length) / 2
+    );
+
     const minX = this.width - 1;
     const minY = this.height - 1 - offsetY;
     const bottomY = minY - this.yDelta;
@@ -1397,6 +1415,12 @@ class SpriteGenerator {
   }
   get yDelta(): number {
     return this._yDelta;
+  }
+  get centre(): Coord {
+    return this._centre;
+  }
+  get grad(): Coord {
+    return this._grad;
   }
   get top1(): Coord {
     return this._top1;
@@ -1621,84 +1645,58 @@ class SpriteGenerator {
     this.ctx.fill();
   }
 
-  getBeginAndEnd(angleInDeg: number): Coord {
-    // 1. Convert CSS angle to Canvas-friendly radians
-    const angle = ((180 - angleInDeg) / 180) * Math.PI;
-
-    // 2. Calculate length to fit the container perfectly
-    //const length = Math.abs(this.width * Math.sin(angle)) +
-      //Math.abs(this.yDelta * 2 * Math.cos(angle));
-
-    const length = Math.sqrt(Math.pow(this.xDelta, 2) + Math.pow(this.yDelta, 2));
-
-    /*
-    // 3. Find start and end points relative to center
-    const cx = this.xDelta;
-    const cy = this.yDelta;
-    const x1 = cx - (Math.sin(angle) * length) / 2;
-    const y1 = cy - (Math.cos(angle) * length) / 2;
-    const x2 = cx + (Math.sin(angle) * length) / 2;
-    const y2 = cy + (Math.cos(angle) * length) / 2;
-
-    return [ new Coord(x1, y1), new Coord(x2, y2) ];
-    */
-    return new Coord((Math.sin(angle) * length) / 2,
-                     (Math.cos(angle) * length) / 2);
-  }
-
-
   drawGradientTop(shape: TerrainShape, shadowDirection: DirectionBit) {
     let begin: Coord;
     let end: Coord;
-    const angleInDeg = 26.57;
-    const northEastAngle = angleInDeg;
-    const southEastAngle = angleInDeg;
-    const southWestAngle = angleInDeg;
-    const northWestAngle = angleInDeg;
 
-    const cx = this.xDelta;
-    const cy = this.yDelta;
+    // Change mode to keep the layers of shadows.
+    this.ctx.globalCompositeOperation = "darken";
+
     switch (shadowDirection) {
       default:
         console.error("unhandled direction");
-      case DirectionBit.North:
-        begin = this.top2;
-        end = this.mid2;
-        break;
       case DirectionBit.NorthEast: {
-        const dxy = this.getBeginAndEnd(northEastAngle);
-        begin = new Coord(cx + dxy.x, cy - dxy.y);
-        end = new Coord(cx - dxy.x, cy + dxy.y);
+        begin = new Coord(
+          this.centre.x + this.grad.x,
+          this.centre.y - this.grad.y
+        );
+        end = new Coord(
+          this.centre.x - this.grad.x,
+          this.centre.y + this.grad.y
+        );
         break;
       }
-      case DirectionBit.East:
-        begin = this.topRight;
-        end = this.topLeft;
-        break;
       case DirectionBit.SouthEast: {
-        const dxy = this.getBeginAndEnd(southEastAngle);
-        begin = new Coord(cx + dxy.x, cy + dxy.y);
-        end = new Coord(cx - dxy.x, cy - dxy.y);
+        begin = new Coord(
+          this.centre.x + this.grad.x,
+          this.centre.y + this.grad.y
+        );
+        end = new Coord(
+          this.centre.x - this.grad.x,
+          this.centre.y - this.grad.y
+        );
         break;
       }
-      case DirectionBit.South:
-        begin = this.mid2;
-        end = this.top2;
-        break;
       case DirectionBit.SouthWest: {
-        const dxy = this.getBeginAndEnd(southWestAngle);
-        begin = new Coord(cx - dxy.x, cy + dxy.y);
-        end = new Coord(cx + dxy.x, cy - dxy.y);
+        begin = new Coord(
+          this.centre.x - this.grad.x,
+          this.centre.y + this.grad.y
+        );
+        end = new Coord(
+          this.centre.x + this.grad.x,
+          this.centre.y - this.grad.y
+        );
         break;
       }
-      case DirectionBit.West:
-        begin = this.topLeft;
-        end = this.topRight;
-        break;
       case DirectionBit.NorthWest: {
-        const dxy = this.getBeginAndEnd(northWestAngle);
-        begin = new Coord(cx - dxy.x, cy - dxy.y);
-        end = new Coord(cx + dxy.x, cy + dxy.y);
+        begin = new Coord(
+          this.centre.x - this.grad.x,
+          this.centre.y - this.grad.y
+        );
+        end = new Coord(
+          this.centre.x + this.grad.x,
+          this.centre.y + this.grad.y
+        );
         break;
       }
     }
@@ -1716,6 +1714,7 @@ class SpriteGenerator {
       this.top2
     );
 
+    const stopGap = 0.1;
     for (let i = 0; i < this.colours.length; ++i) {
       const topColour = this.colours[i];
       const offset = new Coord(this.width * shape, this.height * i);
@@ -1725,10 +1724,10 @@ class SpriteGenerator {
         end.x + offset.x,
         end.y + offset.y
       );
-      gradient.addColorStop(0, this.partialShadow(RGB.fromHex('#FF00FF').toHSL().toString()));
-      //gradient.addColorStop(0.2, topColour);
-      //gradient.addColorStop(0.3, this.partialBright(topColour));
-      gradient.addColorStop(0.4, this.fullBright(topColour));
+      gradient.addColorStop(0, this.partialShadow(topColour));
+      gradient.addColorStop(1 * stopGap, topColour);
+      gradient.addColorStop(2 * stopGap, this.partialBright(topColour));
+      gradient.addColorStop(3 * stopGap, this.fullBright(topColour));
       this.drawGradientSide(
         coords,
         this.fullBright(topColour),
@@ -1736,6 +1735,9 @@ class SpriteGenerator {
         offset
       );
     }
+
+    // reset to default drawing mode.
+    this.ctx.globalCompositeOperation = "source-over";
   }
 
   generateFlat(shape: TerrainShape) {
@@ -1910,7 +1912,8 @@ class SpriteGenerator {
   generateEdge(shape: TerrainShape) {
     this.generateFlat(shape);
     switch (shape) {
-      default: console.error('unhandled shape');
+      default:
+        console.error("unhandled shape");
       case TerrainShape.NorthEdge:
         this.drawGradientTop(shape, DirectionBit.NorthWest);
         break;
@@ -1932,30 +1935,74 @@ class SpriteGenerator {
       default:
         console.error("unhandled shape");
       case TerrainShape.NorthEastCorner:
-        this.drawGradientTop(shape, DirectionBit.North);
+        this.drawGradientTop(shape, DirectionBit.NorthWest);
+        this.drawGradientTop(shape, DirectionBit.NorthEast);
         break;
       case TerrainShape.SouthEastCorner:
-        this.drawGradientTop(shape, DirectionBit.East);
+        this.drawGradientTop(shape, DirectionBit.NorthEast);
+        this.drawGradientTop(shape, DirectionBit.SouthEast);
         break;
       case TerrainShape.SouthWestCorner:
-        this.drawGradientTop(shape, DirectionBit.South);
+        this.drawGradientTop(shape, DirectionBit.SouthEast);
+        this.drawGradientTop(shape, DirectionBit.SouthWest);
         break;
       case TerrainShape.NorthWestCorner:
-        this.drawGradientTop(shape, DirectionBit.West);
+        this.drawGradientTop(shape, DirectionBit.SouthWest);
+        this.drawGradientTop(shape, DirectionBit.NorthWest);
         break;
     }
   }
 
   generateCorridor(shape: TerrainShape) {
     this.generateFlat(shape);
+    switch (shape) {
+      default:
+        console.error("unhandled shape");
+      case TerrainShape.NorthSouthCorridor:
+        this.drawGradientTop(shape, DirectionBit.NorthEast);
+        this.drawGradientTop(shape, DirectionBit.SouthWest);
+        break;
+      case TerrainShape.EastWestCorridor:
+        this.drawGradientTop(shape, DirectionBit.NorthWest);
+        this.drawGradientTop(shape, DirectionBit.SouthEast);
+        break;
+    }
   }
 
   generateSpire() {
     const shape = TerrainShape.Spire;
     this.generateFlat(shape);
+    this.drawGradientTop(shape, DirectionBit.NorthEast);
+    this.drawGradientTop(shape, DirectionBit.SouthEast);
+    this.drawGradientTop(shape, DirectionBit.SouthWest);
+    this.drawGradientTop(shape, DirectionBit.NorthWest);
   }
 
   generatePeninsula(shape: TerrainShape) {
     this.generateFlat(shape);
+    switch (shape) {
+      default:
+        console.error("unhandled shape");
+      case TerrainShape.NorthPeninsula:
+        this.drawGradientTop(shape, DirectionBit.NorthWest);
+        this.drawGradientTop(shape, DirectionBit.NorthEast);
+        this.drawGradientTop(shape, DirectionBit.SouthWest);
+        break;
+      case TerrainShape.EastPeninsula:
+        this.drawGradientTop(shape, DirectionBit.NorthWest);
+        this.drawGradientTop(shape, DirectionBit.NorthEast);
+        this.drawGradientTop(shape, DirectionBit.SouthEast);
+        break;
+      case TerrainShape.SouthPeninsula:
+        this.drawGradientTop(shape, DirectionBit.NorthEast);
+        this.drawGradientTop(shape, DirectionBit.SouthEast);
+        this.drawGradientTop(shape, DirectionBit.SouthWest);
+        break;
+      case TerrainShape.WestPeninsula:
+        this.drawGradientTop(shape, DirectionBit.NorthWest);
+        this.drawGradientTop(shape, DirectionBit.SouthEast);
+        this.drawGradientTop(shape, DirectionBit.SouthWest);
+        break;
+    }
   }
 }
