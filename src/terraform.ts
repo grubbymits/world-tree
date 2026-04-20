@@ -1621,14 +1621,17 @@ class SpriteGenerator {
     this.ctx.fill();
   }
 
-  getBeginAndEnd(angleInDeg: number): Array<Coord> {
+  getBeginAndEnd(angleInDeg: number): Coord {
     // 1. Convert CSS angle to Canvas-friendly radians
     const angle = ((180 - angleInDeg) / 180) * Math.PI;
 
     // 2. Calculate length to fit the container perfectly
-    const length = Math.abs(this.width * Math.sin(angle)) +
-      Math.abs(this.yDelta * 2 * Math.cos(angle));
+    //const length = Math.abs(this.width * Math.sin(angle)) +
+      //Math.abs(this.yDelta * 2 * Math.cos(angle));
 
+    const length = Math.sqrt(Math.pow(this.xDelta, 2) + Math.pow(this.yDelta, 2));
+
+    /*
     // 3. Find start and end points relative to center
     const cx = this.xDelta;
     const cy = this.yDelta;
@@ -1638,6 +1641,9 @@ class SpriteGenerator {
     const y2 = cy + (Math.cos(angle) * length) / 2;
 
     return [ new Coord(x1, y1), new Coord(x2, y2) ];
+    */
+    return new Coord((Math.sin(angle) * length) / 2,
+                     (Math.cos(angle) * length) / 2);
   }
 
 
@@ -1645,11 +1651,13 @@ class SpriteGenerator {
     let begin: Coord;
     let end: Coord;
     const angleInDeg = 26.57;
-    const northEastAngle = angleInDeg + 270;
-    const southEastAngle = angleInDeg + 180;
-    const southWestAngle = angleInDeg + 90;
+    const northEastAngle = angleInDeg;
+    const southEastAngle = angleInDeg;
+    const southWestAngle = angleInDeg;
     const northWestAngle = angleInDeg;
 
+    const cx = this.xDelta;
+    const cy = this.yDelta;
     switch (shadowDirection) {
       default:
         console.error("unhandled direction");
@@ -1658,9 +1666,9 @@ class SpriteGenerator {
         end = this.mid2;
         break;
       case DirectionBit.NorthEast: {
-        const coords = this.getBeginAndEnd(northEastAngle);
-        begin = coords[0];
-        end = coords[1];
+        const dxy = this.getBeginAndEnd(northEastAngle);
+        begin = new Coord(cx + dxy.x, cy - dxy.y);
+        end = new Coord(cx - dxy.x, cy + dxy.y);
         break;
       }
       case DirectionBit.East:
@@ -1668,18 +1676,31 @@ class SpriteGenerator {
         end = this.topLeft;
         break;
       case DirectionBit.SouthEast: {
-        const coords = this.getBeginAndEnd(southEastAngle);
-        begin = coords[0];
-        end = coords[1];
+        const dxy = this.getBeginAndEnd(southEastAngle);
+        begin = new Coord(cx + dxy.x, cy + dxy.y);
+        end = new Coord(cx - dxy.x, cy - dxy.y);
         break;
       }
       case DirectionBit.South:
         begin = this.mid2;
         end = this.top2;
         break;
+      case DirectionBit.SouthWest: {
+        const dxy = this.getBeginAndEnd(southWestAngle);
+        begin = new Coord(cx - dxy.x, cy + dxy.y);
+        end = new Coord(cx + dxy.x, cy - dxy.y);
+        break;
+      }
       case DirectionBit.West:
         begin = this.topLeft;
         end = this.topRight;
+        break;
+      case DirectionBit.NorthWest: {
+        const dxy = this.getBeginAndEnd(northWestAngle);
+        begin = new Coord(cx - dxy.x, cy - dxy.y);
+        end = new Coord(cx + dxy.x, cy + dxy.y);
+        break;
+      }
     }
 
     const coords = new Array<Coord>(
@@ -1704,9 +1725,9 @@ class SpriteGenerator {
         end.x + offset.x,
         end.y + offset.y
       );
-      gradient.addColorStop(0, this.partialShadow(topColour));
-      gradient.addColorStop(0.2, topColour);
-      gradient.addColorStop(0.3, this.partialBright(topColour));
+      gradient.addColorStop(0, this.partialShadow(RGB.fromHex('#FF00FF').toHSL().toString()));
+      //gradient.addColorStop(0.2, topColour);
+      //gradient.addColorStop(0.3, this.partialBright(topColour));
       gradient.addColorStop(0.4, this.fullBright(topColour));
       this.drawGradientSide(
         coords,
@@ -1889,12 +1910,18 @@ class SpriteGenerator {
   generateEdge(shape: TerrainShape) {
     this.generateFlat(shape);
     switch (shape) {
-      default: break;
+      default: console.error('unhandled shape');
+      case TerrainShape.NorthEdge:
+        this.drawGradientTop(shape, DirectionBit.NorthWest);
+        break;
       case TerrainShape.EastEdge:
         this.drawGradientTop(shape, DirectionBit.NorthEast);
         break;
       case TerrainShape.SouthEdge:
         this.drawGradientTop(shape, DirectionBit.SouthEast);
+        break;
+      case TerrainShape.WestEdge:
+        this.drawGradientTop(shape, DirectionBit.SouthWest);
         break;
     }
   }
