@@ -12,36 +12,39 @@
 
   const width = 20;
   const depth = 20;
-  const scale = 4;
-  const factor = 3;
+  const scale = 2;
+  const H = 0.1;
+  const octaves = 4;
   const numTerraces = 3;
-  const lattice = new WT.GradientNoise(width, depth, scale, factor);
-  const worldDescriptor = {
-    canvasName: "demoCanvas",
-    projection: "TwoByOneIsometric",
-    heightMap: lattice.valueGradientNoise(),
-    numTerraces: numTerraces,
-    hasRamps: true,
-    defaultTerrainType: WT.TerrainType.DryGrass,
-    biomeConfig: {
-      waterLine: 1,
-      rainfall: 50,
-      rainDirection: WT.Direction.North,
-      uplandThreshold: 4,
-    },
-    terrainSpriteDescriptor: {
-      spriteWidth: 160,
-      spriteHeight: 120,
-      snowColour: '#D2D2CF',
-      sandColour: '#B1B191',
-      rockColour: '#ADAD9F',
-      soilColour: '#836F49',
-      grassColour: '#9DA17C',
-      waterColour: '#5B80A4',
-    },
-  };
+  const offset_x = 1023;
+  const offset_y = 990;
 
   window.onload = async (event) => {
+    const lattice = await WT.GradientNoise(width, depth, offset_x, offset_y, H, scale, octaves);
+    const worldDescriptor = {
+      canvasName: "demoCanvas",
+      projection: "TwoByOneIsometric",
+      heightMap: lattice,
+      numTerraces: numTerraces,
+      hasRamps: true,
+      defaultTerrainType: WT.TerrainType.DryGrass,
+      biomeConfig: {
+        waterLine: 1,
+        rainfall: 50,
+        rainDirection: WT.Direction.North,
+        uplandThreshold: 4,
+      },
+      terrainSpriteDescriptor: {
+        spriteWidth: 160,
+        spriteHeight: 120,
+        snowColour: '#D2D2CF',
+        sandColour: '#B1B191',
+        rockColour: '#ADAD9F',
+        soilColour: '#836F49',
+        grassColour: '#9DA17C',
+        waterColour: '#5B80A4',
+      },
+    };
     const context = await WT.createWorld(worldDescriptor);
     const canvas = document.getElementById("demoCanvas");
     const camera = new WT.MouseCamera(
