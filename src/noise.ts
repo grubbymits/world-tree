@@ -3,31 +3,33 @@ export interface NoiseFunction {
 }
 
 export interface NoiseGenerator {
-  (x: number,
-   y: number,
-   freq: number,
-   G: number,
-   octaves: number,
-   noise2d: NoiseFunction): number;
+  (
+    x: number,
+    y: number,
+    freq: number,
+    G: number,
+    octaves: number,
+    noise2d: NoiseFunction
+  ): number;
 }
 
 export class Noise {
-
   private static _cached: Noise;
 
   static async Create(): Promise<Noise> {
     if (this._cached != undefined) {
       return this._cached;
     }
-    return WebAssembly.instantiateStreaming(fetch("../dist/noise.wasm"), {}).then(
-      (obj) => {
-        this._cached = new Noise(obj.instance);
-        return this._cached;
-      }
-    );
+    return WebAssembly.instantiateStreaming(
+      fetch("../dist/noise.wasm"),
+      {}
+    ).then((obj) => {
+      this._cached = new Noise(obj.instance);
+      return this._cached;
+    });
   }
 
-  private constructor(private readonly _wasm_instance: WebAssembly.Instance) { }
+  private constructor(private readonly _wasm_instance: WebAssembly.Instance) {}
 
   get wasm_instance(): WebAssembly.Instance {
     return this._wasm_instance;
@@ -43,12 +45,14 @@ export class Noise {
   }
 }
 
-export function Fbm(x: number,
-                    y: number,
-                    freq: number,
-                    G: number,
-                    octaves: number,
-                    noise2d: NoiseFunction): number {
+export function Fbm(
+  x: number,
+  y: number,
+  freq: number,
+  G: number,
+  octaves: number,
+  noise2d: NoiseFunction
+): number {
   let a = 1.0;
   let t = 0.0;
   let total_square_a = 0.0;
@@ -63,16 +67,17 @@ export function Fbm(x: number,
     a *= G;
   }
   console.assert(total_square_a);
-  return t /= Math.sqrt(total_square_a);
+  return (t /= Math.sqrt(total_square_a));
 }
-  
-export function FbmMulti(x: number,
-                         y: number,
-                         freq: number,
-                         G: number,
-                         octaves: number,
-                         noise2d: NoiseFunction): number {
-  
+
+export function FbmMulti(
+  x: number,
+  y: number,
+  freq: number,
+  G: number,
+  octaves: number,
+  noise2d: NoiseFunction
+): number {
   let a = 1.0;
   let t = 0.0;
   let total_square_a = 0.0;
@@ -91,15 +96,17 @@ export function FbmMulti(x: number,
     a *= G;
   }
   console.assert(total_square_a);
-  return t /= Math.sqrt(total_square_a);
+  return (t /= Math.sqrt(total_square_a));
 }
 
-export function Turbulence(x: number,
-                           y: number,
-                           freq: number,
-                           G: number,
-                           octaves: number,
-                           noise2d: NoiseFunction): number {
+export function Turbulence(
+  x: number,
+  y: number,
+  freq: number,
+  G: number,
+  octaves: number,
+  noise2d: NoiseFunction
+): number {
   let a = 1.0;
   let t = 0.0;
   const lac = Math.pow(Math.LOG2E, 2);
@@ -111,12 +118,14 @@ export function Turbulence(x: number,
   return t;
 }
 
-export function Ridged(x: number,
-                       y: number,
-                       freq: number,
-                       G: number,
-                       octaves: number,
-                       noise2d: NoiseFunction): number {
+export function Ridged(
+  x: number,
+  y: number,
+  freq: number,
+  G: number,
+  octaves: number,
+  noise2d: NoiseFunction
+): number {
   let a = 1.0;
   let t = 0.0;
   const lac = Math.pow(Math.LOG2E, 2);
@@ -127,13 +136,15 @@ export function Ridged(x: number,
   }
   return t;
 }
- 
-export function RidgedMulti(x: number,
-                            y: number,
-                            freq: number,
-                            G: number,
-                            octaves: number,
-                            noise2d: NoiseFunction): number {
+
+export function RidgedMulti(
+  x: number,
+  y: number,
+  freq: number,
+  G: number,
+  octaves: number,
+  noise2d: NoiseFunction
+): number {
   const baseline = 1.0;
   const gain = 2.0;
   let a = 1.0;
@@ -156,32 +167,35 @@ export function RidgedMulti(x: number,
   }
   return t;
 }
-  /*
-  domain_warp(x: number,
-              y: number,
-              offset_x: number,
-              offset_y: number,
-              freq: number,
-              G: number,
-              octaves: number,
-              gen_func) {
-    // https://iquilezles.org/articles/warp/
-    const nx = fbm(x: y, offset_x, offset_y, freq, G, octaves);
-    const ny = fbm(x + 5.2, y + 1.3, offset_x, offset_y, freq, G, octaves);
-    return gen_func(x + nx * 4.0, y + ny * 4.0, offset_x, offset_y, freq, G,
-                    octaves);
-  }
-  */
 
-function NoiseLattice(width: number,
-                      height: number,
-                      offset_x: number,
-                      offset_y: number,
-                      H: number,
-                      freq: number,
-                      octaves: number,
-                      noise_generator: NoiseGenerator,
-                      noise2d: NoiseFunction): Array<Float32Array> {
+export function DomainWarp(
+  x: number,
+  y: number,
+  offset_x: number,
+  offset_y: number,
+  freq: number,
+  G: number,
+  octaves: number,
+  noise_generator: NoiseGenerator,
+  noise2d: NoiseFunction
+) {
+  // https://iquilezles.org/articles/warp/
+  const nx = noise_generator(x, y, freq, G, octaves, noise2d);
+  const ny = noise_generator(x + 5.2, y + 1.3, freq, G, octaves, noise2d);
+  return noise_generator(x + nx * 4.0, y + ny * 4.0, freq, G, octaves, noise2d);
+}
+
+function NoiseGrid(
+  width: number,
+  height: number,
+  offset_x: number,
+  offset_y: number,
+  H: number,
+  freq: number,
+  octaves: number,
+  noise_generator: NoiseGenerator,
+  noise2d: NoiseFunction
+): Array<Float32Array> {
   const lattice = new Array<Float32Array>();
   const G = Math.pow(2, -H);
 
@@ -194,25 +208,27 @@ function NoiseLattice(width: number,
         freq,
         G,
         octaves,
-        noise2d,
+        noise2d
       );
     }
   }
   return lattice;
 }
 
-export async function GradientNoise(width: number,
-                                    height: number,
-                                    offset_x: number,
-                                    offset_y: number,
-                                    H: number,
-                                    freq: number,
-                                    octaves: number): Promise<Array<Float32Array>> {
+export async function AdditiveNoiseGrid(
+  width: number,
+  height: number,
+  offset_x: number,
+  offset_y: number,
+  H: number,
+  freq: number,
+  octaves: number
+): Promise<Array<Float32Array>> {
   console.assert(offset_x >= 1);
   console.assert(offset_y >= 1);
-  
+
   return Noise.Create().then((noise) =>
-    NoiseLattice(
+    NoiseGrid(
       width,
       height,
       offset_x,
@@ -221,7 +237,34 @@ export async function GradientNoise(width: number,
       freq,
       octaves,
       Fbm,
-      noise.quintic_fade,
-    ),
+      noise.quintic_fade
+    )
+  );
+}
+
+export async function MultiplicativeNoiseGrid(
+  width: number,
+  height: number,
+  offset_x: number,
+  offset_y: number,
+  H: number,
+  freq: number,
+  octaves: number
+): Promise<Array<Float32Array>> {
+  console.assert(offset_x >= 1);
+  console.assert(offset_y >= 1);
+
+  return Noise.Create().then((noise) =>
+    NoiseGrid(
+      width,
+      height,
+      offset_x,
+      offset_y,
+      H,
+      freq,
+      octaves,
+      FbmMulti,
+      noise.quintic_fade
+    )
   );
 }

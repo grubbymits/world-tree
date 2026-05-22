@@ -12,19 +12,19 @@
 
   const width = 20;
   const depth = 20;
-  const scale = 2;
-  const H = 0.1;
+  const scale = 0.05;
+  const H = 0.5;
   const octaves = 4;
   const numTerraces = 3;
   const offset_x = 1023;
   const offset_y = 990;
 
   window.onload = async (event) => {
-    const lattice = await WT.GradientNoise(width, depth, offset_x, offset_y, H, scale, octaves);
+    const heightMap = await WT.MultiplicativeNoiseGrid(width, depth, offset_x, offset_y, H, scale, octaves);
     const worldDescriptor = {
       canvasName: "demoCanvas",
       projection: "TwoByOneIsometric",
-      heightMap: lattice,
+      heightMap: heightMap,
       numTerraces: numTerraces,
       hasRamps: true,
       defaultTerrainType: WT.TerrainType.DryGrass,
