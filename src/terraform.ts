@@ -705,7 +705,6 @@ export function normaliseHeightGrid(
     minHeight = Math.min(minHeight, min);
     maxHeight = Math.max(maxHeight, max);
   }
-  console.log('Normalising height. Min,Max =', minHeight, maxHeight);
   if (minHeight < 0) {
     minHeight = Math.abs(minHeight);
     for (let y = 0; y < cellsY; y++) {

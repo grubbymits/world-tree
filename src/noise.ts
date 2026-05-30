@@ -13,6 +13,18 @@ export interface NoiseGenerator {
   ): number;
 }
 
+export interface NoiseWarper {
+  (
+    x: number,
+    y: number,
+    freq: number,
+    G: number,
+    octaves: number,
+    noise_generator: NoiseGenerator,
+    noise2d: NoiseFunction
+  ): number;
+}
+
 export class Noise {
   private static _cached: Noise;
 
@@ -171,8 +183,6 @@ export function RidgedMulti(
 export function DomainWarp(
   x: number,
   y: number,
-  offset_x: number,
-  offset_y: number,
   freq: number,
   G: number,
   octaves: number,
@@ -183,6 +193,22 @@ export function DomainWarp(
   const nx = noise_generator(x, y, freq, G, octaves, noise2d);
   const ny = noise_generator(x + 5.2, y + 1.3, freq, G, octaves, noise2d);
   return noise_generator(x + nx * 4.0, y + ny * 4.0, freq, G, octaves, noise2d);
+}
+
+export function IsometricRepeat(
+  x: number,
+  y: number,
+  freq: number,
+  G: number,
+  octaves: number,
+  noise_generator: NoiseGenerator,
+  noise2d: NoiseFunction
+) {
+  const n = noise_generator(x, y, freq, G, octaves, noise2d);
+  const nx = 2 * x + n;
+  const ny = y + n;
+  const nf = Math.PI * 2 * freq;
+  return Math.sin((nx + ny) * nf) * Math.cos((nx + ny) * nf);
 }
 
 function NoiseGrid(
@@ -264,6 +290,66 @@ export async function MultiplicativeNoiseGrid(
       freq,
       octaves,
       FbmMulti,
+      noise.quintic_fade
+    )
+  );
+}
+
+function WarpedNoiseGrid(
+  width: number,
+  height: number,
+  offset_x: number,
+  offset_y: number,
+  H: number,
+  freq: number,
+  octaves: number,
+  noise_warper: NoiseWarper,
+  noise_generator: NoiseGenerator,
+  noise2d: NoiseFunction
+): Array<Float32Array> {
+  const lattice = new Array<Float32Array>();
+  const G = Math.pow(2, -H);
+
+  for (let y = 0; y < height; ++y) {
+    lattice[y] = new Float32Array(width);
+    for (let x = 0; x < width; ++x) {
+      lattice[y][x] = noise_warper(
+        x + offset_x,
+        y + offset_y,
+        freq,
+        G,
+        octaves,
+        noise_generator,
+        noise2d
+      );
+    }
+  }
+  return lattice;
+}
+
+export async function RepeatingIsometricNoiseGrid(
+  width: number,
+  height: number,
+  offset_x: number,
+  offset_y: number,
+  H: number,
+  freq: number,
+  octaves: number
+): Promise<Array<Float32Array>> {
+  console.assert(offset_x >= 1);
+  console.assert(offset_y >= 1);
+
+  return Noise.Create().then((noise) =>
+    WarpedNoiseGrid(
+      width,
+      height,
+      offset_x,
+      offset_y,
+      H,
+      freq,
+      octaves,
+      IsometricRepeat,
+      Fbm,
       noise.quintic_fade
     )
   );

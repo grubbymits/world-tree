@@ -20,7 +20,7 @@
   const offset_y = 990;
 
   window.onload = async (event) => {
-    const heightMap = await WT.MultiplicativeNoiseGrid(width, depth, offset_x, offset_y, H, scale, octaves);
+    const heightMap = await WT.RepeatingIsometricNoiseGrid(width, depth, offset_x, offset_y, H, scale, octaves);
     const worldDescriptor = {
       canvasName: "demoCanvas",
       projection: "TwoByOneIsometric",
