@@ -17,22 +17,21 @@ std::unique_ptr<EdgeContainer> findEdges(TerraceGrid& terraceGrid) {
     for (uint32_t centreX = 0; centreX < maxX; ++centreX) {
       const uint8_t centreTerrace = terraceGrid[centreY][centreX];
       uint8_t centreEdges = static_cast<uint8_t>(edge::Shape::None);
+      const Coord centre(centreX, centreY);
       for (uint32_t i = 0; i < 4; ++i) {
-        const Coord offset = neighbour::offsets[i];
-        const uint32_t neighbourX = centreX + offset.x;
-        const uint32_t neighbourY = centreY + offset.y;
+        const Coord neighbour = neighbour::get(centre, i);
 
         if (
-          neighbourX < 0 ||
-          neighbourX >= maxX ||
-          neighbourY < 0 ||
-          neighbourY >= maxY
+          neighbour.x < 0 ||
+          neighbour.x >= maxX ||
+          neighbour.y < 0 ||
+          neighbour.y >= maxY
         ) {
           continue;
         }
 
         // This assignment defines the values of edge::Shape::
-        if (terraceGrid[neighbourY][neighbourX] < centreTerrace) {
+        if (terraceGrid[neighbour.y][neighbour.x] < centreTerrace) {
           // north = 1;
           // east = 2;
           // south = 4;
@@ -45,10 +44,10 @@ std::unique_ptr<EdgeContainer> findEdges(TerraceGrid& terraceGrid) {
       if (shape == edge::Shape::None) {
         continue;
       }
-      edges->emplace(centreX, centreY, shape);
+      edges->emplace(Coord(centre.x, centre.y), shape);
     }
   }
-  return std::make_unique<EdgeContainer>(edges);
+  return std::make_unique<EdgeContainer>(*edges);
 }
 
 std::unique_ptr<RampContainer> findRamps(const TerraceGrid terraceGrid,
@@ -92,7 +91,7 @@ std::unique_ptr<RampContainer> findRamps(const TerraceGrid terraceGrid,
 
   auto areNeighbourTerracesEqual = [&avoidEdgeAt, &distance, &terraceGrid](
       uint32_t x, uint32_t y, neighbour::Cardinal direction) {
-    const Coord offset = neighbour::offsets[static_cast<uint8_t>(direction)];
+    const Coord offset = neighbour::offset(direction);
     const uint32_t closestNeighbourX = x + offset.x;
     const uint32_t closestNeighbourY = y + offset.y;
     if (avoidEdgeAt(closestNeighbourX, closestNeighbourY)) {
@@ -112,7 +111,7 @@ std::unique_ptr<RampContainer> findRamps(const TerraceGrid terraceGrid,
 
   auto areNeighbourTerracesLower = [&avoidEdgeAt, &distance, &terraceGrid](
       uint32_t x, uint32_t y, neighbour::Cardinal direction) {
-    const Coord offset = neighbour::offsets[static_cast<uint8_t>(direction)];
+    const Coord offset = neighbour::offset(direction);
     const uint32_t closestNeighbourX = x + offset.x;
     const uint32_t closestNeighbourY = y + offset.y;
     if (avoidEdgeAt(closestNeighbourX, closestNeighbourY)) {
@@ -145,7 +144,7 @@ std::unique_ptr<RampContainer> findRamps(const TerraceGrid terraceGrid,
           areNeighbourTerracesLower(x, y, Cardinal::North) &&
           areNeighbourTerracesEqual(x, y, Cardinal::South)
         ) {
-          ramps->emplace(x, y, ramp::Shape::South);
+          ramps->emplace(Coord(x, y), ramp::Shape::South);
         }
         break;
       case edge::Shape::South:
@@ -154,7 +153,7 @@ std::unique_ptr<RampContainer> findRamps(const TerraceGrid terraceGrid,
           areNeighbourTerracesLower(x, y, Cardinal::South) &&
           areNeighbourTerracesEqual(x, y, Cardinal::North)
         ) {
-          ramps->emplace(x, y, ramp::Shape::North);
+          ramps->emplace(Coord(x, y), ramp::Shape::North);
         }
         break;
       case edge::Shape::East:
@@ -163,7 +162,7 @@ std::unique_ptr<RampContainer> findRamps(const TerraceGrid terraceGrid,
           areNeighbourTerracesLower(x, y, Cardinal::East) &&
           areNeighbourTerracesEqual(x, y, Cardinal::West)
         ) {
-          ramps->emplace(x, y, ramp::Shape::West);
+          ramps->emplace(Coord(x, y), ramp::Shape::West);
         }
         break;
       case edge::Shape::West:
@@ -172,7 +171,7 @@ std::unique_ptr<RampContainer> findRamps(const TerraceGrid terraceGrid,
           areNeighbourTerracesLower(x, y, Cardinal::West) &&
           areNeighbourTerracesEqual(x, y, Cardinal::East)
         ) {
-          ramps->emplace(x, y, ramp::Shape::East);
+          ramps->emplace(Coord(x, y), ramp::Shape::East);
         }
         break;
     }
@@ -194,17 +193,140 @@ std::unique_ptr<RampContainer> findRamps(const TerraceGrid terraceGrid,
     const uint32_t x = coord.x;
     const uint32_t y = coord.y;
     switch (shape) {
+      case ramp::Shape::Max: break;
       case ramp::Shape::North:
       case ramp::Shape::South:
-        addEdge(getNeighbour(coord, Cardinal::East), edge::Shape::West);
-        addEdge(getNeighbour(coord, Cardinal::West), edge::Shape::East);
+        addEdge(neighbour::get(coord, Cardinal::East), edge::Shape::West);
+        addEdge(neighbour::get(coord, Cardinal::West), edge::Shape::East);
         break;
       case ramp::Shape::East:
       case ramp::Shape::West:
-        addEdge(getNeighbour(coord, Cardinal::North), edge::Shape::South);
-        addEdge(getNeighbour(coord, Cardinal::South), edge::Shape::North);
+        addEdge(neighbour::get(coord, Cardinal::North), edge::Shape::South);
+        addEdge(neighbour::get(coord, Cardinal::South), edge::Shape::North);
         break;
     }
   }
-  return std::make_unique<RampContainer>(ramps);
+  return std::make_unique<RampContainer>(*ramps);
+}
+
+std::unique<BlockingGrid> buildBlockingGrid(
+  TerraceGrid terraceGrid,
+  const EdgeContainer& edges,
+  const RampContainer& ramps,
+  bool blockingRamps = false,
+  uint32_t blockingUpHeight = 1,
+  uint32_t blockingDownHeight = 1) {
+  // Initialise new grid
+  const blockingGrid = new Array<Uint8Array>();
+  for (let i = 0; i < terraceGrid.length; ++i) {
+    blockingGrid.push(new Uint8Array(terraceGrid[i].length));
+  }
+
+  // Top edge
+  for (let x = 0; x < blockingGrid[0].length; ++x) {
+    blockingGrid[0][x] |=
+      DirectionBit.North | DirectionBit.NorthWest | DirectionBit.NorthEast;
+  }
+  // Bottom edge
+  for (let x = 0; x < blockingGrid[blockingGrid.length - 1].length; ++x) {
+    const y = blockingGrid.length - 1;
+    blockingGrid[y][x] |=
+      DirectionBit.South | DirectionBit.SouthWest | DirectionBit.SouthEast;
+  }
+  // Left edge
+  for (let y = 0; y < blockingGrid.length; ++y) {
+    blockingGrid[y][0] |=
+      DirectionBit.West | DirectionBit.NorthWest | DirectionBit.SouthWest;
+  }
+  // Right edge
+  for (let y = 0; y < blockingGrid.length; ++y) {
+    const x = blockingGrid[y].length - 1;
+    blockingGrid[y][x] |=
+      DirectionBit.East | DirectionBit.NorthEast | DirectionBit.SouthEast;
+  }
+
+  // Nothing to do.
+  if (blockingUpHeight < 1 && blockingDownHeight < 1) {
+    return blockingGrid;
+  }
+
+  for (let edge of edges) {
+    for (let cardinalDirection of blockingCardinals[edge.shape]) {
+      const cardinalNeighbour: Coord = getNeighbourCoord(
+        edge.x,
+        edge.y,
+        cardinalDirection
+      );
+      const edgeHeight = terraceGrid[edge.y][edge.x];
+      console.assert(terraceGrid.length > cardinalNeighbour.y);
+      console.assert(
+        terraceGrid[cardinalNeighbour.y].length > cardinalNeighbour.x
+      );
+      const neighbourHeight =
+        terraceGrid[cardinalNeighbour.y][cardinalNeighbour.x];
+      const heightDiff = edgeHeight - neighbourHeight;
+
+      const otherDirections = [
+        rotateRight(cardinalDirection, 1),
+        rotateLeft(cardinalDirection, 1),
+      ];
+      const allDirections = [
+        rotateRight(cardinalDirection, 1),
+        cardinalDirection,
+        rotateLeft(cardinalDirection, 1),
+      ];
+
+      if (heightDiff >= blockingUpHeight) {
+        // Block the cardinal neighbour by all directions.
+        for (let d of allDirections) {
+          const fromDirectionBit = getOpposite(d);
+          // block the cardinal neighbour
+          blockingGrid[cardinalNeighbour.y][cardinalNeighbour.x] |=
+            fromDirectionBit;
+
+          // block the neighbours of the cardinal neighbour, including this edge.
+          const neighbour = getNeighbourCoord(
+            cardinalNeighbour.x,
+            cardinalNeighbour.y,
+            fromDirectionBit
+          );
+          if (inrange(neighbour, blockingGrid)) {
+            blockingGrid[neighbour.y][neighbour.x] |= d;
+          }
+        }
+        // Block the other, diagonal, neighbours too.
+        for (let d of otherDirections) {
+          const fromDirectionBit = getOpposite(d);
+          const neighbour: Coord = getNeighbourCoord(edge.x, edge.y, d);
+          if (inrange(neighbour, terraceGrid)) {
+            blockingGrid[neighbour.y][neighbour.x] |= fromDirectionBit;
+          }
+        }
+      }
+    }
+  }
+
+  // Some edges will be ramps, so undo some of the blocking.
+  const rampDirections = new Map<RampShape, DirectionBit>([
+    [RampShape.North, DirectionBit.North],
+    [RampShape.East, DirectionBit.East],
+    [RampShape.South, DirectionBit.South],
+    [RampShape.West, DirectionBit.West],
+  ]);
+
+  for (let ramp of ramps) {
+    const direction = rampDirections.get(ramp.shape)!;
+    const oppositeDirection = getOpposite(direction);
+
+    // The edge unblocks itself in one direction.
+    blockingGrid[ramp.y][ramp.x] &= ~oppositeDirection;
+
+    // Two of its cardinal neighbours are then also unblocked.
+    let neighbour = getNeighbourCoord(ramp.x, ramp.y, direction);
+    blockingGrid[neighbour.y][neighbour.x] &= ~oppositeDirection;
+    neighbour = getNeighbourCoord(ramp.x, ramp.y, oppositeDirection);
+    blockingGrid[neighbour.y][neighbour.x] &= ~direction;
+  }
+
+  return blockingGrid;
 }

@@ -1,5 +1,6 @@
 #include <array>
 #include <cstdint>
+#include <sstream>
 #include <unordered_map>
 #include <vector>
 
@@ -147,13 +148,18 @@ static constexpr auto offsets = std::to_array<Coord>({
   {-1, 0}, // W
 });
 
-Coord getOffset(Cardinal direction) {
+Coord offset(Cardinal direction) {
   return offsets[static_cast<uint8_t>(direction)];
 }
 
-Coord getNeighbour(Coord coord, Cardinal direction) {
+Coord get(Coord coord, Cardinal direction) {
   Coord offset = offsets[static_cast<uint8_t>(direction)];
-  return Coord(coord.x + offset.x, coord.y + offset.y)
+  return Coord(coord.x + offset.x, coord.y + offset.y);
+}
+
+Coord get(Coord coord, uint8_t direction) {
+  Coord offset = offsets[direction];
+  return Coord(coord.x + offset.x, coord.y + offset.y);
 }
 
 } // end neighbour
@@ -169,3 +175,12 @@ std::unique_ptr<RampContainer> findRamps(const TerraceGrid &terraceGrid,
                                          uint32_t extraDistance = 0);
 
 } // end terraform
+
+template<> struct std::hash<terraform::Coord> {
+  std::size_t operator()(const terraform::Coord& c) const noexcept {
+    basic_stringstream<char> ss;
+    ss << c.x << "," << c.y;
+    return std::hash<std::string>{}(ss.str());
+  }
+};
+
