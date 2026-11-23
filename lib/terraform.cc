@@ -11,7 +11,7 @@ float normaliseHeightGrid(HeightGrid& heightGrid, uint8_t numTerraces) {
   // Normalise heights, minimum = 0;
   float minHeight = 0;
   float maxHeight = 0;
-  for (uint32_t i = 0; i < heightGrid.height(); i++) {
+  for (uint32_t i = 0; i < heightGrid.depth(); i++) {
     const std::vector<float> &row = heightGrid.row(i);
     const float max = *std::max_element(row.begin(), row.end());
     const float min = *std::min_element(row.begin(), row.end());
@@ -20,7 +20,7 @@ float normaliseHeightGrid(HeightGrid& heightGrid, uint8_t numTerraces) {
   }
   if (minHeight < 0) {
     minHeight = std::abs(minHeight);
-    for (uint32_t i = 0; i < heightGrid.height(); i++) {
+    for (uint32_t i = 0; i < heightGrid.depth(); i++) {
       std::vector<float> &row = heightGrid.row(i);
       std::transform(row.begin(), row.end(), row.begin(), [&minHeight]
           (float h) { return h + minHeight; });
@@ -32,12 +32,12 @@ float normaliseHeightGrid(HeightGrid& heightGrid, uint8_t numTerraces) {
 
 TerraceGrid buildTerraceGrid(const HeightGrid& heightGrid,
                              uint32_t terraceSpacing) {
-  TerraceGrid terraceGrid(heightGrid.width(), heightGrid.height());
+  TerraceGrid terraceGrid(heightGrid.width(), heightGrid.depth());
 
-  for (uint32_t i = 0; i < terraceGrid.height(); i++) {
+  for (uint32_t i = 0; i < terraceGrid.depth(); i++) {
     const std::vector<float> &heightRow = heightGrid.row(i);
     std::vector<uint8_t> &terraceRow = terraceGrid.row(i);
-    std::transform(heightRow.begin(), heightRow.end(), terraceRow.begin(),
+    std::transform(depthRow.begin(), depthRow.end(), terraceRow.begin(),
         [&terraceSpacing](float surfaceHeight) {
           return std::floor(surfaceHeight / terraceSpacing);
         });
@@ -47,7 +47,7 @@ TerraceGrid buildTerraceGrid(const HeightGrid& heightGrid,
 
 EdgeContainer findEdges(TerraceGrid& terraceGrid) {
   const uint32_t maxX = terraceGrid.width();
-  const uint32_t maxY = terraceGrid.height();
+  const uint32_t maxY = terraceGrid.depth();
 
   EdgeContainer edges;
 
@@ -105,7 +105,7 @@ RampContainer findRamps(const TerraceGrid& terraceGrid,
   const uint32_t minX = distance;
   const uint32_t minY = distance;
   const uint32_t maxX = terraceGrid.width() - distance;
-  const uint32_t maxY = terraceGrid.height() - distance;
+  const uint32_t maxY = terraceGrid.depth() - distance;
   RampContainer ramps;
 
   auto avoidEdgeAt = [&edges](uint32_t x, uint32_t y) {
@@ -255,7 +255,7 @@ BlockingGrid buildBlockingGrid(
   uint32_t blockingUpHeight,
   uint32_t blockingDownHeight) {
   // Initialise new grid
-  BlockingGrid blockingGrid(terraceGrid.width(), terraceGrid.height());
+  BlockingGrid blockingGrid(terraceGrid.width(), terraceGrid.depth());
 
   // Top edge
   for (uint32_t x = 0; x < blockingGrid.width(); ++x) {
@@ -266,21 +266,21 @@ BlockingGrid buildBlockingGrid(
   }
   // Bottom edge
   for (uint32_t x = 0; x < blockingGrid.width(); ++x) {
-    uint32_t y = blockingGrid.height() - 1;
+    uint32_t y = blockingGrid.depth() - 1;
     blockingGrid.at(x, y) |=
       direction::u8(direction::Bit::South) |
       direction::u8(direction::Bit::SouthWest) |
       direction::u8(direction::Bit::SouthEast);
   }
   // Left edge
-  for (uint32_t y = 0; y < blockingGrid.height(); ++y) {
+  for (uint32_t y = 0; y < blockingGrid.depth(); ++y) {
     blockingGrid.at(0, y) |=
       direction::u8(direction::Bit::West) |
       direction::u8(direction::Bit::NorthWest) |
       direction::u8(direction::Bit::SouthWest);
   }
   // Right edge
-  for (uint32_t y = 0; y < blockingGrid.height(); ++y) {
+  for (uint32_t y = 0; y < blockingGrid.depth(); ++y) {
     uint32_t x = blockingGrid.width() - 1;
     blockingGrid.at(x, y) |=
       direction::u8(direction::Bit::East) |
@@ -298,7 +298,7 @@ BlockingGrid buildBlockingGrid(
             edge::blockingCardinals[edge::u8(shape)]) {
       Coord cardinalNeighbour = neighbour::get(coord, cardinal);
       uint32_t edgeHeight = terraceGrid.at(coord);
-      assert(terraceGrid.height() > cardinalNeighbour.y);
+      assert(terraceGrid.depth() > cardinalNeighbour.y);
       assert(terraceGrid.width() > cardinalNeighbour.x);
       uint32_t neighbourHeight = terraceGrid.at(cardinalNeighbour);
       int32_t heightDiff = edgeHeight - neighbourHeight;
@@ -357,4 +357,70 @@ BlockingGrid buildBlockingGrid(
   }
 
   return blockingGrid;
+}
+
+std::optional<std::vector<Coord>>
+findPath(Coord start, Coord end, BlockingGrid& blockingGrid) {
+  if (start == end) return {};
+
+  auto isCompletelyBlocked = [&blockingGrid](Coord coord) {
+    assert(y >= 0 && y < blockingGrid.depth());
+    assert(x >= 0 && x < blockingGrid.width());
+    return blockingGrid.at(x, y) == 255;
+  };
+
+  if (isCompletelyBlocked(start) || isCompletelyBlocked(end)) {
+    return {};
+  }
+
+  auto isNeighbourAccessible = [&blockingGrid](Coord coord,
+                                               direction::Bit direction) {
+    assert(y >= 0 && y < grid.depth());
+    assert(x >= 0 && x < grid.width());
+    return (grid.at(x, y) & direction::u8(direction)) == 0;
+  }
+
+  // https://www.redblobgames.com/pathfinding/a-star/introduction.html
+  const frontier = new MinPriorityQueue<number>();
+  const cameFrom = std::unordered_map<uint32_t, uint32_t>();
+  const costs = std::unordered_map<uint32_t, uint32_t>();
+  const startId = blockingGrid.id(start);
+  const endId = blockingGrid.id(end);
+  frontier.insert(startId, 0);
+  cameFrom.set(startId, null);
+  costs.set(startId, 0);
+
+  uint32_t currentId = startId;
+  while (!frontier.empty()) {
+    currentId = frontier.pop();
+    if (currentId == endId) break;
+
+    const current = blockingGrid.coord(currentId);
+    for (direction::Bit direction : direction::all) {
+      if (isNeighbourAccessible(current, direction)) {
+        const nextCoord = neighbour::get(current, direction);
+        const nextId = blockingGrid.id(nextCoord);
+        // TODO: ramps should cost more.
+        const cost = isDiagonal(direction) ? 3 : 2;
+        const new_cost = costs.get(currentId)! + cost;
+        if (!costs.has(nextId) || new_cost < costs.get(nextId)!) {
+          costs.set(nextId, new_cost);
+          const priority = new_cost; // + heuristic(goal, next)
+          frontier.insert(nextId, priority);
+          cameFrom.set(nextId, currentId);
+        }
+      }
+    }
+  }
+
+  // Failed to find path.
+  if (currentId != endId) return {}
+
+  const path = new Array<Coord>(coord(currentId));
+  while (currentId != startId) {
+    currentId = cameFrom.get(currentId!)!;
+    path.push(coord(currentId));
+  }
+  path.reverse();
+  return path.splice(1);
 }

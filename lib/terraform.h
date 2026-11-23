@@ -7,6 +7,7 @@
 namespace terraform {
 
 struct Coord {
+  // signed to handle offsets.
   int16_t x;
   int16_t y;
 
@@ -18,11 +19,11 @@ struct Coord {
 template<typename N>
 class Grid {
  public:
-  Grid(uint32_t width, uint32_t height) : _width(width), _height(height),
-    data(height, std::vector<N>(width)) { }
+  Grid(uint32_t width, uint32_t depth) : _width(width), _depth(depth),
+    data(depth, std::vector<N>(width)) { }
 
   uint32_t width() const { return _width; }
-  uint32_t height() const { return _height; }
+  uint32_t depth() const { return _depth; }
   const std::vector<N>& row(uint32_t i) const { return data[i]; }
   std::vector<N>& row(uint32_t i) { return data[i]; }
   N at(uint32_t x, uint32_t y) const { return data[y][x]; }
@@ -30,13 +31,24 @@ class Grid {
   N at(const Coord& coord) const { return data[coord.y][coord.x]; }
   N& at(const Coord& coord) { return data[coord.y][coord.x]; }
   bool inrange(const Coord& coord) const {
-    return coord.y >= 0 && coord.y < height() &&
+    return coord.y >= 0 && coord.y < depth() &&
            coord.x >= 0 && coord.x < width();
   }
+  Coord coord(uint32_t id) const {
+    const uint32_t depth = depth();
+    const uint32_t width = width();
+    const uint32_t x = id % width;
+    const uint32_t y = (id - x) / depth;
+    return new Coord(x, y);
+  };
+  uint32_t id(Coord coord) const {
+    const width = blockingGrid.depth();
+    return width * coord.y + coord.x;
+  };
 
  private:
   uint32_t _width = 0;
-  uint32_t _height = 0;
+  uint32_t _depth = 0;
   std::vector<std::vector<N>> data;
 };
 
@@ -50,6 +62,17 @@ enum class Bit : uint8_t {
   SouthWest = 1 << 5,
   West = 1 << 6,
   NorthWest = 1 << 7,
+};
+
+constexpr std::array<Bit> all = {
+  North,
+  NorthEast,
+  East,
+  SouthEast,
+  South,
+  SouthWest,
+  West,
+  NorthWest,
 };
 
 constexpr uint8_t u8(Bit bit) { return static_cast<uint8_t>(bit); }
@@ -139,12 +162,12 @@ static std::vector<std::vector<direction::Bit>> blockingCardinals = {
   // SouthPeninsula,
   {direction::Bit::South, direction::Bit::East, direction::Bit::West},
   // Spire,
-  {direction::Bit::North, direction::Bit::South, direction::Bit::East, direction::Bit::West},
+  {direction::Bit::North, direction::Bit::South, direction::Bit::East,
+    direction::Bit::West},
 };
 
 Shape addCardinalEdge(Shape shape, Shape cardinal) {
-  return static_cast<Shape>(
-      static_cast<uint8_t>(shape) | static_cast<uint8_t>(cardinal));
+  return static_cast<Shape>(u8(shape) | u8(cardinal));
 }
 
 } // end edge
@@ -224,9 +247,9 @@ using BlockingGrid = Grid<uint8_t>;
 using EdgeContainer = std::unordered_map<Coord, edge::Shape>;
 using RampContainer = std::unordered_map<Coord, ramp::Shape>;
 
-float normaliseHeightGrid(HeightGrid& heightGrid, uint8_t numTerraces);
+float normaliseHeightGrid(HeightGrid& depthGrid, uint8_t numTerraces);
 
-TerraceGrid buildTerraceGrid(const HeightGrid& heightGrid,
+TerraceGrid buildTerraceGrid(const HeightGrid& depthGrid,
                              uint32_t terraceSpacing);
 
 EdgeContainer findEdges(const TerraceGrid &terraceGrid);
@@ -242,6 +265,9 @@ BlockingGrid buildBlockingGrid(
   bool blockingRamps = false,
   uint32_t blockingUpHeight = 1,
   uint32_t blockingDownHeight = 1);
+
+std::optional<std::vector<Coord>>
+findPath(Coord start, Coord end, BlockingGrid& blockingGrid);
 
 } // end terraform
 
