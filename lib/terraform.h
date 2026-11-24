@@ -1,4 +1,5 @@
 #include <array>
+#include <cassert>
 #include <cstdint>
 #include <sstream>
 #include <unordered_map>
@@ -19,36 +20,47 @@ struct Coord {
 template<typename N>
 class Grid {
  public:
-  Grid(uint32_t width, uint32_t depth) : _width(width), _depth(depth),
+  Grid(int16_t width, int16_t depth) : _width(width), _depth(depth),
     data(depth, std::vector<N>(width)) { }
 
-  uint32_t width() const { return _width; }
-  uint32_t depth() const { return _depth; }
+  int16_t width() const { return _width; }
+  int16_t depth() const { return _depth; }
   const std::vector<N>& row(uint32_t i) const { return data[i]; }
   std::vector<N>& row(uint32_t i) { return data[i]; }
-  N at(uint32_t x, uint32_t y) const { return data[y][x]; }
-  N& at(uint32_t x, uint32_t y) { return data[y][x]; }
-  N at(const Coord& coord) const { return data[coord.y][coord.x]; }
-  N& at(const Coord& coord) { return data[coord.y][coord.x]; }
+  N at(uint32_t x, uint32_t y) const {
+    assert(inrange(Coord(x, y)));
+    return data[y][x];
+  }
+  N& at(uint32_t x, uint32_t y) {
+    assert(inrange(Coord(x, y)));
+    return data[y][x];
+  }
+  N at(const Coord& coord) const {
+    assert(inrange(coord));
+    return data[coord.y][coord.x];
+  }
+  N& at(const Coord& coord) {
+    assert(inrange(coord));
+    return data[coord.y][coord.x];
+  }
   bool inrange(const Coord& coord) const {
     return coord.y >= 0 && coord.y < depth() &&
            coord.x >= 0 && coord.x < width();
   }
   Coord coord(uint32_t id) const {
-    const uint32_t depth = depth();
-    const uint32_t width = width();
-    const uint32_t x = id % width;
-    const uint32_t y = (id - x) / depth;
-    return new Coord(x, y);
+    const uint32_t x = id % width();
+    const uint32_t y = (id - x) / depth();
+    assert((x & 0xFFFF) == x);
+    assert((y & 0xFFFF) == y);
+    return Coord(x, y);
   };
   uint32_t id(Coord coord) const {
-    const width = blockingGrid.depth();
-    return width * coord.y + coord.x;
+    return width() * coord.y + coord.x;
   };
 
  private:
-  uint32_t _width = 0;
-  uint32_t _depth = 0;
+  int16_t _width = 0;
+  int16_t _depth = 0;
   std::vector<std::vector<N>> data;
 };
 
@@ -64,16 +76,16 @@ enum class Bit : uint8_t {
   NorthWest = 1 << 7,
 };
 
-constexpr std::array<Bit> all = {
-  North,
-  NorthEast,
-  East,
-  SouthEast,
-  South,
-  SouthWest,
-  West,
-  NorthWest,
-};
+constexpr std::array all = std::to_array<Bit>({
+  Bit::North,
+  Bit::NorthEast,
+  Bit::East,
+  Bit::SouthEast,
+  Bit::South,
+  Bit::SouthWest,
+  Bit::West,
+  Bit::NorthWest,
+});
 
 constexpr uint8_t u8(Bit bit) { return static_cast<uint8_t>(bit); }
 

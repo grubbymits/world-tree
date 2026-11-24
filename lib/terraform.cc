@@ -1,6 +1,5 @@
 #include "terraform.h"
 
-#include <cassert>
 #include <cstdint>
 #include <numeric>
 #include <unordered_map>
@@ -37,7 +36,7 @@ TerraceGrid buildTerraceGrid(const HeightGrid& heightGrid,
   for (uint32_t i = 0; i < terraceGrid.depth(); i++) {
     const std::vector<float> &heightRow = heightGrid.row(i);
     std::vector<uint8_t> &terraceRow = terraceGrid.row(i);
-    std::transform(depthRow.begin(), depthRow.end(), terraceRow.begin(),
+    std::transform(heightRow.begin(), heightRow.end(), terraceRow.begin(),
         [&terraceSpacing](float surfaceHeight) {
           return std::floor(surfaceHeight / terraceSpacing);
         });
@@ -364,9 +363,7 @@ findPath(Coord start, Coord end, BlockingGrid& blockingGrid) {
   if (start == end) return {};
 
   auto isCompletelyBlocked = [&blockingGrid](Coord coord) {
-    assert(y >= 0 && y < blockingGrid.depth());
-    assert(x >= 0 && x < blockingGrid.width());
-    return blockingGrid.at(x, y) == 255;
+    return blockingGrid.at(coord) == 255;
   };
 
   if (isCompletelyBlocked(start) || isCompletelyBlocked(end)) {
@@ -375,20 +372,22 @@ findPath(Coord start, Coord end, BlockingGrid& blockingGrid) {
 
   auto isNeighbourAccessible = [&blockingGrid](Coord coord,
                                                direction::Bit direction) {
-    assert(y >= 0 && y < grid.depth());
-    assert(x >= 0 && x < grid.width());
-    return (grid.at(x, y) & direction::u8(direction)) == 0;
-  }
+    return (blockingGrid.at(coord) & direction::u8(direction)) == 0;
+  };
 
   // https://www.redblobgames.com/pathfinding/a-star/introduction.html
-  const frontier = new MinPriorityQueue<number>();
-  const cameFrom = std::unordered_map<uint32_t, uint32_t>();
-  const costs = std::unordered_map<uint32_t, uint32_t>();
-  const startId = blockingGrid.id(start);
-  const endId = blockingGrid.id(end);
-  frontier.insert(startId, 0);
-  cameFrom.set(startId, null);
-  costs.set(startId, 0);
+  using QueueNode = std::pair<uint32_t, uint32_t>; 
+  std::priority_queue<QueueNode> frontier;
+
+  constexpr uint32_t kSentinal = 0xFFFFFFFF;
+  std::unordered_map<uint32_t, uint32_t>cameFrom;
+  std::unordered_map<uint32_t, uint32_t> costs;
+
+  uint32_t startId = blockingGrid.id(start);
+  uint32_t endId = blockingGrid.id(end);
+  frontier.emplace(startId, 0);
+  cameFrom[startId] = kSentinal;
+  costs[startId] = 0;
 
   uint32_t currentId = startId;
   while (!frontier.empty()) {
@@ -401,13 +400,13 @@ findPath(Coord start, Coord end, BlockingGrid& blockingGrid) {
         const nextCoord = neighbour::get(current, direction);
         const nextId = blockingGrid.id(nextCoord);
         // TODO: ramps should cost more.
-        const cost = isDiagonal(direction) ? 3 : 2;
-        const new_cost = costs.get(currentId)! + cost;
-        if (!costs.has(nextId) || new_cost < costs.get(nextId)!) {
-          costs.set(nextId, new_cost);
-          const priority = new_cost; // + heuristic(goal, next)
-          frontier.insert(nextId, priority);
-          cameFrom.set(nextId, currentId);
+        uint32_t cost = isDiagonal(direction) ? 3 : 2;
+        uint32_t new_cost = costs[currentId] + cost;
+        if (!costs.count(nextId) || new_cost < costs[nextId]) {
+          costs[nextId] = new_cost;
+          uint32_t priority = new_cost; // + heuristic(goal, next)
+          frontier.emplace(nextId, priority);
+          cameFrom[nextId] = currentId;
         }
       }
     }
@@ -416,11 +415,12 @@ findPath(Coord start, Coord end, BlockingGrid& blockingGrid) {
   // Failed to find path.
   if (currentId != endId) return {}
 
-  const path = new Array<Coord>(coord(currentId));
+  std::vector<Coord> path(blockingGrid.coord(currentId));
   while (currentId != startId) {
-    currentId = cameFrom.get(currentId!)!;
-    path.push(coord(currentId));
+    currentId = cameFrom[currentId];
+    path.push_back(blockingGrid.coord(currentId));
   }
-  path.reverse();
-  return path.splice(1);
+  path.pop_back();
+  std::reverse(path);
+  return path;
 }
